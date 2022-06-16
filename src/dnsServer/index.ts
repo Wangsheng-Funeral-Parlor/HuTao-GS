@@ -1,0 +1,203 @@
+import { join } from 'path'
+import { cwd } from 'process'
+import Tcp, { AddressInfo } from 'net'
+import * as dgram from 'dgram'
+import EventEmitter from 'promise-events'
+import Logger from '@/logger'
+import { cRGB } from '@/tty'
+import DnsPacket, { PacketQuestion, ResA, ResCNAME, ResHTTPS } from './packet'
+import { listAnswer, readStream } from './utils'
+import NameServer from './nameserver'
+import { NAME_TO_QTYPE, QTYPE_TO_NAME } from './packet/consts'
+import GlobalState from '@/globalState'
+import config from '@/config'
+import { writeFile } from '@/utils/fileSystem'
+
+const logger = new Logger('DNSSRV', 0xfc9c14)
+
+export default class DnsServer extends EventEmitter {
+  globalState: GlobalState
+
+  private tcp: Tcp.Server
+  private udp: dgram.Socket
+
+  private nsMap: { [address: string]: NameServer }
+
+  constructor(globalState: GlobalState) {
+    super()
+
+    this.globalState = globalState
+
+    this.tcp = new Tcp.Server()
+    this.udp = dgram.createSocket('udp4')
+
+    this.nsMap = {}
+
+    this.handleTcpConnection = this.handleTcpConnection.bind(this)
+    this.handleUdpMessage = this.handleUdpMessage.bind(this)
+
+    this.tcp.on('connection', this.handleTcpConnection)
+    this.tcp.on('error', err => logger.error('TCP err:', err))
+
+    this.udp.on('message', this.handleUdpMessage)
+    this.udp.on('error', err => logger.error('UDP err:', err))
+  }
+
+  start(): void {
+    let listening = 0
+
+    this.tcp.listen(config.dnsPort, () => {
+      logger.debug('[TCP]', `Listening on port ${cRGB(0xffffff, this.tcpAddress().port.toString())}`)
+      if (++listening >= 2) this.emit('listening')
+    })
+
+    this.udp.bind(config.dnsPort, () => {
+      logger.debug('[UDP]', `Listening on port ${cRGB(0xffffff, this.udpAddress().port.toString())}`)
+      if (++listening >= 2) this.emit('listening')
+    })
+  }
+
+  stop(): void {
+    const { nsMap, tcp, udp } = this
+
+    for (let addr in nsMap) {
+      nsMap[addr].destroy()
+      delete nsMap[addr]
+    }
+
+    tcp.close()
+    udp.close()
+  }
+
+  tcpAddress(): AddressInfo {
+    return this.tcp.address() as AddressInfo
+  }
+
+  udpAddress(): AddressInfo {
+    return this.udp.address()
+  }
+
+  private async handleTcpConnection(client: Tcp.Socket) {
+    try {
+      const msg = await readStream(client)
+      const rsp = await this.processQuery(msg)
+
+      if (rsp == null) {
+        client.end()
+        return
+      }
+
+      const len = Buffer.alloc(2)
+      len.writeUInt16BE(rsp.length)
+
+      client.end(Buffer.concat([len, rsp]))
+    } catch (err) {
+      logger.error('TCP error:', err)
+    }
+  }
+
+  private async handleUdpMessage(msg: Buffer, rinfo: dgram.RemoteInfo) {
+    const { udp } = this
+    const { address, port } = rinfo
+
+    const rsp = await this.processQuery(msg)
+    if (rsp == null) return
+
+    udp.send(rsp, 0, rsp.length, port, address)
+  }
+
+  async processQuery(msg: Buffer): Promise<Buffer> {
+    const { domains, nameservers } = config
+
+    try {
+      if (msg.length === 0) return null
+
+      const query = DnsPacket.parse(msg)
+      if (query.question.length === 0) return null
+
+      const { name, type } = query.question[0]
+      const typeName = QTYPE_TO_NAME[type] || type
+
+      logger.verbose(`Qry: ${name} (${typeName})`)
+
+      for (let domain in domains) {
+        const index = name.indexOf(domain)
+        if (index === -1 || index !== (name.length - domain.length) || name.indexOf('autopatchhk.') === 0) continue
+
+        this.createResponse(query, query.question[0], domain)
+
+        const rsp = DnsPacket.write(query, 1024)
+        logger.verbose(`RdRsp: [DM]:${name} [ANS]:${listAnswer(rsp)}`)
+        return rsp
+      }
+
+      for (let ns of nameservers) {
+        const rsp = await this.queryNS(ns, query.header.id, false, msg)
+        if (rsp == null) continue
+
+        logger.verbose(`NsRsp: [NS]:${ns} [QRY]:${name} [TYP]:${typeName} [ANS]:${listAnswer(rsp)}`)
+        return rsp
+      }
+
+      logger.verbose(`NoRsp: [QRY]:${name} [TYP]:${typeName}`)
+
+      query.header.qr = 1
+      query.header.rd = 1
+      query.header.ra = 1
+
+      return DnsPacket.write(query, 1024)
+    } catch (err) {
+      if ((<Error>err).name === 'RangeError') return null
+
+      logger.error('Error:', (<Error>err).message)
+      try { await writeFile(join(cwd(), 'data/log/dump', `dns-${Date.now()}.bin`), msg) } catch (_err) { }
+    }
+
+    return null
+  }
+
+  queryNS(nsAddress: string, id: number, useTcp: boolean, msg: Buffer): Promise<Buffer> {
+    const { nsMap } = this
+
+    const address = nsAddress.split(':')
+    const ip = address[0]
+    const port = parseInt(address[1]) || 53
+
+    const ns = nsMap[nsAddress] || new NameServer(this, ip, port)
+    if (nsMap[nsAddress] == null) nsMap[nsAddress] = ns
+
+    return ns.query(id, useTcp, msg)
+  }
+
+  createResponse(packet: DnsPacket, question: PacketQuestion, domain: string) {
+    const { domains } = config
+    const { header, answer } = packet
+    const { name, type } = question
+
+    header.qr = 1
+    header.rd = 1
+    header.ra = 1
+
+    const resCNAME = new ResCNAME(name)
+    resCNAME.name = name
+    resCNAME.ttl = 30
+    answer.push(resCNAME)
+
+    switch (type) {
+      case NAME_TO_QTYPE.A: {
+        const resA = new ResA(domains[domain] || config.hostIp)
+        resA.name = name
+        resA.ttl = 30
+        answer.push(resA)
+        break
+      }
+      case NAME_TO_QTYPE.HTTPS: {
+        const resHTTPS = new ResHTTPS(1, name)
+        resHTTPS.name = name
+        resHTTPS.ttl = 30
+        answer.push(resHTTPS)
+        break
+      }
+    }
+  }
+}

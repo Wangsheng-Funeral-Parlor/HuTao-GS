@@ -1,0 +1,14 @@
+/buildDev
+/buildRel
+/cache
+/captures
+/config-ph.json
+/config.json
+/data
+/desktop.ini
+/dist
+/icon.webp
+/node_modules
+/package-lock.json
+/ssl
+/webstaticSea

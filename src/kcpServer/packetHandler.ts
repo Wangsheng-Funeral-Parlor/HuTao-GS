@@ -1,0 +1,91 @@
+import dataUtil from '#/utils/dataUtils'
+import ProtoMatch from '#/protomatch'
+import KcpServer from '.'
+import Logger from '@/logger'
+import { PacketInterface, PacketContext } from './packet'
+import { ClientState } from '@/types/enum/state'
+
+const logger = new Logger('PACKET', 0x8810cd)
+
+export default class PacketHandler {
+  private server: KcpServer
+  private ptm: ProtoMatch
+
+  private instances: { [name: string]: PacketInterface }
+
+  constructor(server: KcpServer) {
+    this.server = server
+    this.ptm = new ProtoMatch()
+
+    this.instances = {}
+  }
+
+  private async getPacket(name: string): Promise<PacketInterface> {
+    const { instances } = this
+
+    if (!instances[name]) {
+      instances[name] = (await import(`./packets/${name}`)).default as PacketInterface
+    }
+
+    return instances[name]
+  }
+
+  private parsePacketName(packetName: string): { name: string, type: string } {
+    const [name, type] = packetName.match(/(^.*)([A-Z].*$)/).slice(1)
+    return { name, type }
+  }
+
+  private unknownPacket(packetData: Buffer, packetID: number): void {
+    logger.warn('Unknown packet:', packetID)
+
+    const { UseProtoMatch } = this.server.globalState.state
+
+    if (!UseProtoMatch) return
+
+    logger.debug('ProtoMatch:', packetID, this.ptm.parseBuffer(packetData), JSON.stringify(this.ptm.findProto(packetData), null, 2))
+  }
+
+  async handle(packetID: number, packetName: string, packetData: Buffer, context: PacketContext, ...any: any[]): Promise<void> {
+    // Unknown packet
+    if (packetID === parseInt(packetName)) return this.unknownPacket(packetData, packetID)
+
+    try {
+      const { name, type } = this.parsePacketName(packetName)
+      const packet = await this.getPacket(name)
+      const {
+        reqState, reqStatePass, reqStateMask,
+        notifyState, notifyStatePass, notifyStateMask,
+        reqWaitState, reqWaitStatePass, reqWaitStateMask,
+        notifyWaitState, notifyWaitStatePass, notifyWaitStateMask
+      } = packet
+
+      const state = {
+        'Req': [
+          reqState, reqStatePass, reqStateMask,
+          reqWaitState, reqWaitStatePass, reqWaitStateMask
+        ],
+        'Notify': [
+          notifyState, notifyStatePass, notifyStateMask,
+          notifyWaitState, notifyWaitStatePass, notifyWaitStateMask
+        ]
+      }[type] as [ClientState, boolean, number, ClientState, boolean, number]
+
+      const data = await dataUtil.dataToProtobuffer(packetData, packetID)
+
+      if (state == null || !packet.checkState(context, state[0], state[1], state[2])) return
+      await packet.waitState(context, state[3], state[4], state[5])
+
+      switch (type) {
+        case 'Req':
+          await packet.request(context, data, ...any)
+          break
+        case 'Notify':
+          await packet.recvNotify(context, data, ...any)
+          break
+      }
+    } catch (err) {
+      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('No handler for packet:', this.server.globalState.state.ShowPacketId ? packetID : '-', packetName)
+      else logger.error('Error handling packet:', err)
+    }
+  }
+}

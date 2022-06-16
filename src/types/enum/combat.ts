@@ -1,0 +1,6 @@
+export enum HitColliderTypeEnum {
+  HIT_COLLIDER_INVALID = 0,
+  HIT_COLLIDER_HIT_BOX = 1,
+  HIT_COLLIDER_WET_HIT_BOX = 2,
+  HIT_COLLIDER_HEAD_BOX = 3
+}
