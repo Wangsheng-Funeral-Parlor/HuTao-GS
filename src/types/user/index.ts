@@ -19,6 +19,7 @@ export default interface UserData {
   teamData: TeamManagerUserData
   flycloakDataList: FlycloakUserData[]
   costumeDataList: CostumeUserData[]
+  emojiIdList: number[]
   worldData: WorldUserData
   gameTime: number
 }

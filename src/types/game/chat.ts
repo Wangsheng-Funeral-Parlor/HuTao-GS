@@ -1,5 +1,9 @@
 import { SystemHintTypeEnum } from '../enum/chat'
 
+export interface ChatEmojiCollectionData {
+  emojiIdList: number[]
+}
+
 export interface ChatInfo {
   text?: string
   icon?: number

@@ -53,6 +53,7 @@ export default class Player extends BaseClass {
   avatarList: Avatar[]
   flycloakList: FlycloakData[]
   costumeList: CostumeData[]
+  emojiCollection: number[]
 
   hostWorld: World
   currentWorld: World
@@ -103,6 +104,7 @@ export default class Player extends BaseClass {
     this.avatarList = []
     this.flycloakList = []
     this.costumeList = []
+    this.emojiCollection = []
 
     this.loadedEntityIdList = []
 
@@ -206,6 +208,7 @@ export default class Player extends BaseClass {
       teamData,
       flycloakDataList,
       costumeDataList,
+      emojiIdList,
       gameTime
     } = userData || {}
 
@@ -224,13 +227,14 @@ export default class Player extends BaseClass {
 
     teamManager.init(teamData)
 
-    this.flycloakList = flycloakDataList.map(data => ({
+    this.flycloakList = (flycloakDataList || []).map(data => ({
       Id: data.id
     }))
-    this.costumeList = costumeDataList.map(data => ({
+    this.costumeList = (costumeDataList || []).map(data => ({
       Id: data.id,
       AvatarId: data.avatarId
     }))
+    this.emojiCollection = (emojiIdList || []).filter(id => !isNaN(id))
 
     hostWorld.init(worldData)
 
@@ -588,6 +592,7 @@ export default class Player extends BaseClass {
       avatarList,
       flycloakList,
       costumeList,
+      emojiCollection,
       gameTime
     } = this
 
@@ -607,6 +612,7 @@ export default class Player extends BaseClass {
         id: costume.Id,
         avatarId: costume.AvatarId
       })),
+      emojiIdList: emojiCollection,
       worldData: hostWorld.exportUserData(),
       gameTime
     }
