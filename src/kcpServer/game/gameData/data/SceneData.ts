@@ -1,7 +1,7 @@
 import Loader from '$/gameData/loader'
-import PointConfig from '@/types/data/BinOutput/ScenePoint/Point'
-import DungeonEntry from '@/types/data/BinOutput/ScenePoint/Point/DungeonEntry'
-import SceneDataList, { SceneData } from '@/types/data/SceneData'
+import PointConfig from '@/types/gameData/BinOutput/ScenePoint/Point'
+import DungeonEntry from '@/types/gameData/BinOutput/ScenePoint/Point/DungeonEntry'
+import SceneDataList, { SceneData } from '@/types/gameData/SceneData'
 
 class SceneDataLoader extends Loader {
   declare data: SceneDataList

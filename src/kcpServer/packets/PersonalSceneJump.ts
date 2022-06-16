@@ -4,7 +4,7 @@ import { RetcodeEnum } from '@/types/enum/retcode'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
 import { VectorInterface } from '@/types/game/motion'
 import SceneData from '$/gameData/data/SceneData'
-import PersonalSceneJumpPoint from '@/types/data/BinOutput/ScenePoint/Point/PersonalSceneJumpPoint'
+import PersonalSceneJumpPoint from '@/types/gameData/BinOutput/ScenePoint/Point/PersonalSceneJumpPoint'
 import { ClientState } from '@/types/enum/state'
 
 export interface PersonalSceneJumpReq {

@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import WorldDataList, { WorldData } from '@/types/data/WorldData'
+import WorldDataList, { WorldData } from '@/types/gameData/WorldData'
 
 class WorldDataLoader extends Loader {
   declare data: WorldDataList

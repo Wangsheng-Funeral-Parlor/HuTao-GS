@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import MapAreaDataList, { MapAreaData } from '@/types/data/MapAreaData'
+import MapAreaDataList, { MapAreaData } from '@/types/gameData/MapAreaData'
 
 class MapAreaDataLoader extends Loader {
   declare data: MapAreaDataList

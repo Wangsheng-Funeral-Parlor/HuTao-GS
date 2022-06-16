@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import DungeonDataGroup, { DungeonData } from '@/types/data/DungeonData'
+import DungeonDataGroup, { DungeonData } from '@/types/gameData/DungeonData'
 
 class DungeonDataLoader extends Loader {
   declare data: DungeonDataGroup

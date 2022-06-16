@@ -1,5 +1,5 @@
 import Vector from '$/utils/vector'
-import { SceneData } from '@/types/data/SceneData'
+import { SceneData } from '@/types/gameData/SceneData'
 import { ClientState } from '@/types/enum/state'
 import { LastStateUserData } from '@/types/user/WorldUserData'
 import World from '.'

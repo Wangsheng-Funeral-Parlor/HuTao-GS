@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import ShopDataList, { ShopData } from '@/types/data/ShopData'
+import ShopDataList, { ShopData } from '@/types/gameData/ShopData'
 
 class ShopDataLoader extends Loader {
   declare data: ShopDataList

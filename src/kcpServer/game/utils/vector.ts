@@ -1,4 +1,4 @@
-import DataVector from '@/types/data/BinOutput/Common/Vector'
+import DataVector from '@/types/gameData/BinOutput/Common/Vector'
 import { VectorInterface } from '@/types/game/motion'
 
 export default class Vector {

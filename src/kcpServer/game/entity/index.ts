@@ -14,7 +14,7 @@ import { SceneGadgetInfo } from '@/types/game/gadget'
 import { SceneMonsterInfo } from '@/types/game/monster'
 import { SceneNpcInfo } from '@/types/game/npc'
 import LifeStateChange from '#/packets/LifeStateChange'
-import { CurveExcelConfig } from '@/types/data/ExcelBinOutput/CurveExcelConfig'
+import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
 import EntityUserData from '@/types/user/EntityUserData'
 
 export default class Entity extends BaseClass {

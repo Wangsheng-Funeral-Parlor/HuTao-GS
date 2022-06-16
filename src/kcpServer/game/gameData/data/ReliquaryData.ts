@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import ReliquaryDataGroup, { ReliquaryAffixData, ReliquaryData, ReliquaryMainPropData } from '@/types/data/ReliquaryData'
+import ReliquaryDataGroup, { ReliquaryAffixData, ReliquaryData, ReliquaryMainPropData } from '@/types/gameData/ReliquaryData'
 
 class ReliquaryDataLoader extends Loader {
   declare data: ReliquaryDataGroup

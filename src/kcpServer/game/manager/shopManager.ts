@@ -1,6 +1,6 @@
 import ShopData from '$/gameData/data/ShopData'
 import Player from '$/player'
-import { ShopData as ShopDataType } from '@/types/data/ShopData'
+import { ShopData as ShopDataType } from '@/types/gameData/ShopData'
 import { Shop, ShopCardProduct, ShopGoods } from '@/types/game/shop'
 import Game from '..'
 

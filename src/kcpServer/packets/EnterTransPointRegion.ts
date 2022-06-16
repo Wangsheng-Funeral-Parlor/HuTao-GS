@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
-import SceneTransPoint from '@/types/data/BinOutput/ScenePoint/Point/SceneTransPoint'
+import SceneTransPoint from '@/types/gameData/BinOutput/ScenePoint/Point/SceneTransPoint'
 import { ClientState } from '@/types/enum/state'
 
 export interface EnterTransPointRegionNotify {

@@ -1,4 +1,4 @@
-import FetterConfig from '@/types/data/ExcelBinOutput/Common/FetterConfig'
+import FetterConfig from '@/types/gameData/ExcelBinOutput/Common/FetterConfig'
 import { FetterStateEnum } from '@/types/enum/avatar'
 import { PlayerPropEnum } from '@/types/enum/player'
 import { FetterInfo } from '@/types/game/avatar'

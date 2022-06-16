@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import SkillDataGroup, { SkillDepotData, SkillData, ProudSkillData, TalentData } from '@/types/data/SkillData'
+import SkillDataGroup, { SkillDepotData, SkillData, ProudSkillData, TalentData } from '@/types/gameData/SkillData'
 
 class SkillDataLoader extends Loader {
   declare data: SkillDataGroup

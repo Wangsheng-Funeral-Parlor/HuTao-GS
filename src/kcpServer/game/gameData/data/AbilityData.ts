@@ -1,6 +1,6 @@
 import Loader from '$/gameData/loader'
-import AbilityData from '@/types/data/AbilityData'
-import ConfigAbilityConfig from '@/types/data/BinOutput/ConfigAbility'
+import AbilityData from '@/types/gameData/AbilityData'
+import ConfigAbilityConfig from '@/types/gameData/BinOutput/ConfigAbility'
 
 class AbilityDataLoader extends Loader {
   declare data: {

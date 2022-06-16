@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import MaterialDataList, { MaterialData } from '@/types/data/MaterialData'
+import MaterialDataList, { MaterialData } from '@/types/gameData/MaterialData'
 
 class MaterialDataLoader extends Loader {
   declare data: MaterialDataList

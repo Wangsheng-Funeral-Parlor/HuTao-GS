@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import WeaponDataGroup, { WeaponData } from '@/types/data/WeaponData'
+import WeaponDataGroup, { WeaponData } from '@/types/gameData/WeaponData'
 
 class WeaponDataLoader extends Loader {
   declare data: WeaponDataGroup
