@@ -26,6 +26,7 @@ import AllWidgetData from '#/packets/AllWidgetData'
 import ShopManager from './manager/shopManager'
 import GachaSimpleInfo from '#/packets/GachaSimpleInfo'
 import PlayerRechargeData from '#/packets/PlayerRechargeData'
+import CoopData from '#/packets/CoopData'
 
 export default class Game {
   server: KcpServer
@@ -163,6 +164,7 @@ export default class Game {
     await GachaSimpleInfo.sendNotify(context)
     await PlayerRechargeData.sendNotify(context)
     await AllWidgetData.sendNotify(context)
+    await CoopData.sendNotify(context)
 
     // Set client state
     client.state = ClientState.POST_LOGIN | ClientState.SCENE_WORLD
