@@ -57,6 +57,7 @@ export default class World extends BaseClass {
     this.hostLastState = new LastState(this)
 
     this.peerIdCounter = 0
+    this.mpMode = false
 
     super.initHandlers(this.host)
   }

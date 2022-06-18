@@ -20,6 +20,23 @@ export default class Team {
     this.initialized = false
   }
 
+  private async notify(isCurTeam: boolean, teamId?: number, seqId?: number) {
+    const { teamManager, avatarList } = this
+    const { player } = teamManager
+    const { context, currentScene } = player
+
+    const broadcastContextList = currentScene?.broadcastContextList || [context]
+    for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+
+    for (let avatar of avatarList) {
+      await AbilityChange.broadcastNotify(broadcastContextList, avatar)
+      await AvatarEquipChange.broadcastNotify(broadcastContextList, avatar)
+    }
+
+    if (!player.isInMp()) await AvatarTeamUpdate.sendNotify(context, teamId)
+    if (isCurTeam) await SceneTeamUpdate.broadcastNotify(broadcastContextList)
+  }
+
   get id(): number {
     return this.teamManager.teamList.indexOf(this)
   }
@@ -49,7 +66,7 @@ export default class Team {
   async setUpAvatarTeam(data: SetUpAvatarTeamReq, noNotify: boolean = false, seqId?: number): Promise<RetcodeEnum> {
     const { teamManager, avatarList } = this
     const { player, currentTeam } = teamManager
-    const { context, currentScene, currentAvatar } = player
+    const { currentScene, currentAvatar } = player
     const { teamId, avatarTeamGuidList, curAvatarGuid } = data
     const oldAvatar = currentAvatar
 
@@ -61,25 +78,15 @@ export default class Team {
     avatarList.splice(0)
     avatarList.push(...avatarTeamList)
 
-    if (teamId != null && (Number(!player.isInMp()) * currentTeam) !== teamId) return RetcodeEnum.RET_SUCC
+    const isCurTeam = teamId == null || (Number(!player.isInMp()) * currentTeam) === teamId
+
+    if (!noNotify) await this.notify(isCurTeam, teamId, seqId)
+    if (!isCurTeam) return RetcodeEnum.RET_SUCC
 
     if (!avatarTeamGuidList.includes(curAvatarGuid)) {
       player.currentAvatar = this.getAliveAvatar()
     } else if (oldAvatar?.guid !== BigInt(curAvatarGuid)) {
       player.currentAvatar = this.getAvatar(BigInt(curAvatarGuid))
-    }
-
-    if (!noNotify) {
-      const broadcastContextList = currentScene?.broadcastContextList || [context]
-      for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
-
-      for (let avatar of avatarList) {
-        await AbilityChange.broadcastNotify(broadcastContextList, avatar)
-        await AvatarEquipChange.broadcastNotify(broadcastContextList, avatar)
-      }
-
-      if (!player.isInMp()) await AvatarTeamUpdate.sendNotify(context, teamId)
-      await SceneTeamUpdate.broadcastNotify(broadcastContextList)
     }
 
     if (oldAvatar && player.currentAvatar !== oldAvatar) {
