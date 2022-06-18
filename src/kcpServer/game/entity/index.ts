@@ -79,12 +79,12 @@ export default class Entity extends BaseClass {
     fightProps.update()
   }
 
-  initNew() {
+  initNew(level: number = 1) {
     const { props, abilityList, fightProps } = this
 
     this.lifeState = LifeStateEnum.LIFE_ALIVE
 
-    props.initNew()
+    props.initNew(level)
 
     abilityList.update()
     fightProps.update()

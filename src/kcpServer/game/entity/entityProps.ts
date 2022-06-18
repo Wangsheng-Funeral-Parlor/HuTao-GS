@@ -21,12 +21,12 @@ export default class EntityProps {
     }
   }
 
-  initNew() {
+  initNew(level: number = 1) {
     this.set(PlayerPropEnum.PROP_EXP, 0)
     this.set(PlayerPropEnum.PROP_BREAK_LEVEL, 0)
     this.set(PlayerPropEnum.PROP_SATIATION_VAL, 0)
     this.set(PlayerPropEnum.PROP_SATIATION_PENALTY_TIME, 0)
-    this.set(PlayerPropEnum.PROP_LEVEL, 1)
+    this.set(PlayerPropEnum.PROP_LEVEL, level)
   }
 
   get(type: number) {

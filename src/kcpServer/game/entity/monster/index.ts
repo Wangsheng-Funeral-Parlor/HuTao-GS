@@ -12,6 +12,9 @@ export default class Monster extends Entity {
   affixList: number[]
   weaponList: Weapon[]
 
+  poseId: number
+  isElite: boolean
+
   bornType: MonsterBornTypeEnum
 
   titleId: number
@@ -31,6 +34,9 @@ export default class Monster extends Entity {
     this.weaponList = []
     this.bornType = MonsterBornTypeEnum.MONSTER_BORN_DEFAULT
 
+    this.poseId = 0
+    this.isElite = false
+
     super.initHandlers(this)
 
     const monsterData = MonsterData.getMonster(monsterId)
@@ -47,7 +53,7 @@ export default class Monster extends Entity {
   }
 
   exportSceneMonsterInfo(): SceneMonsterInfo {
-    const { manager, monsterId, groupId, configId, weaponList, bornType, blockId, titleId, specialNameId } = this
+    const { manager, monsterId, groupId, configId, weaponList, bornType, blockId, poseId, isElite, titleId, specialNameId } = this
 
     return {
       monsterId,
@@ -57,6 +63,8 @@ export default class Monster extends Entity {
       authorityPeerId: manager?.scene?.host?.peerId || 1,
       bornType,
       blockId,
+      poseId,
+      isElite,
       titleId,
       specialNameId
     }

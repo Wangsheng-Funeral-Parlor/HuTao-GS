@@ -79,7 +79,7 @@ export default class World extends BaseClass {
   initNew(worldId: number) {
     this.id = worldId
 
-    const data = WorldData.get(worldId)
+    const data = WorldData.getWorld(worldId)
     if (!data) return
 
     const { MainSceneId } = data
