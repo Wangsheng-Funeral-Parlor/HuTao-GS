@@ -11,6 +11,7 @@ import uidPrefix from '#/utils/uidPrefix'
 const logger = new Logger('ENTITY', 0x00a0ff)
 
 export const VIEW_DIST = 128
+export const ENTITY_LIMIT = 32
 
 function getPrefix(player: Player, vistionType: VisionTypeEnum): string {
   return uidPrefix(VisionTypeEnum[vistionType].split('_')[1]?.slice(0, 4)?.padEnd(4, ' ') || '????', player, 0xe0a000)
@@ -70,12 +71,11 @@ export default class EntityManager {
       const loaded = loadedEntityIdList.includes(entityId)
       const canLoad = this.canLoadEntity(player, entity)
 
-      if (!loaded && canLoad) {
+      if (!loaded && canLoad && loadedEntityIdList.length < ENTITY_LIMIT) {
         loadedEntityIdList.push(entityId)
+        seenEntities.push(entityId)
         this.appearQueuePush(player, entity, VisionTypeEnum.VISION_MEET)
-      }
-
-      if (canLoad) seenEntities.push(entityId)
+      } else if (canLoad) seenEntities.push(entityId)
     }
 
     const missingEntities = loadedEntityIdList.filter(id => !seenEntities.includes(id))
@@ -160,7 +160,7 @@ export default class EntityManager {
 
     for (let player of playerList) {
       const { loadedEntityIdList } = player
-      if (loadedEntityIdList.includes(entityId) || !this.canLoadEntity(player, entity)) continue
+      if (loadedEntityIdList.includes(entityId) || !this.canLoadEntity(player, entity) || (!immediate && loadedEntityIdList.length >= ENTITY_LIMIT)) continue
 
       loadedEntityIdList.push(entityId)
       this.appearQueuePush(player, entity, vistionType, param)
@@ -204,15 +204,12 @@ export default class EntityManager {
     logger.debug('Replace:', oldEntity.entityId, '->', newEntity.entityId)
 
     for (let player of playerList) {
-      const { currentScene, currentAvatar, loadedEntityIdList } = player
-      const sameScene = (scene === currentScene)
+      const { loadedEntityIdList } = player
       const oldEntityId = oldEntity.entityId
       const oldLoaded = loadedEntityIdList.includes(oldEntityId)
-      const newDistance = newEntity.distanceTo(currentAvatar)
-      const newCanLoad = (newDistance <= VIEW_DIST && sameScene)
 
       if (oldLoaded) await this.remove(oldEntity, VisionTypeEnum.VISION_REPLACE, immediate, seqId)
-      if (newCanLoad) await this.add(newEntity, oldLoaded ? VisionTypeEnum.VISION_REPLACE : VisionTypeEnum.VISION_BORN, oldLoaded ? oldEntityId : undefined, immediate, seqId)
+      if (this.canLoadEntity(player, newEntity)) await this.add(newEntity, oldLoaded ? VisionTypeEnum.VISION_REPLACE : VisionTypeEnum.VISION_BORN, oldLoaded ? oldEntityId : undefined, immediate, seqId)
     }
   }
 
