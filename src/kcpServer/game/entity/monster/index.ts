@@ -67,12 +67,12 @@ export default class Monster extends Entity {
   // Register
   async handleRegister() {
     const { manager, weaponList } = this
-    for (let weapon of weaponList) await manager.register(weapon.entity)
+    for (let weapon of weaponList) await manager?.register(weapon.entity)
   }
 
   // Unregister
   async handleUnregister() {
     const { manager, weaponList } = this
-    for (let weapon of weaponList) await manager.unregister(weapon.entity)
+    for (let weapon of weaponList) await manager?.unregister(weapon.entity)
   }
 }

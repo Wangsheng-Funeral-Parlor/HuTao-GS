@@ -3,6 +3,7 @@ import { RetcodeEnum } from '@/types/enum/retcode'
 import EnterScenePeer from './EnterScenePeer'
 import { ClientState } from '@/types/enum/state'
 import PlayerPreEnterMp from './PlayerPreEnterMp'
+import { SceneEnterTypeEnum } from '@/types/enum/scene'
 
 export interface EnterSceneReadyReq {
   enterSceneToken: number
@@ -34,7 +35,7 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
     // Set client state
     player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_ENTER_SCENE_READY
 
-    if (!player.isHost()) {
+    if (!player.isHost() && player.sceneEnterType === SceneEnterTypeEnum.ENTER_OTHER) {
       const hostCtx = currentScene.host.context
       hostCtx.seqId = seqId
 
