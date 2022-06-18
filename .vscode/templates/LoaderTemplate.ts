@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import LoaderTemplate from '@/types/data/LoaderTemplate'
+import LoaderTemplate from '@/types/gameData/LoaderTemplate'
 
 class LoaderTemplateLoader extends Loader {
   declare data: LoaderTemplate[]

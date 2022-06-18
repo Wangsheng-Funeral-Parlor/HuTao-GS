@@ -7,7 +7,7 @@ import { CombatInvokeEntry } from '@/types/game/invoke'
 import { EntityMoveInfo, EvtBeingHitInfo } from '@/types/game/combat'
 import CombatInvocations from '#/packets/CombatInvocations'
 import { ChangeHpReasonEnum, FightPropEnum } from '@/types/enum/fightProp'
-import { MotionStateEnum } from '@/types/enum/entity'
+import { MotionStateEnum, ProtEntityTypeEnum } from '@/types/enum/entity'
 import Entity from '$/entity'
 import { ClientState } from '@/types/enum/state'
 
@@ -120,8 +120,20 @@ export default class CombatManager extends BaseClass {
     const target = entityManager.getEntity(defenseId)
     if (!target || !target.isAlive()) return
 
+    let reason: ChangeHpReasonEnum = ChangeHpReasonEnum.CHANGE_HP_SUB_ENVIR
+    if (attacker) {
+      switch (attacker.entityType) {
+        case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
+          reason = ChangeHpReasonEnum.CHANGE_HP_SUB_AVATAR
+          break
+        case ProtEntityTypeEnum.PROT_ENTITY_MONSTER:
+          reason = ChangeHpReasonEnum.CHANGE_HP_SUB_MONSTER
+          break
+      }
+    }
+
     // Take attack damage
-    await target.fightProps.takeDamage(attackerId, damage, true, attacker ? ChangeHpReasonEnum.CHANGE_HP_SUB_MONSTER : ChangeHpReasonEnum.CHANGE_HP_SUB_ENVIR)
+    await target.fightProps.takeDamage(attackerId, damage, true, reason)
   }
 
   // EvtCombatForceSetPosInfo

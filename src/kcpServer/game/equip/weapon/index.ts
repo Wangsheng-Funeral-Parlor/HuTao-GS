@@ -32,6 +32,12 @@ export default class Weapon extends Equip {
     }
   }
 
+  static createByGadgetId(gadgetId: number): Weapon {
+    const weapon = new Weapon(0)
+    weapon.gadgetId = gadgetId
+    return weapon
+  }
+
   get level() {
     return this.entity.level
   }

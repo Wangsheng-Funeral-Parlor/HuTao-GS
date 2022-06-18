@@ -34,6 +34,7 @@ import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
 import { ClientState } from '@/types/enum/state'
 import Widget from './widget'
 import UserData from '@/types/user'
+import SceneBlock from '$/scene/sceneBlock'
 
 export default class Player extends BaseClass {
   game: Game
@@ -58,6 +59,8 @@ export default class Player extends BaseClass {
   hostWorld: World
   currentWorld: World
   currentScene: Scene
+
+  sceneBlockList: SceneBlock[]
 
   timestampGameTime: number
   timestamp: number
@@ -106,6 +109,7 @@ export default class Player extends BaseClass {
     this.costumeList = []
     this.emojiCollection = []
 
+    this.sceneBlockList = []
     this.loadedEntityIdList = []
 
     this.prevScenePos = new Vector()

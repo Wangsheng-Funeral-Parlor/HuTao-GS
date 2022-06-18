@@ -21,6 +21,13 @@ export interface EntityFightPropConfig {
   // Avatar
   Critical?: number
   CriticalHurt?: number
+
+  // Monster
+  IceSubHurt?: number
+  GrassSubHurt?: number
+  WindSubHurt?: number
+  ElecSubHurt?: number
+  PhysicalSubHurt?: number
 }
 
 // Packet

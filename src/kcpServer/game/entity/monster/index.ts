@@ -4,30 +4,46 @@ import { SceneMonsterInfo } from '@/types/game/monster'
 import Weapon from '$/equip/weapon'
 import { MonsterBornTypeEnum } from '@/types/enum/monster'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
+import MonsterData from '$/gameData/data/MonsterData'
 
 export default class Monster extends Entity {
   monsterId: number
-  groupId: number
-  configId: number
 
+  affixList: number[]
   weaponList: Weapon[]
 
   bornType: MonsterBornTypeEnum
-  blockId: number
+
   titleId: number
   specialNameId: number
 
-  constructor(monsterId: number, groupId: number) {
+  constructor(monsterId: number) {
     super()
 
     this.monsterId = monsterId
-    this.groupId = groupId
 
+    this.config = MonsterData.getFightPropConfig(monsterId)
     this.growCurve = GrowCurveData.getGrowCurve('Monster')
 
     this.entityType = ProtEntityTypeEnum.PROT_ENTITY_MONSTER
 
+    this.affixList = []
+    this.weaponList = []
+    this.bornType = MonsterBornTypeEnum.MONSTER_BORN_DEFAULT
+
     super.initHandlers(this)
+
+    const monsterData = MonsterData.getMonster(monsterId)
+    if (!monsterData) return
+
+    this.affixList = monsterData.Affix || []
+    this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id))
+
+    const describeData = MonsterData.getDescribe(monsterData.DescribeId)
+    if (!describeData) return
+
+    this.titleId = describeData.TitleID || 0
+    this.specialNameId = MonsterData.getSpecialName(describeData.SpecialNameLabID)?.Id || 0
   }
 
   exportSceneMonsterInfo(): SceneMonsterInfo {

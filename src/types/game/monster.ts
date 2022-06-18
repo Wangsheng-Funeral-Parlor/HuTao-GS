@@ -3,6 +3,12 @@ import { VectorInterface } from './motion'
 import { MonsterRoute } from './route'
 import { SceneWeaponInfo } from './weapon'
 
+export interface AiSyncInfo {
+  entityId: number
+  hasPathToTarget?: boolean
+  isSelfKilling?: boolean
+}
+
 export interface SceneFishInfo {
   fishId: number
   fishPoolEntityId: number

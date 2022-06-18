@@ -3,7 +3,8 @@ import Player from '$/player'
 import World from '$/world'
 import Vector from '$/utils/vector'
 import BaseClass from '#/baseClass'
-import SceneTag from './tag'
+import SceneTag from './sceneTag'
+import SceneBlock from './sceneBlock'
 import EntityManager from '$/manager/entityManager'
 import { ScenePlayerInfo } from '@/types/game/playerInfo'
 import { PlayerWorldSceneInfo } from '@/types/game/scene'
@@ -27,7 +28,9 @@ export default class Scene extends BaseClass {
 
   id: number
   enterSceneToken: number
+
   sceneTagList: SceneTag[]
+  sceneBlockList: SceneBlock[]
 
   abilitymanager: AbilityManager
   entityManager: EntityManager
@@ -52,6 +55,9 @@ export default class Scene extends BaseClass {
 
     this.id = sceneId
     this.enterSceneToken = Math.floor(Math.random() * 1e4)
+
+    this.sceneTagList = []
+    this.sceneBlockList = []
 
     this.abilitymanager = new AbilityManager(this)
     this.entityManager = new EntityManager(this)
@@ -90,6 +96,7 @@ export default class Scene extends BaseClass {
     if (!sceneData) return
 
     this.sceneTagList = sceneData.Tag?.map(tagData => new SceneTag(this, tagData)) || []
+    this.sceneBlockList = Object.entries(sceneData.Block).map(e => new SceneBlock(this, parseInt(e[0]), Object.values((e[1] as any).Groups)))
 
     this.dieY = sceneData.DieY
     this.isLocked = sceneData.IsLocked
@@ -235,7 +242,9 @@ export default class Scene extends BaseClass {
 
   // SceneUpdate
   async handleSceneUpdate() {
-    const { id, playerList, broadcastContextList, lastLocUpdate, lastTimeUpdate } = this
+    const { id, sceneBlockList, playerList, broadcastContextList, lastLocUpdate, lastTimeUpdate } = this
+
+    for (let sceneBlock of sceneBlockList) await sceneBlock.emit('Update')
 
     if (lastLocUpdate == null || Date.now() - lastLocUpdate > 5e3) {
       this.lastLocUpdate = Date.now()
