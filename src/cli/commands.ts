@@ -1,4 +1,5 @@
 import KcpServer from '#/.'
+import Monster from '$/entity/monster'
 import Weapon from '$/equip/weapon'
 import SceneData from '$/gameData/data/SceneData'
 import Material from '$/material'
@@ -455,6 +456,43 @@ const commands: CommandDefinition[] = [
       player.inventory.add(material)
 
       print('Give material:', `(${id})x${material.count}`)
+    }
+  },
+  {
+    name: 'monster',
+    desc: 'Spawn monster at player location',
+    args: [
+      { name: 'id', type: 'int' },
+      { name: 'lv', type: 'int' },
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+
+      const { currentScene, currentAvatar } = player
+      if (!currentScene || !currentAvatar) {
+        printError('Unable to get player location.')
+        return
+      }
+
+      print('Attempt to spawn monster:', args[0])
+
+      const entity = new Monster(args[0])
+
+      entity.motionInfo.pos.copy(currentAvatar.motionInfo?.pos)
+      entity.bornPos.copy(currentAvatar.motionInfo?.pos)
+
+      entity.initNew(args[1])
+
+      currentScene.entityManager.add(entity, undefined, undefined, true)
     }
   },
   {
