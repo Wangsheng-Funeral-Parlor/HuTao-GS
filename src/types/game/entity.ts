@@ -9,9 +9,11 @@ import { PropPair } from './prop'
 
 // Config
 export interface EntityFightPropConfig {
-  HpBase: number
-  AttackBase: number
-  DefenseBase: number
+  // Common
+  HpBase?: number
+  AttackBase?: number
+  DefenseBase?: number
+
   PropGrowCurves: {
     PropType: string
     Type: string

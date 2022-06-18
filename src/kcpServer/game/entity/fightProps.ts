@@ -12,6 +12,13 @@ import Entity from '.'
 import Avatar from './avatar'
 import Monster from './monster'
 
+const DYNAMIC_PROPS = [
+  FightPropEnum.FIGHT_PROP_HP,
+  FightPropEnum.FIGHT_PROP_HP_PERCENT,
+  FightPropEnum.FIGHT_PROP_ATTACK,
+  FightPropEnum.FIGHT_PROP_ATTACK_PERCENT
+]
+
 export interface FightPropChangeReason {
   changeHpReason?: ChangeHpReasonEnum
   changeEnergyReason?: ChangeEnergyReasonEnum
@@ -38,6 +45,8 @@ export default class FightProp {
   async update(notify: boolean = false): Promise<void> {
     const curve = this.getCurve()
     if (!curve) return
+
+    this.clear(true)
 
     if (this.entity.entityType === ProtEntityTypeEnum.PROT_ENTITY_WEAPON) {
       this.updateWeaponStats(curve)
@@ -327,10 +336,10 @@ export default class FightProp {
     await this.set(type, this.get(type) + val, notify, changeReason)
   }
 
-  clear() {
+  clear(dynamic: boolean = false) {
     const { propMap } = this
-    for (let id in propMap) {
-      delete propMap[id]
+    for (let type in propMap) {
+      if (!dynamic || DYNAMIC_PROPS.includes(parseInt(type))) delete propMap[type]
     }
   }
 

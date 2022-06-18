@@ -21,7 +21,7 @@ export default class Weapon extends Equip {
 
     this.affixList = []
 
-    const weaponData = WeaponData.get(itemId)
+    const weaponData = WeaponData.getWeapon(itemId)
     if (!weaponData) return
 
     this.gadgetId = weaponData.GadgetId
