@@ -6,6 +6,7 @@ import priceTier from '../priceTier.json'
 import hash from '@/utils/hash'
 import { getJson } from '@/utils/json'
 import UserData from '@/types/user'
+import config from '@/config'
 
 class Hk4eSdkHandler extends Handler {
   constructor() {
@@ -48,6 +49,18 @@ class Hk4eSdkHandler extends Handler {
   private async compareProtocolVersion(req: HttpRequest): Promise<HttpResponse> {
     const { body } = req
 
+    let major: number
+    switch (config.version) {
+      case '2.6.0':
+        major = 10
+        break
+      case '2.7.0':
+        major = 11
+        break
+      default:
+        major = 10
+    }
+
     return new HttpResponse({
       retcode: RetcodeEnum.RET_SUCC,
       message: 'OK',
@@ -59,9 +72,11 @@ class Hk4eSdkHandler extends Handler {
           language: body.language || 'en-us',
           user_proto: '',
           priv_proto: '',
-          major: 10,
+          major,
           minimum: 0,
-          create_time: '0'
+          create_time: '0',
+          teenager_proto: '',
+          third_proto: ''
         }
       }
     })

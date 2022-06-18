@@ -2,6 +2,7 @@ import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Logger from '@/logger'
 import { ClientState } from '@/types/enum/state'
 import { getNameByCmdId } from '#/cmdIds'
+import { waitTick } from '@/utils/asyncWait'
 
 const logger = new Logger('UNICMD', 0x80a0ff)
 
@@ -26,7 +27,10 @@ class UnionCmdPacket extends Packet implements PacketInterface {
     const { server, player } = context
     const { cmdList } = data
 
+    let i = 0
     for (let cmd of cmdList) {
+      if (++i % 3 === 0) await waitTick()
+
       const { messageId, body } = cmd
       const packetName = getNameByCmdId(messageId).toString()
 

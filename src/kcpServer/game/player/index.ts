@@ -34,6 +34,8 @@ import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
 import { ClientState } from '@/types/enum/state'
 import Widget from './widget'
 import UserData from '@/types/user'
+import SceneBlock from '$/scene/sceneBlock'
+import { VisionTypeEnum } from '@/types/enum/entity'
 
 export default class Player extends BaseClass {
   game: Game
@@ -58,6 +60,8 @@ export default class Player extends BaseClass {
   hostWorld: World
   currentWorld: World
   currentScene: Scene
+
+  sceneBlockList: SceneBlock[]
 
   timestampGameTime: number
   timestamp: number
@@ -106,6 +110,7 @@ export default class Player extends BaseClass {
     this.costumeList = []
     this.emojiCollection = []
 
+    this.sceneBlockList = []
     this.loadedEntityIdList = []
 
     this.prevScenePos = new Vector()
@@ -643,7 +648,7 @@ export default class Player extends BaseClass {
 
   // SceneLeave
   async handleSceneLeave(scene: Scene) {
-    const { avatarList, teamManager, currentAvatar, context, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
+    const { avatarList, teamManager, currentAvatar, sceneBlockList, context, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
     const { entityManager } = scene
     const teamEntityId = teamManager.entity.entityId
 
@@ -662,6 +667,8 @@ export default class Player extends BaseClass {
         // Prevent player from falling through the ground
         prevScenePos.Y += 1.5
       }
+
+      for (let sceneBlock of sceneBlockList) sceneBlock.tryRemovePlayer(this)
     }
 
     // Unregister entities
@@ -669,6 +676,8 @@ export default class Player extends BaseClass {
     for (let avatar of avatarList) await entityManager.unregister(avatar)
 
     // Unload entities
+    for (let entityId of loadedEntityIdList) entityManager.disappearQueuePush(this, entityId, VisionTypeEnum.VISION_MISS)
+    await entityManager.disappearQueueFlush(this)
     loadedEntityIdList.splice(0)
 
     await DelTeamEntity.sendNotify(context, scene, [teamEntityId])

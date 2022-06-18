@@ -25,6 +25,10 @@ export default class Entity extends BaseClass {
 
   name?: string
 
+  groupId: number
+  configId: number
+  blockId: number
+
   config: EntityFightPropConfig
   growCurve: CurveExcelConfig[]
 
@@ -32,6 +36,8 @@ export default class Entity extends BaseClass {
   props: EntityProps
   fightProps: FightProp
   motionInfo: MotionInfo
+
+  bornPos: Vector
 
   animatorParaList: any[]
 
@@ -51,6 +57,12 @@ export default class Entity extends BaseClass {
     this.fightProps = new FightProp(this)
     this.motionInfo = new MotionInfo()
 
+    this.bornPos = new Vector()
+
+    this.groupId = 0
+    this.configId = 0
+    this.blockId = 0
+
     this.isOnScene = false
   }
 
@@ -67,12 +79,12 @@ export default class Entity extends BaseClass {
     fightProps.update()
   }
 
-  initNew() {
+  initNew(level: number = 1) {
     const { props, abilityList, fightProps } = this
 
     this.lifeState = LifeStateEnum.LIFE_ALIVE
 
-    props.initNew()
+    props.initNew(level)
 
     abilityList.update()
     fightProps.update()
@@ -151,7 +163,7 @@ export default class Entity extends BaseClass {
   exportSceneGadgetInfo(): SceneGadgetInfo { return null }
 
   exportSceneEntityInfo(): SceneEntityInfo {
-    const { entityId, entityType, motionInfo, props, fightProps, lifeState } = this
+    const { entityId, entityType, motionInfo, bornPos, props, fightProps, lifeState } = this
     const { sceneTime, reliableSeq } = motionInfo
 
     const sceneEntityInfo: SceneEntityInfo = {
@@ -170,9 +182,9 @@ export default class Entity extends BaseClass {
         rendererChangedInfo: {},
         aiInfo: {
           isAiOpen: true,
-          bornPos: new Vector().export()
+          bornPos: bornPos.export()
         },
-        bornPos: new Vector().export()
+        bornPos: bornPos.export()
       }
     }
 

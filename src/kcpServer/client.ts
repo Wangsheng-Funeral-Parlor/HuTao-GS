@@ -53,7 +53,7 @@ export default class Client extends BaseClass {
     this.token = token
 
     this.kcp = new Kcp(conv, token, this.outputKcp.bind(this))
-    this.kcp.setNodelay(true, 2, false)
+    this.kcp.setNodelay(true, 0, false)
     this.kcp.setInterval(60)
 
     this.ctx = ctx

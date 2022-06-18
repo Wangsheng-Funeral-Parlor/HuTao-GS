@@ -14,6 +14,7 @@ export default class Vector {
     this.X = x || 0
     this.Y = y || 0
     this.Z = z || 0
+
     return this
   }
 
@@ -23,6 +24,8 @@ export default class Vector {
     this.X = typeof X === 'number' ? X : (X?.[1] || 0)
     this.Y = typeof Y === 'number' ? Y : (Y?.[1] || 0)
     this.Z = typeof Z === 'number' ? Z : (Z?.[1] || 0)
+
+    return this
   }
 
   distanceTo(vec: Vector): number {
@@ -30,9 +33,16 @@ export default class Vector {
     return Math.sqrt(((vec.X - X) ** 2) + ((vec.Y - Y) ** 2) + ((vec.Z - Z) ** 2))
   }
 
+  distanceTo2D(vec: Vector): number {
+    const { X, Z } = this
+    return Math.sqrt(((vec.X - X) ** 2) + ((vec.Z - Z) ** 2))
+  }
+
   copy(vec: Vector): Vector {
     const { X, Y, Z } = vec
+
     this.set(X, Y, Z)
+
     return this
   }
 

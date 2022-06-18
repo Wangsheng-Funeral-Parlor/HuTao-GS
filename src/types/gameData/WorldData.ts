@@ -4,6 +4,12 @@ export interface WorldData {
   MainSceneId: number
 }
 
-type WorldDataList = WorldData[]
+export interface WorldLevelData {
+  Level: number
+  MonsterLevel: number
+}
 
-export default WorldDataList
+export default interface WorldDataGroup {
+  World: WorldData[]
+  Level: WorldLevelData[]
+}

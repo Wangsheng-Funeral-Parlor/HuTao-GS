@@ -12,7 +12,6 @@ import LeaveWorld from '#/packets/LeaveWorld'
 import WorldPlayerInfo from '#/packets/WorldPlayerInfo'
 import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
 import WorldPlayerLocation from '#/packets/WorldPlayerLocation'
-import PlayerPreEnterMp from '#/packets/PlayerPreEnterMp'
 import ClientReconnect from '#/packets/ClientReconnect'
 import SceneKickPlayer from '#/packets/SceneKickPlayer'
 import Game from '..'
@@ -58,6 +57,7 @@ export default class World extends BaseClass {
     this.hostLastState = new LastState(this)
 
     this.peerIdCounter = 0
+    this.mpMode = false
 
     super.initHandlers(this.host)
   }
@@ -80,7 +80,7 @@ export default class World extends BaseClass {
   initNew(worldId: number) {
     this.id = worldId
 
-    const data = WorldData.get(worldId)
+    const data = WorldData.getWorld(worldId)
     if (!data) return
 
     const { MainSceneId } = data

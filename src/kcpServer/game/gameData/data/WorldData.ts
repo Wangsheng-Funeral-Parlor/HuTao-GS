@@ -1,15 +1,33 @@
 import Loader from '$/gameData/loader'
-import WorldDataList, { WorldData } from '@/types/gameData/WorldData'
+import WorldDataGroup, { WorldData, WorldLevelData } from '@/types/gameData/WorldData'
 
 class WorldDataLoader extends Loader {
-  declare data: WorldDataList
+  declare data: WorldDataGroup
 
   constructor() {
     super('WorldData', [])
   }
 
-  get(id: number): WorldData {
-    return this.data.find(data => data.Id === id)
+  getWorld(id: number): WorldData {
+    return this.getWorldList().find(data => data.Id === id)
+  }
+
+  getWorldList(): WorldData[] {
+    return this.data?.World || []
+  }
+
+  getWorldLevel(level: number): WorldLevelData {
+    const worldLevelList = this.getWorldLevelList()
+    if (worldLevelList.length === 0) return null
+
+    const maxLevel = Math.max(...worldLevelList.map(wl => wl.Level))
+    if (level > maxLevel) return this.getWorldLevel(maxLevel)
+
+    return this.getWorldLevelList().find(data => data.Level === level) || null
+  }
+
+  getWorldLevelList(): WorldLevelData[] {
+    return this.data?.Level || []
   }
 }
 

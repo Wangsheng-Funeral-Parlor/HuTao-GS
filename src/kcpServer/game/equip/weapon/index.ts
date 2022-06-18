@@ -21,7 +21,7 @@ export default class Weapon extends Equip {
 
     this.affixList = []
 
-    const weaponData = WeaponData.get(itemId)
+    const weaponData = WeaponData.getWeapon(itemId)
     if (!weaponData) return
 
     this.gadgetId = weaponData.GadgetId
@@ -30,6 +30,12 @@ export default class Weapon extends Equip {
       if (affix === 0) continue
       this.affixList.push(new Affix(this, affix))
     }
+  }
+
+  static createByGadgetId(gadgetId: number): Weapon {
+    const weapon = new Weapon(0)
+    weapon.gadgetId = gadgetId
+    return weapon
   }
 
   get level() {

@@ -10,7 +10,7 @@ import uidPrefix from '#/utils/uidPrefix'
 
 const logger = new Logger('ENTITY', 0x00a0ff)
 
-const viewDistance = 128
+export const VIEW_DIST = 128
 
 function getPrefix(player: Player, vistionType: VisionTypeEnum): string {
   return uidPrefix(VisionTypeEnum[vistionType].split('_')[1]?.slice(0, 4)?.padEnd(4, ' ') || '????', player, 0xe0a000)
@@ -45,7 +45,7 @@ export default class EntityManager {
 
     clearInterval(loop)
 
-    for (let key in entityMap) await this.unregister(entityMap[key])
+    for (let key in entityMap) await this.unregister(entityMap[key], true)
     await this.update()
   }
 
@@ -101,7 +101,7 @@ export default class EntityManager {
 
     return (
       (state & 0xF0FF) >= (ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE) &&
-      distance <= viewDistance &&
+      distance <= VIEW_DIST &&
       scene === currentScene
     )
   }
@@ -131,20 +131,20 @@ export default class EntityManager {
     logger.verbose('Register:', entity.entityId)
   }
 
-  async unregister(entity: Entity): Promise<void> {
+  async unregister(entity: Entity, verbose: boolean = false): Promise<void> {
     if (entity.manager !== this) return
 
     logger.verbose('Unregister:', entity.entityId)
 
     await entity.emit('Unregister')
 
-    if (this.getEntity(entity.entityId)) await this.remove(entity)
+    if (this.getEntity(entity.entityId)) await this.remove(entity, undefined, undefined, undefined, verbose)
 
     entity.manager = null
     entity.entityId = null
   }
 
-  async add(entity: Entity, vistionType: VisionTypeEnum = VisionTypeEnum.VISION_BORN, param?: number, immediate: boolean = false, seqId?: number): Promise<void> {
+  async add(entity: Entity, vistionType: VisionTypeEnum = VisionTypeEnum.VISION_BORN, param?: number, immediate: boolean = false, seqId?: number, verbose: boolean = false): Promise<void> {
     if (entity.manager !== this) await this.register(entity)
 
     this.entityMap[entity.entityId] = entity
@@ -155,7 +155,8 @@ export default class EntityManager {
     const { entityId } = entity
     const { playerList } = this.scene
 
-    logger.debug('Add:', entityId)
+    if (verbose) logger.verbose('Add:', entityId)
+    else logger.debug('Add:', entityId)
 
     for (let player of playerList) {
       const { loadedEntityIdList } = player
@@ -170,7 +171,7 @@ export default class EntityManager {
     }
   }
 
-  async remove(entity: Entity | number, vistionType: VisionTypeEnum = VisionTypeEnum.VISION_MISS, immediate: boolean = false, seqId?: number): Promise<void> {
+  async remove(entity: Entity | number, vistionType: VisionTypeEnum = VisionTypeEnum.VISION_MISS, immediate: boolean = false, seqId?: number, verbose: boolean = false): Promise<void> {
     const { scene, entityMap } = this
     const targetEntity = typeof entity === 'number' ? entityMap[entity] : entity
 
@@ -180,7 +181,8 @@ export default class EntityManager {
     const { entityId } = targetEntity
     const { playerList } = scene
 
-    logger.debug('Remove:', entityId)
+    if (verbose) logger.verbose('Remove:', entityId)
+    else logger.debug('Remove:', entityId)
 
     for (let player of playerList) {
       const { loadedEntityIdList } = player
@@ -207,7 +209,7 @@ export default class EntityManager {
       const oldEntityId = oldEntity.entityId
       const oldLoaded = loadedEntityIdList.includes(oldEntityId)
       const newDistance = newEntity.distanceTo(currentAvatar)
-      const newCanLoad = (newDistance <= viewDistance && sameScene)
+      const newCanLoad = (newDistance <= VIEW_DIST && sameScene)
 
       if (oldLoaded) await this.remove(oldEntity, VisionTypeEnum.VISION_REPLACE, immediate, seqId)
       if (newCanLoad) await this.add(newEntity, oldLoaded ? VisionTypeEnum.VISION_REPLACE : VisionTypeEnum.VISION_BORN, oldLoaded ? oldEntityId : undefined, immediate, seqId)

@@ -3,8 +3,6 @@ import Entity from '$/entity'
 
 export default class Gadget extends Entity {
   gadgetId: number
-  groupId: number
-  configId: number
   ownerEntityId: number
   gadgetState: number
   gadgetType: number

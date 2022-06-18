@@ -23,6 +23,8 @@ let logFileName = null
 let logHistory: string[] = null
 let logger: Logger
 
+const entryMap: { [name: string]: number[] } = {}
+
 function getTimestamp(): string {
   const d = new Date()
   const Y = d.getFullYear().toString()
@@ -123,23 +125,28 @@ export default class Logger {
   }
 
   performance(list: PerformanceObserverEntryList) {
-    const entryMap: { [name: string]: number[] } = {}
-
     for (let perfEntry of list.getEntries()) {
       const { name, duration } = perfEntry
-      const entry = entryMap[name] || (entryMap[name] = [])
+      const entry = entryMap[name] || (entryMap[name] = [1])
+
+      entry[0] = 1
 
       entry.push(duration)
+      if (entry.length > 11) entry.splice(1, entry.length - 10)
     }
 
     for (let name in entryMap) {
       const entry = entryMap[name]
 
-      const avg = Math.floor(entry.reduce((c, p) => p + c) / entry.length)
+      if (entry[0] === 0) continue
+      entry[0] = 0
+
+      const slicedEntry = entry.slice(1)
+      const avg = Math.floor(slicedEntry.reduce((c, p) => p + c) / entry.length)
       if (avg < 5) continue
 
-      const min = Math.floor(Math.min(...entry))
-      const max = Math.floor(Math.max(...entry))
+      const min = Math.floor(Math.min(...slicedEntry))
+      const max = Math.floor(Math.max(...slicedEntry))
 
       this.log(LogLevel.PERF, 'Perf:', name, 'Avg:', `${avg}ms`, 'Min:', `${min}ms`, 'Max:', `${max}ms`)
     }
