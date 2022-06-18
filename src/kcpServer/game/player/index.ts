@@ -647,7 +647,7 @@ export default class Player extends BaseClass {
 
   // SceneLeave
   async handleSceneLeave(scene: Scene) {
-    const { avatarList, teamManager, currentAvatar, context, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
+    const { avatarList, teamManager, currentAvatar, sceneBlockList, context, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
     const { entityManager } = scene
     const teamEntityId = teamManager.entity.entityId
 
@@ -666,6 +666,8 @@ export default class Player extends BaseClass {
         // Prevent player from falling through the ground
         prevScenePos.Y += 1.5
       }
+
+      for (let sceneBlock of sceneBlockList) sceneBlock.tryRemovePlayer(this)
     }
 
     // Unregister entities

@@ -5,7 +5,10 @@ import SceneData from '$/gameData/data/SceneData'
 import { VIEW_DIST } from '$/manager/entityManager'
 import Player from '$/player'
 import Vector from '$/utils/vector'
+import Logger from '@/logger'
 import Scene from '.'
+
+const logger = new Logger('GSCENE', 0xefa8ec)
 
 export default class SceneBlock extends BaseClass {
   scene: Scene
@@ -99,11 +102,11 @@ export default class SceneBlock extends BaseClass {
     this.gadgetList = gadgetList.filter(gadget => !unloaded.includes(gadget))
   }
 
-  private tryAddPlayer(player: Player) {
-    const { playerList, loaded } = this
-    const { sceneBlockList } = player
+  tryAddPlayer(player: Player) {
+    const { scene, playerList, loaded } = this
+    const { currentScene, sceneBlockList } = player
 
-    if (!this.inRange(player)) return
+    if (currentScene !== scene || !this.inRange(player)) return
 
     playerList.push(player)
     sceneBlockList.push(this)
@@ -111,11 +114,11 @@ export default class SceneBlock extends BaseClass {
     if (!loaded) this.load()
   }
 
-  private tryRemovePlayer(player: Player) {
-    const { playerList, loaded } = this
-    const { sceneBlockList } = player
+  tryRemovePlayer(player: Player) {
+    const { scene, playerList, loaded } = this
+    const { currentScene, sceneBlockList } = player
 
-    if (this.inRange(player)) return
+    if (currentScene === scene && this.inRange(player)) return
 
     playerList.splice(playerList.indexOf(player), 1)
     sceneBlockList.splice(sceneBlockList.indexOf(this), 1)
@@ -136,7 +139,7 @@ export default class SceneBlock extends BaseClass {
   }
 
   load() {
-    const { scene, groups, loaded } = this
+    const { id, scene, groups, loaded } = this
     if (loaded) return
 
     this.loaded = true
@@ -151,10 +154,12 @@ export default class SceneBlock extends BaseClass {
       this.loadMonsters(Id, Object.values(groupData.Monsters || {}))
       this.loadGadgets(Id, Object.values(groupData.Gadgets || {}))
     }
+
+    logger.debug('Load block:', id)
   }
 
   unload() {
-    const { groups, playerList, loaded } = this
+    const { id, groups, playerList, loaded } = this
     if (!loaded) return
 
     this.loaded = false
@@ -167,6 +172,8 @@ export default class SceneBlock extends BaseClass {
     }
 
     playerList.splice(0)
+
+    logger.debug('Unload block:', id)
   }
 
   /**Internal Events**/

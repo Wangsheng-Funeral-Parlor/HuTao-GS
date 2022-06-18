@@ -106,7 +106,15 @@ export default class Scene extends BaseClass {
   }
 
   async destroy() {
-    await this.entityManager.destroy()
+    const { world, entityManager, sceneBlockList } = this
+    const { sceneList, mpSceneList } = world
+
+    await entityManager.destroy()
+
+    for (let sceneBlock of sceneBlockList) sceneBlock.unload()
+
+    if (sceneList.includes(this)) sceneList.splice(sceneList.indexOf(this), 1)
+    if (mpSceneList.includes(this)) mpSceneList.splice(mpSceneList.indexOf(this), 1)
   }
 
   pause() {
@@ -188,6 +196,8 @@ export default class Scene extends BaseClass {
     player.sceneEnterType = enterType
 
     player.currentScene = this
+    player.nextScene = null
+
     if (!playerList.includes(player)) playerList.push(player)
 
     currentAvatar.motionInfo.pos.copy(pos)
@@ -217,6 +227,11 @@ export default class Scene extends BaseClass {
     playerList.splice(playerList.indexOf(player), 1)
 
     await player.emit('SceneLeave', this, context)
+
+    // Destroy scene if no player is inside
+    if (playerList.length > 0 || player.nextScene === this) return
+
+    await this.destroy()
   }
 
   exportSceneTeamAvatarList(): SceneTeamAvatar[] {
