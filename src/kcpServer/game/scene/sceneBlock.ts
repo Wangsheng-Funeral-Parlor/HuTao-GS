@@ -123,7 +123,7 @@ export default class SceneBlock extends BaseClass {
     playerList.splice(playerList.indexOf(player), 1)
     sceneBlockList.splice(sceneBlockList.indexOf(this), 1)
 
-    if (loaded) this.unload()
+    if (loaded && playerList.length === 0) this.unload()
   }
 
   inRange(player: Player): boolean {

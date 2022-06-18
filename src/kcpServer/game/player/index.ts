@@ -35,6 +35,7 @@ import { ClientState } from '@/types/enum/state'
 import Widget from './widget'
 import UserData from '@/types/user'
 import SceneBlock from '$/scene/sceneBlock'
+import { VisionTypeEnum } from '@/types/enum/entity'
 
 export default class Player extends BaseClass {
   game: Game
@@ -675,6 +676,8 @@ export default class Player extends BaseClass {
     for (let avatar of avatarList) await entityManager.unregister(avatar)
 
     // Unload entities
+    for (let entityId of loadedEntityIdList) entityManager.disappearQueuePush(this, entityId, VisionTypeEnum.VISION_MISS)
+    await entityManager.disappearQueueFlush(this)
     loadedEntityIdList.splice(0)
 
     await DelTeamEntity.sendNotify(context, scene, [teamEntityId])
