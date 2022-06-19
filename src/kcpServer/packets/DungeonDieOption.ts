@@ -25,8 +25,7 @@ class DungeonDieOptionPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: DungeonDieOptionReq): Promise<void> {
     const { player } = context
-    const { teamManager, currentScene, currentAvatar } = player
-    const { pos, rot } = currentAvatar.motionInfo
+    const { teamManager, currentScene, pos, rot } = player
     const { dieOption } = data
 
     switch (dieOption) {

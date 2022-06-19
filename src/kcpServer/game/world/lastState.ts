@@ -38,19 +38,17 @@ export default class LastState {
 
   saveState() {
     const { host } = this.world
-    const { currentScene, currentAvatar } = host
-    if ((host.state & 0xF000) !== ClientState.IN_GAME || !host.isHost() || !currentScene || !currentAvatar) return false
+    const { currentScene, pos, rot, hasLastSafeState, lastSafePos, lastSafeRot } = host
+    if ((host.state & 0xF000) !== ClientState.IN_GAME || !host.isHost() || !currentScene) return false
 
     this.sceneId = currentScene.id
 
-    const { motionInfo } = currentAvatar
-
-    if (motionInfo.hasLastSafeState) {
-      this.pos.copy(motionInfo.lastSafePos)
-      this.rot.copy(motionInfo.lastSafeRot)
-    } else {
-      this.pos.copy(motionInfo.pos)
-      this.rot.copy(motionInfo.rot)
+    if (hasLastSafeState) {
+      this.pos.copy(lastSafePos)
+      this.rot.copy(lastSafeRot)
+    } else if (pos && rot) {
+      this.pos.copy(pos)
+      this.rot.copy(rot)
     }
 
     return true

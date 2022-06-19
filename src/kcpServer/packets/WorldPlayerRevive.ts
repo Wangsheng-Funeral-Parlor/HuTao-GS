@@ -19,8 +19,7 @@ class WorldPlayerRevivePacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, _data: WorldPlayerReviveReq): Promise<void> {
     const { player } = context
-    const { teamManager, currentScene, currentAvatar } = player
-    const { lastSafePos, lastSafeRot } = currentAvatar.motionInfo
+    const { teamManager, currentScene, lastSafePos, lastSafeRot } = player
 
     // Revive all avatar
     const team = teamManager.getTeam()

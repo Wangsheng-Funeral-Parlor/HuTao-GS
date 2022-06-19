@@ -178,7 +178,7 @@ const commands: CommandDefinition[] = [
 
       for (let clientID in clients) {
         const client = clients[clientID]
-        lines.push(`${client.uid || '------'}|${client.state.toString(16).padStart(4, '0').toUpperCase()}|${clientID}`)
+        lines.push(`${client.uid.toString().padStart(6, '0') || '------'}|${client.state.toString(16).padStart(4, '0').toUpperCase()}|${clientID}`)
       }
 
       if (lines.length === 0) {
@@ -248,12 +248,13 @@ const commands: CommandDefinition[] = [
         printError('Player not found.')
         return
       }
-      if (!player.currentAvatar) {
+
+      const pos = player.pos
+      if (!pos) {
         printError('Unable to get player position.')
         return
       }
 
-      const pos = player.currentAvatar.motionInfo.pos
       print('Scene:', player.currentScene?.id || '?', 'X:', pos.X, 'Y:', pos.Y, 'Z:', pos.Z)
     }
   },
@@ -477,9 +478,9 @@ const commands: CommandDefinition[] = [
         return
       }
 
-      const { currentScene, currentAvatar } = player
-      if (!currentScene || !currentAvatar) {
-        printError('Unable to get player location.')
+      const { currentScene, pos } = player
+      if (!currentScene || !pos) {
+        printError('Unable to get player position.')
         return
       }
 
@@ -487,8 +488,8 @@ const commands: CommandDefinition[] = [
 
       const entity = new Monster(args[0])
 
-      entity.motionInfo.pos.copy(currentAvatar.motionInfo?.pos)
-      entity.bornPos.copy(currentAvatar.motionInfo?.pos)
+      entity.motionInfo.pos.copy(pos)
+      entity.bornPos.copy(pos)
 
       entity.initNew(args[1])
 

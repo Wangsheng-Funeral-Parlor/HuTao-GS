@@ -142,7 +142,7 @@ export default class Scene extends BaseClass {
   ): Promise<boolean> {
     const { world, id, host, enterSceneToken, sceneTagList, playerList, beginTime } = this
     const { player } = context
-    const { state, currentScene, currentAvatar } = player
+    const { state, currentScene, pos: playerPos, rot: playerRot } = player
 
     let sceneType = (state & 0x0F00)
     switch (enterReason) {
@@ -180,9 +180,9 @@ export default class Scene extends BaseClass {
       sceneTransaction: `${id}-${host.uid}-${Math.floor(Date.now() / 1e3)}-33696`
     }
 
-    if (currentScene) {
+    if (currentScene && playerPos) {
       const prevPos = new Vector()
-      prevPos.copy(currentAvatar.motionInfo.pos)
+      prevPos.copy(playerPos)
 
       playerEnterSceneData.prevSceneId = currentScene.id
       playerEnterSceneData.prevPos = prevPos
@@ -200,8 +200,8 @@ export default class Scene extends BaseClass {
 
     if (!playerList.includes(player)) playerList.push(player)
 
-    currentAvatar.motionInfo.pos.copy(pos)
-    currentAvatar.motionInfo.rot.copy(rot)
+    playerPos.copy(pos)
+    playerRot.copy(rot)
 
     await player.emit('SceneJoin', this, context)
 

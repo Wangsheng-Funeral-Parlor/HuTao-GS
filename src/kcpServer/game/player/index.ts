@@ -186,6 +186,26 @@ export default class Player extends BaseClass {
     return new PacketContext(this.client)
   }
 
+  get pos(): Vector | null {
+    return this.currentAvatar?.motionInfo?.pos || null
+  }
+
+  get rot(): Vector | null {
+    return this.currentAvatar?.motionInfo?.rot || null
+  }
+
+  get hasLastSafeState(): boolean {
+    return !!this.currentAvatar?.motionInfo?.hasLastSafeState
+  }
+
+  get lastSafePos(): Vector | null {
+    return this.currentAvatar?.motionInfo?.lastSafePos || null
+  }
+
+  get lastSafeRot(): Vector | null {
+    return this.currentAvatar?.motionInfo?.lastSafeRot || null
+  }
+
   // Setter
 
   set state(v) {
@@ -421,7 +441,7 @@ export default class Player extends BaseClass {
   }
 
   async dragBack(): Promise<void> {
-    const { teamManager, currentWorld, currentScene, currentAvatar, lastDragBack, draggingBack, prevScene, context } = this
+    const { state, teamManager, currentWorld, currentScene, currentAvatar, lastDragBack, draggingBack, prevScene, context } = this
     const now = Date.now()
 
     if (!currentWorld || !currentScene || !currentAvatar || !currentAvatar.isAlive() || draggingBack) return
@@ -434,27 +454,28 @@ export default class Player extends BaseClass {
       this.dragBackCount = 0
     }
 
+    this.lastDragBack = now
+
     this.draggingBack = true
     if (continuousFall && this.dragBackCount >= 5 && prevScene) {
       // Still falling into the void, go back to last scene
-      await this.returnToPrevScene(SceneEnterReasonEnum.FORCE_QUIT_SCENE)
-    } else {
-      // Falling into the void, go back to last safe pos
-      const team = teamManager.getTeam()
-      const avatarList = team.getAliveAvatarList()
-      for (let avatar of avatarList) {
-        const { fightProps } = avatar
-        await fightProps.drainEnergy(true)
-        await fightProps.takeDamage(0, fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS)
-      }
-
-      if (team.getAliveAvatar()) {
-        if (!currentAvatar.isAlive()) await waitUntil(() => this.currentAvatar?.isAlive())
-        await currentScene.join(context, lastSafePos.clone(), lastSafeRot.clone(), SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.FORCE_DRAG_BACK)
-      }
+      await this.returnToPrevScene((state & 0x0F00) === ClientState.SCENE_DUNGEON ? SceneEnterReasonEnum.DUNGEON_QUIT : SceneEnterReasonEnum.FORCE_QUIT_SCENE)
+      return
     }
 
-    this.lastDragBack = now
+    // Falling into the void, go back to last safe pos
+    const team = teamManager.getTeam()
+    const avatarList = team.getAliveAvatarList()
+    for (let avatar of avatarList) {
+      const { fightProps } = avatar
+      await fightProps.drainEnergy(true)
+      await fightProps.takeDamage(0, fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS)
+    }
+
+    if (team.getAliveAvatar()) {
+      if (!currentAvatar.isAlive()) await waitUntil(() => this.currentAvatar?.isAlive())
+      await currentScene.join(context, lastSafePos.clone(), lastSafeRot.clone(), SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.FORCE_DRAG_BACK)
+    }
   }
 
   exportEnterSceneInfo(): PlayerEnterSceneInfoNotify {
@@ -502,13 +523,12 @@ export default class Player extends BaseClass {
   }
 
   exportLocationInfo(): PlayerLocationInfo {
-    const { uid, currentAvatar } = this
-    const { pos, rot } = currentAvatar.motionInfo
+    const { uid, pos, rot } = this
 
     return {
       uid,
-      pos: pos.export(),
-      rot: rot.export()
+      pos: pos?.export(),
+      rot: rot?.export()
     }
   }
 
@@ -629,8 +649,8 @@ export default class Player extends BaseClass {
   async handleUpdate() {
     if (!this.isInMp() || this.isHost()) this.emit('WorldUpdate')
 
-    const { state, currentScene, currentAvatar } = this
-    if ((state & 0xF0FF) === ClientState.IN_GAME && currentAvatar && currentAvatar.motionInfo.pos.Y <= currentScene?.dieY) this.dragBack()
+    const { state, currentScene, pos } = this
+    if ((state & 0xF0FF) === ClientState.IN_GAME && pos && pos.Y <= currentScene?.dieY) this.dragBack()
   }
 
   // SceneJoin
@@ -648,7 +668,7 @@ export default class Player extends BaseClass {
 
   // SceneLeave
   async handleSceneLeave(scene: Scene) {
-    const { avatarList, teamManager, currentAvatar, sceneBlockList, context, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
+    const { avatarList, teamManager, sceneBlockList, context, pos, rot, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
     const { entityManager } = scene
     const teamEntityId = teamManager.entity.entityId
 
@@ -658,9 +678,8 @@ export default class Player extends BaseClass {
     if (nextScene !== scene) {
       this.prevScene = scene
 
-      // Save previous scene player position
-      if (currentAvatar) {
-        const { pos, rot } = currentAvatar.motionInfo
+      // Save previous scene player location
+      if (pos && rot) {
         prevScenePos.copy(pos)
         prevSceneRot.copy(rot)
 

@@ -136,7 +136,7 @@ export default class SceneBlock extends BaseClass {
 
   inRange(player: Player): boolean {
     const { groups } = this
-    const pos = player?.currentAvatar?.motionInfo?.pos
+    const { pos } = player
     if (!pos) return false
 
     for (let group of groups) {

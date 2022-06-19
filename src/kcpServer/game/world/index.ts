@@ -154,8 +154,8 @@ export default class World extends BaseClass {
     const scene = isHost ? (this.getScene(sceneId) || this.getScene(mainSceneId)) : host.currentScene
     if (!scene) return false
 
-    const enterPos = isHost ? pos : host.currentAvatar.motionInfo.pos
-    const enterRot = isHost ? rot : host.currentAvatar.motionInfo.rot
+    const enterPos = isHost ? pos : host.pos
+    const enterRot = isHost ? rot : host.rot
     const enterType = isHost ? SceneEnterTypeEnum.ENTER_SELF : SceneEnterTypeEnum.ENTER_OTHER
     const enterReason = isHost ? SceneEnterReasonEnum.LOGIN : SceneEnterReasonEnum.TEAM_JOIN
 
@@ -229,7 +229,7 @@ export default class World extends BaseClass {
 
   async changeToMp() {
     const { host, hostLastState, mpMode } = this
-    const { teamManager, currentWorld, currentScene, currentAvatar } = host
+    const { teamManager, currentWorld, currentScene, context, pos, rot } = host
     if (mpMode || currentWorld !== this) return
 
     logger.debug(uidPrefix('MODE', host), 'SP -> MP')
@@ -238,7 +238,7 @@ export default class World extends BaseClass {
     this.mpMode = true
 
     teamManager.getTeam().clear()
-    await this.getScene(currentScene.id).join(host.context, currentAvatar.motionInfo.pos, currentAvatar.motionInfo.rot, SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.HOST_FROM_SINGLE_TO_MP)
+    await this.getScene(currentScene.id).join(context, pos, rot, SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.HOST_FROM_SINGLE_TO_MP)
   }
 
   async changeToSingle() {
