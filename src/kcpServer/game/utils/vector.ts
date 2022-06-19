@@ -6,8 +6,28 @@ export default class Vector {
   Y: number
   Z: number
 
-  constructor(x?: number, y?: number, z?: number) {
+  hash: number
+
+  grid: Vector | null
+  gridSize: number | null
+
+  constructor(x?: number, y?: number, z?: number, gridSize: number = null) {
+    this.grid = gridSize == null ? null : new Vector()
+    this.gridSize = gridSize
+
     this.set(x, y, z)
+  }
+
+  private updateHash() {
+    const { X, Y, Z } = this
+    this.hash = 1 * X + 12 * Y + 123 * Z
+  }
+
+  private updateGrid() {
+    const { X, Y, Z, grid, gridSize } = this
+    if (gridSize == null) return
+
+    grid?.set(Math.floor(X / gridSize), Math.floor(Y / gridSize), Math.floor(Z / gridSize))
   }
 
   set(x?: number, y?: number, z?: number): Vector {
@@ -15,15 +35,27 @@ export default class Vector {
     this.Y = y || 0
     this.Z = z || 0
 
+    this.updateHash()
+    this.updateGrid()
+
     return this
   }
 
-  setData(vec: DataVector | VectorInterface) {
+  setGridSize(gridSize: number = null) {
+    this.grid = gridSize == null ? null : new Vector()
+    this.gridSize = gridSize
+
+    this.updateGrid()
+  }
+
+  setData(vec: DataVector | VectorInterface | Vector) {
     const { X, Y, Z } = vec
 
-    this.X = typeof X === 'number' ? X : (X?.[1] || 0)
-    this.Y = typeof Y === 'number' ? Y : (Y?.[1] || 0)
-    this.Z = typeof Z === 'number' ? Z : (Z?.[1] || 0)
+    this.set(
+      typeof X === 'number' ? X : X?.[1],
+      typeof Y === 'number' ? Y : Y?.[1],
+      typeof Z === 'number' ? Z : Z?.[1]
+    )
 
     return this
   }
@@ -36,6 +68,12 @@ export default class Vector {
   distanceTo2D(vec: Vector): number {
     const { X, Z } = this
     return Math.sqrt(((vec.X - X) ** 2) + ((vec.Z - Z) ** 2))
+  }
+
+  equal(vec: Vector): boolean {
+    const { X, Y, Z } = this
+    const { X: x, Y: y, Z: z } = vec
+    return X === x && Y === y && Z === z
   }
 
   copy(vec: Vector): Vector {

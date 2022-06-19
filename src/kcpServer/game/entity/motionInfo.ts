@@ -1,3 +1,4 @@
+import { GRID_SIZE } from '$/manager/entityManager'
 import Vector from '$/utils/vector'
 import { MotionStateEnum } from '@/types/enum/entity'
 import { MotionInfoInterface } from '@/types/game/motion'
@@ -24,6 +25,8 @@ export default class MotionInfo {
     rot: Vector = new Vector(0, 0, 0),
     speed: Vector = new Vector(0, 0, 0)
   ) {
+    pos.setGridSize(GRID_SIZE)
+
     this.pos = pos
     this.rot = rot
     this.speed = speed

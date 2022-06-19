@@ -122,6 +122,10 @@ export default class Entity extends BaseClass {
     return this.motionInfo.distanceTo(entity.motionInfo)
   }
 
+  gridEqual(grid: Vector) {
+    return this.motionInfo.pos.grid.equal(grid)
+  }
+
   async kill(attackerId: number, dieType: PlayerDieTypeEnum): Promise<void> {
     // Can't die again if you are dead
     if (!this.isAlive()) return
