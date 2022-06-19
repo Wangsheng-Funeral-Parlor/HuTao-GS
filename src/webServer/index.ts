@@ -143,7 +143,9 @@ export default class WebServer extends EventEmitter {
       rsp.end('404 page not found')
       return
     } catch (err) {
-      logger.error('Error handling request:', (<Error>err).message)
+      const errMsg = (<Error>err).message
+
+      if (errMsg !== 'aborted') logger.error('Error handling request:', errMsg)
 
       rsp.writeHead(500)
       rsp.end('500 internal server error')
