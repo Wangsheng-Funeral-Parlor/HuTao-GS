@@ -31,10 +31,16 @@ export default class MotionInfo {
     this.rot = rot
     this.speed = speed
     this.state = MotionStateEnum.MOTION_NONE
+    this.params = []
 
     this.lastSafePos = new Vector(pos.X, pos.Y, pos.Z)
     this.lastSafeRot = new Vector(rot.X, rot.Y, rot.Z)
     this.hasLastSafeState = false
+  }
+
+  standby() {
+    this.speed.set()
+    this.state = MotionStateEnum.MOTION_STANDBY
   }
 
   distanceTo(motionInfo: MotionInfo) {
@@ -73,13 +79,14 @@ export default class MotionInfo {
   }
 
   export(): MotionInfoInterface {
-    const { pos, rot, speed, state } = this
+    const { pos, rot, speed, state, params } = this
 
     return {
       pos: pos.export(),
       rot: rot.export(),
       speed: speed.export(),
-      state
+      state,
+      params: params.map(param => param.export())
     }
   }
 }

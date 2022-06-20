@@ -8,7 +8,7 @@ import newGuid from '$/utils/newGuid'
 import Weapon from '$/equip/weapon'
 import Reliquary from '$/equip/reliquary'
 import { AvatarTypeEnum } from '@/types/enum/avatar'
-import { MotionStateEnum, ProtEntityTypeEnum } from '@/types/enum/entity'
+import { ProtEntityTypeEnum } from '@/types/enum/entity'
 import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo } from '@/types/game/avatar'
 import { SceneTeamAvatar } from '@/types/game/team'
 import AvatarFlycloakChange from '#/packets/AvatarFlycloakChange'
@@ -77,7 +77,7 @@ export default class Avatar extends Entity {
     skillDepot.init(skillDepotData)
     fetterList.init(fettersData)
 
-    motionInfo.state = MotionStateEnum.MOTION_STANDBY
+    motionInfo.standby()
 
     const weaponItem = player.inventory.getItem(BigInt(weaponGuid))
 
@@ -106,7 +106,7 @@ export default class Avatar extends Entity {
     skillDepot.initNew()
     fetterList.initNew()
 
-    motionInfo.state = MotionStateEnum.MOTION_STANDBY
+    motionInfo.standby()
 
     const weapon = new Weapon(AvatarData.getAvatar(avatarId)?.InitialWeapon)
     weapon.initNew()

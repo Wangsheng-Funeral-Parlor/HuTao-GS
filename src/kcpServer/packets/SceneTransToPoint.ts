@@ -4,6 +4,7 @@ import { RetcodeEnum } from '@/types/enum/retcode'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
 import SceneData from '$/gameData/data/SceneData'
 import { ClientState } from '@/types/enum/state'
+import SceneTransPoint from '@/types/gameData/BinOutput/ScenePoint/Point/SceneTransPoint'
 
 export interface SceneTransToPointReq {
   sceneId: number
@@ -26,12 +27,12 @@ class SceneTransToPointPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: SceneTransToPointReq): Promise<void> {
     const { player } = context
-    const { currentWorld, currentScene } = player
+    const { currentWorld, currentScene, currentAvatar } = player
 
     const { sceneId, pointId } = data
 
     const scene = currentWorld.getScene(sceneId)
-    const { TranPos, TranRot } = SceneData.getScenePoint(sceneId, pointId) || {}
+    const { Type, TranPos, TranRot } = <SceneTransPoint>SceneData.getScenePoint(sceneId, pointId) || {}
 
     if (!scene || !TranPos) {
       await this.response(context, { retcode: RetcodeEnum.RET_POINT_NOT_UNLOCKED })
@@ -44,7 +45,19 @@ class SceneTransToPointPacket extends Packet implements PacketInterface {
     pos.setData(TranPos || {})
     rot.setData(TranRot || {})
 
-    await scene.join(context, pos, rot, currentScene?.id === sceneId ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
+    let enterType = SceneEnterTypeEnum.ENTER_JUMP
+    if (currentScene?.id === sceneId) {
+      currentAvatar.motionInfo.standby()
+
+      if (Type === 'PORTAL') {
+        currentAvatar.motionInfo.params = [new Vector(), new Vector()]
+        enterType = SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL
+      } else {
+        enterType = SceneEnterTypeEnum.ENTER_GOTO
+      }
+    }
+
+    await scene.join(context, pos, rot, enterType, SceneEnterReasonEnum.TRANS_POINT)
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,

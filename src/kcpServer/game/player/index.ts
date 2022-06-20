@@ -35,7 +35,6 @@ import { ClientState } from '@/types/enum/state'
 import Widget from './widget'
 import UserData from '@/types/user'
 import SceneBlock from '$/scene/sceneBlock'
-import { VisionTypeEnum } from '@/types/enum/entity'
 
 export default class Player extends BaseClass {
   game: Game
@@ -668,36 +667,31 @@ export default class Player extends BaseClass {
 
   // SceneLeave
   async handleSceneLeave(scene: Scene) {
-    const { avatarList, teamManager, sceneBlockList, context, pos, rot, loadedEntityIdList, nextScene, prevScenePos, prevSceneRot } = this
+    const { avatarList, teamManager, sceneBlockList, context, pos, rot, nextScene, prevScenePos, prevSceneRot } = this
     const { entityManager } = scene
     const teamEntityId = teamManager.entity.entityId
 
     this.draggingBack = false
 
-    // Set previous scene if changing scene
-    if (nextScene !== scene) {
-      this.prevScene = scene
-
-      // Save previous scene player location
-      if (pos && rot) {
-        prevScenePos.copy(pos)
-        prevSceneRot.copy(rot)
-
-        // Prevent player from falling through the ground
-        prevScenePos.Y += 1.5
-      }
-
-      for (let sceneBlock of sceneBlockList) sceneBlock.tryRemovePlayer(this)
-    }
-
     // Unregister entities
     await entityManager.unregister(teamManager.entity)
     for (let avatar of avatarList) await entityManager.unregister(avatar)
 
-    // Unload entities
-    for (let entityId of loadedEntityIdList) entityManager.disappearQueuePush(this, entityId, VisionTypeEnum.VISION_MISS)
-    await entityManager.disappearQueueFlush(this)
-    loadedEntityIdList.splice(0)
+    if (nextScene === scene) return
+
+    // Set previous scene
+    this.prevScene = scene
+
+    // Save previous scene player location
+    if (pos && rot) {
+      prevScenePos.copy(pos)
+      prevSceneRot.copy(rot)
+
+      // Prevent player from falling through the ground
+      prevScenePos.Y += 1.5
+    }
+
+    for (let sceneBlock of sceneBlockList) sceneBlock.tryRemovePlayer(this)
 
     await DelTeamEntity.sendNotify(context, scene, [teamEntityId])
     await DelTeamEntity.broadcastNotify(scene.broadcastContextList, scene, [teamEntityId])

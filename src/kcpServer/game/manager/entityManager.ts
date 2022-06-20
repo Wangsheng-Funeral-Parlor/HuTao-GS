@@ -69,7 +69,7 @@ export default class EntityManager {
     }
   }
 
-  async updatePlayer(player: Player, waitFlush: boolean = false, seqId?: number): Promise<void> {
+  async updatePlayer(player: Player, visionType: VisionTypeEnum = VisionTypeEnum.VISION_MEET, waitFlush: boolean = false, seqId?: number): Promise<void> {
     const { onSceneEntityMap } = this
     const { state, loadedEntityIdList } = player
 
@@ -85,7 +85,7 @@ export default class EntityManager {
 
       if (!loaded && canLoad) {
         loadedEntityIdList.push(entityId)
-        this.appearQueuePush(player, entity, VisionTypeEnum.VISION_MEET)
+        this.appearQueuePush(player, entity, visionType)
       }
 
       if (canLoad) seenEntities.push(entityId)

@@ -177,6 +177,7 @@ export default class World extends BaseClass {
   async leave(context: PacketContext, quitReason: QuitReasonEnum = QuitReasonEnum.INVALID, clientReconnectReason: ClientReconnectReasonEnum = ClientReconnectReasonEnum.CLIENT_RECONNNECT_NONE) {
     const { game, playerList, hostLastState } = this
     const { player, seqId } = context
+    const { currentScene } = player
 
     // Check if player is in world
     if (!playerList.includes(player)) return false
@@ -190,7 +191,7 @@ export default class World extends BaseClass {
     if (quitReason !== QuitReasonEnum.INVALID) await PlayerQuitFromMp.sendNotify(context, quitReason)
 
     // Leave scene
-    if (player.currentScene) player.currentScene.leave(context)
+    if (currentScene) currentScene.leave(context)
 
     // Send mp leave system hint
     if (!isHost) await game.chatManager.sendPublic(this, 0, ChatChannel.createSystemHint(player, SystemHintTypeEnum.CHAT_LEAVE_WORLD))

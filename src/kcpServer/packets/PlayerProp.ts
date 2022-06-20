@@ -11,18 +11,21 @@ class PlayerPropPacket extends Packet implements PacketInterface {
     super('PlayerProp')
   }
 
-  async sendNotify(context: PacketContext, type: number): Promise<void> {
+  async sendNotify(context: PacketContext, ...types: number[]): Promise<void> {
     if (!this.checkState(context, ClientState.LOGIN, true)) return
 
-    const value = context.player.props.get(type)
     const notifyData: PlayerPropNotify = {
-      propMap: {
-        [type]: {
+      propMap: Object.fromEntries(types.map(type => {
+        const value = context.player.props.get(type)
+        return [
           type,
-          ival: value,
-          val: value
-        }
-      }
+          {
+            type,
+            ival: value,
+            val: value
+          }
+        ]
+      }))
     }
 
     await super.sendNotify(context, notifyData)

@@ -19,6 +19,8 @@ import ChatChannel from '$/chat/chatChannel'
 import { SystemHintTypeEnum } from '@/types/enum/chat'
 import { SceneEnterTypeEnum } from '@/types/enum/scene'
 import { ClientState } from '@/types/enum/state'
+import PlayerProp from './PlayerProp'
+import { PlayerPropEnum } from '@/types/enum/player'
 
 export interface SceneInitFinishReq {
   enterSceneToken: number
@@ -74,6 +76,7 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
 
     await SyncTeamEntity.broadcastNotify(broadcastContextList)
     await SyncScenePlayTeamEntity.broadcastNotify(broadcastContextList)
+    await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_MAX_SPRING_VOLUME, PlayerPropEnum.PROP_CUR_SPRING_VOLUME)
     await ScenePlayBattleInfoList.sendNotify(context)
 
     await AllMarkPoint.sendNotify(context)

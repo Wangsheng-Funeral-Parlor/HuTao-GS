@@ -4,6 +4,8 @@ import EnterScenePeer from './EnterScenePeer'
 import { ClientState } from '@/types/enum/state'
 import PlayerPreEnterMp from './PlayerPreEnterMp'
 import { SceneEnterTypeEnum } from '@/types/enum/scene'
+import SceneEntityDisappear from './SceneEntityDisappear'
+import { VisionTypeEnum } from '@/types/enum/entity'
 
 export interface EnterSceneReadyReq {
   enterSceneToken: number
@@ -24,7 +26,7 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: EnterSceneReadyReq): Promise<void> {
     const { player, seqId } = context
-    const { state, currentScene } = player
+    const { state, currentScene, loadedEntityIdList } = player
     const { enterSceneToken } = data
 
     if (currentScene.enterSceneToken !== enterSceneToken) {
@@ -41,6 +43,8 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
 
       await PlayerPreEnterMp.sendNotify(hostCtx, player)
     }
+
+    if (loadedEntityIdList.length > 0) await SceneEntityDisappear.sendNotify(context, loadedEntityIdList.splice(0), VisionTypeEnum.VISION_MISS)
 
     await EnterScenePeer.sendNotify(context)
 

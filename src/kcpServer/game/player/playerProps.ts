@@ -32,6 +32,8 @@ export default class PlayerProps {
     this.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL_LIMIT, 3)
     this.set(PlayerPropEnum.PROP_PLAYER_RESIN, 160)
     this.set(PlayerPropEnum.PROP_IS_SPRING_AUTO_USE, true)
+    this.set(PlayerPropEnum.PROP_MAX_SPRING_VOLUME, 8000000)
+    this.set(PlayerPropEnum.PROP_CUR_SPRING_VOLUME, 8000000)
     this.set(PlayerPropEnum.PROP_SPRING_AUTO_USE_PERCENT, 1)
     this.set(PlayerPropEnum.PROP_MAX_STAMINA, 24000)
     this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, 24000)
