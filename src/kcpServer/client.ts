@@ -9,8 +9,6 @@ import { Handshake } from './handshake'
 import { ClientState } from '@/types/enum/state'
 import protoCleanup from './utils/protoCleanup'
 
-const PingTimeout = 60e3
-
 const logger = new Logger('CLIENT', 0xffdb4a)
 
 export default class Client extends BaseClass {
@@ -19,8 +17,6 @@ export default class Client extends BaseClass {
 
   private kcp: Kcp
   private ctx: SocketContext
-  private nextUpdate: number
-  private lastPing: number
 
   server: KcpServer
 
@@ -55,11 +51,10 @@ export default class Client extends BaseClass {
 
     this.kcp = new Kcp(conv, token, this.outputKcp.bind(this))
     this.kcp.setNodelay(true, 0, false)
-    this.kcp.setInterval(60)
+    this.kcp.setInterval(0)
+    this.kcp.setMaxResend(1024)
 
     this.ctx = ctx
-    this.nextUpdate = 0
-    this.lastPing = Date.now()
 
     this.readyToSave = false
   }
@@ -88,10 +83,10 @@ export default class Client extends BaseClass {
 
   // Update function
   update() {
-    const { server, player, lastPing } = this
+    const { server, kcp, player, state } = this
 
-    if (Date.now() - lastPing > PingTimeout) {
-      this.lastPing = Infinity
+    if (state > ClientState.DEADLINK && kcp.isDeadLink()) {
+      this.state = ClientState.DEADLINK
       server.disconnect(this.id)
     }
 
@@ -133,18 +128,7 @@ export default class Client extends BaseClass {
 
   // Update kcp
   updateKcp() {
-    const { kcp, nextUpdate } = this
-    const now = Date.now()
-
-    if (now < nextUpdate) return
-
-    kcp.update(now)
-    this.nextUpdate = now + kcp.check(now)
-  }
-
-  // Update ping
-  ping() {
-    this.lastPing = Date.now()
+    this.kcp.update(Date.now())
   }
 
   // Generate xor key from seed

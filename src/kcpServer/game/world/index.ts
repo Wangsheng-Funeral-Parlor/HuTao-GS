@@ -144,7 +144,7 @@ export default class World extends BaseClass {
   async join(context: PacketContext): Promise<boolean> {
     const { player } = context
 
-    if (player.currentWorld === this) return false
+    if (!player || player.currentWorld === this) return false
 
     const { mainSceneId, host, playerList, hostLastState } = this
     const { sceneId, pos, rot } = hostLastState

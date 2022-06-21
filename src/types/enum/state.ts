@@ -2,11 +2,12 @@ export enum ClientState {
   NONE = 0,
 
   /*== Main state ==*/
-  CONNECTION = (0x1 << 12),
-  LOGIN = (0x2 << 12),
-  PRE_ENTER_SCENE = (0x3 << 12),
-  ENTER_SCENE = (0x4 << 12),
-  IN_GAME = (0x5 << 12),
+  DEADLINK = (0x1 << 12),
+  CONNECTION = (0x2 << 12),
+  LOGIN = (0x3 << 12),
+  PRE_ENTER_SCENE = (0x4 << 12),
+  ENTER_SCENE = (0x5 << 12),
+  IN_GAME = (0x6 << 12),
 
   /*== Scene type state ==*/
   SCENE_WORLD = (0x1 << 8),

@@ -127,23 +127,26 @@ export default class Logger {
   performance(list: PerformanceObserverEntryList) {
     for (let perfEntry of list.getEntries()) {
       const { name, duration } = perfEntry
-      const entry = entryMap[name] || (entryMap[name] = [1])
+      const entry = entryMap[name] || (entryMap[name] = [1, 0])
 
       entry[0] = 1
 
       entry.push(duration)
-      if (entry.length > 11) entry.splice(1, entry.length - 10)
+      if (entry.length > 12) entry.splice(2, entry.length - 10)
     }
+
+    const now = Date.now()
 
     for (let name in entryMap) {
       const entry = entryMap[name]
 
-      if (entry[0] === 0) continue
-      entry[0] = 0
+      if (entry[0] === 0 || now - entry[1] < 3e3) continue
 
-      const slicedEntry = entry.slice(1)
+      entry[0] = 0
+      entry[1] = now
+
+      const slicedEntry = entry.slice(2)
       const avg = Math.floor(slicedEntry.reduce((c, p) => p + c) / entry.length)
-      if (avg < 5) continue
 
       const min = Math.floor(Math.min(...slicedEntry))
       const max = Math.floor(Math.max(...slicedEntry))

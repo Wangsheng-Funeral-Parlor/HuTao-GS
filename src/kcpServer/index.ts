@@ -133,6 +133,8 @@ export default class KcpServer extends EventEmitter {
   }
 
   update() {
+    performance.mark('Tick')
+
     const { frame, clients } = this
     const clientList = Object.values(clients)
 
@@ -142,6 +144,8 @@ export default class KcpServer extends EventEmitter {
     }
 
     this.frame ^= 1
+
+    performance.measure('Game tick', 'Tick')
   }
 
   private async handleMessage(data: Buffer, rinfo: dgram.RemoteInfo): Promise<void> {

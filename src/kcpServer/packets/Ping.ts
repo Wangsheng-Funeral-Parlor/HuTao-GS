@@ -21,10 +21,7 @@ class PingPacket extends Packet implements PacketInterface {
   }
 
   async request(context: PacketContext, data: PingReq): Promise<void> {
-    const { client } = context
     const { clientTime } = data
-
-    client.ping()
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
