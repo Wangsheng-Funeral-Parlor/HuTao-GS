@@ -21,6 +21,7 @@ import GrowCurveData from '$/gameData/data/GrowCurveData'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import AvatarUserData from '@/types/user/AvatarUserData'
 import { EquipTypeEnum } from '@/types/user/EquipUserData'
+import { getTimeSeconds } from '@/utils/time'
 
 export default class Avatar extends Entity {
   player: Player
@@ -116,7 +117,7 @@ export default class Avatar extends Entity {
 
     this.wearingFlycloakId = 140001
     this.avatarType = avatarType
-    this.bornTime = Math.floor(Date.now() / 1e3)
+    this.bornTime = getTimeSeconds()
 
     super.initNew()
   }

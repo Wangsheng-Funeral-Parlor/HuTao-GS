@@ -35,6 +35,7 @@ import { ClientState } from '@/types/enum/state'
 import Widget from './widget'
 import UserData from '@/types/user'
 import SceneBlock from '$/scene/sceneBlock'
+import { getTimeSeconds } from '@/utils/time'
 
 export default class Player extends BaseClass {
   game: Game
@@ -512,7 +513,7 @@ export default class Player extends BaseClass {
       signature,
       onlineState,
       isMpModeAvailable: !!props.get(PlayerPropEnum.PROP_IS_MP_MODE_AVAILABLE),
-      lastActiveTime: Math.floor(Date.now() / 1e3),
+      lastActiveTime: getTimeSeconds(),
       nameCardId,
       showAvatarInfoList: profile.exportShowAvatarInfoList(),
       profilePicture,

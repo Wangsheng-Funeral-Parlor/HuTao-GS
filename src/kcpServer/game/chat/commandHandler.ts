@@ -5,6 +5,7 @@ import { ChatInfo } from '@/types/game/chat'
 import ChatChannel from './chatChannel'
 import { noColor } from '@/tty'
 import { waitMs } from '@/utils/asyncWait'
+import { getTimeSeconds } from '@/utils/time'
 
 export default class CommandHandler extends BaseClass {
   channel: ChatChannel
@@ -49,7 +50,7 @@ export default class CommandHandler extends BaseClass {
     await waitMs(500)
 
     this.channel.send(player, {
-      time: Math.floor(Date.now() / 1e3),
+      time: getTimeSeconds(),
       uid: 1,
       sequence: sequence + 1,
       text: noColor(printBuffer.splice(0).join('\n'))

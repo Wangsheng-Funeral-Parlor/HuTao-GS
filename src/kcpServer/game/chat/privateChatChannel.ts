@@ -2,6 +2,7 @@ import PrivateChat, { PrivateChatReq } from '#/packets/PrivateChat'
 import { ChatManager } from '$/manager/chatManager'
 import Player from '$/player'
 import { ChatInfo } from '@/types/game/chat'
+import { getTimeSeconds } from '@/utils/time'
 import ChatChannel from './chatChannel'
 import CommandHandler from './commandHandler'
 
@@ -24,7 +25,7 @@ export default class PrivateChatChannel extends ChatChannel {
 
   static createChatInfo(sender: Player, req: PrivateChatReq): ChatInfo {
     const chatInfo: ChatInfo = {
-      time: Math.floor(Date.now() / 1e3),
+      time: getTimeSeconds(),
       uid: sender.uid,
       toUid: req.targetUid
     }

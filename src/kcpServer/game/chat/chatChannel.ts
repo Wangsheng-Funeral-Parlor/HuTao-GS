@@ -3,6 +3,7 @@ import { ChatManager } from '$/manager/chatManager'
 import Player from '$/player'
 import { SystemHintTypeEnum } from '@/types/enum/chat'
 import { ChatInfo } from '@/types/game/chat'
+import { getTimeSeconds } from '@/utils/time'
 
 export default class ChatChannel extends BaseClass {
   chatManager: ChatManager
@@ -36,7 +37,7 @@ export default class ChatChannel extends BaseClass {
 
   static createSystemHint(player: Player, type: SystemHintTypeEnum): ChatInfo {
     return {
-      time: Math.floor(Date.now() / 1e3),
+      time: getTimeSeconds(),
       uid: player.uid,
       systemHint: {
         type

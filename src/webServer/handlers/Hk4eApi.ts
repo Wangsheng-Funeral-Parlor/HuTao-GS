@@ -2,24 +2,13 @@ import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import { Announcement, AnnouncementType } from '@/types/announcement'
+import { getTimeSeconds, getTimestamp } from '@/utils/time'
 
 const CORSHeaders = {
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Headers': 'Origin,X-Requested-With,Content-Type,Accept,gameName,Channel,DS',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE',
   'Access-Control-Allow-Origin': '*'
-}
-
-function getTimestamp(t: number) {
-  const d = new Date(t)
-  const Y = d.getFullYear().toString().padStart(4, '0')
-  const M = (d.getMonth() + 1).toString().padStart(2, '0')
-  const D = d.getDate().toString().padStart(2, '0')
-  const h = d.getHours().toString().padStart(2, '0')
-  const m = d.getMinutes().toString().padStart(2, '0')
-  const s = d.getSeconds().toString().padStart(2, '0')
-
-  return `${Y}-${M}-${D} ${h}:${m}:${s}`
 }
 
 class Hk4eApiHandler extends Handler {
@@ -177,7 +166,7 @@ class Hk4eApiHandler extends Handler {
         pic_total: 0,
         pic_type_list: [],
         static_sign: '',
-        t: Math.floor(Date.now() / 1e3).toString(),
+        t: getTimeSeconds().toString(),
         timezone: 1,
         total: announcements.length,
         type_list: announcementTypes.map(t => ({

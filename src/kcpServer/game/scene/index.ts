@@ -20,6 +20,7 @@ import { ClientState } from '@/types/enum/state'
 import DungeonData from '$/gameData/data/DungeonData'
 import uidPrefix from '#/utils/uidPrefix'
 import AbilityManager from '$/manager/abilityManager'
+import { getTimeSeconds } from '@/utils/time'
 
 const logger = new Logger('GSCENE', 0xefa8ec)
 
@@ -177,7 +178,7 @@ export default class Scene extends BaseClass {
       sceneTagIdList: sceneTagList.filter(tag => tag.isActive()).map(tag => tag.id),
       enterReason,
       worldType: 1,
-      sceneTransaction: `${id}-${host.uid}-${Math.floor(Date.now() / 1e3)}-33696`
+      sceneTransaction: `${id}-${host.uid}-${getTimeSeconds()}-33696`
     }
 
     if (currentScene && playerPos) {

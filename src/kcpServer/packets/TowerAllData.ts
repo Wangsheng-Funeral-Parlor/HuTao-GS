@@ -1,6 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import { TowerCurLevelRecord, TowerFloorRecord, TowerMonthlyBrief } from '@/types/game/tower'
+import { getTimeSeconds } from '@/utils/time'
 
 export interface TowerAllDataReq {
   isInteract?: boolean
@@ -32,6 +33,8 @@ class TowerAllDataPacket extends Packet implements PacketInterface {
   }
 
   async request(context: PacketContext, _data: TowerAllDataReq): Promise<void> {
+    const now = getTimeSeconds()
+
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       towerScheduleId: 0,
@@ -39,9 +42,9 @@ class TowerAllDataPacket extends Packet implements PacketInterface {
       curLevelRecord: {
         isEmpty: true
       },
-      nextScheduleChangeTime: Math.floor(Date.now() / 1e3) + (86400 * 31),
+      nextScheduleChangeTime: now + (86400 * 31),
       floorOpenTimeMap: {},
-      scheduleStartTime: Math.floor(Date.now() / 1e3)
+      scheduleStartTime: now
     })
   }
 

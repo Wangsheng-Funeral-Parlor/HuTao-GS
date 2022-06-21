@@ -3,6 +3,7 @@ import Player from '$/player'
 import { ShopData as ShopDataType } from '@/types/gameData/ShopData'
 import { Shop, ShopCardProduct, ShopGoods } from '@/types/game/shop'
 import Game from '..'
+import { getTimeSeconds } from '@/utils/time'
 
 const cardShopProducts: ShopCardProduct[] = [
   {
@@ -45,7 +46,7 @@ export default class ShopManager {
         return null
     }
 
-    return Math.floor(d.getTime() / 1e3)
+    return getTimeSeconds(d)
   }
 
   getNextRefresh(shopType: number): number | null {
@@ -55,8 +56,10 @@ export default class ShopManager {
 
   exportGoodsList(shopType: number, _player: Player): ShopGoods[] {
     const dataList = ShopData.getShopGoods(shopType)
+    const now = getTimeSeconds()
+
     return dataList
-      .filter(data => data.EndTime > Math.floor(Date.now() / 1e3))
+      .filter(data => data.EndTime > now)
       .map(data => <ShopGoods>Object.fromEntries(Object.entries(<ShopGoods>{
         goodsId: data.Id,
         goodsItem: {
