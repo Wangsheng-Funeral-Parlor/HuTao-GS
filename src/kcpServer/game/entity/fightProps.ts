@@ -253,6 +253,9 @@ export default class FightProp {
       this.get(FightPropEnum.FIGHT_PROP_CUR_HP),
       Math.max(0, val)
     )
+
+    if (damage <= 0) return
+
     this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason })
 
     // Check if entity is dead

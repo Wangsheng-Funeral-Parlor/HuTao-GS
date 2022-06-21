@@ -131,6 +131,10 @@ export default class Player extends BaseClass {
     return this.client.state
   }
 
+  get godMode(): boolean {
+    return !!this.currentAvatar?.godMode
+  }
+
   get mora(): number {
     return this.props.get(PlayerPropEnum.PROP_PLAYER_SCOIN)
   }
@@ -208,16 +212,21 @@ export default class Player extends BaseClass {
 
   // Setter
 
-  set state(v) {
+  set state(v: ClientState) {
     this.client.state = v
   }
 
-  set gameTime(v) {
+  set gameTime(v: number) {
     this.timestampGameTime = v
     this.timestamp = Date.now()
 
     if (!this.currentScene) return
     PlayerGameTime.broadcastNotify(this.currentScene.broadcastContextList)
+  }
+
+  set godMode(v: boolean) {
+    const { avatarList } = this
+    for (let avatar of avatarList) avatar.godMode = v
   }
 
   async init(userData: UserData): Promise<void> {
@@ -234,6 +243,7 @@ export default class Player extends BaseClass {
       flycloakDataList,
       costumeDataList,
       emojiIdList,
+      godMode,
       gameTime
     } = userData || {}
 
@@ -263,7 +273,8 @@ export default class Player extends BaseClass {
 
     hostWorld.init(worldData)
 
-    this.gameTime = gameTime
+    this.godMode = !!godMode
+    this.gameTime = isNaN(parseInt(<any>gameTime)) ? 0 : gameTime
   }
 
   async initNew(avatarId: number, nickName: string): Promise<void> {
@@ -618,6 +629,7 @@ export default class Player extends BaseClass {
       flycloakList,
       costumeList,
       emojiCollection,
+      godMode,
       gameTime
     } = this
 
@@ -639,6 +651,7 @@ export default class Player extends BaseClass {
       })),
       emojiIdList: emojiCollection,
       worldData: hostWorld.exportUserData(),
+      godMode,
       gameTime
     }
   }

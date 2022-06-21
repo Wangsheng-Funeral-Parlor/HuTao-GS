@@ -21,5 +21,6 @@ export default interface UserData {
   costumeDataList: CostumeUserData[]
   emojiIdList: number[]
   worldData: WorldUserData
+  godMode: boolean
   gameTime: number
 }

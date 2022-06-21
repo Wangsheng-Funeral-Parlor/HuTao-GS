@@ -358,11 +358,9 @@ const commands: CommandDefinition[] = [
         return
       }
 
-      const { avatarList, currentAvatar } = player
-      const enabled = !currentAvatar?.godMode
+      player.godMode = !player.godMode
 
-      for (let avatar of avatarList) avatar.godMode = enabled
-      print(`God mode ${enabled ? 'enabled' : 'disabled'}.`)
+      print(`God mode ${player.godMode ? 'enabled' : 'disabled'}.`)
     }
   },
   {
