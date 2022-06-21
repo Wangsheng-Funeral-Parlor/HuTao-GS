@@ -52,6 +52,9 @@ export interface EntityAuthorityInfo {
   aiInfo: SceneEntityAiInfo
   bornPos: VectorInterface
   poseParaList?: AnimatorParameterValueInfoPair[]
+  unknown1?: {
+    unknown1?: VectorInterface
+  }
 }
 
 export interface EntityClientData {
@@ -103,7 +106,7 @@ export interface SceneEntityInfo {
   motionInfo: MotionInfoInterface
   propList: PropPair[]
   fightPropList: FightPropPair[]
-  lifeState: LifeStateEnum
+  lifeState?: LifeStateEnum
   animatorParaList: AnimatorParameterValueInfoPair[]
   lastMoveSceneTimeMs?: number
   lastMoveReliableSeq?: number

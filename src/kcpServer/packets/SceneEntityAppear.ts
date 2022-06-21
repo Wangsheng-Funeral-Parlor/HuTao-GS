@@ -1,8 +1,10 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Entity from '$/entity'
-import { VisionTypeEnum } from '@/types/enum/entity'
+import Npc from '$/entity/npc'
+import { ProtEntityTypeEnum, VisionTypeEnum } from '@/types/enum/entity'
 import { ClientState } from '@/types/enum/state'
 import { SceneEntityInfo } from '@/types/game/entity'
+import GroupSuite from './GroupSuite'
 import SceneEntityMove from './SceneEntityMove'
 
 export interface SceneEntityAppearNotify {
@@ -27,6 +29,9 @@ class SceneEntityAppearPacket extends Packet implements PacketInterface {
     if (param != null) notifyData.param = param
 
     await super.sendNotify(context, notifyData)
+
+    const npcList = entityList.filter(entity => entity.entityType === ProtEntityTypeEnum.PROT_ENTITY_NPC)
+    if (npcList.length > 0) await GroupSuite.sendNotify(context, <Npc[]>npcList)
 
     if (appearType !== VisionTypeEnum.VISION_BORN) return
     for (let entity of entityList) await SceneEntityMove.sendNotify(context, entity)

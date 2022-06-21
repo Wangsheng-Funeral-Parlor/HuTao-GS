@@ -53,14 +53,14 @@ export default class Monster extends Entity {
   }
 
   exportSceneMonsterInfo(): SceneMonsterInfo {
-    const { manager, monsterId, groupId, configId, weaponList, bornType, blockId, poseId, isElite, titleId, specialNameId } = this
+    const { authorityPeerId, monsterId, groupId, configId, weaponList, bornType, blockId, poseId, isElite, titleId, specialNameId } = this
 
     return {
       monsterId,
       groupId,
       configId,
       weaponList: weaponList.map(weapon => weapon.exportSceneWeaponInfo()),
-      authorityPeerId: manager?.scene?.host?.peerId || 1,
+      authorityPeerId,
       bornType,
       blockId,
       poseId,

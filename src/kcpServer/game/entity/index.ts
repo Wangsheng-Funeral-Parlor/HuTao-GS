@@ -118,6 +118,11 @@ export default class Entity extends BaseClass {
     this.props.set(PlayerPropEnum.PROP_BREAK_LEVEL, v)
   }
 
+  get authorityPeerId() {
+    const { manager } = this
+    return manager?.scene?.host?.peerId || 1
+  }
+
   distanceTo(entity: Entity) {
     return this.motionInfo.distanceTo(entity.motionInfo)
   }
@@ -188,7 +193,10 @@ export default class Entity extends BaseClass {
           isAiOpen: true,
           bornPos: bornPos.export()
         },
-        bornPos: bornPos.export()
+        bornPos: bornPos.export(),
+        unknown1: {
+          unknown1: {}
+        }
       }
     }
 
@@ -204,6 +212,9 @@ export default class Entity extends BaseClass {
         break
       case ProtEntityTypeEnum.PROT_ENTITY_NPC:
         sceneEntityInfo.npc = this.exportSceneNpcInfo()
+        sceneEntityInfo.propList = []
+        delete sceneEntityInfo.lifeState
+        delete sceneEntityInfo.entityAuthorityInfo.abilityInfo
         break
       case ProtEntityTypeEnum.PROT_ENTITY_GADGET:
         sceneEntityInfo.gadget = this.exportSceneGadgetInfo()

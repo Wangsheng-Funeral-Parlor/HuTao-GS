@@ -187,21 +187,21 @@ export interface SceneGadgetInfo {
   roguelikeGadgetInfo?: RoguelikeGadgetInfo
 
   gadgetId: number
-  groupId: number
-  configId: number
-  ownerEntityId: number
-  bornType: GadgetBornTypeEnum
-  gadgetState: number
-  gadgetType: number
-  isShowCutscene: boolean
-  authorityPeerId: number
-  isEnableInteract: boolean
-  interactId: number
-  markFlag: number
-  propOwnerEntityId: number
-  platform: PlatformInfo
-  interactUidList: number[]
-  draftId: number
-  gadgetTalkState: number
-  playInfo: GadgetPlayInfo
+  groupId?: number
+  configId?: number
+  ownerEntityId?: number
+  bornType?: GadgetBornTypeEnum
+  gadgetState?: number
+  gadgetType?: number
+  isShowCutscene?: boolean
+  authorityPeerId?: number
+  isEnableInteract?: boolean
+  interactId?: number
+  markFlag?: number
+  propOwnerEntityId?: number
+  platform?: PlatformInfo
+  interactUidList?: number[]
+  draftId?: number
+  gadgetTalkState?: number
+  playInfo?: GadgetPlayInfo
 }

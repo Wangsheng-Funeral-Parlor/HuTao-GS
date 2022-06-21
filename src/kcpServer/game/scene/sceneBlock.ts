@@ -1,6 +1,8 @@
 import BaseClass from '#/baseClass'
+import Entity from '$/entity'
 import Gadget from '$/entity/gadget'
 import Monster from '$/entity/monster'
+import Npc from '$/entity/npc'
 import SceneData from '$/gameData/data/SceneData'
 import WorldData from '$/gameData/data/WorldData'
 import { VIEW_DIST } from '$/manager/entityManager'
@@ -22,6 +24,7 @@ export default class SceneBlock extends BaseClass {
 
   playerList: Player[]
   monsterList: Monster[]
+  npcList: Npc[]
   gadgetList: Gadget[]
 
   loaded: boolean
@@ -40,6 +43,7 @@ export default class SceneBlock extends BaseClass {
 
     this.playerList = []
     this.monsterList = []
+    this.npcList = []
     this.gadgetList = []
 
     super.initHandlers(this)
@@ -74,40 +78,71 @@ export default class SceneBlock extends BaseClass {
     }
   }
 
-  private loadGadgets(_groupId: number, _gadgets: any[]) {
-    return
-  }
-
-  private unloadMonsters(groupId: number) {
-    const { scene, monsterList } = this
+  private loadNpcs(groupId: number, npcs: any[], suits: any[]) {
+    const { id, scene, npcList } = this
     const { entityManager } = scene
 
-    const unloaded: Monster[] = []
+    for (let npc of npcs) {
+      const { NpcId, ConfigId, Pos, Rot } = npc
+      const entity = new Npc(NpcId)
 
-    for (let monster of monsterList) {
-      if (monster.groupId !== groupId) continue
+      entity.groupId = groupId
+      entity.configId = ConfigId
+      entity.blockId = id
+      entity.suitIdList = Object.keys(suits).map(s => parseInt(s))
 
-      entityManager.unregister(monster, true)
-      unloaded.push(monster)
+      entity.motionInfo.pos.setData(Pos)
+      entity.motionInfo.rot.setData(Rot)
+      entity.bornPos.setData(Pos)
+
+      entity.initNew()
+
+      npcList.push(entity)
+      entityManager.add(entity, undefined, undefined, undefined, undefined, true)
     }
-
-    this.monsterList = monsterList.filter(monster => !unloaded.includes(monster))
   }
 
-  private unloadGadgets(groupId: number) {
-    const { scene, gadgetList } = this
+  private loadGadgets(groupId: number, gadgets: any[]) {
+    const { id, scene, gadgetList } = this
     const { entityManager } = scene
 
-    const unloaded: Gadget[] = []
+    for (let gadget of gadgets) {
+      const { GadgetId, ConfigId, Level, Pos, Rot, InteractId } = gadget
+      const entity = new Gadget(GadgetId)
 
-    for (let gadget of gadgetList) {
-      if (gadget.groupId !== groupId) continue
+      entity.groupId = groupId
+      entity.configId = ConfigId
+      entity.blockId = id
+      entity.interactId = InteractId || null
 
-      entityManager.unregister(gadget, true)
-      unloaded.push(gadget)
+      entity.motionInfo.pos.setData(Pos)
+      entity.motionInfo.rot.setData(Rot)
+      entity.bornPos.setData(Pos)
+
+      entity.initNew(Level)
+
+      gadgetList.push(entity)
+      entityManager.add(entity, undefined, undefined, undefined, undefined, true)
+    }
+  }
+
+  private unloadGroup(groupId: number, list: Entity[]) {
+    const { scene } = this
+    const { entityManager } = scene
+
+    const unloaded: Entity[] = []
+
+    for (let entity of list) {
+      if (entity.groupId !== groupId) continue
+
+      entityManager.unregister(entity, true)
+      unloaded.push(entity)
     }
 
-    this.gadgetList = gadgetList.filter(gadget => !unloaded.includes(gadget))
+    while (unloaded.length > 0) {
+      const entity = unloaded.shift()
+      list.splice(list.indexOf(entity), 1)
+    }
   }
 
   tryAddPlayer(player: Player) {
@@ -160,6 +195,7 @@ export default class SceneBlock extends BaseClass {
       if (!groupData) continue
 
       this.loadMonsters(Id, Object.values(groupData.Monsters || {}))
+      this.loadNpcs(Id, Object.values(groupData.Npcs || {}), groupData.Suites)
       this.loadGadgets(Id, Object.values(groupData.Gadgets || {}))
     }
 
@@ -167,7 +203,7 @@ export default class SceneBlock extends BaseClass {
   }
 
   unload() {
-    const { id, groups, playerList, loaded } = this
+    const { id, groups, playerList, monsterList, npcList, gadgetList, loaded } = this
     if (!loaded) return
 
     this.loaded = false
@@ -175,8 +211,9 @@ export default class SceneBlock extends BaseClass {
     for (let group of groups) {
       const { Id } = group
 
-      this.unloadMonsters(Id)
-      this.unloadGadgets(Id)
+      this.unloadGroup(Id, monsterList)
+      this.unloadGroup(Id, npcList)
+      this.unloadGroup(Id, gadgetList)
     }
 
     playerList.splice(0)
