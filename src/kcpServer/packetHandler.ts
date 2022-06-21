@@ -42,7 +42,7 @@ export default class PacketHandler {
 
     if (!UseProtoMatch) return
 
-    logger.debug('ProtoMatch:', packetID, this.ptm.parseBuffer(packetData), JSON.stringify(this.ptm.findProto(packetData), null, 2))
+    logger.debug('ProtoMatch:', packetID, JSON.stringify(this.ptm.parseBuffer(packetData), null, 2), JSON.stringify(this.ptm.findProto(packetData), null, 2))
   }
 
   async handle(packetID: number, packetName: string, packetData: Buffer, context: PacketContext, ...any: any[]): Promise<void> {

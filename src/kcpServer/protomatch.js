@@ -1,6 +1,8 @@
 const { readdirSync, readFileSync } = require('fs')
 const { join } = require('path')
 const { cwd } = require('process')
+const { cmdIds } = require('./cmdIds')
+const { default: config } = require('../config')
 
 const TYPE_NAMES = {
   0: ['int32', 'int64', 'uint32', 'uint64', 'sint32', 'sint64', 'bool', 'enum'],
@@ -18,14 +20,8 @@ const TYPES = {
   FIXED32: 5
 }
 
-const protoDir = join(cwd(), 'data/proto')
-const ignoreProtos = (() => {
-  try {
-    return Object.values(JSON.parse(readFileSync(join(cwd(), 'data/packetIds.json'), 'utf8')))
-  } catch (err) {
-    return []
-  }
-})()
+const protoDir = join(cwd(), `data/proto/${config.version}`)
+const ignoreProtos = Object.keys(cmdIds)
 
 function readUntil(ref, end, include = false) {
   const { data, offset } = ref
@@ -68,7 +64,7 @@ function decodeDouble(buf, offset) {
 
   return exponent === 0 // denormal
     ? sign * 5e-324 * mantissa
-    : sign * Math.pow(2, exponent - 1075) * (mantissa + 4503599627370496);
+    : sign * Math.pow(2, exponent - 1075) * (mantissa + 4503599627370496)
 }
 
 function decodeVarint(data, offset, bits = 64, signed = false) {
@@ -348,6 +344,7 @@ class ProtoMatch {
         const protoname = filename.split('.')[0]
 
         if (ignoreProtos.includes(protoname)) continue
+        if (!filename.includes('Notify') && !filename.includes('Req') && !filename.includes('Rsp')) continue
 
         const data = readFileSync(join(protoDir, filename), 'utf8')
         Object.assign(ret, this.parseProto(data))

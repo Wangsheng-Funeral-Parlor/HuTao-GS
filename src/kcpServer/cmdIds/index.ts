@@ -10,8 +10,8 @@ const versionMap: { [version: string]: CmdIds } = {
   '2.7.0': ver2_7
 }
 
-const cmdIds: CmdIds = versionMap[config.version] || versionMap[DEFAULT_CONFIG.version] || {}
-const switchedCmdIds = Object.fromEntries(
+export const cmdIds: CmdIds = versionMap[config.version] || versionMap[DEFAULT_CONFIG.version] || {}
+export const switchedCmdIds = Object.fromEntries(
   Object.entries(cmdIds)
     .map(e => [e[1], e[0]])
 )

@@ -7,6 +7,7 @@ import Logger from '@/logger'
 import { Kcp } from '#/utils/kcp'
 import { Handshake } from './handshake'
 import { ClientState } from '@/types/enum/state'
+import protoCleanup from './utils/protoCleanup'
 
 const PingTimeout = 60e3
 
@@ -178,7 +179,6 @@ export default class Client extends BaseClass {
 
   // Send protobuf packet
   async sendProtobuf(packetName: string, packetHead: PacketHead, obj: object) {
-    if ((obj as any).retcode === 0) delete (obj as any).retcode
-    await this.server.sendProtobuf(this, packetName, packetHead, obj)
+    await this.server.sendProtobuf(this, packetName, packetHead, protoCleanup(obj))
   }
 }
