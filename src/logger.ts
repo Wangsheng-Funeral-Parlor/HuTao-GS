@@ -2,7 +2,7 @@ import fs from 'fs'
 const { appendFile } = fs.promises
 import { join } from 'path'
 import { cwd } from 'process'
-import { PerformanceObserverEntryList } from 'perf_hooks'
+import { PerformanceObserverEntryList, performance } from 'perf_hooks'
 import getTTY, { TTY, cRGB, noColor } from './tty'
 
 export enum LogLevel {
@@ -24,6 +24,7 @@ let logHistory: string[] = null
 let logger: Logger
 
 const entryMap: { [name: string]: number[] } = {}
+const ENTRY_BUF_LEN = 32
 
 function getTimestamp(): string {
   const d = new Date()
@@ -132,7 +133,7 @@ export default class Logger {
       entry[0] = 1
 
       entry.push(duration)
-      if (entry.length > 12) entry.splice(2, entry.length - 10)
+      if (entry.length > ENTRY_BUF_LEN + 2) entry.splice(2, entry.length - ENTRY_BUF_LEN)
     }
 
     const now = Date.now()
@@ -151,7 +152,7 @@ export default class Logger {
       const min = Math.floor(Math.min(...slicedEntry))
       const max = Math.floor(Math.max(...slicedEntry))
 
-      this.log(LogLevel.PERF, 'Perf:', name, 'Avg:', `${avg}ms`, 'Min:', `${min}ms`, 'Max:', `${max}ms`)
+      this.log(LogLevel.PERF, 'Avg:', `${avg}ms`, 'Min:', `${min}ms`, 'Max:', `${max}ms`, 'Name:', name)
     }
   }
 
@@ -161,6 +162,16 @@ export default class Logger {
 
   extremelyVerbose(...args: any[]) {
     this.log(LogLevel.VERBH, ...args)
+  }
+
+  static mark(name: string) {
+    performance.clearMarks(name)
+    performance.mark(name)
+  }
+
+  static measure(name: string, markName: string) {
+    (<any>performance).clearMeasures(name) // ???
+    performance.measure(name, markName)
   }
 
   static getLogger(): Logger {

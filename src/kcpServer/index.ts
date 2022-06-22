@@ -1,7 +1,6 @@
 import { AddressInfo } from 'net'
 import { join } from 'path'
 import { cwd } from 'process'
-import { performance } from 'perf_hooks'
 import * as dgram from 'dgram'
 import EventEmitter from 'promise-events'
 import { dataToPacket, dataToProtobuffer, objToProtobuffer, parsePacket, xorData } from '#/utils/dataUtils'
@@ -133,7 +132,7 @@ export default class KcpServer extends EventEmitter {
   }
 
   update() {
-    performance.mark('Tick')
+    Logger.mark('Tick')
 
     const { frame, clients } = this
     const clientList = Object.values(clients)
@@ -145,11 +144,11 @@ export default class KcpServer extends EventEmitter {
 
     this.frame ^= 1
 
-    performance.measure('Game tick', 'Tick')
+    Logger.measure('Game tick', 'Tick')
   }
 
   private async handleMessage(data: Buffer, rinfo: dgram.RemoteInfo): Promise<void> {
-    performance.mark('UDP')
+    Logger.mark('UDP')
 
     const { socket, clients, tokens } = this
     const { address, port } = rinfo
@@ -171,7 +170,7 @@ export default class KcpServer extends EventEmitter {
       }
 
       socket.send(ret.buffer, 0, ret.buffer.length, port, address)
-      performance.measure('UDP Handshake', 'UDP')
+      Logger.measure('UDP Handshake', 'UDP')
 
       return
     }
@@ -203,7 +202,7 @@ export default class KcpServer extends EventEmitter {
 
     while (await this.handleRecvKcp(client));
 
-    performance.measure('UDP Message', 'UDP')
+    Logger.measure('UDP Message', 'UDP')
   }
 
   private async handleRecvKcp(client: Client): Promise<boolean> {

@@ -25,7 +25,10 @@ class SceneEntityDrownPacket extends Packet implements PacketInterface {
     const { entityId } = data
 
     const entity = entityManager?.getEntity(entityId)
-    if (!entity) await this.response(context, { retcode: RetcodeEnum.RET_ENTITY_NOT_EXIST })
+    if (!entity) {
+      await this.response(context, { retcode: RetcodeEnum.RET_ENTITY_NOT_EXIST })
+      return
+    }
 
     entity.kill(0, PlayerDieTypeEnum.PLAYER_DIE_NONE)
 

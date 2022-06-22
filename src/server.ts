@@ -2,7 +2,7 @@ import { spawn, exec } from 'child_process'
 import { statSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { cwd } from 'process'
-import { performance, PerformanceObserver } from 'perf_hooks'
+import { PerformanceObserver } from 'perf_hooks'
 import * as hostile from 'hostile'
 import WebServer from '@/webServer'
 import KcpServer from '@/kcpServer'
@@ -167,7 +167,7 @@ export default class Server {
 
     observer.observe({ type: 'measure', buffered: true })
 
-    performance.mark('Start')
+    Logger.mark('Start')
 
     logger.info('Starting...')
 
@@ -179,7 +179,7 @@ export default class Server {
       if (++listening < 3) return
 
       logger.info('Started.')
-      performance.measure('Server start', 'Start')
+      Logger.measure('Server start', 'Start')
     }
 
     dnsServer.on('listening', onListening)
