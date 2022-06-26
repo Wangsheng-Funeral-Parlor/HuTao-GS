@@ -47,6 +47,10 @@ export default class MotionInfo {
     return this.pos.distanceTo(motionInfo.pos)
   }
 
+  distanceTo2D(motionInfo: MotionInfo) {
+    return this.pos.distanceTo2D(motionInfo.pos)
+  }
+
   copy(motionInfo: MotionInfo) {
     const { pos, rot, speed, lastSafePos, lastSafeRot, hasLastSafeState } = motionInfo
 

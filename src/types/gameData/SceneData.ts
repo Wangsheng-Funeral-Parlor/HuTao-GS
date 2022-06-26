@@ -1,5 +1,6 @@
 import Vector from './BinOutput/Common/Vector'
 import ScenePointConfig from './BinOutput/ScenePoint'
+import { SceneBlockScriptConfig, SceneGroupScriptConfig } from './Script/SceneScriptConfig'
 
 export interface CityData {
   Id: number
@@ -37,8 +38,8 @@ export interface SceneData {
   City: CityData[]
   ScenePoint: ScenePointConfig
   Tag: SceneTagData[]
-  Group: any
-  Block: any
+  Group: { [groupId: number]: SceneGroupScriptConfig }
+  Block: { [blockId: number]: SceneBlockScriptConfig }
 }
 
 type SceneDataList = SceneData[]

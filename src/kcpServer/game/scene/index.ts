@@ -1,26 +1,27 @@
-import Logger from '@/logger'
-import Player from '$/player'
-import World from '$/world'
-import Vector from '$/utils/vector'
 import BaseClass from '#/baseClass'
-import SceneTag from './sceneTag'
-import SceneBlock from './sceneBlock'
+import { PacketContext } from '#/packet'
+import GuestBeginEnterScene from '#/packets/GuestBeginEnterScene'
+import PlayerEnterScene, { PlayerEnterSceneNotify } from '#/packets/PlayerEnterScene'
+import ScenePlayerLocation from '#/packets/ScenePlayerLocation'
+import SceneTime from '#/packets/SceneTime'
+import uidPrefix from '#/utils/uidPrefix'
+import DungeonData from '$/gameData/data/DungeonData'
+import SceneData from '$/gameData/data/SceneData'
+import AbilityManager from '$/manager/abilityManager'
 import EntityManager from '$/manager/entityManager'
+import Player from '$/player'
+import Vector from '$/utils/vector'
+import World from '$/world'
+import Logger from '@/logger'
+import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
+import { ClientState } from '@/types/enum/state'
 import { ScenePlayerInfo } from '@/types/game/playerInfo'
 import { PlayerWorldSceneInfo } from '@/types/game/scene'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import PlayerEnterScene, { PlayerEnterSceneNotify } from '#/packets/PlayerEnterScene'
-import GuestBeginEnterScene from '#/packets/GuestBeginEnterScene'
-import { PacketContext } from '#/packet'
 import { SceneTeamAvatar } from '@/types/game/team'
-import SceneTime from '#/packets/SceneTime'
-import ScenePlayerLocation from '#/packets/ScenePlayerLocation'
-import SceneData from '$/gameData/data/SceneData'
-import { ClientState } from '@/types/enum/state'
-import DungeonData from '$/gameData/data/DungeonData'
-import uidPrefix from '#/utils/uidPrefix'
-import AbilityManager from '$/manager/abilityManager'
+import { waitTick } from '@/utils/asyncWait'
 import { getTimeSeconds } from '@/utils/time'
+import SceneBlock from './sceneBlock'
+import SceneTag from './sceneTag'
 
 const logger = new Logger('GSCENE', 0xefa8ec)
 
@@ -28,6 +29,7 @@ export default class Scene extends BaseClass {
   world: World
 
   id: number
+  type: string
   enterSceneToken: number
 
   sceneTagList: SceneTag[]
@@ -57,14 +59,19 @@ export default class Scene extends BaseClass {
     this.id = sceneId
     this.enterSceneToken = Math.floor(Math.random() * 1e4)
 
-    this.sceneTagList = []
-    this.sceneBlockList = []
+    const sceneData = SceneData.getScene(sceneId)
+
+    this.type = sceneData.Type || 'SCENE_WORLD'
+
+    this.sceneTagList = sceneData?.Tag?.map(tagData => new SceneTag(this, tagData)) || []
+    this.sceneBlockList = Object.keys(sceneData?.Block || {}).map(e => new SceneBlock(this, parseInt(e)))
 
     this.abilitymanager = new AbilityManager(this)
     this.entityManager = new EntityManager(this)
     this.playerList = []
 
-    this.dieY = 0
+    this.dieY = sceneData?.DieY || 0
+    this.isLocked = !!sceneData?.IsLocked
 
     super.initHandlers(this)
   }
@@ -90,20 +97,26 @@ export default class Scene extends BaseClass {
     SceneTime.broadcastNotify(this.broadcastContextList)
   }
 
-  initNew() {
-    const { id } = this
-    const sceneData = SceneData.getScene(id)
+  // TODO: implement it :p
+  async init(_userData: any) {
+    await this.initNew()
+  }
 
-    if (!sceneData) return
-
-    this.sceneTagList = sceneData.Tag?.map(tagData => new SceneTag(this, tagData)) || []
-    this.sceneBlockList = Object.entries(sceneData.Block).map(e => new SceneBlock(this, parseInt(e[0]), Object.values((e[1] as any).Groups)))
-
-    this.dieY = sceneData.DieY
-    this.isLocked = sceneData.IsLocked
+  async initNew() {
+    const { id, host } = this
 
     this.beginTime = Date.now()
     this.sceneTime = 0
+
+    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
+
+    const { sceneBlockList } = this
+    for (let block of sceneBlockList) {
+      await block.initNew()
+      await waitTick()
+    }
+
+    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
   }
 
   async destroy() {

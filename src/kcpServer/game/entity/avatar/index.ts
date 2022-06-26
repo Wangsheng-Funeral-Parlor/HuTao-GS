@@ -390,7 +390,7 @@ export default class Avatar extends Entity {
     await super.handleUnregister()
 
     const { manager, weapon } = this
-    if (weapon) await manager.unregister(weapon.entity)
+    if (weapon) await manager?.unregister(weapon.entity)
   }
 
   // Revive

@@ -143,19 +143,25 @@ export default class CombatManager extends BaseClass {
   // EntityMoveInfo
   async handleEntityMoveInfo(data: EntityMoveInfo) {
     const { player, landSpeedInfoMap } = this
+    const { state, currentScene } = player
     const { entityId, motionInfo, sceneTime, reliableSeq } = data
-    const { state, speed, params } = motionInfo
+    const { state: motionState, speed, params } = motionInfo
 
-    if ((player.state & 0xF000) !== ClientState.IN_GAME) return
+    if ((state & 0xF000) !== ClientState.IN_GAME) return
 
-    const { entityManager } = player.currentScene
+    const { entityManager } = currentScene
     const entity = entityManager.getEntity(entityId)
     if (!entity) return
 
     // Update entity motion info
     entity.motionInfo.update(motionInfo, sceneTime, reliableSeq)
 
-    switch (state) {
+    if (!entity.isActive && entity.motionInfo.pos.hasChanged()) {
+      entity.isActive = true
+      entityManager.activeEntityList.push(entity)
+    }
+
+    switch (motionState) {
       // Save landing speed
       case MotionStateEnum.MOTION_LAND_SPEED: {
         landSpeedInfoMap[entityId] = [speed.Y, params[0]?.X || 0, Date.now()]
@@ -168,7 +174,7 @@ export default class CombatManager extends BaseClass {
         const speedInfo = landSpeedInfoMap[entityId]
         if (speedInfo == null || Date.now() - speedInfo[2] > 500) break
 
-        await this.takeFallDamage(entity, speedInfo, state === MotionStateEnum.MOTION_FIGHT)
+        await this.takeFallDamage(entity, speedInfo, motionState === MotionStateEnum.MOTION_FIGHT)
         break
       }
     }

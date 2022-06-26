@@ -1,22 +1,24 @@
-import Logger from '@/logger'
+import SceneEntityAppear from '#/packets/SceneEntityAppear'
+import SceneEntityDisappear from '#/packets/SceneEntityDisappear'
+import uidPrefix from '#/utils/uidPrefix'
 import Entity from '$/entity'
 import Player from '$/player'
 import Scene from '$/scene'
+import Vector from '$/utils/vector'
+import Logger from '@/logger'
 import { ProtEntityTypeEnum, VisionTypeEnum } from '@/types/enum/entity'
-import SceneEntityAppear from '#/packets/SceneEntityAppear'
-import SceneEntityDisappear from '#/packets/SceneEntityDisappear'
 import { ClientState } from '@/types/enum/state'
-import uidPrefix from '#/utils/uidPrefix'
 
 const logger = new Logger('ENTITY', 0x00a0ff)
 
-export const VIEW_DIST = 128
+export const WORLD_VIEW_DIST = 128
+export const DEFAULT_VIEW_DIST = 256
 export const GRID_SIZE = 64
 export const DEFAULT_ENTITY_LIMIT = 32
 export const ENTITY_LIMIT = {
   [ProtEntityTypeEnum.PROT_ENTITY_MONSTER]: 12,
   [ProtEntityTypeEnum.PROT_ENTITY_GADGET]: 128,
-  [ProtEntityTypeEnum.PROT_ENTITY_NPC]: 64
+  [ProtEntityTypeEnum.PROT_ENTITY_NPC]: 128
 }
 
 function getPrefix(player: Player, vistionType: VisionTypeEnum): string {
@@ -27,12 +29,24 @@ export default class EntityManager {
   scene: Scene
 
   registeredEntityMap: { [entityId: number]: Entity }
-  sceneEntityMap: { [entityType: number]: { [entityId: number]: Entity } }
+  entityGridMap: {
+    [hash: number]: {
+      nearbyHash: number[]
+      entityTypeMap: {
+        [entityType: number]: { [entityId: number]: Entity }
+      }
+    }
+  }
   entityIdCounter: { [entityType: number]: number }
   gridCache: { [uid: number]: { [entityType: number]: { [hash: number]: number } } }
+
+  activeEntityList: Entity[]
+
   paramBuffer: { [uid: number]: { [visionType: number]: number } }
   appearQueue: { [uid: number]: { [visionType: number]: Entity[] } }
   disappearQueue: { [uid: number]: { [visionType: number]: number[] } }
+
+  viewDistance: number
 
   loop: NodeJS.Timer
 
@@ -40,16 +54,69 @@ export default class EntityManager {
     this.scene = scene
 
     this.registeredEntityMap = {}
-    this.sceneEntityMap = {}
+    this.entityGridMap = {}
     this.gridCache = {}
     this.entityIdCounter = {}
+
+    this.activeEntityList = []
+
     this.paramBuffer = {}
     this.appearQueue = {}
     this.disappearQueue = {}
 
-    for (let i = 0; i <= 14; i++) this.entityIdCounter[i] = Math.floor(Math.random() * 0x10000)
+    this.viewDistance = scene.type === 'SCENE_WORLD' ? WORLD_VIEW_DIST : DEFAULT_VIEW_DIST
 
     this.loop = setInterval(this.update.bind(this), 1e3)
+  }
+
+  private addEntityToMap(entity: Entity) {
+    const { entityGridMap, viewDistance } = this
+    const { entityId, entityType, motionInfo } = entity
+    const { grid } = motionInfo.pos
+    const { hash, X, Y, Z } = grid
+
+    const { nearbyHash, entityTypeMap } = (entityGridMap[hash] = entityGridMap[hash] || {
+      nearbyHash: [],
+      entityTypeMap: {}
+    })
+    const entityMap = (entityTypeMap[entityType] = entityTypeMap[entityType] || {})
+
+    entityMap[entityId] = entity
+    entity.gridHash = hash
+
+    if (nearbyHash.length > 0) return
+
+    const r = Math.ceil(viewDistance / GRID_SIZE)
+
+    const sX = X - r
+    const sY = Y - r
+    const sZ = Z - r
+
+    const eX = X + r
+    const eY = Y + r
+    const eZ = Z + r
+
+    const vec = new Vector()
+
+    for (let x = sX; x <= eX; x++) {
+      for (let y = sY; y <= eY; y++) {
+        for (let z = sZ; z <= eZ; z++) {
+          vec.set(x, y, z)
+          nearbyHash.push(vec.hash)
+        }
+      }
+    }
+  }
+
+  private removeEntityFromMap(entity: Entity) {
+    const { entityGridMap } = this
+    const { entityId, entityType, gridHash } = entity
+
+    const entityMap = entityGridMap[gridHash]?.entityTypeMap?.[entityType]
+    if (!entityMap) return
+
+    delete entityMap[entityId]
+    entity.gridHash = null
   }
 
   async destroy() {
@@ -62,45 +129,56 @@ export default class EntityManager {
   }
 
   async update() {
-    const { scene, gridCache } = this
+    const { scene, activeEntityList, gridCache } = this
     const { playerList } = scene
 
+    // Clear cache
     for (let uid in gridCache) {
       for (let hash in gridCache[uid]) delete gridCache[uid][hash]
     }
 
-    for (let player of playerList) {
-      await this.updatePlayer(player)
+    // Update active entity
+    const activeEntities = activeEntityList.splice(0)
+    for (let entity of activeEntities) {
+      const { entityId, motionInfo, gridHash } = entity
+      const { hash } = motionInfo.pos.grid
+
+      entity.isActive = false
+
+      if (gridHash === hash) continue
+
+      logger.debug('Grid change:', gridHash, '->', hash, 'EntityID:', entityId)
+
+      this.removeEntityFromMap(entity)
+      this.addEntityToMap(entity)
     }
+
+    // Is it not obvious?
+    for (let player of playerList) this.updatePlayer(player)
   }
 
   async updatePlayer(player: Player, visionType: VisionTypeEnum = VisionTypeEnum.VISION_MEET, waitFlush: boolean = false, seqId?: number): Promise<void> {
-    const { sceneEntityMap } = this
-    const { state, loadedEntityIdList } = player
+    const { state, currentAvatar, loadedEntityIdList } = player
 
     if ((state & 0xF0FF) < (ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE)) return
 
-    const seenEntities = []
+    const entityList = this.getNearbyEntityList(currentAvatar)
+    const seenEntityIdList = []
 
-    for (let type in sceneEntityMap) {
-      const entityMap = sceneEntityMap[type]
+    for (let entity of entityList) {
+      const { entityId } = entity
+      const loaded = loadedEntityIdList.includes(entityId)
+      const canLoad = this.canLoadEntity(player, entity)
 
-      for (let id in entityMap) {
-        const entityId = parseInt(id)
-        const entity = entityMap[entityId]
-        const loaded = loadedEntityIdList.includes(entityId)
-        const canLoad = this.canLoadEntity(player, entity)
-
-        if (!loaded && canLoad) {
-          loadedEntityIdList.push(entityId)
-          this.appearQueuePush(player, entity, visionType)
-        }
-
-        if (canLoad) seenEntities.push(entityId)
+      if (!loaded && canLoad) {
+        loadedEntityIdList.push(entityId)
+        this.appearQueuePush(player, entity, visionType)
       }
+
+      if (canLoad) seenEntityIdList.push(entityId)
     }
 
-    const missingEntities = loadedEntityIdList.filter(id => !seenEntities.includes(id))
+    const missingEntities = loadedEntityIdList.filter(id => !seenEntityIdList.includes(id))
     for (let entityId of missingEntities) {
       loadedEntityIdList.splice(loadedEntityIdList.indexOf(entityId), 1)
       this.disappearQueuePush(player, entityId, VisionTypeEnum.VISION_MISS)
@@ -117,24 +195,21 @@ export default class EntityManager {
   }
 
   isGridAvailable(player: Player, entity: Entity) {
-    const { sceneEntityMap, gridCache } = this
+    const { entityGridMap, gridCache } = this
     const { uid, loadedEntityIdList } = player
-    const { entityType, motionInfo } = entity
-    const { grid } = motionInfo?.pos || {}
-    const entityMap = sceneEntityMap[entity.entityType]
+    const { entityType, gridHash } = entity
 
-    if (!grid) return false
-    if (entityMap == null) return true
+    const entityMap = entityGridMap[gridHash]?.entityTypeMap?.[entityType]
+    if (!entityMap) return true
 
     const playerGridCache = gridCache[uid] = gridCache[uid] || {}
     const entTypeGridCache = playerGridCache[entityType] = playerGridCache[entityType] || {}
 
-    const { hash } = grid
-    const cache = entTypeGridCache[hash]
+    const cache = entTypeGridCache[gridHash]
     if (cache != null) {
       if (cache <= 0) return false
 
-      entTypeGridCache[hash]--
+      entTypeGridCache[gridHash]--
       return true
     }
 
@@ -142,29 +217,28 @@ export default class EntityManager {
 
     let count = 0
     for (let entityId in entityMap) {
-      const ent = entityMap[entityId]
-      if (!loadedEntityIdList.includes(parseInt(entityId)) || !ent.gridEqual(grid)) continue
+      if (!loadedEntityIdList.includes(parseInt(entityId))) continue
 
       count++
       if (count >= entityLimit) {
-        entTypeGridCache[hash] = 0
+        entTypeGridCache[gridHash] = 0
         return false
       }
     }
 
-    entTypeGridCache[hash] = entityLimit - count
+    entTypeGridCache[gridHash] = entityLimit - count
     return true
   }
 
   canLoadEntity(player: Player, entity: Entity): boolean {
-    const { scene } = this
+    const { scene, viewDistance } = this
     const { state, currentScene, currentAvatar, loadedEntityIdList } = player
-    const distance = entity.distanceTo(currentAvatar)
+    const distance = entity.distanceTo2D(currentAvatar)
     const loaded = loadedEntityIdList.includes(entity.entityId)
 
     return (
       (state & 0xF0FF) >= (ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE) &&
-      distance <= VIEW_DIST &&
+      distance <= viewDistance &&
       scene === currentScene &&
       (loaded || this.isGridAvailable(player, entity))
     )
@@ -173,6 +247,8 @@ export default class EntityManager {
   getNextEntityId(entityType: ProtEntityTypeEnum): number {
     const { entityIdCounter } = this
 
+    if (entityIdCounter[entityType] == null) entityIdCounter[entityType] = Math.floor(Math.random() * 0x10000)
+
     entityIdCounter[entityType]++
     entityIdCounter[entityType] %= 0x10000
 
@@ -180,16 +256,41 @@ export default class EntityManager {
   }
 
   getEntity(entityId: number): Entity | null {
-    return this.sceneEntityMap[entityId >>> 24]?.[entityId] || null
+    const entity = this.registeredEntityMap[entityId]
+    if (!entity || !entity.isOnScene) return null
+
+    return entity
+  }
+
+  getNearbyEntityList(entity: Entity): Entity[] {
+    const { entityGridMap } = this
+    const { gridHash } = entity
+
+    const entityGrid = entityGridMap[gridHash]
+    if (!entityGrid) return []
+
+    const { nearbyHash } = entityGrid
+    const nearbyEntityMap = {}
+
+    for (let hash of nearbyHash) {
+      const grid = entityGridMap[hash]
+      if (!grid) continue
+
+      const { entityTypeMap } = grid
+      for (let type in entityTypeMap) Object.assign(nearbyEntityMap, entityTypeMap[type] || {})
+    }
+
+    return Object.values(nearbyEntityMap)
   }
 
   async register(entity: Entity): Promise<void> {
     if (entity.manager === this) return
     if (entity.manager) await entity.manager.unregister(entity)
 
-    this.registeredEntityMap[entity.entityId] = entity
     entity.manager = this
     entity.entityId = this.getNextEntityId(entity.entityType)
+
+    this.registeredEntityMap[entity.entityId] = entity
 
     await entity.emit('Register')
 
@@ -198,14 +299,14 @@ export default class EntityManager {
 
   async unregister(entity: Entity, verbose: boolean = false): Promise<void> {
     if (entity.manager !== this) return
+    if (this.getEntity(entity.entityId)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, undefined, verbose)
 
     logger.verbose('Unregister:', entity.entityId)
 
     await entity.emit('Unregister')
 
-    if (this.getEntity(entity.entityId)) await this.remove(entity, undefined, undefined, undefined, verbose)
-
     delete this.registeredEntityMap[entity.entityId]
+
     entity.manager = null
     entity.entityId = null
   }
@@ -213,16 +314,19 @@ export default class EntityManager {
   async add(entity: Entity, vistionType: VisionTypeEnum = VisionTypeEnum.VISION_BORN, param?: number, immediate: boolean = false, seqId?: number, verbose: boolean = false): Promise<void> {
     if (entity.manager !== this) await this.register(entity)
 
-    const { scene, sceneEntityMap } = this
+    const { scene, activeEntityList } = this
     const { playerList } = scene
-    const { entityId, entityType, motionInfo } = entity
+    const { entityId, motionInfo } = entity
 
-    sceneEntityMap[entityType] = sceneEntityMap[entityType] || {}
-    sceneEntityMap[entityType][entityId] = entity
+    this.addEntityToMap(entity)
+    activeEntityList.push(entity)
+
+    // Set entity state
+    entity.isOnScene = true
+    entity.isActive = true
 
     motionInfo.sceneTime = null
     motionInfo.reliableSeq = null
-    entity.isOnScene = true
 
     if (verbose) logger.verbose('Add:', entityId)
     else logger.debug('Add:', entityId)
@@ -245,12 +349,16 @@ export default class EntityManager {
 
     if (targetEntity == null) return
 
-    const { scene, sceneEntityMap } = this
+    const { scene, activeEntityList } = this
     const { playerList } = scene
-    const { entityId, entityType } = targetEntity
+    const { entityId } = targetEntity
 
-    delete sceneEntityMap[entityType][entityId]
+    this.removeEntityFromMap(targetEntity)
+    activeEntityList.splice(activeEntityList.indexOf(targetEntity), 1)
+
+    // Reset entity state
     targetEntity.isOnScene = false
+    targetEntity.isActive = false
 
     if (verbose) logger.verbose('Remove:', entityId)
     else logger.debug('Remove:', entityId)
@@ -315,11 +423,11 @@ export default class EntityManager {
 
     for (let visionType in appearQueue) {
       const param = paramBuffer[visionType]
-      const queue = appearQueue[visionType]
+      const queue = appearQueue[visionType].splice(0).filter(entity => entity.manager === this)
       if (queue.length === 0) continue
 
       for (let entity of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'A', entity.entityId)
-      await SceneEntityAppear.sendNotify(context, queue.splice(0), parseInt(visionType), param)
+      await SceneEntityAppear.sendNotify(context, queue, parseInt(visionType), param)
     }
   }
 

@@ -34,7 +34,6 @@ import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
 import { ClientState } from '@/types/enum/state'
 import Widget from './widget'
 import UserData from '@/types/user'
-import SceneBlock from '$/scene/sceneBlock'
 import { getTimeSeconds } from '@/utils/time'
 
 export default class Player extends BaseClass {
@@ -60,8 +59,6 @@ export default class Player extends BaseClass {
   hostWorld: World
   currentWorld: World
   currentScene: Scene
-
-  sceneBlockList: SceneBlock[]
 
   timestampGameTime: number
   timestamp: number
@@ -110,7 +107,6 @@ export default class Player extends BaseClass {
     this.costumeList = []
     this.emojiCollection = []
 
-    this.sceneBlockList = []
     this.loadedEntityIdList = []
 
     this.prevScenePos = new Vector()
@@ -455,7 +451,7 @@ export default class Player extends BaseClass {
     const { state, teamManager, currentWorld, currentScene, currentAvatar, lastDragBack, draggingBack, prevScene, context } = this
     const now = Date.now()
 
-    if (!currentWorld || !currentScene || !currentAvatar || !currentAvatar.isAlive() || draggingBack) return
+    if (!currentWorld || !currentScene || !currentAvatar?.isAlive() || draggingBack) return
     const { lastSafePos, lastSafeRot } = currentAvatar.motionInfo
 
     const continuousFall = lastDragBack != null && now - lastDragBack < 10e3
@@ -468,7 +464,7 @@ export default class Player extends BaseClass {
     this.lastDragBack = now
 
     this.draggingBack = true
-    if (continuousFall && this.dragBackCount >= 5 && prevScene) {
+    if (continuousFall && this.dragBackCount >= 3 && prevScene) {
       // Still falling into the void, go back to last scene
       await this.returnToPrevScene((state & 0x0F00) === ClientState.SCENE_DUNGEON ? SceneEnterReasonEnum.DUNGEON_QUIT : SceneEnterReasonEnum.FORCE_QUIT_SCENE)
       return
@@ -681,7 +677,7 @@ export default class Player extends BaseClass {
 
   // SceneLeave
   async handleSceneLeave(scene: Scene) {
-    const { avatarList, teamManager, sceneBlockList, context, pos, rot, nextScene, prevScenePos, prevSceneRot } = this
+    const { avatarList, teamManager, context, pos, rot, nextScene, prevScenePos, prevSceneRot } = this
     const { entityManager } = scene
     const teamEntityId = teamManager.entity.entityId
 
@@ -704,8 +700,6 @@ export default class Player extends BaseClass {
       // Prevent player from falling through the ground
       prevScenePos.Y += 1.5
     }
-
-    for (let sceneBlock of sceneBlockList) sceneBlock.tryRemovePlayer(this)
 
     await DelTeamEntity.sendNotify(context, scene, [teamEntityId])
     await DelTeamEntity.broadcastNotify(scene.broadcastContextList, scene, [teamEntityId])

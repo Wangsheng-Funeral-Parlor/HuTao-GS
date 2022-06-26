@@ -6,7 +6,7 @@
   "bin": "buildRel/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-dev": "tsc && tsc-alias",
+    "build-dev": "tsc --incremental && tsc-alias",
     "build-rel": "npm run build-dev && webpack --config webpack.config.js",
     "build": "node ./build",
     "pack-exe": "pkg . -o \"dist/HuTao-GS.exe\" --build"

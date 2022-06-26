@@ -48,6 +48,8 @@ export default class Entity extends BaseClass {
   attackerId: number
 
   isOnScene: boolean
+  isActive: boolean
+  gridHash: number
 
   constructor() {
     super()
@@ -94,6 +96,10 @@ export default class Entity extends BaseClass {
     return this.lifeState === LifeStateEnum.LIFE_ALIVE
   }
 
+  isDead() {
+    return this.lifeState === LifeStateEnum.LIFE_DEAD
+  }
+
   get level() {
     return this.props.get(PlayerPropEnum.PROP_LEVEL)
   }
@@ -125,6 +131,10 @@ export default class Entity extends BaseClass {
 
   distanceTo(entity: Entity) {
     return this.motionInfo.distanceTo(entity.motionInfo)
+  }
+
+  distanceTo2D(entity: Entity) {
+    return this.motionInfo.distanceTo2D(entity.motionInfo)
   }
 
   gridEqual(grid: Vector) {
