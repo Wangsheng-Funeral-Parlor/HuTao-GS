@@ -39,7 +39,7 @@ export const readStream = (stream: Readable): Promise<Buffer> => {
     function processMessage() {
       if (received) return
       received = true
-      resolve(Buffer.concat(chunks, chunkLen).slice(2))
+      resolve(Buffer.concat(chunks, chunkLen).subarray(2))
     }
 
     stream.on('error', reject)

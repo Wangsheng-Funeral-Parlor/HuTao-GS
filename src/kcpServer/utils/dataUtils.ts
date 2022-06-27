@@ -21,8 +21,8 @@ export const parsePacket = (buf: Buffer): {
 
   let offset = 10
 
-  const head = buf.slice(offset, (() => offset += headLen)())
-  const data = buf.slice(offset, (() => offset += dataLen)())
+  const head = buf.subarray(offset, (() => offset += headLen)())
+  const data = buf.subarray(offset, (() => offset += dataLen)())
 
   return { head, data }
 }
@@ -104,7 +104,7 @@ export const getPackets = (data: Buffer, len: number = 28): Buffer[] => {
   const buffers = []
   while (i < data.length) {
     const contentLen = data.readUInt32BE(i + len - 4)
-    const sliced = data.slice(i, i + len + contentLen)
+    const sliced = data.subarray(i, i + len + contentLen)
     buffers.push(sliced)
     i += len + contentLen
   }

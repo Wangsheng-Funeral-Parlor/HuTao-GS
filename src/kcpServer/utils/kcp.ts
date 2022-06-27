@@ -343,8 +343,8 @@ export class Kcp {
           const capacity = (this.mss - l) >>> 0
           const extend = Math.min(buf.length, capacity)
 
-          const lf = buf.slice(0, extend)
-          const rt = buf.slice(extend)
+          const lf = buf.subarray(0, extend)
+          const rt = buf.subarray(extend)
           old.data = Buffer.concat([old.data, lf])
           buf = rt
 
@@ -362,8 +362,8 @@ export class Kcp {
 
     for (let i = 0; i < count; i++) {
       const size = Math.min(this.mss, buf.length)
-      const lf = buf.slice(0, size)
-      const rt = buf.slice(size)
+      const lf = buf.subarray(0, size)
+      const rt = buf.subarray(size)
 
       let newSegment = createSegment(lf)
       buf = rt
@@ -535,7 +535,7 @@ export class Kcp {
 
         if (sn - this.rcvNxt < 0) break
 
-        const sbuf = buf.slice(KCP_OVERHEAD, KCP_OVERHEAD + len)
+        const sbuf = buf.subarray(KCP_OVERHEAD, KCP_OVERHEAD + len)
         const segment = createSegment(sbuf)
 
         segment.conv = conv
@@ -609,7 +609,7 @@ export class Kcp {
       maxAck = cmdResult.maxAck
 
       totalRead += KCP_OVERHEAD + len
-      buf = buf.slice(KCP_OVERHEAD + len)
+      buf = buf.subarray(KCP_OVERHEAD + len)
     }
 
     return { totalRead, flag, maxAck }
@@ -661,14 +661,14 @@ export class Kcp {
     for (let i = 0; i < this.acklist.length; i++) {
       const [sn, ts] = this.acklist.peekAt(i)!
       if (this.bufOffset + KCP_OVERHEAD > this.mtu) {
-        this.output(this.buf.slice(0, this.bufOffset))
+        this.output(this.buf.subarray(0, this.bufOffset))
         this.bufOffset = 0
       }
 
       segment.sn = sn
       segment.ts = ts
 
-      this.bufOffset += encodeSegment(this.buf.slice(this.bufOffset), segment)
+      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment)
     }
 
     this.acklist.clear()
@@ -705,11 +705,11 @@ export class Kcp {
     segment.cmd = cmd
 
     if (this.bufOffset + KCP_OVERHEAD > this.mtu) {
-      this.output(this.buf.slice(0, this.bufOffset))
+      this.output(this.buf.subarray(0, this.bufOffset))
       this.bufOffset = 0
     }
 
-    this.bufOffset += encodeSegment(this.buf.slice(this.bufOffset), segment)
+    this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment)
   }
 
   private flushProbeCommands(segment: KcpSegment) {
@@ -824,17 +824,17 @@ export class Kcp {
       const need = KCP_OVERHEAD + sndSegment.data.length
 
       if (this.bufOffset + need > this.mtu) {
-        this.output(this.buf.slice(0, this.bufOffset))
+        this.output(this.buf.subarray(0, this.bufOffset))
         this.bufOffset = 0
       }
 
-      this.bufOffset += encodeSegment(this.buf.slice(this.bufOffset), sndSegment)
+      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), sndSegment)
 
       if (sndSegment.xmit >= this.deadLink) this.state = -1
     }
 
     // Flush all data in buffer
-    this.output(this.buf.slice(0, this.bufOffset))
+    this.output(this.buf.subarray(0, this.bufOffset))
     this.bufOffset = 0
 
     // update ssthresh

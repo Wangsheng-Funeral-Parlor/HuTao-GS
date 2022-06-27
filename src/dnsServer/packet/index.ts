@@ -801,7 +801,7 @@ export default class DnsPacket {
       }
     }
 
-    return msg.buffer.slice(0, msg.tell())
+    return msg.buffer.subarray(0, msg.tell())
   }
 
   static parse(buf: Buffer) {
@@ -904,5 +904,5 @@ function namePack(str: string, buf?: BufferCursor | Buffer, index: LableIndex = 
 
   if (!str) buf.writeUInt8(0)
 
-  return buf.buffer.slice(0, buf.tell())
+  return buf.buffer.subarray(0, buf.tell())
 }

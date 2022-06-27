@@ -77,7 +77,7 @@ export default class BufferCursor {
       end = this._pos + length
     }
 
-    b = new BufferCursor(this.buffer.slice(this._pos, end))
+    b = new BufferCursor(this.buffer.subarray(this._pos, end))
     this.seek(end)
 
     return b

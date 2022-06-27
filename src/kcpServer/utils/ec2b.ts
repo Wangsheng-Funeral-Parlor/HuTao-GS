@@ -42,8 +42,8 @@ export default function ec2b(buf: Buffer): Buffer {
   const dataLen = buf.readUint32LE(8 + keyLen)
   if (buf.length < 8 + keyLen + 4 + dataLen) return xorpad
 
-  const key = buf.slice(8, 8 + keyLen)
-  const data = buf.slice(12 + keyLen, 12 + keyLen + dataLen)
+  const key = buf.subarray(8, 8 + keyLen)
+  const data = buf.subarray(12 + keyLen, 12 + keyLen + dataLen)
 
   keyScramble(key)
   for (let i = 0; i < 16; i++) key[i] ^= keyXorpad[i]
