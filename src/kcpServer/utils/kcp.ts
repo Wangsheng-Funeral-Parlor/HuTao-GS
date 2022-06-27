@@ -789,7 +789,7 @@ export class Kcp {
     let lost = false
     let change = 0
 
-    for (let i = 0; i < this.sndBuf.length; i++) {
+    for (let i = 0; i < Math.min(this.sndBuf.length, 1024); i++) {
       const sndSegment = this.sndBuf.peekAt(i)!
 
       switch (true) {

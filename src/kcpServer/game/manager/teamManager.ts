@@ -130,11 +130,9 @@ export default class TeamManager extends BaseClass {
 
     if (!avatarList.includes(currentAvatar)) {
       avatarList[0].motionInfo.copy(currentAvatar.motionInfo)
-      currentScene.entityManager.replace(currentAvatar, avatarList[0])
 
       player.currentAvatar = avatarList[0]
-
-      await currentScene.entityManager.update()
+      currentScene.entityManager.replace(currentAvatar, avatarList[0], true, seqId)
     }
 
     return RetcodeEnum.RET_SUCC

@@ -7,6 +7,8 @@ import WorldData from '$/gameData/data/WorldData'
 import Vector from '$/utils/vector'
 import { VisionTypeEnum } from '@/types/enum/entity'
 import { SceneGadgetScriptConfig, SceneMonsterScriptConfig, SceneNpcScriptConfig, SceneSuiteScriptConfig } from '@/types/gameData/Script/SceneScriptConfig'
+import { WaitOnBlock } from '@/utils/asyncWait'
+import { performance } from 'perf_hooks'
 import SceneBlock from './sceneBlock'
 
 export default class SceneGroup {
@@ -100,9 +102,9 @@ export default class SceneGroup {
       entity.configId = ConfigId || 0
       entity.blockId = blockId
       entity.suitIdList = suites
-        .map((suite, i) => ({ i, suite }))
+        .map((suite, index) => ({ index, suite }))
         .filter(e => e.suite?.Npcs?.includes(ConfigId))
-        .map(e => e.i + 1)
+        .map(e => e.index + 1)
 
       const { motionInfo, bornPos } = entity
       const { pos, rot } = motionInfo
@@ -156,7 +158,7 @@ export default class SceneGroup {
     for (let entity of entityList) await entityManager.remove(entity, undefined, undefined, undefined, true)
   }
 
-  async load() {
+  async load(wob: WaitOnBlock) {
     const { block, id: groupId, loaded } = this
     const { id: sceneId } = block.scene
 
@@ -166,9 +168,16 @@ export default class SceneGroup {
     const groupData = SceneData.getGroup(sceneId, groupId)
     if (!groupData) return
 
+    performance.mark('GroupLoad')
+
+    await wob.waitTick()
     await this.loadMonsters(Object.values(groupData.Monsters || {}))
+    await wob.waitTick()
     await this.loadNpcs(Object.values(groupData.Npcs || {}), Object.values(groupData.Suites || {}))
+    await wob.waitTick()
     await this.loadGadgets(Object.values(groupData.Gadgets || {}))
+
+    performance.measure('Group load', 'GroupLoad')
   }
 
   async unload() {
@@ -177,8 +186,12 @@ export default class SceneGroup {
     if (!loaded) return
     this.loaded = false
 
+    performance.mark('GroupUnload')
+
     await this.unloadList(monsterList)
     await this.unloadList(npcList)
     await this.unloadList(gadgetList)
+
+    performance.measure('Group unload', 'GroupUnload')
   }
 }

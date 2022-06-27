@@ -44,6 +44,7 @@ export const verbosePackets = [
   'SceneAudioNotify',
   'ScenePlayerLocationNotify',
   'SceneTimeNotify',
+  'SetEntityClientDataNotify',
   'UnionCmdNotify',
   'WorldPlayerLocationNotify',
   'WorldPlayerRTTNotify'

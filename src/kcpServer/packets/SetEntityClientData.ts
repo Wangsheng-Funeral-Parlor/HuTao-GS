@@ -11,13 +11,18 @@ class SetEntityClientDataPacket extends Packet implements PacketInterface {
   constructor() {
     super('SetEntityClientData', {
       notifyWaitState: ClientState.ENTER_SCENE | ClientState.ENTER_SCENE_READY,
-      notifyStateMask: 0xF0FF,
-      notifyStatePass: true
+      notifyWaitStateMask: 0xF0FF,
+      notifyWaitStatePass: true
     })
   }
 
   async recvNotify(context: PacketContext, data: SetEntityClientDataNotify): Promise<void> {
-    await this.broadcastNotify(context.player.currentScene.broadcastContextList, data)
+    const { player } = context
+    const { broadcastContextList } = player.currentScene
+
+    for (let ctx of broadcastContextList) ctx.seqId = context.seqId
+
+    await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), data)
   }
 
   async sendNotify(context: PacketContext, data: SetEntityClientDataNotify): Promise<void> {

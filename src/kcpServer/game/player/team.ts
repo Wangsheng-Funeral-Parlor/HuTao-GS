@@ -66,9 +66,8 @@ export default class Team {
   async setUpAvatarTeam(data: SetUpAvatarTeamReq, noNotify: boolean = false, seqId?: number): Promise<RetcodeEnum> {
     const { teamManager, avatarList } = this
     const { player, currentTeam } = teamManager
-    const { currentScene, currentAvatar } = player
+    const { currentScene, currentAvatar: oldAvatar } = player
     const { teamId, avatarTeamGuidList, curAvatarGuid } = data
-    const oldAvatar = currentAvatar
 
     this.initialized = true
 
@@ -89,9 +88,10 @@ export default class Team {
       player.currentAvatar = this.getAvatar(BigInt(curAvatarGuid))
     }
 
-    if (oldAvatar && player.currentAvatar !== oldAvatar) {
-      player.currentAvatar.motionInfo.copy(oldAvatar.motionInfo)
-      currentScene?.entityManager?.replace(oldAvatar, player.currentAvatar, true, seqId)
+    const { currentAvatar } = player
+    if (oldAvatar && currentAvatar !== oldAvatar) {
+      currentAvatar.motionInfo.copy(oldAvatar.motionInfo)
+      currentScene?.entityManager?.replace(oldAvatar, currentAvatar, true, seqId)
     }
 
     return RetcodeEnum.RET_SUCC

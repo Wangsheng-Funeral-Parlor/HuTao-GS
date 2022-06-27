@@ -147,7 +147,7 @@ export default class Logger {
       entry[1] = now
 
       const slicedEntry = entry.slice(2)
-      const avg = Math.floor(slicedEntry.reduce((c, p) => p + c) / entry.length)
+      const avg = Math.floor(slicedEntry.reduce((c, p) => p + c) / slicedEntry.length)
 
       const min = Math.floor(Math.min(...slicedEntry))
       const max = Math.floor(Math.max(...slicedEntry))

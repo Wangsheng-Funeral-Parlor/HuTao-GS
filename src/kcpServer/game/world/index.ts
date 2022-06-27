@@ -22,6 +22,7 @@ import SceneData from '$/gameData/data/SceneData'
 import WorldUserData from '@/types/user/WorldUserData'
 import Logger from '@/logger'
 import uidPrefix from '#/utils/uidPrefix'
+import { performance } from 'perf_hooks'
 
 const logger = new Logger('GWORLD', 0xefc8cc)
 
@@ -112,7 +113,7 @@ export default class World extends BaseClass {
     return player === this.host
   }
 
-  getScene(sceneId: number) {
+  getScene(sceneId: number, fullInit: boolean = true) {
     const sceneList = this.mpMode ? this.mpSceneList : this.sceneList
 
     // check if scene already loaded
@@ -124,9 +125,17 @@ export default class World extends BaseClass {
 
     // create new scene
     scene = new Scene(this, sceneId)
-    sceneList.push(scene)
 
-    scene.initNew()
+    if (fullInit) {
+      performance.mark('SceneInitSync')
+
+      sceneList.push(scene)
+      scene.initNew(true)
+
+      performance.measure('Scene init sync', 'SceneInitSync')
+    } else {
+      scene.initNew(false)
+    }
 
     return scene
   }
@@ -146,13 +155,18 @@ export default class World extends BaseClass {
 
     if (!player || player.currentWorld === this) return false
 
+    performance.mark('WorldJoin')
+
     const { mainSceneId, host, playerList, hostLastState } = this
     const { sceneId, pos, rot } = hostLastState
 
     const isHost = this.isHost(player)
 
     const scene = isHost ? (this.getScene(sceneId) || this.getScene(mainSceneId)) : host.currentScene
-    if (!scene) return false
+    if (!scene) {
+      performance.clearMarks('WorldJoin')
+      return false
+    }
 
     const enterPos = isHost ? pos : host.pos
     const enterRot = isHost ? rot : host.rot
@@ -168,9 +182,11 @@ export default class World extends BaseClass {
       player.peerId = null
       playerList.splice(playerList.indexOf(player), 1)
 
+      performance.clearMarks('WorldJoin')
       return false
     }
 
+    performance.measure('World join', 'WorldJoin')
     return true
   }
 

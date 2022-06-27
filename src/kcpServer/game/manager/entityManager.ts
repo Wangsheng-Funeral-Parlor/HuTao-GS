@@ -143,8 +143,6 @@ export default class EntityManager {
       const { entityId, motionInfo, gridHash } = entity
       const { hash } = motionInfo.pos.grid
 
-      entity.isActive = false
-
       if (gridHash === hash) continue
 
       logger.debug('Grid change:', gridHash, '->', hash, 'EntityID:', entityId)
@@ -323,7 +321,6 @@ export default class EntityManager {
 
     // Set entity state
     entity.isOnScene = true
-    entity.isActive = true
 
     motionInfo.sceneTime = null
     motionInfo.reliableSeq = null
@@ -358,7 +355,6 @@ export default class EntityManager {
 
     // Reset entity state
     targetEntity.isOnScene = false
-    targetEntity.isActive = false
 
     if (verbose) logger.verbose('Remove:', entityId)
     else logger.debug('Remove:', entityId)
@@ -426,7 +422,12 @@ export default class EntityManager {
       const queue = appearQueue[visionType].splice(0).filter(entity => entity.manager === this)
       if (queue.length === 0) continue
 
-      for (let entity of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'A', entity.entityId)
+      if (queue.length <= 4) {
+        for (let entity of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'A', 'EntityID:', entity.entityId)
+      } else {
+        logger.debug(getPrefix(player, parseInt(visionType)), 'A', `x${queue.length}`)
+      }
+
       await SceneEntityAppear.sendNotify(context, queue, parseInt(visionType), param)
     }
   }
@@ -441,7 +442,12 @@ export default class EntityManager {
       const queue = disappearQueue[visionType]
       if (queue.length === 0) continue
 
-      for (let entityId of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'D', entityId)
+      if (queue.length <= 4) {
+        for (let entityId of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'D', 'EntityID:', entityId)
+      } else {
+        logger.debug(getPrefix(player, parseInt(visionType)), 'D', `x${queue.length}`)
+      }
+
       await SceneEntityDisappear.sendNotify(context, queue.splice(0), parseInt(visionType))
     }
   }

@@ -18,8 +18,8 @@ import { ClientState } from '@/types/enum/state'
 import { ScenePlayerInfo } from '@/types/game/playerInfo'
 import { PlayerWorldSceneInfo } from '@/types/game/scene'
 import { SceneTeamAvatar } from '@/types/game/team'
-import { waitTick } from '@/utils/asyncWait'
 import { getTimeSeconds } from '@/utils/time'
+import { performance } from 'perf_hooks'
 import SceneBlock from './sceneBlock'
 import SceneTag from './sceneTag'
 
@@ -76,6 +76,16 @@ export default class Scene extends BaseClass {
     super.initHandlers(this)
   }
 
+  private async loadSceneBlocks() {
+    const { id, host, sceneBlockList } = this
+
+    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
+
+    for (let block of sceneBlockList) await block.initNew()
+
+    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
+  }
+
   get broadcastContextList(): PacketContext[] {
     return this.playerList.map(player => player.context)
   }
@@ -98,25 +108,26 @@ export default class Scene extends BaseClass {
   }
 
   // TODO: implement it :p
-  async init(_userData: any) {
-    await this.initNew()
+  async init(_userData: any, fullInit: boolean) {
+    await this.initNew(fullInit)
   }
 
-  async initNew() {
-    const { id, host } = this
+  async initNew(fullInit: boolean) {
+    const { enterSceneToken } = this
+
+    performance.mark(`SceneInitAsync-${enterSceneToken}`)
 
     this.beginTime = Date.now()
     this.sceneTime = 0
 
-    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
-
-    const { sceneBlockList } = this
-    for (let block of sceneBlockList) {
-      await block.initNew()
-      await waitTick()
+    if (!fullInit) {
+      performance.clearMarks(`SceneInitAsync-${enterSceneToken}`)
+      return
     }
 
-    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
+    await this.loadSceneBlocks()
+
+    performance.measure('Scene init async', `SceneInitAsync-${enterSceneToken}`)
   }
 
   async destroy() {

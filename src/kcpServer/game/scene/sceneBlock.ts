@@ -3,10 +3,13 @@ import SceneData from '$/gameData/data/SceneData'
 import Player from '$/player'
 import Vector from '$/utils/vector'
 import Logger from '@/logger'
+import { WaitOnBlock } from '@/utils/asyncWait'
 import Scene from '.'
 import SceneGroup from './sceneGroup'
 
 const logger = new Logger('GSCENE', 0xefa8ec)
+
+const MAX_BLOCK_MS = 10
 
 export default class SceneBlock extends BaseClass {
   scene: Scene
@@ -83,10 +86,11 @@ export default class SceneBlock extends BaseClass {
 
   async initNew() {
     const { groupList } = this
+    const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
     for (let group of groupList) {
       if (group.dynamicLoad) continue
-      await group.load()
+      await group.load(wob)
     }
   }
 
@@ -98,9 +102,11 @@ export default class SceneBlock extends BaseClass {
 
     logger.debug('Load block:', id)
 
+    const wob = new WaitOnBlock(MAX_BLOCK_MS)
+
     for (let group of groupList) {
       if (!group.dynamicLoad) continue
-      await group.load()
+      await group.load(wob)
     }
   }
 
@@ -112,9 +118,12 @@ export default class SceneBlock extends BaseClass {
 
     logger.debug('Unload block:', id)
 
+    const wob = new WaitOnBlock(MAX_BLOCK_MS)
+
     for (let group of groupList) {
       if (!group.dynamicLoad) continue
       await group.unload()
+      await wob.waitTick()
     }
   }
 

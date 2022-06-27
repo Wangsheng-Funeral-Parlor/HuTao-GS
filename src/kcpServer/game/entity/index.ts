@@ -48,7 +48,6 @@ export default class Entity extends BaseClass {
   attackerId: number
 
   isOnScene: boolean
-  isActive: boolean
   gridHash: number
 
   constructor() {
@@ -127,6 +126,10 @@ export default class Entity extends BaseClass {
   get authorityPeerId() {
     const { manager } = this
     return manager?.scene?.host?.peerId || 1
+  }
+
+  get isActive() {
+    return this.manager?.activeEntityList?.includes(this)
   }
 
   distanceTo(entity: Entity) {

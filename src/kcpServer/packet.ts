@@ -1,6 +1,7 @@
 import Logger from '@/logger'
 import { ClientState } from '@/types/enum/state'
 import { PacketHead } from '@/types/kcp'
+import { WaitOnBlock } from '@/utils/asyncWait'
 import { verbosePackets } from '.'
 import Client from './client'
 const logger = new Logger('PACKET', 0x8810cd)
@@ -53,10 +54,12 @@ export interface PacketOption {
 export class PacketContext {
   client: Client
   seqId: number
+  wob: WaitOnBlock
 
   constructor(client: Client, seqId?: number) {
     this.client = client
     this.seqId = seqId || null
+    this.wob = new WaitOnBlock(2)
   }
 
   get server() {
@@ -125,10 +128,12 @@ export default class Packet implements PacketInterface {
   }
 
   async response(context: PacketContext, data: any): Promise<void> {
+    await context.wob.waitTick()
     await context.client.sendProtobuf(`${this.name}Rsp`, this.getHead(context), data)
   }
 
   async sendNotify(context: PacketContext, data: any, ..._any: any[]): Promise<void> {
+    await context.wob.waitTick()
     await context.client.sendProtobuf(`${this.name}Notify`, this.getHead(context), data)
   }
 
