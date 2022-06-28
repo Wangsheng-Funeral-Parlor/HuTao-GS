@@ -36,3 +36,45 @@ export interface LockedPersonallineData {
   personalLineId: number
   lockReason: PersonalLineLockReasonEnum
 }
+
+export interface ChildQuest {
+  questId: number
+  state: number
+  questConfigId?: number
+}
+
+export interface ParentQuest {
+  parentQuestId: number
+  childQuestList?: ChildQuest[]
+  isFinished?: boolean
+  isRandom?: boolean
+  randomInfo?: ParentQuestRandomInfo
+  questVar: number[]
+  parentQuestState?: number
+  questVarSeq?: number
+  timeVarMap?: { [k: number]: number }
+  GJJJKEIPAPC?: number
+}
+
+export interface ParentQuestRandomInfo {
+  entranceId: number
+  templateId: number
+  factorList: number[]
+}
+
+export interface Quest {
+  questId: number
+  state: number
+  startTime: number
+  isRandom?: boolean
+  parentQuestId: number
+  questConfigId?: number
+  startGameTime: number
+  acceptTime: number
+  lackedNpcList?: number[]
+  finishProgressList?: number[]
+  failProgressList?: number[]
+  lackedNpcMap?: { [k: number]: number }
+  lackedPlaceList?: number[]
+  lackedPlaceMap?: { [k: number]: number }
+}

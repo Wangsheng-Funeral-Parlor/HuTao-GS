@@ -1356,6 +1356,8 @@ const ver2_7: CmdIds = {
   StartFishingReq: 5843,
   FishAttractNotify: 5846,
   FishEscapeNotify: 5847,
+  //MusicGameCustomMapSaveReq: 6326,
+  //MusicGameCustomMapLoadReq: 6332,
   ChannellerSlabOneOffDungeonInfoNotify: 8008,
   RoguelikeGiveUpRsp: 8009,
   PlantFlowerAcceptAllGiveFlowerReq: 8017,

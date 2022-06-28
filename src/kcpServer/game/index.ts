@@ -1,38 +1,44 @@
-import KcpServer from '..'
 import Client from '#/client'
 import DummyClient from '#/dummyClient'
-import PlayerProp from '#/packets/PlayerProp'
-import PlayerData from '#/packets/PlayerData'
-import StoreWeightLimit from '#/packets/StoreWeightLimit'
-import PlayerStore from '#/packets/PlayerStore'
-import OpenStateUpdate from '#/packets/OpenStateUpdate'
+import { PacketContext } from '#/packet'
+import ActivityScheduleInfo from '#/packets/ActivityScheduleInfo'
+import AllWidgetData from '#/packets/AllWidgetData'
 import AvatarData from '#/packets/AvatarData'
 import AvatarSatiationData from '#/packets/AvatarSatiationData'
+import CoopData from '#/packets/CoopData'
+import DoSetPlayerBornData from '#/packets/DoSetPlayerBornData'
+import FinishedParentQuest from '#/packets/FinishedParentQuest'
+import GachaSimpleInfo from '#/packets/GachaSimpleInfo'
+import OpenStateUpdate from '#/packets/OpenStateUpdate'
+import PlayerData from '#/packets/PlayerData'
+import PlayerLogin from '#/packets/PlayerLogin'
+import PlayerProp from '#/packets/PlayerProp'
+import PlayerRechargeData from '#/packets/PlayerRechargeData'
+import PlayerStore from '#/packets/PlayerStore'
+import QuestList from '#/packets/QuestList'
+import StoreWeightLimit from '#/packets/StoreWeightLimit'
 import Player from '$/player'
 import World from '$/world'
-import { OnlinePlayerInfo } from '@/types/game/playerInfo'
+import config from '@/config'
 import { MpSettingTypeEnum } from '@/types/enum/mp'
-import PlayerLogin from '#/packets/PlayerLogin'
-import { PacketContext } from '#/packet'
-import DoSetPlayerBornData from '#/packets/DoSetPlayerBornData'
-import { ChatManager } from './manager/chatManager'
 import { PlayerPropEnum } from '@/types/enum/player'
 import { ClientState } from '@/types/enum/state'
-import config from '@/config'
+import { OnlinePlayerInfo } from '@/types/game/playerInfo'
 import UserData from '@/types/user'
+import { getJsonAsync, setJsonAsync } from '@/utils/json'
+import { performance } from 'perf_hooks'
+import KcpServer from '..'
 import hash from '../../utils/hash'
-import { getJson, setJson } from '@/utils/json'
-import AllWidgetData from '#/packets/AllWidgetData'
+import ActivityManager from './manager/activityManager'
+import { ChatManager } from './manager/chatManager'
 import ShopManager from './manager/shopManager'
-import GachaSimpleInfo from '#/packets/GachaSimpleInfo'
-import PlayerRechargeData from '#/packets/PlayerRechargeData'
-import CoopData from '#/packets/CoopData'
 
 export default class Game {
   server: KcpServer
 
   chatManager: ChatManager
   shopManager: ShopManager
+  activityManager: ActivityManager
 
   playerMap: { [auid: string]: Player }
 
@@ -41,6 +47,7 @@ export default class Game {
 
     this.chatManager = new ChatManager(this)
     this.shopManager = new ShopManager(this)
+    this.activityManager = new ActivityManager(this)
 
     this.playerMap = {}
 
@@ -66,6 +73,13 @@ export default class Game {
 
       player.setLevel(60, false)
 
+      // set born location
+      player.hostWorld.hostLastState.init({
+        sceneId: 3,
+        pos: { X: -657.9599609375, Y: 219.54281616210938, Z: 266.7440490722656 },
+        rot: { Y: 180 }
+      })
+
       // set avatar data
       const huTao = avatarList[0]
       huTao.level = 90
@@ -87,12 +101,12 @@ export default class Game {
     }
   }
 
-  private loadUserData(auid: string): false | UserData {
-    return getJson(`data/user/${hash(auid).slice(5, -5)}.json`, false)
+  private async loadUserData(auid: string): Promise<false | UserData> {
+    return getJsonAsync(`data/user/${hash(auid).slice(5, -5)}.json`, false)
   }
 
-  private saveUserData(auid: string, player: Player): boolean {
-    return setJson(`data/user/${hash(auid).slice(5, -5)}.json`, player.exportUserData())
+  private async saveUserData(auid: string, player: Player): Promise<boolean> {
+    return setJsonAsync(`data/user/${hash(auid).slice(5, -5)}.json`, player.exportUserData())
   }
 
   private async newLogin(context: PacketContext): Promise<Player> {
@@ -114,28 +128,26 @@ export default class Game {
     return player
   }
 
-  getUid(auid: string) {
-    const userData = this.loadUserData(auid)
+  async getUid(auid: string) {
+    const userData = await this.loadUserData(auid)
     if (!userData) return parseInt('1' + hash(auid).slice(0, 5))
 
     return userData.uid
   }
 
   async playerLogin(context: PacketContext, mpWorld?: World): Promise<Player> {
-    const { server, playerMap } = this
+    const { server, playerMap, activityManager } = this
     const { client } = context
     const { auid } = client
     if (auid == null) return null
 
-    // Set client state
-    client.state = ClientState.LOGIN
-
     let player: Player = client.player
 
+    // Logged in with another device
     if (!player && !mpWorld && playerMap[auid]) await server.disconnect(playerMap[auid].client.id, 4)
 
     if (!player) {
-      const userData = this.loadUserData(auid)
+      const userData = await this.loadUserData(auid)
 
       // No user data, create new player
       if (!userData) return this.newLogin(context)
@@ -151,13 +163,24 @@ export default class Game {
       }
     }
 
+    performance.mark('Login')
+
+    // Set client state
+    client.state = ClientState.LOGIN
+
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_PLAYER_RESIN)
+
+    await ActivityScheduleInfo.sendNotify(context)
+    await activityManager.sendAllActivityInfo(context)
+
     await PlayerData.sendNotify(context)
     await OpenStateUpdate.sendNotify(context)
     await StoreWeightLimit.sendNotify(context)
     await PlayerStore.sendNotify(context)
     await AvatarData.sendNotify(context)
     await AvatarSatiationData.sendNotify(context)
+    await FinishedParentQuest.sendNotify(context)
+    await QuestList.sendNotify(context)
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_IS_MP_MODE_AVAILABLE)
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_PLAYER_MP_SETTING_TYPE)
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_IS_ONLY_MP_WITH_PS_PLAYER)
@@ -176,6 +199,8 @@ export default class Game {
 
     await PlayerLogin.response(context)
 
+    performance.measure('Player login', 'Login')
+
     return player
   }
 
@@ -185,22 +210,25 @@ export default class Game {
     const player = this.getPlayer(auid)
     if (!player) return
 
-    // remove public chat of host world
+    // Remove public chat of host world
     chatManager.removePublicChat(player.hostWorld)
 
-    // destroy player instance
+    // Destroy player instance
     await player.destroy()
+
+    // Set client state
+    client.state = ClientState.NONE
 
     delete playerMap[auid]
     client.player = null
   }
 
-  save(client: Client | DummyClient) {
+  async save(client: Client | DummyClient) {
     const { auid, readyToSave } = client
     const player = this.getPlayer(auid)
     if (!player || !readyToSave) return
 
-    this.saveUserData(auid, player)
+    await this.saveUserData(auid, player)
   }
 
   getPlayer(auid: string): Player {

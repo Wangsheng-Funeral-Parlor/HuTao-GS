@@ -57,7 +57,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
     const { game, client } = context
     const { accountUid, accountToken, accountType, platformType, channelId } = data
 
-    const uid = game.getUid(accountUid)
+    const uid = await game.getUid(accountUid)
     const seed = hash(accountToken + Date.now()).slice(0, 19)
 
     await this.response(context, {

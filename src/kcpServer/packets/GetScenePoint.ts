@@ -5,7 +5,8 @@ import { ClientState } from '@/types/enum/state'
 
 const unlockType = [
   'SceneTransPoint',
-  'DungeonEntry'
+  'DungeonEntry',
+  'VirtualTransPoint'
 ]
 
 export interface GetScenePointReq {
