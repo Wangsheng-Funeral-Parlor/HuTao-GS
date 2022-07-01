@@ -9,7 +9,7 @@ import { LifeStateEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/enum/
 import { FightPropEnum } from '@/types/enum/fightProp'
 import { PlayerDieTypeEnum, PlayerPropEnum } from '@/types/enum/player'
 import { SceneAvatarInfo } from '@/types/game/avatar'
-import { EntityFightPropConfig, SceneEntityInfo } from '@/types/game/entity'
+import { EntityAuthorityInfo, EntityFightPropConfig, SceneEntityInfo } from '@/types/game/entity'
 import { SceneGadgetInfo } from '@/types/game/gadget'
 import { SceneMonsterInfo } from '@/types/game/monster'
 import { SceneNpcInfo } from '@/types/game/npc'
@@ -37,6 +37,8 @@ export default class Entity extends BaseClass {
   fightProps: FightProp
   motionInfo: MotionInfo
 
+  authorityPeerId: number
+
   bornPos: Vector
 
   animatorParaList: any[]
@@ -57,6 +59,8 @@ export default class Entity extends BaseClass {
     this.props = new EntityProps(this)
     this.fightProps = new FightProp(this)
     this.motionInfo = new MotionInfo()
+
+    this.authorityPeerId = null
 
     this.bornPos = new Vector()
 
@@ -123,15 +127,6 @@ export default class Entity extends BaseClass {
     this.props.set(PlayerPropEnum.PROP_BREAK_LEVEL, v)
   }
 
-  get authorityPeerId() {
-    const { manager } = this
-    return manager?.scene?.host?.peerId || 1
-  }
-
-  get isActive() {
-    return this.manager?.activeEntityList?.includes(this)
-  }
-
   distanceTo(entity: Entity) {
     return this.motionInfo.distanceTo(entity.motionInfo)
   }
@@ -142,6 +137,23 @@ export default class Entity extends BaseClass {
 
   gridEqual(grid: Vector) {
     return this.motionInfo.pos.grid.equal(grid)
+  }
+
+  updateAuthorityPeer(): boolean {
+    const { manager, entityId, entityType, authorityPeerId } = this
+    const { world, playerList } = manager?.scene || {}
+
+    if (
+      entityType !== ProtEntityTypeEnum.PROT_ENTITY_MONSTER ||
+      world?.getPeer(authorityPeerId)?.loadedEntityIdList?.includes(entityId)
+    ) return false
+
+    const peerId = playerList?.find(player => !player.noAuthority && player.loadedEntityIdList.includes(entityId))?.peerId
+    if (peerId == null) return false
+
+    this.authorityPeerId = peerId
+
+    return authorityPeerId != null
   }
 
   async kill(attackerId: number, dieType: PlayerDieTypeEnum): Promise<void> {
@@ -178,6 +190,23 @@ export default class Entity extends BaseClass {
     await this.emit('Revive')
   }
 
+  exportEntityAuthorityInfo(): EntityAuthorityInfo {
+    const { bornPos } = this
+
+    return {
+      abilityInfo: {},
+      rendererChangedInfo: {},
+      aiInfo: {
+        isAiOpen: true,
+        bornPos: bornPos.export()
+      },
+      bornPos: bornPos.export(),
+      unknown1: {
+        unknown1: {}
+      }
+    }
+  }
+
   // placeholder
   exportSceneAvatarInfo(): SceneAvatarInfo { return null }
   exportSceneMonsterInfo(): SceneMonsterInfo { return null }
@@ -185,7 +214,7 @@ export default class Entity extends BaseClass {
   exportSceneGadgetInfo(): SceneGadgetInfo { return null }
 
   exportSceneEntityInfo(): SceneEntityInfo {
-    const { entityId, entityType, motionInfo, bornPos, props, fightProps, lifeState } = this
+    const { entityId, entityType, motionInfo, props, fightProps, lifeState } = this
     const { sceneTime, reliableSeq } = motionInfo
 
     const sceneEntityInfo: SceneEntityInfo = {
@@ -199,18 +228,7 @@ export default class Entity extends BaseClass {
       lifeState,
       animatorParaList: [{}],
       entityClientData: {},
-      entityAuthorityInfo: {
-        abilityInfo: {},
-        rendererChangedInfo: {},
-        aiInfo: {
-          isAiOpen: true,
-          bornPos: bornPos.export()
-        },
-        bornPos: bornPos.export(),
-        unknown1: {
-          unknown1: {}
-        }
-      }
+      entityAuthorityInfo: this.exportEntityAuthorityInfo()
     }
 
     if (sceneTime != null) sceneEntityInfo.lastMoveSceneTimeMs = sceneTime

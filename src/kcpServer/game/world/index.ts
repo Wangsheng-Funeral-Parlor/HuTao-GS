@@ -34,7 +34,6 @@ export default class World extends BaseClass {
   mainSceneId: number
 
   sceneList: Scene[]
-  mpSceneList: Scene[]
   playerList: Player[]
 
   hostLastState: LastState
@@ -52,7 +51,6 @@ export default class World extends BaseClass {
     this.host = hostPlayer
 
     this.sceneList = []
-    this.mpSceneList = []
     this.playerList = []
 
     this.hostLastState = new LastState(this)
@@ -93,7 +91,7 @@ export default class World extends BaseClass {
   }
 
   async destroy() {
-    const { sceneList, mpSceneList, playerList } = this
+    const { sceneList, playerList } = this
 
     while (playerList.length > 0) {
       const player = playerList[0]
@@ -102,7 +100,6 @@ export default class World extends BaseClass {
     }
 
     while (sceneList.length > 0) await sceneList.shift().destroy()
-    while (mpSceneList.length > 0) await mpSceneList.shift().destroy()
   }
 
   getNextPeerId() {
@@ -113,8 +110,12 @@ export default class World extends BaseClass {
     return player === this.host
   }
 
+  getPeer(peerId: number): Player {
+    return this.playerList.find(player => player.peerId === peerId)
+  }
+
   getScene(sceneId: number, fullInit: boolean = true) {
-    const sceneList = this.mpMode ? this.mpSceneList : this.sceneList
+    const { sceneList } = this
 
     // check if scene already loaded
     let scene = sceneList.find(s => s.id === sceneId)
@@ -141,7 +142,7 @@ export default class World extends BaseClass {
   }
 
   async removeScene(sceneId: number): Promise<void> {
-    const sceneList = this.mpMode ? this.mpSceneList : this.sceneList
+    const { sceneList } = this
 
     const scene = sceneList.find(s => s.id === sceneId)
     if (!scene) return
@@ -244,9 +245,24 @@ export default class World extends BaseClass {
     return this.leave(player.context, QuitReasonEnum.KICK_BY_HOST, ClientReconnectReasonEnum.CLIENT_RECONNNECT_QUIT_MP)
   }
 
+  updateMpTeam() {
+    const { playerList, mpMode } = this
+    if (!mpMode) return
+
+    for (let player of playerList) {
+      const { teamManager } = player
+      const mpTeam = teamManager.getTeam()
+
+      mpTeam.setUpAvatarTeam({
+        teamId: -1,
+        avatarTeamGuidList: teamManager.getTeam(null, !mpTeam.initialized).exportGuidList(true)
+      })
+    }
+  }
+
   async changeToMp() {
     const { host, hostLastState, mpMode } = this
-    const { teamManager, currentWorld, currentScene, context, pos, rot } = host
+    const { currentWorld, currentScene, context, pos, rot } = host
     if (mpMode || currentWorld !== this) return
 
     logger.debug(uidPrefix('MODE', host), 'SP -> MP')
@@ -254,8 +270,9 @@ export default class World extends BaseClass {
     hostLastState.saveState()
     this.mpMode = true
 
-    teamManager.getTeam().clear()
-    await this.getScene(currentScene.id).join(context, pos, rot, SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.HOST_FROM_SINGLE_TO_MP)
+    this.updateMpTeam()
+
+    await currentScene.join(context, pos, rot, SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.HOST_FROM_SINGLE_TO_MP)
   }
 
   async changeToSingle() {
@@ -287,10 +304,9 @@ export default class World extends BaseClass {
 
   // WorldUpdate
   async handleWorldUpdate() {
-    const { playerList, mpMode, broadcastContextList, lastRttNotify, lastLocNotify } = this
+    const { playerList, mpMode, sceneList, broadcastContextList, lastRttNotify, lastLocNotify } = this
     const now = Date.now()
 
-    const sceneList = mpMode ? this.mpSceneList : this.sceneList
     for (let scene of sceneList) scene.emit('SceneUpdate')
 
     if (lastRttNotify == null || now - lastRttNotify > 1e3) {

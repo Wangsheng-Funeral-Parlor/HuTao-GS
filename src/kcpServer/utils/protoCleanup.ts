@@ -21,12 +21,18 @@ export default function protoCleanup(obj: any) {
   obj = Object.assign({}, obj) // clone
 
   for (let k in obj) {
-    if (!keepValue(obj[k])) {
+    const v = obj[k]
+
+    if (!keepValue(v)) {
       delete obj[k]
       continue
     }
 
-    if (typeof obj[k] === 'object') protoCleanup(obj[k])
+    if (
+      v != null &&
+      typeof v === 'object' &&
+      !Array.isArray(v)
+    ) obj[k] = protoCleanup(v)
   }
 
   return obj

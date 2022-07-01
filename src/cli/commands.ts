@@ -491,7 +491,7 @@ const commands: CommandDefinition[] = [
 
       entity.initNew(args[1])
 
-      currentScene.entityManager.add(entity, undefined, undefined, true)
+      currentScene.entityManager.add(entity)
     }
   },
   {
@@ -616,6 +616,32 @@ const commands: CommandDefinition[] = [
 
       const avatarList = player.teamManager.getTeam()?.avatarList || []
       for (let avatar of avatarList) avatar.fightProps.rechargeEnergy(true)
+    }
+  },
+  {
+    name: 'coop',
+    desc: 'Change to coop world',
+    args: [
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+      if (player.isInMp()) {
+        printError('Player already in a coop world.')
+        return
+      }
+
+      print('Changing to coop world.')
+
+      player.hostWorld.changeToMp()
     }
   }
 ]

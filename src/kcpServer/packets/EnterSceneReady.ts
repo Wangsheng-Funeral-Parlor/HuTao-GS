@@ -26,10 +26,11 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: EnterSceneReadyReq): Promise<void> {
     const { player, seqId } = context
-    const { state, currentScene, loadedEntityIdList } = player
+    const { state, currentScene, missedEntityIdList } = player
+    const { enterSceneToken: token, host } = currentScene
     const { enterSceneToken } = data
 
-    if (currentScene.enterSceneToken !== enterSceneToken) {
+    if (enterSceneToken !== token) {
       await this.response(context, { retcode: RetcodeEnum.RET_ENTER_SCENE_TOKEN_INVALID })
       return
     }
@@ -38,14 +39,13 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
     player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_ENTER_SCENE_READY
 
     if (!player.isHost() && player.sceneEnterType === SceneEnterTypeEnum.ENTER_OTHER) {
-      const hostCtx = currentScene.host.context
+      const hostCtx = host.context
       hostCtx.seqId = seqId
 
       await PlayerPreEnterMp.sendNotify(hostCtx, player)
     }
 
-    if (loadedEntityIdList.length > 0) await SceneEntityDisappear.sendNotify(context, loadedEntityIdList.splice(0), VisionTypeEnum.VISION_MISS)
-
+    await SceneEntityDisappear.sendNotify(context, missedEntityIdList.splice(0), VisionTypeEnum.VISION_MISS)
     await EnterScenePeer.sendNotify(context)
 
     await this.response(context, {

@@ -29,9 +29,8 @@ class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
       return
     }
 
-    for (let invokeEntry of invokes) {
-      forwardBuffer.addEntry(this, invokeEntry, seqId)
-    }
+    for (let invokeEntry of invokes) forwardBuffer.addEntry(this, invokeEntry, seqId)
+    forwardBuffer.setAdditionalData(seqId, entityId)
 
     forwardBuffer.sendAll()
   }
@@ -40,10 +39,10 @@ class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
     await super.sendNotify(context, data)
   }
 
-  async broadcastNotify(contextList: PacketContext[], invokeList: AbilityInvokeEntry[], entityId?: number): Promise<void> {
+  async broadcastNotify(contextList: PacketContext[], invokes: AbilityInvokeEntry[], entityId: number): Promise<void> {
     const notifyData: ClientAbilityInitFinishNotify = {
-      entityId: invokeList?.[0]?.entityId || entityId,
-      invokes: invokeList
+      entityId,
+      invokes
     }
 
     await super.broadcastNotify(contextList, notifyData)

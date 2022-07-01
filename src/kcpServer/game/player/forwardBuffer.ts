@@ -1,8 +1,7 @@
+import Packet, { PacketContext } from '#/packet'
 import Player from '$/player'
 import { ForwardTypeEnum } from '@/types/enum/invoke'
-import Packet, { PacketContext } from '#/packet'
 import { ClientState } from '@/types/enum/state'
-import Client from '#/client'
 
 export interface ForwardEntry {
   forwardType: ForwardTypeEnum
@@ -14,12 +13,14 @@ export default class ForwardBuffer {
 
   packetList: Packet[]
   bufferMap: { [type: number]: [number, ForwardEntry, number][] }
+  additionalDataMap: { [seqId: number]: any[] }
 
   constructor(player: Player) {
     this.player = player
 
     this.packetList = []
     this.bufferMap = {}
+    this.additionalDataMap = {}
   }
 
   private getEntryList(type: ForwardTypeEnum): [Packet, ForwardEntry[], number][] {
@@ -76,16 +77,19 @@ export default class ForwardBuffer {
   }
 
   private async send(type: ForwardTypeEnum) {
+    const { additionalDataMap } = this
     const entryList = this.getEntryList(type)
 
     for (let entry of entryList) {
+      const [packet, entries, seqId] = entry
       const contextList = this.getContextList(type)
 
-      for (let ctx of contextList) ctx.seqId = entry[2]
+      for (let ctx of contextList) ctx.seqId = seqId
 
-      await entry[0].broadcastNotify(
+      await packet.broadcastNotify(
         contextList,
-        entry[1]
+        entries,
+        ...(additionalDataMap[seqId] || [])
       )
     }
   }
@@ -104,10 +108,19 @@ export default class ForwardBuffer {
     bufferMap[forwardType].push([index, entry, seqId])
   }
 
+  setAdditionalData(seqId: number, ...data: any[]) {
+    this.additionalDataMap[seqId] = data
+  }
+
   async sendAll(): Promise<void> {
+    const { additionalDataMap } = this
+
     for (let type in ForwardTypeEnum) {
       if (isNaN(parseInt(type))) continue
       await this.send(parseInt(type))
     }
+
+    // clear additional data
+    for (let seqId in additionalDataMap) delete additionalDataMap[seqId]
   }
 }

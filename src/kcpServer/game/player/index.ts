@@ -65,6 +65,9 @@ export default class Player extends BaseClass {
   paused: boolean
 
   loadedEntityIdList: number[]
+  missedEntityIdList: number[]
+  entityGridCountMap: { [hash: number]: { [entityType: number]: number } }
+  noAuthority: boolean
 
   currentAvatar: Avatar
 
@@ -108,6 +111,8 @@ export default class Player extends BaseClass {
     this.emojiCollection = []
 
     this.loadedEntityIdList = []
+    this.missedEntityIdList = []
+    this.entityGridCountMap = {}
 
     this.prevScenePos = new Vector()
     this.prevSceneRot = new Vector()
@@ -683,11 +688,11 @@ export default class Player extends BaseClass {
 
     this.draggingBack = false
 
+    if (nextScene === scene) return
+
     // Unregister entities
     await entityManager.unregister(teamManager.entity)
     for (let avatar of avatarList) await entityManager.unregister(avatar)
-
-    if (nextScene === scene) return
 
     // Set previous scene
     this.prevScene = scene

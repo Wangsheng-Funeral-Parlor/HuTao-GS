@@ -42,6 +42,7 @@ export const verbosePackets = [
   'QueryPathReq',
   'QueryPathRsp',
   'SceneAudioNotify',
+  'SceneEntityMoveNotify',
   'ScenePlayerLocationNotify',
   'SceneTimeNotify',
   'SetEntityClientDataNotify',

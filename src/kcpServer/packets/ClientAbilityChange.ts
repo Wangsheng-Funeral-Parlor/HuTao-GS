@@ -5,6 +5,7 @@ import { AbilityInvokeEntry } from '@/types/game/invoke'
 export interface ClientAbilityChangeNotify {
   entityId: number
   invokes: AbilityInvokeEntry[]
+  flag?: boolean
 }
 
 class ClientAbilityChangePacket extends Packet implements PacketInterface {
@@ -19,19 +20,18 @@ class ClientAbilityChangePacket extends Packet implements PacketInterface {
   async recvNotify(context: PacketContext, data: ClientAbilityChangeNotify): Promise<void> {
     const { player, seqId } = context
     const { forwardBuffer, currentScene } = player
-    const { entityId, invokes } = data
+    const { entityId, invokes, flag } = data
 
     if (invokes.length === 0) {
       const { broadcastContextList } = currentScene
       for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
-      await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), [], entityId)
+      await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), [], entityId, !!flag)
       return
     }
 
-    for (let invokeEntry of invokes) {
-      forwardBuffer.addEntry(this, invokeEntry, seqId)
-    }
+    for (let invokeEntry of invokes) forwardBuffer.addEntry(this, invokeEntry, seqId)
+    forwardBuffer.setAdditionalData(seqId, entityId, !!flag)
 
     forwardBuffer.sendAll()
   }
@@ -40,10 +40,11 @@ class ClientAbilityChangePacket extends Packet implements PacketInterface {
     await super.sendNotify(context, data)
   }
 
-  async broadcastNotify(contextList: PacketContext[], invokeList: AbilityInvokeEntry[], entityId?: number): Promise<void> {
+  async broadcastNotify(contextList: PacketContext[], invokes: AbilityInvokeEntry[], entityId: number, flag: boolean): Promise<void> {
     const notifyData: ClientAbilityChangeNotify = {
-      entityId: invokeList?.[0]?.entityId || entityId,
-      invokes: invokeList
+      entityId,
+      invokes,
+      flag
     }
 
     await super.broadcastNotify(contextList, notifyData)

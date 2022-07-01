@@ -19,17 +19,15 @@ class AbilityInvocationsPacket extends Packet implements PacketInterface {
     const { forwardBuffer } = player
     const { invokes } = data
 
-    for (let invokeEntry of invokes) {
-      forwardBuffer.addEntry(this, invokeEntry, seqId)
-    }
+    for (let invokeEntry of invokes) forwardBuffer.addEntry(this, invokeEntry, seqId)
   }
 
   async sendNotify(context: PacketContext, data: AbilityInvocationsNotify): Promise<void> {
     await super.sendNotify(context, data)
   }
 
-  async broadcastNotify(contextList: PacketContext[], invokeList: AbilityInvokeEntry[]): Promise<void> {
-    const notifyData: AbilityInvocationsNotify = { invokes: invokeList }
+  async broadcastNotify(contextList: PacketContext[], invokes: AbilityInvokeEntry[]): Promise<void> {
+    const notifyData: AbilityInvocationsNotify = { invokes }
 
     await super.broadcastNotify(contextList, notifyData)
   }

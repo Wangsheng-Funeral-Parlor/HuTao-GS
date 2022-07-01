@@ -17,15 +17,12 @@ class EvtDestroyGadgetPacket extends Packet implements PacketInterface {
 
   async recvNotify(context: PacketContext, data: EvtDestroyGadgetNotify): Promise<void> {
     const { player, seqId } = context
-    const { forwardBuffer, loadedEntityIdList, currentScene } = player
+    const { forwardBuffer, currentScene } = player
 
     forwardBuffer.addEntry(this, data, seqId)
     await forwardBuffer.sendAll()
 
     if (!player.isInMp()) return
-
-    // remove from player entity list
-    //loadedEntityIdList.splice(loadedEntityIdList.indexOf(data.entityId), 1)
 
     // remove entity from scene entity list
     //currentScene.entityManager.remove(data.entityId)

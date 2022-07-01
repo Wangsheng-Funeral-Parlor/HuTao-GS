@@ -1,7 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { VisionTypeEnum } from '@/types/enum/entity'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import { RetcodeEnum } from '@/types/enum/retcode'
-import { SceneEnterTypeEnum } from '@/types/enum/scene'
 import { ClientState } from '@/types/enum/state'
 import PlayerEyePointState from './PlayerEyePointState'
 
@@ -25,8 +23,8 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: EnterSceneDoneReq): Promise<void> {
     const { player, seqId } = context
-    const { state, currentScene, currentAvatar, sceneEnterType } = player
-    const { entityManager, enterSceneToken } = currentScene
+    const { state, currentScene, sceneEnterType } = player
+    const { enterSceneToken } = currentScene
     const { enterSceneToken: token } = data
 
     if (this.checkState(context, ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE, true, 0xF0FF, false)) {
@@ -45,24 +43,8 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
     // Set client state
     player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_ENTER_SCENE_DONE
 
-    let visionType: VisionTypeEnum
-    switch (sceneEnterType) {
-      case SceneEnterTypeEnum.ENTER_GOTO:
-      case SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL:
-        visionType = VisionTypeEnum.VISION_TRANSPORT
-        break
-      default:
-        visionType = undefined // Use default type
-    }
-
-    // Add current avatar to scene
-    await entityManager.add(currentAvatar, visionType, undefined, true, seqId)
-
-    // Force entity update
-    await entityManager.updatePlayer(player, visionType, true, seqId)
-
-    // Clear params
-    currentAvatar.motionInfo.params = []
+    // Emit player join event
+    await currentScene.emit('PlayerJoin', player, sceneEnterType, seqId)
 
     await PlayerEyePointState.sendNotify(context, {})
 

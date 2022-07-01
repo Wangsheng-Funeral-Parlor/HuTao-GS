@@ -91,7 +91,7 @@ export default class Team {
     const { currentAvatar } = player
     if (oldAvatar && currentAvatar !== oldAvatar) {
       currentAvatar.motionInfo.copy(oldAvatar.motionInfo)
-      currentScene?.entityManager?.replace(oldAvatar, currentAvatar, true, seqId)
+      currentScene?.entityManager?.replace(oldAvatar, currentAvatar, seqId)
     }
 
     return RetcodeEnum.RET_SUCC

@@ -70,8 +70,9 @@ export default class Game {
 
       // set player data
       await player.initNew(10000046, config.serverName)
-
       player.setLevel(60, false)
+
+      player.noAuthority = true
 
       // set born location
       player.hostWorld.hostLastState.init({

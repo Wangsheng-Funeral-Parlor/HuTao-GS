@@ -156,7 +156,7 @@ export default class CombatManager extends BaseClass {
     // Update entity motion info
     entity.motionInfo.update(motionInfo, sceneTime, reliableSeq)
 
-    if (entity.motionInfo.pos.grid.hasChanged() && !entity.isActive) entityManager.activeEntityList.push(entity)
+    if (entity.motionInfo.pos.grid.hasChanged()) entityManager.updateEntity(entity)
 
     switch (motionState) {
       // Save landing speed

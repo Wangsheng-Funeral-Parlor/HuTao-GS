@@ -85,17 +85,22 @@ export default class SceneBlock extends BaseClass {
   }
 
   async initNew() {
-    const { groupList } = this
+    const { scene, groupList } = this
+    const { entityManager } = scene
+
     const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
     for (let group of groupList) {
       if (group.dynamicLoad) continue
       await group.load(wob)
     }
+
+    await entityManager.flushAll()
   }
 
   async load() {
-    const { id, groupList, loaded } = this
+    const { scene, id, groupList, loaded } = this
+    const { entityManager } = scene
 
     if (loaded) return
     this.loaded = true
@@ -108,10 +113,13 @@ export default class SceneBlock extends BaseClass {
       if (!group.dynamicLoad) continue
       await group.load(wob)
     }
+
+    await entityManager.flushAll()
   }
 
   async unload() {
-    const { id, groupList, loaded } = this
+    const { scene, id, groupList, loaded } = this
+    const { entityManager } = scene
 
     if (!loaded) return
     this.loaded = false
@@ -125,6 +133,8 @@ export default class SceneBlock extends BaseClass {
       await group.unload()
       await wob.waitTick()
     }
+
+    await entityManager.flushAll()
   }
 
   /**Events**/

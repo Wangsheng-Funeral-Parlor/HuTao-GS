@@ -39,17 +39,7 @@ class JoinPlayerScenePacket extends Packet implements PacketInterface {
     if (hostAlreadyInMp) await hostWorld.join(context)
     else await game.playerLogin(context, hostWorld)
 
-    player.teamManager.getTeam().clear()
-
-    // Update team avatar
-    for (let p of hostWorld.playerList) {
-      const { teamManager } = p
-      const mpTeam = teamManager.getTeam()
-      mpTeam.setUpAvatarTeam({
-        teamId: -1,
-        avatarTeamGuidList: teamManager.getTeam(null, !mpTeam.initialized).exportGuidList(true)
-      })
-    }
+    hostWorld.updateMpTeam()
   }
 
   async response(context: PacketContext, data: JoinPlayerSceneRsp): Promise<void> {

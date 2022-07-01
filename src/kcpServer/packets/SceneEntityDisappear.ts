@@ -16,7 +16,7 @@ class SceneEntityDisappearPacket extends Packet implements PacketInterface {
     await this.waitState(context, ClientState.POST_LOGIN, true)
 
     const notifyData: SceneEntityDisappearNotify = {
-      entityList: entityIdList,
+      entityList: entityIdList.filter((id, i, list) => list.indexOf(id) === i),
       disappearType
     }
 

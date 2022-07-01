@@ -1,4 +1,3 @@
-import AbilityManager from '$/manager/abilityManager'
 import { AbilityAppliedAbility, AbilityEmbryo } from '@/types/game/ability'
 import AbilityList from './abilityList'
 

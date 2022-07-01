@@ -47,7 +47,7 @@ export default class SceneGroup {
 
     for (let entity of entityList) {
       if (entity.isDead()) continue
-      await entityManager.add(entity, VisionTypeEnum.VISION_MEET, undefined, undefined, undefined, true)
+      await entityManager.add(entity, VisionTypeEnum.VISION_MEET, undefined, undefined, true)
     }
 
     return true
@@ -83,7 +83,7 @@ export default class SceneGroup {
       entity.initNew(Math.max(1, Math.min(100, Level + levelOffset)))
 
       monsterList.push(entity)
-      await entityManager.add(entity, undefined, undefined, undefined, undefined, true)
+      await entityManager.add(entity, undefined, undefined, undefined, true)
     }
   }
 
@@ -116,7 +116,7 @@ export default class SceneGroup {
       entity.initNew()
 
       npcList.push(entity)
-      await entityManager.add(entity, undefined, undefined, undefined, undefined, true)
+      await entityManager.add(entity, undefined, undefined, undefined, true)
     }
   }
 
@@ -146,7 +146,7 @@ export default class SceneGroup {
       entity.initNew(Level)
 
       gadgetList.push(entity)
-      await entityManager.add(entity, undefined, undefined, undefined, undefined, true)
+      await entityManager.add(entity, undefined, undefined, undefined, true)
     }
   }
 
@@ -155,7 +155,7 @@ export default class SceneGroup {
     const { scene } = block
     const { entityManager } = scene
 
-    for (let entity of entityList) await entityManager.remove(entity, undefined, undefined, undefined, true)
+    for (let entity of entityList) await entityManager.remove(entity, undefined, undefined, true)
   }
 
   async load(wob: WaitOnBlock) {

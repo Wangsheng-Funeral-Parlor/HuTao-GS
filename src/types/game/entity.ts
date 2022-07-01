@@ -46,6 +46,12 @@ export interface AnimatorParameterValueInfoPair {
   animatorPara?: AnimatorParameterValueInfo
 }
 
+export interface AuthorityChange {
+  entityId: number
+  authorityPeerId: number
+  entityAuthorityInfo: EntityAuthorityInfo
+}
+
 export interface EntityAuthorityInfo {
   abilityInfo: AbilitySyncStateInfo
   rendererChangedInfo: EntityRendererChangedInfo

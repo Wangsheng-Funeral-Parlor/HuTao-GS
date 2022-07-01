@@ -51,6 +51,8 @@ export default class Scene extends BaseClass {
   lastLocUpdate: number
   lastTimeUpdate: number
 
+  destroyed: boolean
+
   constructor(world: World, sceneId: number) {
     super()
 
@@ -81,7 +83,13 @@ export default class Scene extends BaseClass {
 
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
 
-    for (let block of sceneBlockList) await block.initNew()
+    for (let block of sceneBlockList) {
+      if (this.destroyed) {
+        logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Abort load non dynamic groups.')
+        return
+      }
+      await block.initNew()
+    }
 
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
   }
@@ -132,14 +140,15 @@ export default class Scene extends BaseClass {
 
   async destroy() {
     const { world, entityManager, sceneBlockList } = this
-    const { sceneList, mpSceneList } = world
+    const { sceneList } = world
+
+    this.destroyed = true
 
     await entityManager.destroy()
 
-    for (let sceneBlock of sceneBlockList) sceneBlock.unload()
+    for (let sceneBlock of sceneBlockList) await sceneBlock.unload()
 
     if (sceneList.includes(this)) sceneList.splice(sceneList.indexOf(this), 1)
-    if (mpSceneList.includes(this)) mpSceneList.splice(mpSceneList.indexOf(this), 1)
   }
 
   pause() {
@@ -239,11 +248,12 @@ export default class Scene extends BaseClass {
   async leave(context: PacketContext) {
     const { id, host, playerList } = this
     const { player } = context
+    const { uid } = player
 
     // Check if player is in scene
     if (!playerList.includes(player)) return
 
-    logger.debug(uidPrefix('QUIT', host, 0xffff00), `UID: ${player.uid} ID: ${id}`)
+    logger.debug(uidPrefix('QUIT', host, 0xffff00), `UID: ${uid} ID: ${id}`)
 
     // Set client state
     player.state = ClientState.POST_LOGIN | (player.state & 0x0F00)
@@ -252,6 +262,7 @@ export default class Scene extends BaseClass {
     playerList.splice(playerList.indexOf(player), 1)
 
     await player.emit('SceneLeave', this, context)
+    await this.emit('PlayerLeave', player)
 
     // Destroy scene if no player is inside
     if (playerList.length > 0 || player.nextScene === this) return
@@ -278,7 +289,7 @@ export default class Scene extends BaseClass {
     return this.playerList.map(p => p.exportScenePlayerInfo())
   }
 
-  /**Internal Events**/
+  /**Events**/
 
   // SceneUpdate
   async handleSceneUpdate() {
