@@ -1,17 +1,16 @@
+import WeaponData from '$/gameData/data/WeaponData'
 import { EquipInterface } from '@/types/game/item'
 import { SceneWeaponInfo } from '@/types/game/weapon'
+import { EquipTypeEnum } from '@/types/user/EquipUserData'
+import WeaponUserData from '@/types/user/WeaponUserData'
 import Equip from '..'
 import Affix from './affix'
 import { WeaponEntity } from './entity'
-import WeaponData from '$/gameData/data/WeaponData'
-import { EquipTypeEnum } from '@/types/user/EquipUserData'
-import WeaponUserData from '@/types/user/WeaponUserData'
 
 export default class Weapon extends Equip {
   entity: WeaponEntity
 
   gadgetId: number
-
   affixList: Affix[]
 
   constructor(itemId: number, guid?: bigint) {
@@ -19,17 +18,8 @@ export default class Weapon extends Equip {
 
     this.entity = new WeaponEntity(this)
 
+    this.gadgetId = 0
     this.affixList = []
-
-    const weaponData = WeaponData.getWeapon(itemId)
-    if (!weaponData) return
-
-    this.gadgetId = weaponData.GadgetId
-
-    for (let affix of weaponData.SkillAffix) {
-      if (affix === 0) continue
-      this.affixList.push(new Affix(this, affix))
-    }
   }
 
   static createByGadgetId(gadgetId: number): Weapon {
@@ -62,7 +52,7 @@ export default class Weapon extends Equip {
     this.entity.promoteLevel = v
   }
 
-  init(userData: WeaponUserData) {
+  async init(userData: WeaponUserData) {
     const { entity, affixList } = this
     const { gadgetId, affixDataList, entityData } = userData
 
@@ -70,23 +60,36 @@ export default class Weapon extends Equip {
 
     this.gadgetId = gadgetId || 0
 
-    for (let affix of affixList) {
-      const affixData = affixDataList.find(data => data.id === affix.id)
-      if (affixData == null) continue
+    for (let affixData of affixDataList) {
+      const affix = new Affix(this, affixData.id)
 
       affix.init(affixData)
+      affixList.push(affix)
     }
 
-    entity.init(entityData)
+    await entity.init(entityData)
   }
 
-  initNew() {
-    const { entity, affixList } = this
+  async initNew() {
+    const { itemId, entity, affixList } = this
 
     super.initNew()
 
-    for (let affix of affixList) affix.initNew()
-    entity.initNew()
+    const weaponData = await WeaponData.getWeapon(itemId)
+    if (weaponData != null) {
+      this.gadgetId = weaponData.GadgetId
+
+      for (let affixId of weaponData.SkillAffix) {
+        if (affixId === 0) continue
+
+        const affix = new Affix(this, affixId)
+
+        affix.initNew()
+        affixList.push(affix)
+      }
+    }
+
+    await entity.initNew()
   }
 
   exportAffixMap() {

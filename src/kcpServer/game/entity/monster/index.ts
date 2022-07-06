@@ -5,6 +5,7 @@ import Weapon from '$/equip/weapon'
 import { MonsterBornTypeEnum } from '@/types/enum/monster'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import MonsterData from '$/gameData/data/MonsterData'
+import EntityUserData from '@/types/user/EntityUserData'
 
 export default class Monster extends Entity {
   monsterId: number
@@ -25,9 +26,6 @@ export default class Monster extends Entity {
 
     this.monsterId = monsterId
 
-    this.config = MonsterData.getFightPropConfig(monsterId)
-    this.growCurve = GrowCurveData.getGrowCurve('Monster')
-
     this.entityType = ProtEntityTypeEnum.PROT_ENTITY_MONSTER
 
     this.affixList = []
@@ -38,18 +36,35 @@ export default class Monster extends Entity {
     this.isElite = false
 
     super.initHandlers(this)
+  }
 
-    const monsterData = MonsterData.getMonster(monsterId)
+  private async loadMonsterData() {
+    const { monsterId } = this
+
+    this.config = await MonsterData.getFightPropConfig(monsterId)
+    this.growCurve = await GrowCurveData.getGrowCurve('Monster')
+
+    const monsterData = await MonsterData.getMonster(monsterId)
     if (!monsterData) return
 
     this.affixList = monsterData.Affix || []
     this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id))
 
-    const describeData = MonsterData.getDescribe(monsterData.DescribeId)
+    const describeData = await MonsterData.getDescribe(monsterData.DescribeId)
     if (!describeData) return
 
     this.titleId = describeData.TitleID || 0
-    this.specialNameId = MonsterData.getSpecialName(describeData.SpecialNameLabID)?.Id || 0
+    this.specialNameId = (await MonsterData.getSpecialName(describeData.SpecialNameLabID))?.Id || 0
+  }
+
+  async init(userData: EntityUserData): Promise<void> {
+    await this.loadMonsterData()
+    super.init(userData)
+  }
+
+  async initNew(level?: number): Promise<void> {
+    await this.loadMonsterData()
+    super.initNew(level)
   }
 
   exportSceneMonsterInfo(): SceneMonsterInfo {

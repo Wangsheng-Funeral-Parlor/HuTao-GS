@@ -60,7 +60,7 @@ export default class SceneGroup {
 
     if (await this.reloadList(monsterList)) return
 
-    const worldLevelData = WorldData.getWorldLevel(world.level)
+    const worldLevelData = await WorldData.getWorldLevel(world.level)
     const levelOffset = worldLevelData == null ? 0 : (worldLevelData.MonsterLevel - 22)
 
     for (let monster of monsters) {
@@ -165,7 +165,7 @@ export default class SceneGroup {
     if (loaded) return
     this.loaded = true
 
-    const groupData = SceneData.getGroup(sceneId, groupId)
+    const groupData = await SceneData.getGroup(sceneId, groupId)
     if (!groupData) return
 
     performance.mark('GroupLoad')

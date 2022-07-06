@@ -69,24 +69,24 @@ export default class World extends BaseClass {
     return this.host.worldLevel
   }
 
-  init(userData: WorldUserData) {
+  async init(userData: WorldUserData) {
     const { id, lastStateData } = userData
 
     this.id = id
     this.hostLastState.init(lastStateData)
   }
 
-  initNew(worldId: number) {
+  async initNew(worldId: number) {
     this.id = worldId
 
-    const data = WorldData.getWorld(worldId)
+    const data = await WorldData.getWorld(worldId)
     if (!data) return
 
     const { MainSceneId } = data
 
     this.mainSceneId = MainSceneId
 
-    const mainSceneData = SceneData.getScene(MainSceneId)
+    const mainSceneData = await SceneData.getScene(MainSceneId)
     if (mainSceneData) this.hostLastState.initNew(mainSceneData)
   }
 
@@ -114,7 +114,7 @@ export default class World extends BaseClass {
     return this.playerList.find(player => player.peerId === peerId)
   }
 
-  getScene(sceneId: number, fullInit: boolean = true) {
+  async getScene(sceneId: number, fullInit: boolean = true) {
     const { sceneList } = this
 
     // check if scene already loaded
@@ -122,21 +122,13 @@ export default class World extends BaseClass {
     if (scene) return scene
 
     // check if scene data exists
-    if (!SceneData.getScene(sceneId)) return null
+    if (!await SceneData.getScene(sceneId)) return null
 
     // create new scene
     scene = new Scene(this, sceneId)
 
-    if (fullInit) {
-      performance.mark('SceneInitSync')
-
-      sceneList.push(scene)
-      scene.initNew(true)
-
-      performance.measure('Scene init sync', 'SceneInitSync')
-    } else {
-      scene.initNew(false)
-    }
+    if (fullInit) sceneList.push(scene)
+    await scene.initNew(fullInit)
 
     return scene
   }
@@ -163,7 +155,7 @@ export default class World extends BaseClass {
 
     const isHost = this.isHost(player)
 
-    const scene = isHost ? (this.getScene(sceneId) || this.getScene(mainSceneId)) : host.currentScene
+    const scene = isHost ? ((await this.getScene(sceneId)) || (await this.getScene(mainSceneId))) : host.currentScene
     if (!scene) {
       performance.clearMarks('WorldJoin')
       return false

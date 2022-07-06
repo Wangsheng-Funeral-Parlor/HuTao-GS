@@ -32,7 +32,15 @@ export default class SceneBlock extends BaseClass {
 
     this.id = blockId
 
-    const blockData = SceneData.getBlock(scene.id, blockId)
+    this.groupList = []
+
+    super.initHandlers(this)
+  }
+
+  private async loadSceneBlockData() {
+    const { scene, id } = this
+    const blockData = await SceneData.getBlock(scene.id, id)
+    if (blockData == null) return
 
     this.rect = blockData?.Rect != null ? {
       min: new Vector().setData(blockData.Rect.Min),
@@ -46,8 +54,6 @@ export default class SceneBlock extends BaseClass {
         new Vector().setData(group.Pos),
         group.DynamicLoad
       )) || []
-
-    super.initHandlers(this)
   }
 
   private inBoundingRect(player: Player): boolean {
@@ -87,6 +93,8 @@ export default class SceneBlock extends BaseClass {
   async initNew() {
     const { scene, groupList } = this
     const { entityManager } = scene
+
+    await this.loadSceneBlockData()
 
     const wob = new WaitOnBlock(MAX_BLOCK_MS)
 

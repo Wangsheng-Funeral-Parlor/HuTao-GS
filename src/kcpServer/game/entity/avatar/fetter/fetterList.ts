@@ -14,11 +14,18 @@ export default class FetterList {
     this.avatar = avatar
 
     this.fetterList = []
-
-    this.update()
   }
 
-  init(userData: FettersUserData) {
+  private async loadFetterData() {
+    const avatarData = await AvatarData.getAvatar(this.avatar.avatarId)
+    if (!avatarData) return
+
+    this.fetterList = avatarData.Fetters.map(fetter => new Fetter(this, fetter))
+  }
+
+  async init(userData: FettersUserData) {
+    await this.loadFetterData()
+
     const { fetterList } = this
     const { expLevel, rewarded } = userData
 
@@ -28,23 +35,15 @@ export default class FetterList {
     for (let fetter of fetterList) fetter.update()
   }
 
-  initNew() {
+  async initNew() {
+    await this.loadFetterData()
+
     const { fetterList } = this
 
     this.expLevel = 1
     this.rewardedFetterLevelList = []
 
     for (let fetter of fetterList) fetter.update()
-  }
-
-  update() {
-    const { avatar, fetterList } = this
-
-    const data = AvatarData.getAvatar(avatar.avatarId)
-    if (!data) return
-
-    fetterList.splice(0)
-    fetterList.push(...data.Fetters.map(fetter => new Fetter(this, fetter)))
   }
 
   export(): AvatarFetterInfo {

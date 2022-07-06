@@ -1,11 +1,13 @@
-import Skill from './skill'
-import Avatar from '..'
-import InherentProudSkill from './inherentProudSkill'
-import Talent from './talent'
-import { PlayerPropEnum } from '@/types/enum/player'
 import AvatarData from '$/gameData/data/AvatarData'
 import SkillData from '$/gameData/data/SkillData'
+import { PlayerPropEnum } from '@/types/enum/player'
 import SkillDepotUserData from '@/types/user/SkillDepotUserData'
+import Avatar from '..'
+import InherentProudSkill from './inherentProudSkill'
+import Skill from './skill'
+import Talent from './talent'
+
+// TODO: Reimplement
 
 export default class SkillDepot {
   avatar: Avatar
@@ -21,42 +23,49 @@ export default class SkillDepot {
     this.inherentProudSkills = []
     this.skills = []
     this.talents = []
-
-    this.update()
   }
 
-  init(userData: SkillDepotUserData) {
-    const { skills, energySkill } = this
+  async init(userData: SkillDepotUserData) {
+    const { skills, talents, energySkill } = this
     const { skillDataList, energySkillData } = userData
+
+    await this.update()
 
     for (let skill of skills) {
       const skillData = skillDataList.find(data => data.id === skill.id)
       if (!skillData) continue
 
-      skill.init(skillData)
+      await skill.init(skillData)
     }
+
+    for (let talent of talents) await talent.init()
 
     if (!energySkill) return
 
-    if (energySkillData) energySkill.init(energySkillData)
-    else energySkill.initNew()
+    if (energySkillData) await energySkill.init(energySkillData)
+    else await energySkill.initNew()
   }
 
-  initNew() {
-    const { skills, energySkill } = this
+  async initNew() {
+    const { skills, talents, energySkill } = this
 
-    for (let skill of skills) skill.initNew()
-    energySkill?.initNew()
+    await this.update()
+
+    for (let skill of skills) await skill.initNew()
+
+    for (let talent of talents) await talent.init()
+
+    await energySkill?.initNew()
   }
 
-  update() {
+  async update() {
     const { avatar, inherentProudSkills, skills, talents } = this
     const promoteLevel = avatar.props.get(PlayerPropEnum.PROP_BREAK_LEVEL)
 
-    const avatarData = AvatarData.getAvatar(avatar.avatarId)
+    const avatarData = await AvatarData.getAvatar(avatar.avatarId)
     if (!avatarData) return
 
-    const depotData = SkillData.getSkillDepot(avatarData.SkillDepotId)
+    const depotData = await SkillData.getSkillDepot(avatarData.SkillDepotId)
     if (!depotData) return
 
     this.id = depotData.Id
@@ -66,7 +75,7 @@ export default class SkillDepot {
       if (proudSkillOpen.ProudSkillGroupId == null) continue
       if (proudSkillOpen.NeedAvatarPromoteLevel != null && promoteLevel < proudSkillOpen.NeedAvatarPromoteLevel) continue
 
-      const proudSkillData = SkillData.getProudSkillByGroup(proudSkillOpen.ProudSkillGroupId)
+      const proudSkillData = await SkillData.getProudSkillByGroup(proudSkillOpen.ProudSkillGroupId)
 
       inherentProudSkills.push(new InherentProudSkill(this, proudSkillData.Id))
     }

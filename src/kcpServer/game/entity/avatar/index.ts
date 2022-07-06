@@ -48,9 +48,6 @@ export default class Avatar extends Entity {
     this.avatarId = avatarId
     this.guid = guid || newGuid()
 
-    this.config = AvatarData.getFightPropConfig(avatarId)
-    this.growCurve = GrowCurveData.getGrowCurve('Avatar')
-
     this.reliquaryMap = {}
 
     this.skillDepot = new SkillDepot(this)
@@ -62,8 +59,13 @@ export default class Avatar extends Entity {
     super.initHandlers(this)
   }
 
-  init(userData: AvatarUserData) {
-    const { player, avatarId, skillDepot, fetterList, motionInfo } = this
+  async loadAvatarData() {
+    this.config = await AvatarData.getFightPropConfig(this.avatarId)
+    this.growCurve = await GrowCurveData.getGrowCurve('Avatar')
+  }
+
+  async init(userData: AvatarUserData) {
+    const { player, avatarId, skillDepot, fetterList, excelInfo, motionInfo } = this
     const {
       id,
       type,
@@ -75,8 +77,11 @@ export default class Avatar extends Entity {
     } = userData
     if (avatarId !== id) return this.initNew(undefined, false)
 
-    skillDepot.init(skillDepotData)
-    fetterList.init(fettersData)
+    await this.loadAvatarData()
+
+    await skillDepot.init(skillDepotData)
+    await fetterList.init(fettersData)
+    await excelInfo.init()
 
     motionInfo.standby()
 
@@ -86,7 +91,7 @@ export default class Avatar extends Entity {
     if (weaponItem?.equip?.type === EquipTypeEnum.WEAPON) {
       weapon = <Weapon>weaponItem.equip
     } else {
-      weapon = new Weapon(AvatarData.getAvatar(avatarId)?.InitialWeapon)
+      weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon)
       weapon.initNew()
 
       player.inventory.add(weapon, false)
@@ -102,15 +107,18 @@ export default class Avatar extends Entity {
   }
 
   async initNew(avatarType: AvatarTypeEnum = AvatarTypeEnum.FORMAL, notify: boolean = true): Promise<void> {
-    const { player, avatarId, skillDepot, fetterList, motionInfo } = this
+    const { player, avatarId, skillDepot, fetterList, excelInfo, motionInfo } = this
 
-    skillDepot.initNew()
-    fetterList.initNew()
+    await this.loadAvatarData()
+
+    await skillDepot.initNew()
+    await fetterList.initNew()
+    await excelInfo.init()
 
     motionInfo.standby()
 
-    const weapon = new Weapon(AvatarData.getAvatar(avatarId)?.InitialWeapon)
-    weapon.initNew()
+    const weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon)
+    await weapon.initNew()
 
     await player.inventory.add(weapon, notify)
     await this.equip(weapon, notify)

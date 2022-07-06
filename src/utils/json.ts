@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { cwd } from 'process'
 import { parseAsync, stringifyAsync } from 'yieldable-json'
@@ -26,6 +26,8 @@ export const setJson = (path: string, value: any): boolean => {
     return false
   }
 }
+
+export const hasJson = (path: string): boolean => existsSync(join(cwd(), path))
 
 export const getJsonAsync = (path: string, defValue: any = null): Promise<any> => {
   return new Promise(async resolve => {
@@ -63,3 +65,5 @@ export const setJsonAsync = (path: string, value: any): Promise<boolean> => {
     })
   })
 }
+
+export const hasJsonAsync = async (path: string): Promise<boolean> => fileExists(join(cwd(), path))

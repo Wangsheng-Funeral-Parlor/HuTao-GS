@@ -61,37 +61,49 @@ export default class Scene extends BaseClass {
     this.id = sceneId
     this.enterSceneToken = Math.floor(Math.random() * 1e4)
 
-    const sceneData = SceneData.getScene(sceneId)
+    this.sceneTagList = []
+    this.sceneBlockList = []
+
+    this.abilitymanager = new AbilityManager(this)
+    this.entityManager = new EntityManager(this)
+
+    this.playerList = []
+
+    this.dieY = 0
+
+    super.initHandlers(this)
+  }
+
+  private async loadSceneData() {
+    const { id } = this
+    const sceneData = await SceneData.getScene(id)
 
     this.type = sceneData.Type || 'SCENE_WORLD'
 
     this.sceneTagList = sceneData?.Tag?.map(tagData => new SceneTag(this, tagData)) || []
     this.sceneBlockList = Object.keys(sceneData?.Block || {}).map(e => new SceneBlock(this, parseInt(e)))
 
-    this.abilitymanager = new AbilityManager(this)
-    this.entityManager = new EntityManager(this)
-    this.playerList = []
-
     this.dieY = sceneData?.DieY || 0
     this.isLocked = !!sceneData?.IsLocked
-
-    super.initHandlers(this)
   }
 
   private async loadSceneBlocks() {
     const { id, host, sceneBlockList } = this
 
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
+    performance.mark('SceneLoadBlock')
 
     for (let block of sceneBlockList) {
       if (this.destroyed) {
         logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Abort load non dynamic groups.')
+        performance.clearMarks('SceneLoadBlock')
         return
       }
       await block.initNew()
     }
 
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
+    performance.measure('SceneLoadBlock')
   }
 
   get broadcastContextList(): PacketContext[] {
@@ -121,21 +133,22 @@ export default class Scene extends BaseClass {
   }
 
   async initNew(fullInit: boolean) {
-    const { enterSceneToken } = this
+    const { entityManager, enterSceneToken } = this
+    const scenePerfMark = `SceneInit-${enterSceneToken}`
 
-    performance.mark(`SceneInitAsync-${enterSceneToken}`)
+    performance.mark(scenePerfMark)
+
+    await this.loadSceneData()
+
+    entityManager.init()
 
     this.beginTime = Date.now()
     this.sceneTime = 0
 
-    if (!fullInit) {
-      performance.clearMarks(`SceneInitAsync-${enterSceneToken}`)
-      return
-    }
+    // Don't wait for scene blocks to load
+    if (fullInit) this.loadSceneBlocks()
 
-    await this.loadSceneBlocks()
-
-    performance.measure('Scene init async', `SceneInitAsync-${enterSceneToken}`)
+    performance.measure('Scene init', scenePerfMark)
   }
 
   async destroy() {
@@ -222,7 +235,7 @@ export default class Scene extends BaseClass {
       playerEnterSceneData.prevPos = prevPos
     }
 
-    const dungeonData = DungeonData.getDungeonByScene(id)
+    const dungeonData = await DungeonData.getDungeonByScene(id)
     if (dungeonData) playerEnterSceneData.dungeonId = dungeonData.Id
 
     PlayerEnterScene.sendNotify(context, playerEnterSceneData)

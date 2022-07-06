@@ -251,17 +251,17 @@ export default class Player extends BaseClass {
     profile.init(profileData)
     props.init(propsData)
     openState.init(openStateData)
-    inventory.init(inventoryData)
+    await inventory.init(inventoryData)
     widget.init(widgetData)
 
     for (let avatarData of avatarDataList) {
       const avatar = new Avatar(this, avatarData.id, BigInt(avatarData.guid))
-      avatar.init(avatarData)
+      await avatar.init(avatarData)
 
       avatarList.push(avatar)
     }
 
-    teamManager.init(teamData)
+    await teamManager.init(teamData)
 
     this.flycloakList = (flycloakDataList || []).map(data => ({
       Id: data.id
@@ -272,7 +272,7 @@ export default class Player extends BaseClass {
     }))
     this.emojiCollection = (emojiIdList || []).filter(id => !isNaN(id))
 
-    hostWorld.init(worldData)
+    await hostWorld.init(worldData)
 
     this.godMode = !!godMode
     this.gameTime = isNaN(parseInt(<any>gameTime)) ? 0 : gameTime
@@ -285,18 +285,18 @@ export default class Player extends BaseClass {
     props.initNew()
     openState.initNew()
 
-    inventory.add(new Material(221, null, 1000000), false)
-    inventory.add(new Material(222, null, 1000000), false)
+    inventory.add(await Material.create(221, 1000000), false)
+    inventory.add(await Material.create(222, 1000000), false)
 
     // Give all music instrument
-    inventory.add(new Material(220025), false) // lyre
-    inventory.add(new Material(220044), false) // zither
-    inventory.add(new Material(220051), false) // drum
+    inventory.add(await Material.create(220025), false) // lyre
+    inventory.add(await Material.create(220044), false) // zither
+    inventory.add(await Material.create(220051), false) // drum
 
     avatarList.push(new Avatar(this, avatarId))
 
     // Unlock all avatars
-    avatarList.push(...AvatarData.getAvatarList()
+    avatarList.push(...(await AvatarData.getAvatarList())
       .filter(data => (
         !avatarList.find(a => a.avatarId === data.Id) &&
         data.UseType === 'AVATAR_FORMAL'
@@ -308,16 +308,16 @@ export default class Player extends BaseClass {
     for (let avatar of avatarList) await avatar.initNew(AvatarTypeEnum.FORMAL, false)
 
     // Initialize team list
-    teamManager.initNew()
+    await teamManager.initNew()
 
     // Unlock all flycloaks
-    flycloakList.push(...AvatarData.getFlycloakList())
+    flycloakList.push(...(await AvatarData.getFlycloakList()))
 
     // Unlock all costumes
-    costumeList.push(...AvatarData.getCostumeList())
+    costumeList.push(...(await AvatarData.getCostumeList()))
 
     // Initialize host world
-    hostWorld.initNew(1)
+    await hostWorld.initNew(1)
 
     this.gameTime = 0
   }
@@ -444,7 +444,7 @@ export default class Player extends BaseClass {
 
   async returnToPrevScene(reason: SceneEnterReasonEnum): Promise<boolean> {
     const { currentWorld, prevScene, prevScenePos, prevSceneRot, context } = this
-    const scene = currentWorld?.getScene(prevScene.id || currentWorld.mainSceneId)
+    const scene = await currentWorld?.getScene(prevScene.id || currentWorld.mainSceneId)
     if (!scene) return false
 
     // Teleport player

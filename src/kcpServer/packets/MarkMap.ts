@@ -41,7 +41,7 @@ class MarkMapPacket extends Packet implements PacketInterface {
     const { sceneId, name, pos } = mark
 
     if (op === MarkMapOperationEnum.ADD && name.indexOf('tp:') === 0) {
-      const scene = currentWorld.getScene(sceneId)
+      const scene = await currentWorld.getScene(sceneId)
       if (!scene || Date.now() - lastTpReq < 5e3) return
 
       player.lastTpReq = Date.now()

@@ -1,15 +1,19 @@
 import Loader from '$/gameData/loader'
-import LoaderTemplate from '@/types/gameData/LoaderTemplate'
+import LoaderTemplateList, { LoaderTemplate } from '@/types/gameData/LoaderTemplate'
 
 class LoaderTemplateLoader extends Loader {
-  declare data: LoaderTemplate[]
+  declare data: LoaderTemplateList
 
   constructor() {
     super('LoaderTemplate')
   }
 
-  get(id: number): LoaderTemplate {
-    return this.data.find(data => data.Id === id)
+  async getData(): Promise<LoaderTemplateList> {
+    return super.getData()
+  }
+
+  async getLoaderTemplate(id: number): Promise<LoaderTemplate> {
+    return (await this.getData()).find(data => data.Id === id)
   }
 }
 

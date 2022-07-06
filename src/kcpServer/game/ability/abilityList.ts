@@ -27,12 +27,12 @@ export default class AbilityList {
     this.abilityList = []
   }
 
-  update() {
+  async update() {
     this.clear()
 
     switch (this.entity.entityType) {
       case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
-        this.addAvatarAbilities()
+        await this.addAvatarAbilities()
         break
       case ProtEntityTypeEnum.PROT_ENTITY_MONSTER:
         break
@@ -41,12 +41,12 @@ export default class AbilityList {
     }
   }
 
-  addAvatarAbilities() {
+  async addAvatarAbilities() {
     // Default abilities
     for (let ability of AvatarDefaultAbilities) this.add(ability)
 
     const { avatarId } = this.entity as Avatar
-    const data = AvatarData.getAvatar(avatarId)
+    const data = await AvatarData.getAvatar(avatarId)
     if (!data) return
 
     for (let ability of data.Config.Abilities) {

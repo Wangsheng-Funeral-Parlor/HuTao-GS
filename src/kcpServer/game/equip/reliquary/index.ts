@@ -24,8 +24,11 @@ export default class Reliquary extends Equip {
     super(itemId, guid, EquipTypeEnum.RELIQUARY)
 
     this.appendPropIdList = []
+  }
 
-    const reliquaryData = ReliquaryData.get(itemId)
+  private async loadReliquaryData() {
+    const { itemId } = this
+    const reliquaryData = await ReliquaryData.getReliquary(itemId)
     if (!reliquaryData) return
 
     this.setId = reliquaryData.SetId
@@ -37,31 +40,38 @@ export default class Reliquary extends Equip {
     this.equipType = ReliquaryEquipTypeEnum[reliquaryData.EquipType]
   }
 
-  initNew() {
+  async initNew() {
+    await this.loadReliquaryData()
+
     this.level = 1
     this.exp = 0
 
-    this.mainPropId = this.randomFromMain()
-    this.appendPropIdList.push(this.randomFromAppend())
+    this.mainPropId = await this.randomFromMain()
+    this.appendPropIdList.push(await this.randomFromAppend())
   }
 
-  randomFromMain() {
+  async randomFromMain() {
     const { mainDepotId } = this
-    const candidates = ReliquaryData.getMainPropsByDepot(mainDepotId).map(data => data.Id)
-
-    return candidates[Math.floor(Math.random() * candidates.length)]
+    const candidateList = (await ReliquaryData.getMainPropsByDepot(mainDepotId)).map(data => data.Id)
+    return candidateList[Math.floor(Math.random() * candidateList.length)]
   }
 
-  randomFromAppend() {
+  async randomFromAppend() {
     const { appendDepotId, appendNum, appendPropIdList } = this
-    const groups = appendPropIdList
-      .map(id => ReliquaryData.getAffix(id)?.GroupId)
-      .filter((groupId, i, self) => groupId != null && self.indexOf(groupId) === i) // deduplicate and remove null
-    const candidates = ReliquaryData.getAffixsByDepot(appendDepotId)
-      .filter(data => groups.length < appendNum || groups.includes(data.GroupId))
+    const groupIdList: number[] = []
+
+    for (let appendPropId of appendPropIdList) {
+      const groupId = (await ReliquaryData.getAffix(appendPropId))?.GroupId
+      if (groupId == null || groupIdList.includes(groupId)) continue
+
+      groupIdList.push(groupId)
+    }
+
+    const candidateList = (await ReliquaryData.getAffixsByDepot(appendDepotId))
+      .filter(data => groupIdList.length < appendNum || groupIdList.includes(data.GroupId))
       .map(data => data.Id)
 
-    return candidates[Math.floor(Math.random() * candidates.length)]
+    return candidateList[Math.floor(Math.random() * candidateList.length)]
   }
 
   exportSceneReliquaryInfo(): SceneReliquaryInfo {

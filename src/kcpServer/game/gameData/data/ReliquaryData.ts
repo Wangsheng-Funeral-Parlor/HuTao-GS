@@ -8,36 +8,40 @@ class ReliquaryDataLoader extends Loader {
     super('ReliquaryData')
   }
 
-  get(id: number): ReliquaryData {
-    return this.getList().find(data => data.Id === id)
+  async getData(): Promise<ReliquaryDataGroup> {
+    return super.getData()
   }
 
-  getList(): ReliquaryData[] {
-    return this.data?.Reliquary || []
+  async getReliquary(id: number): Promise<ReliquaryData> {
+    return (await this.getReliquaryList()).find(data => data.Id === id)
   }
 
-  getMainProp(id: number): ReliquaryMainPropData {
-    return this.getMainPropList().find(data => data.Id === id)
+  async getReliquaryList(): Promise<ReliquaryData[]> {
+    return (await this.getData())?.Reliquary || []
   }
 
-  getMainPropsByDepot(depotId: number): ReliquaryMainPropData[] {
-    return this.getMainPropList().filter(data => data.PropDepotId === depotId)
+  async getMainProp(id: number): Promise<ReliquaryMainPropData> {
+    return (await this.getMainPropList()).find(data => data.Id === id)
   }
 
-  getMainPropList(): ReliquaryMainPropData[] {
-    return this.data?.MainProp || []
+  async getMainPropsByDepot(depotId: number): Promise<ReliquaryMainPropData[]> {
+    return (await this.getMainPropList()).filter(data => data.PropDepotId === depotId)
   }
 
-  getAffix(id: number): ReliquaryAffixData {
-    return this.getAffixList().find(data => data.Id === id)
+  async getMainPropList(): Promise<ReliquaryMainPropData[]> {
+    return (await this.getData())?.MainProp || []
   }
 
-  getAffixsByDepot(depotId: number): ReliquaryAffixData[] {
-    return this.getAffixList().filter(data => data.DepotId === depotId)
+  async getAffix(id: number): Promise<ReliquaryAffixData> {
+    return (await this.getAffixList()).find(data => data.Id === id)
   }
 
-  getAffixList(): ReliquaryAffixData[] {
-    return this.data?.Affix || []
+  async getAffixsByDepot(depotId: number): Promise<ReliquaryAffixData[]> {
+    return (await this.getAffixList()).filter(data => data.DepotId === depotId)
+  }
+
+  async getAffixList(): Promise<ReliquaryAffixData[]> {
+    return (await this.getData())?.Affix || []
   }
 }
 

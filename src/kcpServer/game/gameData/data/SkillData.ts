@@ -8,24 +8,28 @@ class SkillDataLoader extends Loader {
     super('SkillData')
   }
 
-  getSkillDepot(id: number): SkillDepotData {
-    return this.data?.Depot?.find(data => data.Id === id)
+  async getData(): Promise<SkillDataGroup> {
+    return super.getData()
   }
 
-  getSkill(id: number): SkillData {
-    return this.data?.Skill?.find(data => data.Id === id)
+  async getSkillDepot(id: number): Promise<SkillDepotData> {
+    return (await this.getData())?.Depot?.find(data => data.Id === id)
   }
 
-  getProudSkill(id: number): ProudSkillData {
-    return this.data?.ProudSkill?.find(data => data.Id === id)
+  async getSkill(id: number): Promise<SkillData> {
+    return (await this.getData())?.Skill?.find(data => data.Id === id)
   }
 
-  getProudSkillByGroup(groupId: number, level?: number): ProudSkillData {
-    return this.data?.ProudSkill?.find(data => data.GroupId === groupId && (level == null || data.Level === level))
+  async getProudSkill(id: number): Promise<ProudSkillData> {
+    return (await this.getData())?.ProudSkill?.find(data => data.Id === id)
   }
 
-  getTalent(id: number): TalentData {
-    return this.data?.Talent?.find(data => data.Id === id)
+  async getProudSkillByGroup(groupId: number, level?: number): Promise<ProudSkillData> {
+    return (await this.getData())?.ProudSkill?.find(data => data.GroupId === groupId && (level == null || data.Level === level))
+  }
+
+  async getTalent(id: number): Promise<TalentData> {
+    return (await this.getData())?.Talent?.find(data => data.Id === id)
   }
 }
 

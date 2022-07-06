@@ -38,17 +38,17 @@ class GetScenePointPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: GetScenePointReq): Promise<void> {
     const { sceneId } = data
-    const sceneData = SceneData.getScene(sceneId)
+    const sceneData = await SceneData.getScene(sceneId)
 
     if (sceneData == null) {
-      await this.response(context, { retcode: RetcodeEnum.RET_SVR_ERROR })
+      await this.response(context, { retcode: RetcodeEnum.RET_UNKNOWN_ERROR })
       return
     }
 
     const pointList = []
     const areaList = []
 
-    const scenePointMap = SceneData.getScenePointMap(sceneId)
+    const scenePointMap = await SceneData.getScenePointMap(sceneId)
     for (let pointId in scenePointMap) {
       const { $type, Unlocked } = scenePointMap[pointId]
       if (!unlockType.includes($type) || Unlocked) continue

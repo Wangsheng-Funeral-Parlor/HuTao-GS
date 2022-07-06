@@ -266,7 +266,7 @@ const commands: CommandDefinition[] = [
       { name: 'uid', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
       const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
@@ -282,8 +282,8 @@ const commands: CommandDefinition[] = [
         return
       }
 
-      const scene = currentWorld.getScene(args[0])
-      const sceneData = SceneData.getScene(args[0])
+      const scene = await currentWorld.getScene(args[0])
+      const sceneData = await SceneData.getScene(args[0])
       if (!scene || !sceneData) {
         printError('Scene not found.')
         return
@@ -438,7 +438,7 @@ const commands: CommandDefinition[] = [
       { name: 'uid', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
       const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
@@ -451,7 +451,7 @@ const commands: CommandDefinition[] = [
       const id = args[0]
       const count = args[1] || 1
 
-      const material = new Material(id, null, count)
+      const material = await Material.create(id, count)
       player.inventory.add(material)
 
       print('Give material:', `(${id})x${material.count}`)

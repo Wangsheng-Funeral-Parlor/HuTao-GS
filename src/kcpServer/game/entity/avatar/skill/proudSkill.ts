@@ -13,23 +13,23 @@ export default class ProudSkill {
     this.groupId = groupId
   }
 
-  init(userData: SkillUserData) {
+  async init(userData: SkillUserData) {
     const { level } = userData
 
     this.level = level
 
-    this.update()
+    await this.update()
   }
 
-  initNew() {
+  async initNew() {
     this.level = 1
 
-    this.update()
+    await this.update()
   }
 
-  update() {
+  async update() {
     const { groupId, level } = this
-    const proudSkillData = SkillData.getProudSkillByGroup(groupId, level)
+    const proudSkillData = await SkillData.getProudSkillByGroup(groupId, level)
 
     this.id = proudSkillData?.Id || 0
   }

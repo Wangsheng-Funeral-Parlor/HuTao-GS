@@ -49,18 +49,20 @@ export default class ShopManager {
     return getTimeSeconds(d)
   }
 
-  getNextRefresh(shopType: number): number | null {
-    const dataList = ShopData.getShopGoods(shopType)
+  async getNextRefresh(shopType: number): Promise<number | null> {
+    const dataList = await ShopData.getShopGoods(shopType)
     return this.calcNextRefresh(dataList.find(data => data.RefreshType != null))
   }
 
-  exportGoodsList(shopType: number, _player: Player): ShopGoods[] {
-    const dataList = ShopData.getShopGoods(shopType)
+  async exportGoodsList(shopType: number, _player: Player): Promise<ShopGoods[]> {
+    const dataList = await ShopData.getShopGoods(shopType)
     const now = getTimeSeconds()
 
-    return dataList
-      .filter(data => data.EndTime > now)
-      .map(data => <ShopGoods>Object.fromEntries(Object.entries(<ShopGoods>{
+    const goodsList: ShopGoods[] = []
+    for (let data of dataList) {
+      if (data.EndTime <= now) continue
+
+      goodsList.push(<ShopGoods>Object.fromEntries(Object.entries(<ShopGoods>{
         goodsId: data.Id,
         goodsItem: {
           itemId: data.ItemId,
@@ -76,16 +78,19 @@ export default class ShopManager {
         buyLimit: data.BuyLimit,
         beginTime: data.BeginTime,
         endTime: data.EndTime,
-        nextRefreshTime: this.getNextRefresh(shopType),
+        nextRefreshTime: await this.getNextRefresh(shopType),
         minLevel: data.MinPlayerLevel,
         maxLevel: data.MaxPlayerLevel,
         preGoodsIdList: [],
         mcoin: data.CostMcoin,
         secondarySheetId: data.SecondarySheetId
       }).filter(e => e[1] != null)))
+    }
+
+    return goodsList
   }
 
-  exportShop(shopType: number, player: Player): Shop {
+  async exportShop(shopType: number, player: Player): Promise<Shop> {
     switch (shopType) {
       case 900:
         return {
@@ -95,14 +100,14 @@ export default class ShopManager {
       case 903:
         return null
       default: {
-        const nextRefresh = this.getNextRefresh(shopType)
+        const nextRefresh = await this.getNextRefresh(shopType)
         return nextRefresh != null ? {
           shopType,
-          goodsList: this.exportGoodsList(shopType, player),
+          goodsList: await this.exportGoodsList(shopType, player),
           nextRefreshTime: nextRefresh
         } : {
           shopType,
-          goodsList: this.exportGoodsList(shopType, player)
+          goodsList: await this.exportGoodsList(shopType, player)
         }
       }
     }

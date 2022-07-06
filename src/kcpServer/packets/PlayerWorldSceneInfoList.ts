@@ -17,12 +17,20 @@ class PlayerWorldSceneInfoListPacket extends Packet implements PacketInterface {
 
     const { currentWorld } = context.player
 
-    const notifyData: PlayerWorldSceneInfoListNotify = {
-      infoList: SceneData.getSceneList()
-        .filter(scene => scene.IsMainScene)
-        .map(scene => currentWorld.getScene(scene.Id, false)?.exportSceneInfo())
-        .filter(info => info != null)
+    const sceneDataList = await SceneData.getSceneList()
+    const infoList: PlayerWorldSceneInfo[] = []
+
+    for (let sceneData of sceneDataList) {
+      const { Id, IsMainScene } = sceneData
+      if (!IsMainScene) continue
+
+      const info = (await currentWorld.getScene(Id, false))?.exportSceneInfo()
+      if (info == null) continue
+
+      infoList.push(info)
     }
+
+    const notifyData: PlayerWorldSceneInfoListNotify = { infoList }
 
     await super.sendNotify(context, notifyData)
   }

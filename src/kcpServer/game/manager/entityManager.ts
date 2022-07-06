@@ -67,7 +67,7 @@ export default class EntityManager extends BaseClass {
     this.appearQueue = {}
     this.disappearQueue = {}
 
-    this.viewDistance = scene.type === 'SCENE_WORLD' ? WORLD_VIEW_DIST : DEFAULT_VIEW_DIST
+    this.viewDistance = 0
 
     super.initHandlers(scene)
   }
@@ -211,6 +211,12 @@ export default class EntityManager extends BaseClass {
       stateChanged: canUnload,
       loaded: loadedEntityIdList.includes(entityId)
     }
+  }
+
+  init() {
+    const { scene } = this
+
+    this.viewDistance = scene.type === 'SCENE_WORLD' ? WORLD_VIEW_DIST : DEFAULT_VIEW_DIST
   }
 
   async destroy() {

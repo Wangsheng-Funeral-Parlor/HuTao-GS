@@ -8,26 +8,30 @@ class WorldDataLoader extends Loader {
     super('WorldData', [])
   }
 
-  getWorld(id: number): WorldData {
-    return this.getWorldList().find(data => data.Id === id)
+  async getData(): Promise<WorldDataGroup> {
+    return super.getData()
   }
 
-  getWorldList(): WorldData[] {
-    return this.data?.World || []
+  async getWorld(id: number): Promise<WorldData> {
+    return (await this.getWorldList()).find(data => data.Id === id)
   }
 
-  getWorldLevel(level: number): WorldLevelData {
-    const worldLevelList = this.getWorldLevelList()
+  async getWorldList(): Promise<WorldData[]> {
+    return (await this.getData())?.World || []
+  }
+
+  async getWorldLevel(level: number): Promise<WorldLevelData> {
+    const worldLevelList = await this.getWorldLevelList()
     if (worldLevelList.length === 0) return null
 
     const maxLevel = Math.max(...worldLevelList.map(wl => wl.Level))
     if (level > maxLevel) return this.getWorldLevel(maxLevel)
 
-    return this.getWorldLevelList().find(data => data.Level === level) || null
+    return worldLevelList.find(data => data.Level === level) || null
   }
 
-  getWorldLevelList(): WorldLevelData[] {
-    return this.data?.Level || []
+  async getWorldLevelList(): Promise<WorldLevelData[]> {
+    return (await this.getData())?.Level || []
   }
 }
 

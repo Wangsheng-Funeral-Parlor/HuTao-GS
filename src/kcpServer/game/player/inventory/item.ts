@@ -16,7 +16,7 @@ export default class Item {
   equip?: Equip
   furniture?: any
 
-  constructor(content: Material | Equip) {
+  constructor(content?: Material | Equip) {
     this.guid = content?.guid || newGuid()
 
     if (content instanceof Material) this.material = content
@@ -57,7 +57,7 @@ export default class Item {
     return 1
   }
 
-  init(userData: ItemUserData) {
+  async init(userData: ItemUserData) {
     const { guid, itemId, type, data } = userData
 
     this.guid = BigInt(guid)
@@ -65,8 +65,8 @@ export default class Item {
 
     switch (type) {
       case ItemTypeEnum.MATERIAL:
-        this.material = new Material(null)
-        this.material.init(<MaterialUserData>data)
+        this.material = new Material(itemId)
+        await this.material.init(<MaterialUserData>data)
         break
       case ItemTypeEnum.EQUIP:
         this.initEquip(<EquipUserData>data)

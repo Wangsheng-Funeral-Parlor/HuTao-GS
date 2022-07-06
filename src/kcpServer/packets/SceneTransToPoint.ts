@@ -31,8 +31,8 @@ class SceneTransToPointPacket extends Packet implements PacketInterface {
 
     const { sceneId, pointId } = data
 
-    const scene = currentWorld.getScene(sceneId)
-    const { Type, TranPos, TranRot } = <SceneTransPoint>SceneData.getScenePoint(sceneId, pointId) || {}
+    const scene = await currentWorld.getScene(sceneId)
+    const { Type, TranPos, TranRot } = <SceneTransPoint>(await SceneData.getScenePoint(sceneId, pointId)) || {}
 
     if (!scene || !TranPos) {
       await this.response(context, { retcode: RetcodeEnum.RET_POINT_NOT_UNLOCKED })

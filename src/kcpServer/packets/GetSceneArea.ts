@@ -26,7 +26,7 @@ class GetSceneAreaPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: GetSceneAreaReq): Promise<void> {
     const { sceneId } = data
-    const sceneData = SceneData.getScene(sceneId)
+    const sceneData = await SceneData.getScene(sceneId)
 
     if (sceneData == null) {
       await this.response(context, { retcode: RetcodeEnum.RET_SVR_ERROR })

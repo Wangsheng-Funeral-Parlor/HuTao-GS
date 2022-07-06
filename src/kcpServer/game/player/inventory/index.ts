@@ -63,14 +63,14 @@ export default class Inventory {
     return remaining
   }
 
-  init(userData: InventoryUserData) {
+  async init(userData: InventoryUserData) {
     const { itemList } = this
     const { itemDataList } = userData
     if (!Array.isArray(itemDataList)) return
 
     for (let itemData of itemDataList) {
-      const item = new Item(null)
-      item.init(itemData)
+      const item = new Item()
+      await item.init(itemData)
 
       itemList.push(item)
     }

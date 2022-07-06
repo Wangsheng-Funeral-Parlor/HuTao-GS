@@ -30,8 +30,8 @@ class PersonalSceneJumpPacket extends Packet implements PacketInterface {
     const { currentWorld, currentScene } = player
     const { pointId } = data
 
-    const { TranSceneId, TranPos, TranRot } = SceneData.getScenePoint(currentScene.id, pointId) as PersonalSceneJumpPoint || {}
-    const scene = currentWorld.getScene(TranSceneId)
+    const { TranSceneId, TranPos, TranRot } = await SceneData.getScenePoint(currentScene.id, pointId) as PersonalSceneJumpPoint || {}
+    const scene = await currentWorld.getScene(TranSceneId)
 
     if (!scene) {
       await this.response(context, { retcode: RetcodeEnum.RET_CUR_PLAY_CANNOT_TRANSFER })

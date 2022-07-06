@@ -11,27 +11,31 @@ class SceneDataLoader extends Loader {
     super('SceneData', [])
   }
 
-  getScene(sceneId: number): SceneData {
-    return this.data?.find(scene => scene.Id === sceneId) || null
+  async getData(): Promise<SceneDataList> {
+    return super.getData()
   }
 
-  getSceneList(): SceneData[] {
-    return this.data || []
+  async getScene(sceneId: number): Promise<SceneData> {
+    return (await this.getData())?.find(scene => scene.Id === sceneId) || null
   }
 
-  getScenePoint(sceneId: number, pointId: number): PointConfig {
-    return this.getScenePointMap(sceneId)[pointId] || null
+  async getSceneList(): Promise<SceneData[]> {
+    return (await this.getData()) || []
   }
 
-  getScenePointMap(sceneId: number): { [id: number]: PointConfig } {
-    return this.getScene(sceneId)?.ScenePoint?.Points || {}
+  async getScenePoint(sceneId: number, pointId: number): Promise<PointConfig> {
+    return (await this.getScenePointMap(sceneId))[pointId] || null
   }
 
-  getDungeonEntry(entryPointId: number): DungeonEntry {
-    const { data } = this
+  async getScenePointMap(sceneId: number): Promise<{ [id: number]: PointConfig }> {
+    return (await this.getScene(sceneId))?.ScenePoint?.Points || {}
+  }
 
-    for (let sceneId in data) {
-      const pointMap = this.getScenePointMap(parseInt(sceneId))
+  async getDungeonEntry(entryPointId: number): Promise<DungeonEntry> {
+    const sceneData = await this.getData()
+
+    for (let sceneId in sceneData) {
+      const pointMap = await this.getScenePointMap(parseInt(sceneId))
       for (let pointId in pointMap) {
         const point = pointMap[pointId]
         if (!point || parseInt(pointId) !== entryPointId || point.$type !== 'DungeonEntry') continue
@@ -43,20 +47,20 @@ class SceneDataLoader extends Loader {
     return null
   }
 
-  getGroup(sceneId: number, groupId: number): SceneGroupScriptConfig {
-    return this.getGroupMap(sceneId)[groupId] || null
+  async getGroup(sceneId: number, groupId: number): Promise<SceneGroupScriptConfig> {
+    return (await this.getGroupMap(sceneId))[groupId] || null
   }
 
-  getGroupMap(sceneId: number): { [id: number]: SceneGroupScriptConfig } {
-    return this.getScene(sceneId)?.Group || {}
+  async getGroupMap(sceneId: number): Promise<{ [id: number]: SceneGroupScriptConfig }> {
+    return (await this.getScene(sceneId))?.Group || {}
   }
 
-  getBlock(sceneId: number, blockId: number): SceneBlockScriptConfig {
-    return this.getBlockMap(sceneId)[blockId] || null
+  async getBlock(sceneId: number, blockId: number): Promise<SceneBlockScriptConfig> {
+    return (await this.getBlockMap(sceneId))[blockId] || null
   }
 
-  getBlockMap(sceneId: number): { [id: number]: SceneBlockScriptConfig } {
-    return this.getScene(sceneId)?.Block || {}
+  async getBlockMap(sceneId: number): Promise<{ [id: number]: SceneBlockScriptConfig }> {
+    return (await this.getScene(sceneId))?.Block || {}
   }
 }
 

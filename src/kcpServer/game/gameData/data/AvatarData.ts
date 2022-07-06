@@ -9,36 +9,40 @@ class AvatarDataLoader extends Loader {
     super('AvatarData')
   }
 
-  getAvatarList(): AvatarData[] {
-    return this.data.Avatar || []
+  async getData(): Promise<AvatarDataGroup> {
+    return super.getData()
   }
 
-  getCostumeList(): CostumeData[] {
-    return this.data.Costume || []
+  async getAvatarList(): Promise<AvatarData[]> {
+    return (await this.getData())?.Avatar || []
   }
 
-  getFlycloakList(): FlycloakData[] {
-    return this.data.Flycloak || []
+  async getAvatar(id: number): Promise<AvatarData> {
+    return (await this.getAvatarList())?.find(avatar => avatar.Id === id)
   }
 
-  getAvatar(id: number): AvatarData {
-    return this.getAvatarList()?.find(avatar => avatar.Id === id)
+  async getAvatarByName(name: string): Promise<AvatarData> {
+    return (await this.getAvatarList())?.find(avatar => avatar.Name === name)
   }
 
-  getAvatarByName(name: string): AvatarData {
-    return this.getAvatarList()?.find(avatar => avatar.Name === name)
+  async getCostume(avatarId: number, id: number): Promise<CostumeData> {
+    return (await this.getCostumeList())?.find(costume => costume.AvatarId === avatarId && costume.Id === id)
   }
 
-  getCostume(avatarId: number, id: number): CostumeData {
-    return this.getCostumeList()?.find(costume => costume.AvatarId === avatarId && costume.Id === id)
+  async getCostumeList(): Promise<CostumeData[]> {
+    return (await this.getData())?.Costume || []
   }
 
-  getFlycloak(id: number): FlycloakData {
-    return this.getFlycloakList()?.find(flycloak => flycloak.Id === id)
+  async getFlycloak(id: number): Promise<FlycloakData> {
+    return (await this.getFlycloakList())?.find(flycloak => flycloak.Id === id)
   }
 
-  getFightPropConfig(id: number): EntityFightPropConfig {
-    const data = this.getAvatar(id)
+  async getFlycloakList(): Promise<FlycloakData[]> {
+    return (await this.getData())?.Flycloak || []
+  }
+
+  async getFightPropConfig(id: number): Promise<EntityFightPropConfig> {
+    const data = await this.getAvatar(id)
     if (!data) {
       return {
         HpBase: 0,

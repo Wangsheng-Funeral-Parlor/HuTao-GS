@@ -16,14 +16,20 @@ function execCommand(cmd, slient = false) {
 }
 
 (async () => {
+  const mode = process.argv.find(arg => arg.indexOf('-mode:') === 0)?.split(':')?.[1]?.toLowerCase() || null
+
   console.log('Building development...')
-  await execCommand('tsc')
+  await execCommand('tsc --incremental')
 
   console.log('Resolving alias...')
   await execCommand('tsc-alias')
 
+  if (mode === 'dev') return console.log('Build complete.')
+
   console.log('Building release...')
   await execCommand('webpack --config webpack.config.js')
+
+  if (mode === 'rel') return console.log('Build complete.')
 
   console.log('Preparing node binary...')
   await require('./prepNodeBin')()

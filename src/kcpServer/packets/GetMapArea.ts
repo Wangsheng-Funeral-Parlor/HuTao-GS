@@ -18,10 +18,11 @@ class GetMapAreaPacket extends Packet implements PacketInterface {
   async request(context: PacketContext, _data: GetMapAreaReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      mapAreaInfoList: MapAreaData.getList().map(data => ({
-        mapAreaId: data.Id,
-        isOpen: true
-      }))
+      mapAreaInfoList: (await MapAreaData.getMapAreaList())
+        .map(data => ({
+          mapAreaId: data.Id,
+          isOpen: true
+        }))
     })
   }
 

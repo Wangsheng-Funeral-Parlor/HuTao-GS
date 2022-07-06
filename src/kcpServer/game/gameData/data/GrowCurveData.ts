@@ -9,8 +9,12 @@ class GrowCurveDataLoader extends Loader {
     super('GrowCurveData')
   }
 
-  getGrowCurve(group: string): CurveExcelConfig[] {
-    return this.data?.[group] || []
+  async getData(): Promise<GrowCurveDataGroup> {
+    return super.getData()
+  }
+
+  async getGrowCurve(group: string): Promise<CurveExcelConfig[]> {
+    return (await this.getData())?.[group] || []
   }
 }
 

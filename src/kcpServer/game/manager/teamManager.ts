@@ -38,7 +38,7 @@ export default class TeamManager extends BaseClass {
     super.initHandlers(player)
   }
 
-  init(userData: TeamManagerUserData) {
+  async init(userData: TeamManagerUserData) {
     const { player, teamList } = this
     const { currentTeam, curAvatarGuid, teamGuidList } = userData
 
@@ -48,13 +48,13 @@ export default class TeamManager extends BaseClass {
       const avatarGuidList = teamGuidList?.[i - 1]
 
       if (avatarGuidList != null) {
-        teamList[i].setUpAvatarTeam({
+        await teamList[i].setUpAvatarTeam({
           teamId: i,
           avatarTeamGuidList: avatarGuidList,
           curAvatarGuid: curAvatarGuid || null
         }, true)
       } else {
-        teamList[i].setUpAvatarTeam({
+        await teamList[i].setUpAvatarTeam({
           teamId: i,
           avatarTeamGuidList: [
             player.avatarList[0].guid.toString()
@@ -64,13 +64,13 @@ export default class TeamManager extends BaseClass {
     }
   }
 
-  initNew() {
+  async initNew() {
     const { player, teamList } = this
 
     this.currentTeam = 1
 
     for (let i = 1; i <= 4; i++) {
-      teamList[i].setUpAvatarTeam({
+      await teamList[i].setUpAvatarTeam({
         teamId: i,
         avatarTeamGuidList: [
           player.avatarList[0].guid.toString()

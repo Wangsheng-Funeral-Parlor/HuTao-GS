@@ -24,7 +24,7 @@ class GetShopPacket extends Packet implements PacketInterface {
     const { game, player } = context
     const { shopType } = data
 
-    const shop = game.shopManager.exportShop(shopType, player)
+    const shop = await game.shopManager.exportShop(shopType, player)
 
     if (shop == null) {
       await this.response(context, { retcode: RetcodeEnum.RET_SHOP_NOT_OPEN })

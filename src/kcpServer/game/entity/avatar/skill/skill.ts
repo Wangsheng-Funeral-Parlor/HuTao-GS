@@ -18,29 +18,47 @@ export default class Skill {
     this.depot = depot
     this.id = skillId
 
-    const { ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = SkillData.getSkill(skillId)
-    if (ProudSkillGroupId != null) this.proudSkill = new ProudSkill(this, ProudSkillGroupId)
-    this.costStamina = CostStamina || 0
-    this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
-    this.costElemVal = CostElemVal || 0
+    this.costStamina = 0
+    this.costElemType = 0
+    this.costElemVal = 0
   }
 
-  init(userData: SkillUserData) {
+  async init(userData: SkillUserData) {
     const { id, level, proudSkillData } = userData
     if (this.id !== id) return this.initNew()
 
     this.level = level || 1
 
-    if (!this.proudSkill) return
+    const { ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
 
-    if (proudSkillData) this.proudSkill.init(proudSkillData)
-    else this.proudSkill.initNew()
+    this.costStamina = CostStamina || 0
+    this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
+    this.costElemVal = CostElemVal || 0
+
+    if (ProudSkillGroupId == null) return
+
+    this.proudSkill = new ProudSkill(this, ProudSkillGroupId)
+
+    if (proudSkillData) await this.proudSkill.init(proudSkillData)
+    else await this.proudSkill.initNew()
   }
 
-  initNew() {
+  async initNew() {
+    const { id } = this
+
     this.level = 1
 
-    if (this.proudSkill) this.proudSkill.initNew()
+    const { ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
+
+    this.costStamina = CostStamina || 0
+    this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
+    this.costElemVal = CostElemVal || 0
+
+    if (ProudSkillGroupId == null) return
+
+    this.proudSkill = new ProudSkill(this, ProudSkillGroupId)
+
+    await this.proudSkill.initNew()
   }
 
   exportUserData(): SkillUserData {

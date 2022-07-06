@@ -27,15 +27,16 @@ export default class ExcelInfo {
   constructor(avatar: Avatar) {
     this.avatar = avatar
 
-    const data = AvatarData.getAvatar(avatar.avatarId)
-    if (!data) {
-      this.prefabPathHash = new Hash(0, 0)
-      this.prefabPathRemoteHash = new Hash(0, 0)
-      this.controllerPathHash = new Hash(0, 0)
-      this.controllerPathRemoteHash = new Hash(0, 0)
-      this.combatConfigHash = new Hash(0, 0)
-      return
-    }
+    this.prefabPathHash = new Hash(0, 0)
+    this.prefabPathRemoteHash = new Hash(0, 0)
+    this.controllerPathHash = new Hash(0, 0)
+    this.controllerPathRemoteHash = new Hash(0, 0)
+    this.combatConfigHash = new Hash(0, 0)
+  }
+
+  private async loadExcelData() {
+    const avatarData = await AvatarData.getAvatar(this.avatar.avatarId)
+    if (!avatarData) return
 
     const {
       PrefabPathHashPre,
@@ -48,13 +49,17 @@ export default class ExcelInfo {
       ControllerPathRemoteHashSuffix,
       CombatConfigHashPre,
       CombatConfigHashSuffix
-    } = data
+    } = avatarData
 
     this.prefabPathHash = new Hash(PrefabPathHashPre, PrefabPathHashSuffix)
     this.prefabPathRemoteHash = new Hash(PrefabPathRemoteHashPre, PrefabPathRemoteHashSuffix)
     this.controllerPathHash = new Hash(ControllerPathHashPre, ControllerPathHashSuffix)
     this.controllerPathRemoteHash = new Hash(ControllerPathRemoteHashPre, ControllerPathRemoteHashSuffix)
     this.combatConfigHash = new Hash(CombatConfigHashPre, CombatConfigHashSuffix)
+  }
+
+  async init() {
+    await this.loadExcelData()
   }
 
   export() {

@@ -8,16 +8,20 @@ class ShopDataLoader extends Loader {
     super('ShopData')
   }
 
-  get(id: number): ShopData {
-    return this.getList().find(data => data.Id === id)
+  async getData(): Promise<ShopDataList> {
+    return super.getData()
   }
 
-  getShopGoods(type: number): ShopData[] {
-    return this.getList().filter(data => data.ShopType === type)
+  async getShop(id: number): Promise<ShopData> {
+    return (await this.getShopList()).find(data => data.Id === id)
   }
 
-  getList(): ShopData[] {
-    return this.data || []
+  async getShopGoods(type: number): Promise<ShopData[]> {
+    return (await this.getShopList()).filter(data => data.ShopType === type)
+  }
+
+  async getShopList(): Promise<ShopData[]> {
+    return (await this.getData()) || []
   }
 }
 

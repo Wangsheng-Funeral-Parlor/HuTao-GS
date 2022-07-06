@@ -1,21 +1,20 @@
 import Loader from '$/gameData/loader'
-import AbilityData from '@/types/gameData/AbilityData'
-import ConfigAbilityConfig from '@/types/gameData/BinOutput/ConfigAbility'
+import AbilityDataGroup from '@/types/gameData/AbilityData'
+import AbilityConfig from '@/types/gameData/BinOutput/ConfigAbility'
 
 class AbilityDataLoader extends Loader {
-  declare data: {
-    Animal: AbilityData
-    Avatar: AbilityData
-    Equip: AbilityData
-    Monster: AbilityData
-  }
+  declare data: AbilityDataGroup
 
   constructor() {
     super('AbilityData')
   }
 
-  getAbility(group: string, name: string): ConfigAbilityConfig[] {
-    return this.data?.[group]?.[name] || []
+  async getData(): Promise<AbilityDataGroup> {
+    return super.getData()
+  }
+
+  async getAbility(group: string, name: string): Promise<AbilityConfig[]> {
+    return (await this.getData())?.[group]?.[name] || []
   }
 }
 

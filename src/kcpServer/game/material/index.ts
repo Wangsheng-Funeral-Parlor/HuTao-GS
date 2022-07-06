@@ -10,25 +10,40 @@ export default class Material {
   count: number
   stackLimit: number
 
-  constructor(itemId: number, guid?: bigint, count: number = 1) {
+  constructor(itemId: number) {
     this.itemId = itemId
-    this.guid = guid || newGuid()
-
-    const materialData = MaterialData.get(itemId)
-
-    this.stackLimit = materialData?.StackLimit || 1
-    this.count = Math.min(this.stackLimit, count)
   }
 
-  init(userData: MaterialUserData) {
-    const { guid, itemId, count, stackLimit } = userData
+  private async loadMaterialData() {
+    const { itemId } = this
+    const materialData = await MaterialData.getMaterial(itemId)
 
-    const materialData = MaterialData.get(itemId)
+    this.stackLimit = materialData?.StackLimit || 1
+  }
+
+  static async create(itemId: number, count: number = 1): Promise<Material> {
+    const material = new Material(itemId)
+    await material.initNew(count)
+    return material
+  }
+
+  async init(userData: MaterialUserData) {
+    await this.loadMaterialData()
+
+    const { itemId: id, stackLimit } = this
+    const { guid, itemId, count } = userData
+
+    if (itemId !== id) return // Mismatch item id
 
     this.guid = BigInt(guid) || newGuid()
-    this.itemId = itemId || 0
-    this.stackLimit = materialData?.StackLimit || stackLimit
-    this.count = Math.min(this.stackLimit, count || 1)
+    this.count = Math.min(stackLimit, count || 1)
+  }
+
+  async initNew(count: number = 1, guid?: bigint) {
+    await this.loadMaterialData()
+
+    this.guid = guid || newGuid()
+    this.count = Math.min(this.stackLimit, count)
   }
 
   stack(material: Material): boolean {

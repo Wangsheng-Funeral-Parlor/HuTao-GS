@@ -71,7 +71,7 @@ export default class Entity extends BaseClass {
     this.isOnScene = false
   }
 
-  init(userData: EntityUserData) {
+  async init(userData: EntityUserData) {
     const { props, abilityList, fightProps } = this
     const { lifeState, propsData, fightPropsData } = userData
 
@@ -80,19 +80,19 @@ export default class Entity extends BaseClass {
     props.init(propsData)
     fightProps.init(fightPropsData)
 
-    abilityList.update()
-    fightProps.update()
+    await abilityList.update()
+    await fightProps.update()
   }
 
-  initNew(level: number = 1) {
+  async initNew(level: number = 1) {
     const { props, abilityList, fightProps } = this
 
     this.lifeState = LifeStateEnum.LIFE_ALIVE
 
     props.initNew(level)
 
-    abilityList.update()
-    fightProps.update()
+    await abilityList.update()
+    await fightProps.update()
   }
 
   isAlive() {

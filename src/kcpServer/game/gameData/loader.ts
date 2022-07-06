@@ -1,4 +1,4 @@
-import { getJson } from '@/utils/json'
+import { getJsonAsync, hasJsonAsync } from '@/utils/json'
 import Logger from '@/logger'
 import config from '@/config'
 
@@ -15,16 +15,19 @@ export default class Loader {
   constructor(path: string, defaultData: any = {}) {
     this.path = path
     this.defaultData = defaultData
-
-    this.load()
   }
 
-  load() {
+  async load() {
     const { path, defaultData } = this
     const filePath = `${DATA_DIR}/${path}.json`
 
-    this.data = getJson(filePath, defaultData)
+    if (!await hasJsonAsync(filePath)) logger.warn('Missing data:', path)
 
-    if (this.data == null) logger.warn('Missing data:', path)
+    this.data = await getJsonAsync(filePath, defaultData)
+  }
+
+  async getData() {
+    if (this.data == null) await this.load()
+    return this.data
   }
 }

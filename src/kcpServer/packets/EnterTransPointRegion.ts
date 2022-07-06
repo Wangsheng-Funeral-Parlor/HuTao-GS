@@ -20,7 +20,7 @@ class EnterTransPointRegionPacket extends Packet implements PacketInterface {
     const { player } = context
     const { sceneId, pointId } = data
 
-    const scenePointData = SceneData.getScenePoint(sceneId, pointId) as SceneTransPoint
+    const scenePointData = await SceneData.getScenePoint(sceneId, pointId) as SceneTransPoint
     if (scenePointData.Type !== 'TOWER') return
 
     player.teamManager.getTeam()?.reviveAllAvatar()
