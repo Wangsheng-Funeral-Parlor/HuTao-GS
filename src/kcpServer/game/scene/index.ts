@@ -19,7 +19,6 @@ import { ScenePlayerInfo } from '@/types/game/playerInfo'
 import { PlayerWorldSceneInfo } from '@/types/game/scene'
 import { SceneTeamAvatar } from '@/types/game/team'
 import { getTimeSeconds } from '@/utils/time'
-import { performance } from 'perf_hooks'
 import SceneBlock from './sceneBlock'
 import SceneTag from './sceneTag'
 
@@ -91,19 +90,19 @@ export default class Scene extends BaseClass {
     const { id, host, sceneBlockList } = this
 
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
-    performance.mark('SceneLoadBlock')
+    Logger.mark('SceneLoadBlock')
 
     for (let block of sceneBlockList) {
       if (this.destroyed) {
         logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Abort load non dynamic groups.')
-        performance.clearMarks('SceneLoadBlock')
+        Logger.clearMarks('SceneLoadBlock')
         return
       }
       await block.initNew()
     }
 
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
-    performance.measure('SceneLoadBlock')
+    Logger.measure('Block load', 'SceneLoadBlock')
   }
 
   get broadcastContextList(): PacketContext[] {
@@ -136,7 +135,7 @@ export default class Scene extends BaseClass {
     const { entityManager, enterSceneToken } = this
     const scenePerfMark = `SceneInit-${enterSceneToken}`
 
-    performance.mark(scenePerfMark)
+    Logger.mark(scenePerfMark)
 
     await this.loadSceneData()
 
@@ -148,7 +147,7 @@ export default class Scene extends BaseClass {
     // Don't wait for scene blocks to load
     if (fullInit) this.loadSceneBlocks()
 
-    performance.measure('Scene init', scenePerfMark)
+    Logger.measure('Scene init', scenePerfMark)
   }
 
   async destroy() {

@@ -22,7 +22,6 @@ import SceneData from '$/gameData/data/SceneData'
 import WorldUserData from '@/types/user/WorldUserData'
 import Logger from '@/logger'
 import uidPrefix from '#/utils/uidPrefix'
-import { performance } from 'perf_hooks'
 
 const logger = new Logger('GWORLD', 0xefc8cc)
 
@@ -148,7 +147,7 @@ export default class World extends BaseClass {
 
     if (!player || player.currentWorld === this) return false
 
-    performance.mark('WorldJoin')
+    Logger.mark('WorldJoin')
 
     const { mainSceneId, host, playerList, hostLastState } = this
     const { sceneId, pos, rot } = hostLastState
@@ -157,7 +156,7 @@ export default class World extends BaseClass {
 
     const scene = isHost ? ((await this.getScene(sceneId)) || (await this.getScene(mainSceneId))) : host.currentScene
     if (!scene) {
-      performance.clearMarks('WorldJoin')
+      Logger.clearMarks('WorldJoin')
       return false
     }
 
@@ -175,11 +174,11 @@ export default class World extends BaseClass {
       player.peerId = null
       playerList.splice(playerList.indexOf(player), 1)
 
-      performance.clearMarks('WorldJoin')
+      Logger.clearMarks('WorldJoin')
       return false
     }
 
-    performance.measure('World join', 'WorldJoin')
+    Logger.measure('World join', 'WorldJoin')
     return true
   }
 

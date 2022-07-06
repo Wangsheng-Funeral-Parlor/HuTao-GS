@@ -169,6 +169,10 @@ export default class Logger {
     performance.mark(name)
   }
 
+  static clearMarks(name: string) {
+    performance.clearMarks(name)
+  }
+
   static measure(name: string, markName: string) {
     (<any>performance).clearMeasures(name) // ???
     performance.measure(name, markName)

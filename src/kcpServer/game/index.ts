@@ -20,13 +20,13 @@ import StoreWeightLimit from '#/packets/StoreWeightLimit'
 import Player from '$/player'
 import World from '$/world'
 import config from '@/config'
+import Logger from '@/logger'
 import { MpSettingTypeEnum } from '@/types/enum/mp'
 import { PlayerPropEnum } from '@/types/enum/player'
 import { ClientState } from '@/types/enum/state'
 import { OnlinePlayerInfo } from '@/types/game/playerInfo'
 import UserData from '@/types/user'
 import { getJsonAsync, setJsonAsync } from '@/utils/json'
-import { performance } from 'perf_hooks'
 import KcpServer from '..'
 import hash from '../../utils/hash'
 import ActivityManager from './manager/activityManager'
@@ -164,7 +164,8 @@ export default class Game {
       }
     }
 
-    performance.mark('Login')
+    const loginPerfMark = `Login-${auid}`
+    Logger.mark(loginPerfMark)
 
     // Set client state
     client.state = ClientState.LOGIN
@@ -200,7 +201,7 @@ export default class Game {
 
     await PlayerLogin.response(context)
 
-    performance.measure('Player login', 'Login')
+    Logger.measure('Player login', loginPerfMark)
 
     return player
   }

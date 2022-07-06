@@ -5,10 +5,10 @@ import Npc from '$/entity/npc'
 import SceneData from '$/gameData/data/SceneData'
 import WorldData from '$/gameData/data/WorldData'
 import Vector from '$/utils/vector'
+import Logger from '@/logger'
 import { VisionTypeEnum } from '@/types/enum/entity'
 import { SceneGadgetScriptConfig, SceneMonsterScriptConfig, SceneNpcScriptConfig, SceneSuiteScriptConfig } from '@/types/gameData/Script/SceneScriptConfig'
 import { WaitOnBlock } from '@/utils/asyncWait'
-import { performance } from 'perf_hooks'
 import SceneBlock from './sceneBlock'
 
 export default class SceneGroup {
@@ -168,7 +168,8 @@ export default class SceneGroup {
     const groupData = await SceneData.getGroup(sceneId, groupId)
     if (!groupData) return
 
-    performance.mark('GroupLoad')
+    const grpLoadPerfMark = `GroupLoad-${sceneId}-${groupId}`
+    Logger.mark(grpLoadPerfMark)
 
     await wob.waitTick()
     await this.loadMonsters(Object.values(groupData.Monsters || {}))
@@ -177,21 +178,22 @@ export default class SceneGroup {
     await wob.waitTick()
     await this.loadGadgets(Object.values(groupData.Gadgets || {}))
 
-    performance.measure('Group load', 'GroupLoad')
+    Logger.measure('Group load', grpLoadPerfMark)
   }
 
   async unload() {
-    const { monsterList, npcList, gadgetList, loaded } = this
+    const { id, monsterList, npcList, gadgetList, loaded } = this
 
     if (!loaded) return
     this.loaded = false
 
-    performance.mark('GroupUnload')
+    const grpUnloadPerfMark = `GroupUnload-${this.block?.scene?.id}-${id}`
+    Logger.mark(grpUnloadPerfMark)
 
     await this.unloadList(monsterList)
     await this.unloadList(npcList)
     await this.unloadList(gadgetList)
 
-    performance.measure('Group unload', 'GroupUnload')
+    Logger.measure('Group unload', grpUnloadPerfMark)
   }
 }
