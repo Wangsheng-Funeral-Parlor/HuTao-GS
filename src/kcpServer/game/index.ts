@@ -202,6 +202,7 @@ export default class Game {
     await PlayerLogin.response(context)
 
     Logger.measure('Player login', loginPerfMark)
+    Logger.clearMarks(loginPerfMark)
 
     return player
   }

@@ -19,7 +19,7 @@ export default class SceneBlock extends BaseClass {
   rect: {
     min: Vector
     max: Vector
-  }
+  } | false
 
   groupList: SceneGroup[]
 
@@ -45,7 +45,7 @@ export default class SceneBlock extends BaseClass {
     this.rect = blockData?.Rect != null ? {
       min: new Vector().setData(blockData.Rect.Min),
       max: new Vector().setData(blockData.Rect.Max)
-    } : null
+    } : false
 
     this.groupList = blockData?.Groups
       ?.map(group => new SceneGroup(
@@ -60,8 +60,8 @@ export default class SceneBlock extends BaseClass {
     const { rect } = this
     const { pos } = player
 
-    if (!rect) return true
-    if (!pos) return false
+    if (rect === false) return true
+    if (rect == null || !pos) return false
 
     const { min, max } = rect
     const { X, Z } = pos
@@ -91,10 +91,10 @@ export default class SceneBlock extends BaseClass {
   }
 
   async initNew() {
+    await this.loadSceneBlockData()
+
     const { scene, groupList } = this
     const { entityManager } = scene
-
-    await this.loadSceneBlockData()
 
     const wob = new WaitOnBlock(MAX_BLOCK_MS)
 

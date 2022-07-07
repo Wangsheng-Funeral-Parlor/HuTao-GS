@@ -148,6 +148,7 @@ export default class Scene extends BaseClass {
     if (fullInit) this.loadSceneBlocks()
 
     Logger.measure('Scene init', scenePerfMark)
+    Logger.clearMarks(scenePerfMark)
   }
 
   async destroy() {

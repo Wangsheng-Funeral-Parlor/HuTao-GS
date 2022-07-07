@@ -179,6 +179,7 @@ export default class SceneGroup {
     await this.loadGadgets(Object.values(groupData.Gadgets || {}))
 
     Logger.measure('Group load', grpLoadPerfMark)
+    Logger.clearMarks(grpLoadPerfMark)
   }
 
   async unload() {
@@ -195,5 +196,6 @@ export default class SceneGroup {
     await this.unloadList(gadgetList)
 
     Logger.measure('Group unload', grpUnloadPerfMark)
+    Logger.clearMarks(grpUnloadPerfMark)
   }
 }
