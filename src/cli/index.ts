@@ -11,8 +11,8 @@ const commandsAnnouncement: Announcement = {
   title: 'Command list',
   banner: 'https://webstatic-sea.mihoyo.com/hk4e/announcement/img/banner/command.png',
   content: '<p style="white-space: pre-wrap;">〓Commands〓</p>',
-  start: Date.now() + (365 * 24 * 60 * 60e3),
-  end: Date.now(),
+  start: Date.now(),
+  end: Date.now() + (365 * 24 * 60 * 60e3),
   tag: 3,
   loginAlert: false
 }

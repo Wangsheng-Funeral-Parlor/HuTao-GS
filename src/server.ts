@@ -35,8 +35,8 @@ const welcomeAnnouncement: Announcement = {
   title: `Welcome to ${config.serverName}!`,
   banner: 'https://webstatic-sea.mihoyo.com/hk4e/announcement/img/banner/welcome.png',
   content: '<p style="white-space: pre-wrap;">Hello, have fun~~</p><img src="https://webstatic-sea.mihoyo.com/hk4e/announcement/img/fallen.png"><p style="white-space: pre-wrap;">Powered by: HuTao GS</p>',
-  start: Date.now() + (365 * 24 * 60 * 60e3),
-  end: Date.now(),
+  start: Date.now(),
+  end: Date.now() + (365 * 24 * 60 * 60e3),
   tag: 3,
   loginAlert: true
 }
