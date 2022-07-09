@@ -9,7 +9,8 @@ export default interface AvatarUserData extends EntityUserData {
   type: AvatarTypeEnum
   skillDepotData: SkillDepotUserData
   fettersData: FettersUserData
-  weaponGuid: string | false
+  weaponGuid?: string | false // compatibility
+  equipGuidList: string[]
   flycloak: number
   bornTime: number
 }

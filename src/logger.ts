@@ -174,8 +174,10 @@ export default class Logger {
   }
 
   static measure(name: string, markName: string) {
-    (<any>performance).clearMeasures(name) // ???
-    performance.measure(name, markName)
+    try {
+      (<any>performance).clearMeasures(name) // ???
+      performance.measure(name, markName)
+    } catch (err) { }
   }
 
   static getLogger(): Logger {

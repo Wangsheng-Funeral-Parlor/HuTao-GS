@@ -1,7 +1,8 @@
 import Avatar from '$/entity/avatar'
 import newGuid from '$/utils/newGuid'
+import { EquipTypeEnum } from '@/types/enum/equip'
 import { EquipInterface } from '@/types/game/item'
-import EquipUserData, { EquipTypeEnum } from '@/types/user/EquipUserData'
+import EquipUserData from '@/types/user/EquipUserData'
 
 export default class Equip {
   guid: bigint
@@ -12,13 +13,13 @@ export default class Equip {
 
   isLocked: boolean
 
-  constructor(itemId: number, guid?: bigint, type: EquipTypeEnum = EquipTypeEnum.NONE) {
+  constructor(itemId: number, guid?: bigint, type: EquipTypeEnum = EquipTypeEnum.EQUIP_NONE) {
     this.itemId = itemId
     this.guid = guid || newGuid()
     this.type = type
   }
 
-  init(userData: EquipUserData) {
+  async init(userData: EquipUserData) {
     const { guid, itemId, type, isLocked } = userData
 
     this.guid = BigInt(guid)
@@ -27,7 +28,7 @@ export default class Equip {
     this.isLocked = isLocked
   }
 
-  initNew() {
+  async initNew() {
     this.isLocked = false
   }
 

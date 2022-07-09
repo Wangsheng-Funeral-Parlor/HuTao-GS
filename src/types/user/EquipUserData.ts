@@ -1,8 +1,4 @@
-export enum EquipTypeEnum {
-  NONE = 0,
-  WEAPON = 1,
-  RELIQUARY = 2
-}
+import { EquipTypeEnum } from '../enum/equip'
 
 export default interface EquipUserData {
   guid: string

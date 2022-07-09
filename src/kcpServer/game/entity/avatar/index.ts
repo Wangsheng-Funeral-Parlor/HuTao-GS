@@ -18,9 +18,9 @@ import AvatarEquipChange, { AvatarEquipChangeNotify } from '#/packets/AvatarEqui
 import AvatarChangeCostume from '#/packets/AvatarChangeCostume'
 import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
+import { EquipTypeEnum } from '@/types/enum/equip'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import AvatarUserData from '@/types/user/AvatarUserData'
-import { EquipTypeEnum } from '@/types/user/EquipUserData'
 import { getTimeSeconds } from '@/utils/time'
 
 export default class Avatar extends Entity {
@@ -29,8 +29,7 @@ export default class Avatar extends Entity {
   avatarId: number
   guid: bigint
 
-  weapon: Weapon
-  reliquaryMap: { [slot: number]: Reliquary }
+  equipMap: { [type: number]: Equip }
 
   skillDepot: SkillDepot
   fetterList: FetterList
@@ -48,7 +47,7 @@ export default class Avatar extends Entity {
     this.avatarId = avatarId
     this.guid = guid || newGuid()
 
-    this.reliquaryMap = {}
+    this.equipMap = {}
 
     this.skillDepot = new SkillDepot(this)
     this.fetterList = new FetterList(this)
@@ -66,12 +65,14 @@ export default class Avatar extends Entity {
 
   async init(userData: AvatarUserData) {
     const { player, avatarId, skillDepot, fetterList, excelInfo, motionInfo } = this
+    const { inventory } = player
     const {
       id,
       type,
       skillDepotData,
       fettersData,
       weaponGuid,
+      equipGuidList,
       flycloak,
       bornTime
     } = userData
@@ -85,19 +86,15 @@ export default class Avatar extends Entity {
 
     motionInfo.standby()
 
-    const weaponItem = player.inventory.getItem(BigInt(weaponGuid))
+    const equipGuids = equipGuidList || []
+    if (weaponGuid) equipGuids.push(weaponGuid) // compatibility
 
-    let weapon: Weapon
-    if (weaponItem?.equip?.type === EquipTypeEnum.WEAPON) {
-      weapon = <Weapon>weaponItem.equip
-    } else {
-      weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon)
-      weapon.initNew()
+    for (let equipGuid of equipGuids) {
+      const item = inventory.getItem(BigInt(equipGuid))
+      if (!item?.equip) continue
 
-      player.inventory.add(weapon, false)
+      this.equip(item.equip, false)
     }
-
-    this.equip(weapon, false)
 
     this.wearingFlycloakId = flycloak
     this.avatarType = type
@@ -130,63 +127,53 @@ export default class Avatar extends Entity {
     super.initNew()
   }
 
+  get weapon(): Weapon {
+    return <Weapon>this.equipMap[EquipTypeEnum.EQUIP_WEAPON] || null
+  }
+
   async equip(equip: Equip, notify: boolean = true): Promise<void> {
-    let equipOwner = equip.equipped
+    const { manager, player, fightProps, equipMap } = this
+    const { currentScene, context } = player
+    const { type, equipped: equipOwner } = equip
+
+    const curEquip = equipMap[type]
+    if (equip === curEquip) return
+
     if (equipOwner) await equipOwner.unequip(equip, false)
 
-    const { manager, player, fightProps, weapon, reliquaryMap } = this
-    const { currentScene, context } = player
-
-    const isWeapon = equip instanceof Weapon
-    const isReliquary = equip instanceof Reliquary
-
-    let curEquip: Equip
-    if (isWeapon) curEquip = weapon
-    if (isReliquary) curEquip = reliquaryMap[equip.equipType]
-
-    if (equip === curEquip) return
     if (curEquip) {
       await this.unequip(curEquip, false)
       if (equipOwner) await equipOwner.equip(curEquip, notify)
     }
 
-    if (isWeapon) {
-      this.weapon = equip
-      if (manager) await manager.register(equip.entity)
-    } else if (isReliquary) {
-      reliquaryMap[equip.equipType] = equip
-    }
+    equipMap[type] = equip
+    if (type === EquipTypeEnum.EQUIP_WEAPON && manager) await manager.register((<Weapon>equip).entity)
 
     equip.equipped = this
 
     const broadcastContextList = currentScene?.broadcastContextList || [context]
 
-    if (notify) await AvatarEquipChange.broadcastNotify(broadcastContextList, this)
+    if (notify) await AvatarEquipChange.broadcastNotify(broadcastContextList, this, type)
     await fightProps.update(notify)
   }
 
   async unequip(equip: Equip, notify: boolean = true): Promise<void> {
     if (equip.equipped !== this) return
 
-    const { manager, player, fightProps, weapon, reliquaryMap } = this
+    const { manager, player, fightProps, equipMap } = this
     const { currentScene, context } = player
+    const { type } = equip
 
-    if (equip instanceof Weapon) {
-      if (equip !== weapon) return
-      this.weapon = null
+    if (equipMap[type] !== equip) return
 
-      if (manager) await manager.unregister(equip.entity)
-    } else if (equip instanceof Reliquary) {
-      if (equip !== reliquaryMap[equip.equipType]) return
-
-      delete reliquaryMap[equip.equipType]
-    }
+    delete equipMap[type]
+    if (type === EquipTypeEnum.EQUIP_WEAPON && manager) await manager.unregister((<Weapon>equip).entity)
 
     equip.equipped = null
 
     const broadcastContextList = currentScene?.broadcastContextList || [context]
 
-    if (notify) await AvatarEquipChange.broadcastNotify(broadcastContextList, this)
+    if (notify) await AvatarEquipChange.broadcastNotify(broadcastContextList, this, type)
     await fightProps.update(notify)
   }
 
@@ -241,22 +228,24 @@ export default class Avatar extends Entity {
     }
   }
 
-  exportAvatarEquipChange(equipType: ProtEntityTypeEnum = ProtEntityTypeEnum.PROT_ENTITY_WEAPON): AvatarEquipChangeNotify {
-    const { guid, weapon } = this
+  exportAvatarEquipChange(equipType: EquipTypeEnum = EquipTypeEnum.EQUIP_WEAPON): AvatarEquipChangeNotify {
+    const { guid, equipMap } = this
+    const equip = equipMap[equipType]
 
-    switch (equipType) {
-      case ProtEntityTypeEnum.PROT_ENTITY_WEAPON:
-        return {
-          avatarGuid: guid.toString(),
-          equipType,
-          itemId: weapon?.itemId,
-          equipGuid: weapon?.guid?.toString(),
-          weapon: weapon?.exportSceneWeaponInfo()
-        }
-      case ProtEntityTypeEnum.PROT_ENTITY_GADGET:
-      default:
-        return null
+    const equipChange: AvatarEquipChangeNotify = {
+      avatarGuid: guid.toString(),
+      equipType
     }
+
+    if (equip == null) return equipChange
+
+    equipChange.itemId = equip.itemId
+    equipChange.equipGuid = equip.guid.toString()
+
+    if (equipType === EquipTypeEnum.EQUIP_WEAPON) equipChange.weapon = (<Weapon>equip).exportSceneWeaponInfo()
+    else equipChange.reliquary = (<Reliquary>equip).exportSceneReliquaryInfo()
+
+    return equipChange
   }
 
   exportAvatarInfo(): AvatarInfo {
@@ -268,7 +257,7 @@ export default class Avatar extends Entity {
       guid: guid.toString(),
       propMap: props.exportPropMap(),
       lifeState,
-      equipGuidList: this.exportEquips().map(e => e.guid.toString()),
+      equipGuidList: this.exportEquipList().map(e => e.guid.toString()),
       talentIdList,
       fightPropMap: fightProps.propMap,
       skillDepotId,
@@ -284,14 +273,12 @@ export default class Avatar extends Entity {
     }
   }
 
-  exportEquips() {
-    const { weapon, reliquaryMap } = this
-    const equips = []
-
-    equips.push(...Object.values(reliquaryMap))
-    if (weapon) equips.push(weapon)
-
-    return equips
+  exportEquipList(reliquaryOnly: boolean = false): Equip[] {
+    const { equipMap } = this
+    return Object.values(equipMap).filter(equip =>
+      equip != null &&
+      (!reliquaryOnly || (equip.type > EquipTypeEnum.EQUIP_NONE && equip.type < EquipTypeEnum.EQUIP_WEAPON))
+    )
   }
 
   exportSatiationData(): AvatarSatiationData {
@@ -305,7 +292,7 @@ export default class Avatar extends Entity {
   }
 
   exportSceneAvatarInfo(): SceneAvatarInfo {
-    const { player, avatarId, guid, weapon, reliquaryMap, skillDepot, excelInfo, wearingFlycloakId, costumeId, bornTime } = this
+    const { player, avatarId, guid, weapon, skillDepot, excelInfo, wearingFlycloakId, costumeId, bornTime } = this
     const { uid, peerId } = player
     const { skillDepotId, inherentProudSkillList, skillLevelMap, talentIdList } = skillDepot.export()
 
@@ -314,10 +301,10 @@ export default class Avatar extends Entity {
       avatarId,
       guid: guid.toString(),
       peerId,
-      equipIdList: this.exportEquips().map(e => e.itemId),
+      equipIdList: this.exportEquipList().map(e => e.itemId),
       skillDepotId,
       weapon: weapon.exportSceneWeaponInfo(),
-      reliquaryList: Object.values(reliquaryMap).map(reliquary => reliquary.exportSceneReliquaryInfo()),
+      reliquaryList: (<Reliquary[]>this.exportEquipList(true)).map(reliquary => reliquary.exportSceneReliquaryInfo()),
       inherentProudSkillList,
       skillLevelMap,
       talentIdList,
@@ -366,7 +353,6 @@ export default class Avatar extends Entity {
       avatarType,
       skillDepot,
       fetterList,
-      weapon,
       wearingFlycloakId,
       bornTime
     } = this
@@ -377,7 +363,7 @@ export default class Avatar extends Entity {
       type: avatarType,
       skillDepotData: skillDepot.exportUserData(),
       fettersData: fetterList.exportUserData(),
-      weaponGuid: weapon?.guid?.toString() || <false>false, // stupid typescript >:(
+      equipGuidList: this.exportEquipList().map(equip => equip.guid.toString()),
       flycloak: wearingFlycloakId,
       bornTime
     }, super.exportUserData())

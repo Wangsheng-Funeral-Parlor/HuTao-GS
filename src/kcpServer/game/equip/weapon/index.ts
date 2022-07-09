@@ -1,7 +1,7 @@
 import WeaponData from '$/gameData/data/WeaponData'
+import { EquipTypeEnum } from '@/types/enum/equip'
 import { EquipInterface } from '@/types/game/item'
 import { SceneWeaponInfo } from '@/types/game/weapon'
-import { EquipTypeEnum } from '@/types/user/EquipUserData'
 import WeaponUserData from '@/types/user/WeaponUserData'
 import Equip from '..'
 import Affix from './affix'
@@ -14,7 +14,7 @@ export default class Weapon extends Equip {
   affixList: Affix[]
 
   constructor(itemId: number, guid?: bigint) {
-    super(itemId, guid, EquipTypeEnum.WEAPON)
+    super(itemId, guid, EquipTypeEnum.EQUIP_WEAPON)
 
     this.entity = new WeaponEntity(this)
 

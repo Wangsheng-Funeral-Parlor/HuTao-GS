@@ -46,9 +46,18 @@ export interface ReliquaryLevelData {
   Exp?: number
 }
 
+export interface ReliquarySetData {
+  Id: number
+  SetNeedNum: number[]
+  ContainsList: number[]
+  EquipAffixId?: number
+  DisableFilter?: number
+}
+
 export default interface ReliquaryDataGroup {
   Reliquary: ReliquaryData[]
   MainProp: ReliquaryMainPropData[]
   Affix: ReliquaryAffixData[]
   Level: ReliquaryLevelData[]
+  Set: ReliquarySetData[]
 }

@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import ReliquaryDataGroup, { ReliquaryAffixData, ReliquaryData, ReliquaryMainPropData } from '@/types/gameData/ReliquaryData'
+import ReliquaryDataGroup, { ReliquaryAffixData, ReliquaryData, ReliquaryLevelData, ReliquaryMainPropData, ReliquarySetData } from '@/types/gameData/ReliquaryData'
 
 class ReliquaryDataLoader extends Loader {
   declare data: ReliquaryDataGroup
@@ -42,6 +42,22 @@ class ReliquaryDataLoader extends Loader {
 
   async getAffixList(): Promise<ReliquaryAffixData[]> {
     return (await this.getData())?.Affix || []
+  }
+
+  async getLevel(level: number, rank: number): Promise<ReliquaryLevelData> {
+    return (await this.getLevelList()).find(data => data.Level === level && (data.Rank || 0) === rank)
+  }
+
+  async getLevelList(): Promise<ReliquaryLevelData[]> {
+    return (await this.getData())?.Level || []
+  }
+
+  async getSet(id: number): Promise<ReliquarySetData> {
+    return (await this.getSetList()).find(data => data.Id === id)
+  }
+
+  async getSetList(): Promise<ReliquarySetData[]> {
+    return (await this.getData())?.Set || []
   }
 }
 

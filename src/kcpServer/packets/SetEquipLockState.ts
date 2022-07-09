@@ -1,6 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import { ClientState } from '@/types/enum/state'
+import StoreItemChange from './StoreItemChange'
 
 export interface SetEquipLockStateReq {
   targetEquipGuid: string
@@ -25,13 +26,15 @@ class SetEquipLockStatePacket extends Packet implements PacketInterface {
     const { player } = context
     const { targetEquipGuid, isLocked } = data
 
-    const equip = player.getEquip(BigInt(targetEquipGuid))
-    if (!equip) {
+    const item = player.getItem(BigInt(targetEquipGuid))
+    if (!item?.equip) {
       await this.response(context, { retcode: RetcodeEnum.RET_ITEM_NOT_EXIST })
       return
     }
 
-    equip.isLocked = !!isLocked
+    item.equip.isLocked = !!isLocked
+
+    await StoreItemChange.sendNotify(context, [item])
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,

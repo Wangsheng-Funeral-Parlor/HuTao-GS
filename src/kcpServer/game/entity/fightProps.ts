@@ -11,12 +11,42 @@ import PropsUserData from '@/types/user/PropsUserData'
 import Entity from '.'
 import Avatar from './avatar'
 import Monster from './monster'
+import Reliquary from '$/equip/reliquary'
 
 const DYNAMIC_PROPS = [
   FightPropEnum.FIGHT_PROP_HP,
   FightPropEnum.FIGHT_PROP_HP_PERCENT,
   FightPropEnum.FIGHT_PROP_ATTACK,
-  FightPropEnum.FIGHT_PROP_ATTACK_PERCENT
+  FightPropEnum.FIGHT_PROP_ATTACK_PERCENT,
+  FightPropEnum.FIGHT_PROP_DEFENSE,
+  FightPropEnum.FIGHT_PROP_DEFENSE_PERCENT,
+  FightPropEnum.FIGHT_PROP_CHARGE_EFFICIENCY,
+  FightPropEnum.FIGHT_PROP_ELEMENT_MASTERY,
+  FightPropEnum.FIGHT_PROP_FIRE_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_ELEC_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_ICE_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_WATER_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_WIND_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_ROCK_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_GRASS_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_CRITICAL,
+  FightPropEnum.FIGHT_PROP_CRITICAL_HURT,
+  FightPropEnum.FIGHT_PROP_HEAL_ADD,
+  FightPropEnum.FIGHT_PROP_FIRE_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_ELEC_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_ICE_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_WATER_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_WIND_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_ROCK_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_GRASS_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_PHYSICAL_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_SHIELD_COST_MINUS_RATIO,
+  FightPropEnum.FIGHT_PROP_HEALED_ADD,
+  FightPropEnum.FIGHT_PROP_SKILL_CD_MINUS_RATIO,
+  FightPropEnum.FIGHT_PROP_SPEED_PERCENT,
+  FightPropEnum.FIGHT_PROP_PHYSICAL_SUB_HURT,
+  FightPropEnum.FIGHT_PROP_ADD_HURT,
+  FightPropEnum.FIGHT_PROP_SUB_HURT
 ]
 
 export interface FightPropChangeReason {
@@ -60,6 +90,9 @@ export default class FightProp {
     const weaponList = this.getWeaponList()
     for (let weapon of weaponList) this.applyWeaponStats(weapon)
 
+    const relicList = this.getRelicList()
+    for (let relic of relicList) this.applyRelicStats(relic)
+
     this.updateHpStats()
     this.updateAtkStats()
     this.updateDefStats()
@@ -71,7 +104,6 @@ export default class FightProp {
   }
 
   private updateBaseStats(curve: CurveExcelConfig) {
-
     this.set(FightPropEnum.FIGHT_PROP_BASE_HP, this.calcBaseHp(curve))
     this.set(FightPropEnum.FIGHT_PROP_BASE_ATTACK, this.calcBaseAttack(curve))
     this.set(FightPropEnum.FIGHT_PROP_BASE_DEFENSE, this.calcBaseDefense(curve))
@@ -130,6 +162,29 @@ export default class FightProp {
     for (let prop of propList) {
       const { propType, propValue } = prop
       this.add(propType, propValue)
+    }
+  }
+
+  private applyRelicStats(reliquary: Reliquary) {
+    this.applyRelicMainStats(reliquary)
+    this.applyRelicSubStats(reliquary)
+  }
+
+  private applyRelicMainStats(reliquary: Reliquary) {
+    const { mainPropType, mainPropValue } = reliquary
+    if (mainPropType === FightPropEnum.FIGHT_PROP_NONE) return
+
+    this.add(mainPropType, mainPropValue)
+  }
+
+  private applyRelicSubStats(reliquary: Reliquary) {
+    const { subStatMap } = reliquary
+
+    for (let key in subStatMap) {
+      const type = parseInt(key)
+      if (isNaN(type) || type === FightPropEnum.FIGHT_PROP_NONE) continue
+
+      this.add(type, subStatMap[key])
     }
   }
 
@@ -211,6 +266,15 @@ export default class FightProp {
       default:
         return []
     }
+  }
+
+  private getRelicList(): Reliquary[] {
+    const { entity } = this
+    const { entityType } = entity
+
+    if (entityType !== ProtEntityTypeEnum.PROT_ENTITY_AVATAR) return []
+
+    return <Reliquary[]>(<Avatar>entity).exportEquipList(true)
   }
 
   private getCostElemVal(): number {

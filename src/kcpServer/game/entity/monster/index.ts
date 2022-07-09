@@ -50,6 +50,8 @@ export default class Monster extends Entity {
     this.affixList = monsterData.Affix || []
     this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id))
 
+    for (let weapon of this.weaponList) await weapon.initNew()
+
     const describeData = await MonsterData.getDescribe(monsterData.DescribeId)
     if (!describeData) return
 

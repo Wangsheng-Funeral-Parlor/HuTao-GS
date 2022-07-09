@@ -1,14 +1,17 @@
 import Equip from '$/equip'
-import { ReliquaryEquipTypeEnum } from '@/types/enum/reliquary'
+import { EquipTypeEnum } from '@/types/enum/equip'
 import { SceneReliquaryInfo } from '@/types/game/reliquary'
 import { EquipInterface } from '@/types/game/item'
 import ReliquaryData from '$/gameData/data/ReliquaryData'
-import { EquipTypeEnum } from '@/types/user/EquipUserData'
+import ReliquaryUserData from '@/types/user/ReliquaryUserData'
+import { FightPropEnum } from '@/types/enum/fightProp'
 
 export default class Reliquary extends Equip {
   level: number
   exp: number
 
+  maxLevel: number
+  rankLevel: number
   setId: number
 
   mainDepotId: number
@@ -18,60 +21,172 @@ export default class Reliquary extends Equip {
   mainPropId: number
   appendPropIdList: number[]
 
-  equipType: ReliquaryEquipTypeEnum
+  mainPropType: FightPropEnum
+  mainPropValue: number
+  subStatMap: { [propType: number]: number }
 
   constructor(itemId: number, guid?: bigint) {
-    super(itemId, guid, EquipTypeEnum.RELIQUARY)
+    super(itemId, guid, EquipTypeEnum.EQUIP_NONE)
 
+    this.mainPropId = 0
     this.appendPropIdList = []
+
+    this.mainPropType = FightPropEnum.FIGHT_PROP_NONE
+    this.mainPropValue = 0
+    this.subStatMap = {}
   }
 
   private async loadReliquaryData() {
     const { itemId } = this
     const reliquaryData = await ReliquaryData.getReliquary(itemId)
-    if (!reliquaryData) return
 
-    this.setId = reliquaryData.SetId
+    this.maxLevel = reliquaryData?.MaxLevel || 1
+    this.rankLevel = reliquaryData?.RankLevel || 0
+    this.setId = reliquaryData?.SetId || 0
 
-    this.mainDepotId = reliquaryData.MainPropDepotId
-    this.appendDepotId = reliquaryData.AppendPropDepotId
-    this.appendNum = reliquaryData.AppendPropNum
+    this.mainDepotId = reliquaryData?.MainPropDepotId || 0
+    this.appendDepotId = reliquaryData?.AppendPropDepotId || 0
+    this.appendNum = reliquaryData?.AppendPropNum || 0
 
-    this.equipType = ReliquaryEquipTypeEnum[reliquaryData.EquipType]
+    this.type = EquipTypeEnum[reliquaryData?.EquipType] || EquipTypeEnum.EQUIP_NONE
+  }
+
+  private async setMainProp(id: number) {
+    const propData = await ReliquaryData.getMainProp(id)
+    if (propData == null) return
+
+    this.mainPropId = id
+    this.mainPropType = FightPropEnum[propData?.PropType] || FightPropEnum.FIGHT_PROP_NONE
+
+    await this.updateMainStat()
+  }
+
+  private async randomMainProp() {
+    const { mainDepotId } = this
+    const candidateList = (await ReliquaryData.getMainPropsByDepot(mainDepotId))
+    const candidate = candidateList[Math.floor(Math.random() * candidateList.length)]
+
+    await this.setMainProp(candidate?.Id)
+  }
+
+  private async addRandomAppendProp() {
+    const { appendDepotId, mainPropId, appendPropIdList } = this
+    const blackList: string[] = []
+
+    const mainPropType = (await ReliquaryData.getMainProp(mainPropId))?.PropType
+    if (mainPropType != null) blackList.push(mainPropType)
+
+    for (let appendPropId of appendPropIdList) {
+      const propType = (await ReliquaryData.getAffix(appendPropId))?.PropType
+      if (propType == null || blackList.includes(propType)) continue
+
+      blackList.push(propType)
+    }
+
+    const candidateList = (await ReliquaryData.getAffixsByDepot(appendDepotId))
+      .filter(data => !blackList.includes(data.PropType))
+      .map(data => data.Id)
+
+    const candidate = candidateList[Math.floor(Math.random() * candidateList.length)]
+    if (candidate == null) return
+
+    appendPropIdList.push(candidate)
+  }
+
+  private async upgradeRandomAppendProp() {
+    const { appendDepotId, appendPropIdList } = this
+    const whitelist: string[] = []
+
+    for (let appendPropId of appendPropIdList) {
+      const propType = (await ReliquaryData.getAffix(appendPropId))?.PropType
+      if (propType == null || whitelist.includes(propType)) continue
+
+      whitelist.push(propType)
+    }
+
+    const candidateList = (await ReliquaryData.getAffixsByDepot(appendDepotId))
+      .filter(data => whitelist.includes(data.PropType))
+      .map(data => data.Id)
+
+    const candidate = candidateList[Math.floor(Math.random() * candidateList.length)]
+    if (candidate == null) return
+
+    appendPropIdList.push(candidate)
+  }
+
+  private async addAppendProp() {
+    const { appendPropIdList } = this
+
+    if (appendPropIdList.length < 4) await this.addRandomAppendProp()
+    else await this.upgradeRandomAppendProp()
+
+    await this.updateSubStats()
+  }
+
+  private async updateMainStat() {
+    const { level, rankLevel: rank, mainPropType } = this
+    const levelData = await ReliquaryData.getLevel(level, rank)
+    if (levelData == null) return
+
+    const prop = levelData.AddProps?.find(p => p?.PropType === FightPropEnum[mainPropType])
+
+    this.mainPropValue = prop?.Value || 0
+  }
+
+  private async updateSubStats() {
+    const { appendPropIdList, subStatMap } = this
+
+    // clear stats
+    for (let type in subStatMap) delete subStatMap[type]
+
+    for (let appendPropId of appendPropIdList) {
+      const affixData = await ReliquaryData.getAffix(appendPropId)
+      const type = FightPropEnum[affixData?.PropType] || FightPropEnum.FIGHT_PROP_NONE
+      const value = parseFloat(<any>affixData?.PropValue) || 0
+      const origValue = subStatMap[type] || 0
+
+      if (isNaN(value)) continue
+
+      subStatMap[type] = origValue + value
+    }
+  }
+
+  async init(userData: ReliquaryUserData) {
+    await this.loadReliquaryData()
+    await super.init(userData)
+
+    const { level, exp, mainProp, appendPropList } = userData
+    const { appendNum, appendPropIdList } = this
+
+    this.level = level || 1
+    this.exp = exp || 0
+
+    if (mainProp == null) await this.randomMainProp()
+    else this.setMainProp(mainProp)
+
+    appendPropIdList.splice(0)
+
+    const filteredAppendPropList = appendPropList.map(id => parseInt(<any>id)).filter(id => !isNaN(id))
+    if (filteredAppendPropList.length === 0) {
+      for (let i = 0; i < appendNum; i++) await this.addAppendProp()
+    } else {
+      appendPropIdList.push(...filteredAppendPropList)
+    }
+
+    await this.updateSubStats()
   }
 
   async initNew() {
     await this.loadReliquaryData()
+    await super.initNew()
+
+    const { appendNum } = this
 
     this.level = 1
     this.exp = 0
 
-    this.mainPropId = await this.randomFromMain()
-    this.appendPropIdList.push(await this.randomFromAppend())
-  }
-
-  async randomFromMain() {
-    const { mainDepotId } = this
-    const candidateList = (await ReliquaryData.getMainPropsByDepot(mainDepotId)).map(data => data.Id)
-    return candidateList[Math.floor(Math.random() * candidateList.length)]
-  }
-
-  async randomFromAppend() {
-    const { appendDepotId, appendNum, appendPropIdList } = this
-    const groupIdList: number[] = []
-
-    for (let appendPropId of appendPropIdList) {
-      const groupId = (await ReliquaryData.getAffix(appendPropId))?.GroupId
-      if (groupId == null || groupIdList.includes(groupId)) continue
-
-      groupIdList.push(groupId)
-    }
-
-    const candidateList = (await ReliquaryData.getAffixsByDepot(appendDepotId))
-      .filter(data => groupIdList.length < appendNum || groupIdList.includes(data.GroupId))
-      .map(data => data.Id)
-
-    return candidateList[Math.floor(Math.random() * candidateList.length)]
+    await this.randomMainProp()
+    for (let i = 0; i < appendNum; i++) await this.addAppendProp()
   }
 
   exportSceneReliquaryInfo(): SceneReliquaryInfo {
@@ -94,5 +209,16 @@ export default class Reliquary extends Equip {
       },
       isLocked
     }
+  }
+
+  exportUserData(): ReliquaryUserData {
+    const { level, exp, mainPropId, appendPropIdList } = this
+
+    return Object.assign({
+      level,
+      exp,
+      mainProp: mainPropId,
+      appendPropList: appendPropIdList
+    }, super.exportUserData())
   }
 }

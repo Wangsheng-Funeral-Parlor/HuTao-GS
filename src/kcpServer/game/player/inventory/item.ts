@@ -3,8 +3,9 @@ import Reliquary from '$/equip/reliquary'
 import Weapon from '$/equip/weapon'
 import Material from '$/material'
 import newGuid from '$/utils/newGuid'
+import { EquipTypeEnum } from '@/types/enum/equip'
 import { ItemInterface } from '@/types/game/item'
-import EquipUserData, { EquipTypeEnum } from '@/types/user/EquipUserData'
+import EquipUserData from '@/types/user/EquipUserData'
 import { ItemTypeEnum, ItemUserData } from '@/types/user/InventoryUserData'
 import MaterialUserData from '@/types/user/MaterialUserData'
 
@@ -25,21 +26,25 @@ export default class Item {
     this.itemId = content?.itemId
   }
 
-  private initEquip(userData: EquipUserData) {
+  private async initEquip(userData: EquipUserData) {
     const { itemId, type } = userData
 
     switch (type) {
-      case EquipTypeEnum.RELIQUARY:
-        this.equip = new Reliquary(itemId)
-        break
-      case EquipTypeEnum.WEAPON:
+      case EquipTypeEnum.EQUIP_WEAPON:
         this.equip = new Weapon(itemId)
+        break
+      case EquipTypeEnum.EQUIP_BRACER:
+      case EquipTypeEnum.EQUIP_NECKLACE:
+      case EquipTypeEnum.EQUIP_SHOES:
+      case EquipTypeEnum.EQUIP_RING:
+      case EquipTypeEnum.EQUIP_DRESS:
+        this.equip = new Reliquary(itemId)
         break
       default:
         this.equip = new Equip(itemId)
     }
 
-    this.equip.init(userData)
+    await this.equip.init(userData)
   }
 
   get count() {
@@ -69,7 +74,7 @@ export default class Item {
         await this.material.init(<MaterialUserData>data)
         break
       case ItemTypeEnum.EQUIP:
-        this.initEquip(<EquipUserData>data)
+        await this.initEquip(<EquipUserData>data)
         break
     }
   }
