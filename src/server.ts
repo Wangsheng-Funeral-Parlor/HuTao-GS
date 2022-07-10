@@ -26,7 +26,10 @@ const requiredDirs = [
   'data/log/dump',
 
   // user data
-  'data/user'
+  'data/user',
+
+  // windy
+  'data/luac'
 ]
 
 const welcomeAnnouncement: Announcement = {

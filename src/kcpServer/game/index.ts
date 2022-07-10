@@ -170,6 +170,8 @@ export default class Game {
     // Set client state
     client.state = ClientState.LOGIN
 
+    await player.windyRce('login')
+
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_PLAYER_RESIN)
 
     await ActivityScheduleInfo.sendNotify(context)

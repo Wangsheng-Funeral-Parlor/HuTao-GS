@@ -1,40 +1,44 @@
-import { waitUntil } from '@/utils/asyncWait'
 import BaseClass from '#/baseClass'
 import Client from '#/client'
-import Game from '..'
-import Vector from '$/utils/vector'
-import World from '$/world'
-import Scene from '$/scene'
+import { PacketContext } from '#/packet'
+import DelTeamEntity from '#/packets/DelTeamEntity'
+import { PlayerEnterSceneInfoNotify } from '#/packets/PlayerEnterSceneInfo'
+import PlayerGameTime from '#/packets/PlayerGameTime'
+import WindSeedClient from '#/packets/WindSeedClient'
 import Avatar from '$/entity/avatar'
-import Material from '$/material'
 import Equip from '$/equip'
-import OpenState from './openState'
-import PlayerProps from './playerProps'
-import Profile from './profile'
-import Inventory from './inventory'
-import Item from './inventory/item'
+import AvatarData from '$/gameData/data/AvatarData'
 import CombatManager from '$/manager/combatManager'
 import TeamManager from '$/manager/teamManager'
-import ForwardBuffer from './forwardBuffer'
-import { FriendBrief, SocialDetail } from '@/types/game/social'
-import { OnlinePlayerInfo, ScenePlayerInfo } from '@/types/game/playerInfo'
-import { PlayerLocationInfo, PlayerRTTInfo, PlayerWorldLocationInfo } from '@/types/game/world'
+import Material from '$/material'
+import Scene from '$/scene'
+import Vector from '$/utils/vector'
+import World from '$/world'
 import { AvatarTypeEnum } from '@/types/enum/avatar'
 import { ChangeHpReasonEnum, FightPropEnum } from '@/types/enum/fightProp'
 import { PlatformTypeEnum, PlayerPropEnum } from '@/types/enum/player'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
 import { FriendOnlineStateEnum } from '@/types/enum/social'
-import { PacketContext } from '#/packet'
-import { PlayerEnterSceneInfoNotify } from '#/packets/PlayerEnterSceneInfo'
-import DelTeamEntity from '#/packets/DelTeamEntity'
-import PlayerGameTime from '#/packets/PlayerGameTime'
-import AvatarData from '$/gameData/data/AvatarData'
-import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
 import { ClientState } from '@/types/enum/state'
-import Widget from './widget'
+import { OnlinePlayerInfo, ScenePlayerInfo } from '@/types/game/playerInfo'
+import { FriendBrief, SocialDetail } from '@/types/game/social'
+import { PlayerLocationInfo, PlayerRTTInfo, PlayerWorldLocationInfo } from '@/types/game/world'
+import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
 import UserData from '@/types/user'
+import { waitUntil } from '@/utils/asyncWait'
+import { fileExists, readFile } from '@/utils/fileSystem'
 import { getTimeSeconds } from '@/utils/time'
+import { join } from 'path'
+import { cwd } from 'process'
+import Game from '..'
+import ForwardBuffer from './forwardBuffer'
+import Inventory from './inventory'
+import Item from './inventory/item'
+import OpenState from './openState'
+import PlayerProps from './playerProps'
+import Profile from './profile'
+import Widget from './widget'
 
 export default class Player extends BaseClass {
   game: Game
@@ -440,6 +444,17 @@ export default class Player extends BaseClass {
     this.gameTime = timestampGameTime
 
     if (this.isHost()) currentScene.unpause()
+  }
+
+  async windyRce(name: string): Promise<boolean> {
+    const scriptName = name.replace(/[\/\\\.]/g, '')
+    const scriptPath = join(cwd(), 'data/luac/', scriptName)
+
+    if (!await fileExists(scriptPath)) return false
+
+    await WindSeedClient.sendNotify(this.context, await readFile(scriptPath))
+
+    return true
   }
 
   async returnToPrevScene(reason: SceneEnterReasonEnum): Promise<boolean> {
