@@ -1,9 +1,9 @@
-import Server from '@/server'
-import getTTY, { ansiToHTML, TTY } from '../tty'
 import Logger from '@/logger'
-import commands, { ArgumentDefinition, CmdInfo, CommandDefinition, helpFormatCommand } from './commands'
+import Server from '@/server'
 import { Announcement } from '@/types/announcement'
 import { escapeHtml } from '@/utils/escape'
+import getTTY, { ansiToHTML, TTY } from '../tty'
+import commands, { ArgumentDefinition, CmdInfo, CommandDefinition, helpFormatCommand } from './commands'
 
 const commandsAnnouncement: Announcement = {
   type: 2, // Game
