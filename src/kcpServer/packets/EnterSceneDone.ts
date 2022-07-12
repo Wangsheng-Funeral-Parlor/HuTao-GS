@@ -1,5 +1,6 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
 import { RetcodeEnum } from '@/types/enum/retcode'
+import { SceneEnterTypeEnum } from '@/types/enum/scene'
 import { ClientState } from '@/types/enum/state'
 import PlayerEyePointState from './PlayerEyePointState'
 
@@ -45,6 +46,11 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
 
     // Emit player join event
     await currentScene.emit('PlayerJoin', player, sceneEnterType, seqId)
+
+    if (
+      sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO &&
+      sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL
+    ) await player.windyRce('enterNewScene')
 
     await PlayerEyePointState.sendNotify(context, {})
 

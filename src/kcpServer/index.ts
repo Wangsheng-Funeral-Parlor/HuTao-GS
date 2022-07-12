@@ -26,6 +26,7 @@ export const verbosePackets = [
   'AvatarFightPropUpdateNotify',
   'ClientAbilityChangeNotify',
   'ClientAbilityInitFinishNotify',
+  'ClientReportNotify',
   'CombatInvocationsNotify',
   'EntityAiSyncNotify',
   'EntityConfigHashNotify',
