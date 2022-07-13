@@ -1,13 +1,18 @@
+import config from '@/config'
+import Logger from '@/logger'
+import { QueryRegionListHttpRsp } from '@/types/dispatch/regionList'
+import { RetcodeEnum } from '@/types/enum/retcode'
+import { fileExists } from '@/utils/fileSystem'
+import * as dns from 'dns'
 import { existsSync, writeFileSync } from 'fs'
 import { get } from 'https'
 import { join } from 'path'
 import { cwd } from 'process'
-import * as dns from 'dns'
+import * as protobuf from 'protobufjs'
 const { Resolver } = dns.promises
-import Logger from '@/logger'
-import config from '@/config'
 
 const host = 'dispatchosglobal.yuanshen.com'
+const protoPath = join(cwd(), `data/proto/QueryRegionListHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${config.version}/QueryRegionListHttpRsp.bin`)
 
 const logger = new Logger('UPDATE')
@@ -20,6 +25,8 @@ export const checkForUpdate = async (): Promise<boolean> => {
 
 export const update = async (): Promise<boolean> => {
   try {
+    if (!await fileExists(protoPath)) throw new Error('Missing proto file.')
+
     const r = new Resolver()
 
     r.setServers(config.nameservers)
@@ -52,10 +59,20 @@ export const update = async (): Promise<boolean> => {
         res.setEncoding('utf8')
         res.on('error', err => reject(`IP: ${ip} Host: ${host} Error: ${err.message}`))
         res.on('data', chunk => data += chunk)
-        res.on('end', () => {
+        res.on('end', async () => {
           try {
+            const buf = Buffer.from(data, 'base64')
+
+            const root = await protobuf.load(protoPath)
+            const type = root.lookupType('QueryRegionListHttpRsp')
+            const message = type.decode(buf)
+            const regionListRsp = <QueryRegionListHttpRsp>message.toJSON()
+
+            const retcode = regionListRsp.retcode || 0
+            if (retcode !== RetcodeEnum.RET_SUCC) return reject(`Query failed: ${RetcodeEnum[retcode]}`)
+
             logger.debug('Writing to:', binFilePath)
-            writeFileSync(binFilePath, Buffer.from(data, 'base64'))
+            writeFileSync(binFilePath, buf)
             resolve()
           } catch (err) {
             reject(err)

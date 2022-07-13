@@ -13,7 +13,7 @@ export const checkForUpdate = async (): Promise<void> => {
 
 export const update = async (): Promise<void> => {
   logger.info('Updating...')
-  await QueryCurRegion.update()
   await QueryRegionList.update()
+  await QueryCurRegion.update()
   logger.info('Update complete.')
 }
