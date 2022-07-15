@@ -10,6 +10,7 @@ interface Config {
   // dispatch
   dispatchHost: string | null
   dispatchSeed: string
+  dispatchKeyId: number
 
   // port binding
   dnsPort: number
@@ -34,6 +35,7 @@ export const DEFAULT_CONFIG: Config = {
 
   dispatchHost: null,
   dispatchSeed: null,
+  dispatchKeyId: 3,
 
   dnsPort: 53,
   httpPort: 80,
@@ -54,7 +56,8 @@ export const DEFAULT_CONFIG: Config = {
 export const SUPPORT_VERSIONS = [
   '1.5.0',
   '2.6.0',
-  '2.7.0'
+  '2.7.0',
+  '2.8.0'
 ]
 
 const config: Config = getJson('config.json', DEFAULT_CONFIG)

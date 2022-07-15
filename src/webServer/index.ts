@@ -140,7 +140,7 @@ export default class WebServer extends EventEmitter {
       logger.debug(`Unhandled: ${fullUrl}`)
 
       rsp.writeHead(404)
-      rsp.end('404 page not found')
+      rsp.end('404')
       return
     } catch (err) {
       const errMsg = (<Error>err).message
@@ -148,7 +148,7 @@ export default class WebServer extends EventEmitter {
       if (errMsg !== 'aborted') logger.error('Error handling request:', errMsg)
 
       rsp.writeHead(500)
-      rsp.end('500 internal server error')
+      rsp.end('500')
     }
   }
 }

@@ -1,6 +1,6 @@
 import { mhy128Enc } from './aes'
 import { aesXorpad, keyXorpad } from './magic'
-import MT19937 from './mt19937'
+import MT19937 from '../mt19937'
 
 export function keyScramble(key: Buffer): void {
   const roundKeys = Buffer.alloc(11 * 16)

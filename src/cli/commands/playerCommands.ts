@@ -9,7 +9,7 @@ const playerCommands: CommandDefinition[] = [
       { name: 'uid', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
       const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
@@ -31,7 +31,7 @@ const playerCommands: CommandDefinition[] = [
       { name: 'uid', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
       const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
@@ -56,7 +56,7 @@ const playerCommands: CommandDefinition[] = [
       { name: 'uid', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
       const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
@@ -81,7 +81,7 @@ const playerCommands: CommandDefinition[] = [
       { name: 'uid', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
       const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)

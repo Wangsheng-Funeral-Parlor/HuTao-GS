@@ -1,10 +1,30 @@
+import { getNameByCmdId } from '#/cmdIds'
+import config from '@/config'
+import Logger from '@/logger'
+import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { join } from 'path'
 import { cwd } from 'process'
 import * as protobuf from 'protobufjs'
-import { getNameByCmdId } from '#/cmdIds'
-import config from '@/config'
+
+const logger = new Logger('DTUTIL', 0xc2f542)
 
 const protoTypeCache: { [proto: string]: protobuf.Type } = {}
+
+const logBlacklist: (string | number)[] = []
+
+function canLogProto(name: string | number): boolean {
+  if (logBlacklist.includes(name)) return false
+  logBlacklist.push(name)
+  return true
+}
+
+async function dumpProto(name: string | number, data: Buffer) {
+  try {
+    const dumpPath = join(cwd(), 'data/log/dump', `proto-${name}.bin`)
+    if (await fileExists(dumpPath) && (await readFile(dumpPath)).length >= data.length) return
+    await writeFile(dumpPath, data)
+  } catch (err) { }
+}
 
 export const xorData = (data: Buffer, key: Buffer): void => {
   for (let i = 0; i < data.length; i++) {
@@ -32,7 +52,10 @@ export const getProtoType = async (proto: string, common: boolean = false): Prom
   const cache = protoTypeCache[cacheId]
   if (cache) return cache
 
-  const root = await protobuf.load(join(cwd(), `data/proto${common ? '' : ('/' + config.version)}/${proto}.proto`))
+  const protoPath = join(cwd(), `data/proto${common ? '' : ('/' + config.version)}/${proto}.proto`)
+  if (!await fileExists(protoPath)) return null
+
+  const root = await protobuf.load(protoPath)
   const type = root.lookup(proto) as protobuf.Type
 
   protoTypeCache[cacheId] = type
@@ -41,24 +64,35 @@ export const getProtoType = async (proto: string, common: boolean = false): Prom
 }
 
 export const objToProtobuffer = async (obj: object, cmdId: number | string, common: boolean = false): Promise<Buffer | string> => {
+  const protoName = getNameByCmdId(cmdId)
   try {
-    const protoName = getNameByCmdId(cmdId)
     const type = await getProtoType(protoName.toString(), common)
-    const message = type.create(obj)
+    if (type == null) {
+      if (canLogProto(protoName)) logger.warn('Missing proto:', protoName)
+      return Buffer.alloc(0)
+    }
 
+    const message = type.create(obj)
     return Buffer.from(type.encode(message).finish())
   } catch (err) {
+    if (canLogProto(protoName)) logger.error((<Error>err).message)
     return Buffer.alloc(0)
   }
 }
 
 export const dataToProtobuffer = async (data: Buffer, cmdId: number | string, common: boolean = false): Promise<any> => {
+  const protoName = getNameByCmdId(cmdId)
   try {
-    const protoName = getNameByCmdId(cmdId)
     const type = await getProtoType(protoName.toString(), common)
-
+    if (type == null) {
+      if (canLogProto(protoName)) logger.warn('Missing proto:', protoName)
+      await dumpProto(protoName, data)
+      return {}
+    }
     return type.decode(data)
   } catch (err) {
+    if (canLogProto(protoName)) logger.error((<Error>err).message)
+    await dumpProto(protoName, data)
     return {}
   }
 }

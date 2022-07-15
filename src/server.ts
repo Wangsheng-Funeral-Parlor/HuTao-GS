@@ -15,6 +15,9 @@ import { Announcement } from './types/announcement'
 import config, { SUPPORT_VERSIONS } from './config'
 
 const requiredDirs = [
+  //dispatch
+  'data/key/' + config.dispatchKeyId,
+
   // game resource
   'data/bin/' + config.version,
   'data/proto/' + config.version,

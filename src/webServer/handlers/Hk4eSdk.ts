@@ -57,6 +57,9 @@ class Hk4eSdkHandler extends Handler {
       case '2.7.0':
         major = 11
         break
+      case '2.8.0':
+        major = 13
+        break
       default:
         major = 10
     }

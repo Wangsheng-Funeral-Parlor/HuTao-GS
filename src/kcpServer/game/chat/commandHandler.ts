@@ -37,7 +37,7 @@ export default class CommandHandler extends BaseClass {
 
     if (!player || !text || text.indexOf(CLI.prefix) !== 0) return
 
-    const err = CLI.execCommand(text.slice(1), {
+    const err = await CLI.execCommand(text.slice(1), {
       cli: {
         print: this.print.bind(this),
         printError: this.printError.bind(this)

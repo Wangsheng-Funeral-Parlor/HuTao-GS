@@ -20,6 +20,47 @@ const commandsAnnouncement: Announcement = {
 const errLogger = new Logger('CLIERR', 0xff8080)
 const logger = new Logger('CLIOUT', 0xffffff)
 
+const ARGS_CTYPES = [
+  { type: 'GRP', list: ['"', '`', "'"] },
+  { type: 'SEP', list: [' '] }
+]
+
+function splitArgs(str: string): string[] {
+  const args: string[] = []
+
+  str = str.trim()
+
+  let chunk = ''
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i]
+
+    const { type } = ARGS_CTYPES.find(ct => ct.list.find(c => c === char)) || {}
+    const isGrp = type === 'GRP'
+    const isSep = type === 'SEP'
+
+    // Start group
+    if (isGrp) {
+      const end = str.slice(i + 1).indexOf(char) + (i + 1)
+      if (end <= 0) throw new Error(`Missing ${char}`)
+      chunk += str.slice(i + 1, end)
+      i += end // NOSONAR
+      continue
+    }
+
+    if (isSep) {
+      if (chunk.length > 0) args.push(chunk)
+      chunk = ''
+      continue
+    }
+
+    chunk += char
+  }
+
+  if (chunk.length > 0) args.push(chunk)
+
+  return args
+}
+
 function parseArg(arg: string, def: ArgumentDefinition): any {
   // optional argument check
   if (def.optional && arg == null) return
@@ -122,9 +163,16 @@ export default class CLI {
     server.webServer.announcements.push(commandsAnnouncement)
   }
 
-  static execCommand(input: string, cmdInfo: CmdInfo): false | any[] {
-    const cmdName = input.split(' ')[0]
-    const args = input.split(' ').slice(1)
+  static async execCommand(input: string, cmdInfo: CmdInfo): Promise<false | any[]> {
+    let cmdName: string
+    let args: string[]
+
+    try {
+      cmdName = input.split(' ')[0]
+      args = splitArgs(input.split(' ').slice(1).join(' '))
+    } catch (err) {
+      return ['Failed to parse command:', err]
+    }
 
     const cmdDef = commands.find(cmd => cmd.name === cmdName)
     if (!cmdDef) return [`Unknown command: ${cmdName}`]
@@ -138,7 +186,7 @@ export default class CLI {
     cmdInfo.args = parsed.args
 
     try {
-      cmdDef.exec(cmdInfo)
+      await cmdDef.exec(cmdInfo)
       return false
     } catch (err) {
       return ['Failed to execute command:', err]
@@ -162,7 +210,7 @@ export default class CLI {
   }
 
   async handleLine(line: string): Promise<void> {
-    const err = CLI.execCommand(line, {
+    const err = await CLI.execCommand(line, {
       cli: this,
       server: this.server,
       kcpServer: this.server.kcpServer

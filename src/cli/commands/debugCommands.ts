@@ -7,7 +7,7 @@ const debugCommands: CommandDefinition[] = [
     args: [
       { name: 'level', type: 'int' }
     ],
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, server } = cmdInfo
       const { print } = cli
       const level: number = args[0]
@@ -23,27 +23,27 @@ const debugCommands: CommandDefinition[] = [
   {
     name: 'log',
     desc: 'Enable/Disable save server log',
-    exec: (cmdInfo) => cmdInfo.server.globalState.toggle('SaveLog')
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('SaveLog')
   },
   {
     name: 'saveRecorder',
     desc: 'Enable/Disable save log recorder (overseauspider)',
-    exec: (cmdInfo) => cmdInfo.server.globalState.toggle('SaveRecorder')
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('SaveRecorder')
   },
   {
     name: 'saveReport',
     desc: 'Enable/Disable save report (log-upload-os)',
-    exec: (cmdInfo) => cmdInfo.server.globalState.toggle('SaveReport')
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('SaveReport')
   },
   {
     name: 'packetId',
     desc: 'Show/Hide packetId',
-    exec: (cmdInfo) => cmdInfo.server.globalState.toggle('ShowPacketId')
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('ShowPacketId')
   },
   {
     name: 'protoMatch',
     desc: 'Enable/Disable protoMatch',
-    exec: (cmdInfo) => cmdInfo.server.globalState.toggle('UseProtoMatch')
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('UseProtoMatch')
   }
 ]
 

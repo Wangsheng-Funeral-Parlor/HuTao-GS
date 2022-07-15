@@ -1,23 +1,10 @@
-import * as fs from 'fs'
-const { mkdir, readFile, writeFile } = fs.promises
-import { join, resolve } from 'path'
-import { exec } from 'child_process'
-import { dirExists, fileExists } from '@/utils/fileSystem'
-import Logger from '@/logger'
 import config from '@/config'
+import Logger from '@/logger'
+import { dirExists, fileExists, mkdir, readFile, writeFile } from '@/utils/fileSystem'
+import OpenSSL from '@/utils/openssl'
+import { join, resolve } from 'path'
 
 const logger = new Logger('SSLGEN', 0xa0ff00)
-
-function execCommand(cmd: string): Promise<string> {
-  return new Promise((res, rej) => {
-    const cp = exec(cmd)
-    let buffer = ''
-    cp.stdout.setEncoding('utf8')
-    cp.stdout.on('data', data => buffer += data)
-    cp.on('exit', () => res(buffer))
-    cp.on('error', (err) => rej(err))
-  })
-}
 
 const caCnfData = [
   '[req]',
@@ -78,20 +65,6 @@ export default class SSL {
     this.keyPath = join(this.workDir, srvFiles.srvKey)
   }
 
-  async checkOpenSSL() {
-    logger.info('Checking OpenSSL installation...')
-
-    try {
-      if ((await execCommand('openssl version')).indexOf('OpenSSL') >= 0) return true
-    } catch (err) {
-      logger.error(err)
-    }
-
-    logger.error('OpenSSL not installed.')
-
-    return false
-  }
-
   async validateCaFiles() {
     const { workDir } = this
 
@@ -135,7 +108,7 @@ export default class SSL {
   }
 
   async generateCaFiles() {
-    if (!await this.checkOpenSSL()) return false
+    if (!await OpenSSL.isInstalled()) return false
 
     try {
       const { workDir } = this
@@ -157,10 +130,10 @@ export default class SSL {
       }
 
       logger.info(`Generating ${caKey}...`)
-      await execCommand(`openssl genrsa -out "${caKeyPath}" 4096`)
+      await OpenSSL.generateRsaPrivateKey(caKeyPath, 4096)
 
       logger.info(`Generating ${caCrt}...`)
-      await execCommand(`openssl req -x509 -new -nodes -key "${caKeyPath}" -sha256 -days 3650 -out "${caCrtPath}" -config "${caCnfPath}"`)
+      await OpenSSL.generateRootCaCert(caKeyPath, caCnfPath, caCrtPath)
 
       if (!await this.generateSrvFiles()) return false
     } catch (err) {
@@ -173,7 +146,7 @@ export default class SSL {
 
   async generateSrvFiles() {
     if (!await this.validateCaFiles()) return this.generateCaFiles()
-    if (!await this.checkOpenSSL()) return false
+    if (!await OpenSSL.isInstalled()) return false
 
     try {
       const { workDir } = this
@@ -197,13 +170,13 @@ export default class SSL {
       }
 
       logger.info(`Generating ${srvKey}...`)
-      await execCommand(`openssl genrsa -out "${srvKeyPath}" 4096`)
+      await OpenSSL.generateRsaPrivateKey(srvKeyPath, 4096)
 
       logger.info(`Generating ${srvCsr}...`)
-      await execCommand(`openssl req -new -utf8 -key "${srvKeyPath}" -out "${srvCsrPath}" -config "${srvCnfPath}"`)
+      await OpenSSL.generateCsr(srvKeyPath, srvCnfPath, srvCsrPath)
 
       logger.info(`Generating ${srvCrt}...`)
-      await execCommand(`openssl x509 -req -days 825 -in "${srvCsrPath}" -CA "${caCrtPath}" -CAkey "${caKeyPath}" -CAcreateserial -out "${srvCrtPath}" -extensions req_ext -extfile "${srvCnfPath}"`)
+      await OpenSSL.generateCert(srvCsrPath, caCrtPath, caKeyPath, srvCnfPath, srvCrtPath)
     } catch (err) {
       logger.error(err)
       return false

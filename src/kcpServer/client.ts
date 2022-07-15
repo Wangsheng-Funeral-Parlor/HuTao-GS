@@ -1,12 +1,12 @@
-import KcpServer from './'
-import MT19937 from '#/utils/mt19937'
-import Player from '$/player'
-import { SocketContext, PacketHead } from '@/types/kcp'
 import BaseClass from '#/baseClass'
-import Logger from '@/logger'
 import { Kcp } from '#/utils/kcp'
-import { Handshake } from './handshake'
+import Player from '$/player'
+import Logger from '@/logger'
 import { ClientState } from '@/types/enum/state'
+import { PacketHead, SocketContext } from '@/types/kcp'
+import MT19937 from '@/utils/mt19937'
+import KcpServer from './'
+import { Handshake } from './handshake'
 import protoCleanup from './utils/protoCleanup'
 
 const logger = new Logger('CLIENT', 0xffdb4a)
@@ -132,12 +132,12 @@ export default class Client extends BaseClass {
   }
 
   // Generate xor key from seed
-  setKeyFromSeed(seed: number | string): void {
+  setKeyFromSeed(seed: bigint): void {
     logger.debug('Seed:', seed)
 
     const gen1 = new MT19937()
     const gen2 = new MT19937()
-    gen1.seed(BigInt(seed))
+    gen1.seed(seed)
     gen2.seed(gen1.int64())
     gen2.int64()
 

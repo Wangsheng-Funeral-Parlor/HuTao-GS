@@ -1,17 +1,75 @@
-import keyGen from '@/keyGen'
-import { update } from '@/update'
+import keyGen from '@/tools/keyGen'
+import { decryptMetadata, encryptMetadata, patchMetadata } from '@/tools/metadata'
+import { update } from '@/tools/update'
 import { CommandDefinition } from '.'
 
 const toolsCommands: CommandDefinition[] = [
   {
     name: 'update',
     desc: 'Fetch new dispatch data',
-    exec: () => update()
+    exec: async () => update()
   },
   {
     name: 'keygen',
     desc: 'Attempt to generate key from packet dumps',
-    exec: () => keyGen()
+    exec: async () => keyGen()
+  },
+  {
+    name: 'metadec',
+    desc: 'Decrypt metadata',
+    args: [
+      { name: 'src', type: 'str' },
+      { name: 'dst', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await decryptMetadata(args[0], args[1])
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
+    }
+  },
+  {
+    name: 'metaenc',
+    desc: 'Encrypt metadata',
+    args: [
+      { name: 'src', type: 'str' },
+      { name: 'dst', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await encryptMetadata(args[0], args[1])
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
+    }
+  },
+  {
+    name: 'metapatch',
+    desc: 'Patch metadata',
+    args: [
+      { name: 'src', type: 'str' },
+      { name: 'dst', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await patchMetadata(args[0], args[1])
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
+    }
   }
 ]
 

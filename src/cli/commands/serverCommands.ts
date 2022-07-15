@@ -12,7 +12,7 @@ const serverCommands: CommandDefinition[] = [
       { name: 'page', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, sender } = cmdInfo
       const { print, printError } = cli
 
@@ -44,7 +44,7 @@ const serverCommands: CommandDefinition[] = [
   {
     name: 'stop',
     desc: 'Stop server',
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       (<CLI>cmdInfo.cli).stop()
       cmdInfo.server.stop()
     }
@@ -52,7 +52,7 @@ const serverCommands: CommandDefinition[] = [
   {
     name: 'restart',
     desc: 'Restart server',
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       (<CLI>cmdInfo.cli).stop()
       cmdInfo.server.restart()
     }
@@ -61,7 +61,7 @@ const serverCommands: CommandDefinition[] = [
     name: 'list',
     desc: 'List connected clients',
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { cli, kcpServer } = cmdInfo
       const { print } = cli
       const { clients } = kcpServer
@@ -94,7 +94,7 @@ const serverCommands: CommandDefinition[] = [
       { name: 'reason', type: 'int', optional: true }
     ],
     allowPlayer: true,
-    exec: (cmdInfo) => {
+    exec: async (cmdInfo) => {
       const { args, cli, kcpServer } = cmdInfo
       cli.print('Attempt to disconnect:', args[0])
       if (args[0].indexOf('_') === -1) kcpServer.disconnectUid(parseInt(args[0]), args[1])

@@ -95,7 +95,7 @@ function createSegment(data: Buffer): KcpSegment {
 function encodeSegment(buf: Buffer, seg: KcpSegment) {
   const size = segmentSize(seg)
   if (buf.length < size) {
-    throw Error(`buffer too small to encode kcp segment of size ${size}`)
+    throw new Error(`buffer too small to encode kcp segment of size ${size}`)
   }
 
   buf.writeUInt32LE(seg.conv)

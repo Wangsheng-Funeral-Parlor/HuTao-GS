@@ -24,7 +24,7 @@ export interface CommandDefinition {
   args?: ArgumentDefinition[]
   allowPlayer?: boolean
   onlyAllowPlayer?: boolean
-  exec: (cmdInfo: CmdInfo) => void
+  exec: (cmdInfo: CmdInfo) => Promise<void>
 }
 
 export interface CLILike {
