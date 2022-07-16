@@ -3,7 +3,12 @@ import MT19937 from '../mt19937'
 export type StructDefinition = [string, number][]
 
 export const mHeaderFields: StructDefinition = [
-  ['filler1', 0x18],
+  ['filler00', 4],
+  ['filler04', 4],
+  ['filler08', 4],
+  ['filler0C', 4],
+  ['filler10', 4],
+  ['filler14', 4],
   ['stringLiteralDataOffset', 4], // 18
   ['stringLiteralDataCount', 4], // 1c
   ['stringLiteralOffset', 4], // 20
@@ -53,7 +58,37 @@ export const mHeaderFields: StructDefinition = [
   ['exportedTypeDefinitionsOffset', 4], // D0
   ['exportedTypeDefinitionsCount', 4], // D4
   ['stringOffset', 4],
-  ['stringCount', 4]
+  ['stringCount', 4],
+  ['parametersOffset', 4], // E0
+  ['parametersCount', 4], // E4
+  ['genericParameterConstraintsOffset', 4], // E8
+  ['genericParameterConstraintsCount', 4], // EC
+  ['fillerF0', 4],
+  ['fillerF4', 4],
+  ['metadataUsagePairsOffset', 4], // F8
+  ['metadataUsagePairsCount', 4], // FC
+  ['filler100', 4],
+  ['filler104', 4],
+  ['filler108', 4],
+  ['filler10C', 4],
+  ['fieldRefsOffset', 4], // 110
+  ['fieldRefsCount', 4], // 114
+  ['eventsOffset', 4], // 118
+  ['eventsCount', 4], // 11C
+  ['propertiesOffset', 4], // 120
+  ['propertiesCount', 4], // 124
+  ['methodsOffset', 4], // 128
+  ['methodsCount', 4], // 12C
+  ['parameterDefaultValuesOffset', 4], // 130
+  ['parameterDefaultValuesCount', 4], // 134
+  ['fieldDefaultValuesOffset', 4], // 138
+  ['fieldDefaultValuesCount', 4], // 13C
+  ['filler140', 4],
+  ['filler144', 4],
+  ['filler148', 4],
+  ['filler14C', 4],
+  ['metadataUsageListsOffset', 4], // 150
+  ['metadataUsageListsCount', 4] // 154
 ]
 
 export const mLiteral: StructDefinition = [

@@ -4,7 +4,7 @@ import { cwd } from 'process'
 import { fileExists, readFile } from './fileSystem'
 import OpenSSL from './openssl'
 
-const { dispatchKeyId } = config
+const { dispatchKeyId, signingKeySize } = config
 
 interface Key {
   pem: string
@@ -51,7 +51,7 @@ export default class DispatchKey {
     const privatePath = join(cwd(), `data/key/${keyId}`, 'signingPrivate.pem')
     const publicPath = join(cwd(), `data/key/${keyId}`, 'signingPublic.pem')
 
-    if (!await fileExists(privatePath)) await OpenSSL.generateRsaPrivateKey(privatePath, 2048)
+    if (!await fileExists(privatePath)) await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(signingKeySize, 1024))
     if (!await fileExists(publicPath)) await OpenSSL.extractRsaPublicKey(privatePath, publicPath)
 
     return DispatchKey.getKeyPair(privatePath, publicPath)

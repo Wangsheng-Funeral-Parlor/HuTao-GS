@@ -11,6 +11,7 @@ interface Config {
   dispatchHost: string | null
   dispatchSeed: string
   dispatchKeyId: number
+  signingKeySize: number
 
   // port binding
   dnsPort: number
@@ -36,6 +37,7 @@ export const DEFAULT_CONFIG: Config = {
   dispatchHost: null,
   dispatchSeed: null,
   dispatchKeyId: 3,
+  signingKeySize: 2048,
 
   dnsPort: 53,
   httpPort: 80,

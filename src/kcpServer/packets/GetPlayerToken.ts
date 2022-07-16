@@ -2,8 +2,6 @@ import Packet, { PacketContext, PacketInterface } from '#/packet'
 import { RetcodeEnum } from '@/types/enum/retcode'
 import { ClientState } from '@/types/enum/state'
 import DispatchKey from '@/utils/dispatchKey'
-import hash from '@/utils/hash'
-import MT19937 from '@/utils/mt19937'
 import { rsaDecrypt, rsaEncrypt, rsaSign } from '@/utils/rsa'
 
 interface GetPlayerTokenReq {
@@ -69,14 +67,12 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
     const { accountUid, accountToken, accountType, platformType, channelId, clientSeed, keyId } = data
 
     const uid = await game.getUid(accountUid)
-
-    const mt = new MT19937()
-    mt.seed(BigInt(hash(accountToken + Date.now()).slice(0, 19)))
-
-    const times = Math.max(16 * Math.random(), 2)
-    for (let i = 0; i < times; i++) mt.int64()
-
-    const seed = mt.int64()
+    const seed = (
+      BigInt(Math.floor(0x10000 * Math.random())) << 48n |
+      BigInt(Math.floor(0x10000 * Math.random())) << 32n |
+      BigInt(Math.floor(0x10000 * Math.random())) << 16n |
+      BigInt(Math.floor(0x10000 * Math.random()))
+    )
 
     const rsp: GetPlayerTokenRsp = {
       retcode: RetcodeEnum.RET_SUCC,
