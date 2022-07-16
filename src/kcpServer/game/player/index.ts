@@ -265,6 +265,9 @@ export default class Player extends BaseClass {
       avatarList.push(avatar)
     }
 
+    // Unlock all new avatars
+    await this.unlockAllAvatars()
+
     await teamManager.init(teamData)
 
     this.flycloakList = (flycloakDataList || []).map(data => ({
@@ -297,19 +300,13 @@ export default class Player extends BaseClass {
     inventory.add(await Material.create(220044), false) // zither
     inventory.add(await Material.create(220051), false) // drum
 
-    avatarList.push(new Avatar(this, avatarId))
+    // Add main avatar
+    const mainAvatar = new Avatar(this, avatarId)
+    await mainAvatar.initNew(AvatarTypeEnum.FORMAL, false)
+    avatarList.push(mainAvatar)
 
     // Unlock all avatars
-    avatarList.push(...(await AvatarData.getAvatarList())
-      .filter(data => (
-        !avatarList.find(a => a.avatarId === data.Id) &&
-        data.UseType === 'AVATAR_FORMAL'
-      ))
-      .map(data => new Avatar(this, data.Id))
-    )
-
-    // Initialize all avatars
-    for (let avatar of avatarList) await avatar.initNew(AvatarTypeEnum.FORMAL, false)
+    await this.unlockAllAvatars()
 
     // Initialize team list
     await teamManager.initNew()
@@ -333,6 +330,24 @@ export default class Player extends BaseClass {
     await this.game.save(this.client)
 
     this.unregisterHandlers()
+  }
+
+  async unlockAllAvatars() {
+    const { avatarList } = this
+    const newAvatars = (await AvatarData.getAvatarList())
+      .filter(data => (
+        !avatarList.find(a => a.avatarId === data.Id) &&
+        data.UseType === 'AVATAR_FORMAL'
+      ))
+      .map(data => new Avatar(this, data.Id))
+
+    if (newAvatars.length === 0) return
+
+    // Initialize all new avatars
+    for (let avatar of newAvatars) await avatar.initNew(AvatarTypeEnum.FORMAL, false)
+
+    // Add new avatars to avatar list
+    avatarList.push(...newAvatars)
   }
 
   async changeAvatar(avatar: Avatar, pos?: Vector, seqId?: number): Promise<RetcodeEnum> {
