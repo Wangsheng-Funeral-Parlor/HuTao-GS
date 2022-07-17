@@ -21,7 +21,7 @@ function canLogProto(name: string | number): boolean {
 async function dumpProto(name: string | number, data: Buffer) {
   try {
     const dumpPath = join(cwd(), 'data/log/dump', `proto-${name}.bin`)
-    if (await fileExists(dumpPath) && (await readFile(dumpPath)).length >= data.length) return
+    if (data.length <= 0 || (await fileExists(dumpPath) && (await readFile(dumpPath)).length >= data.length)) return
     await writeFile(dumpPath, data)
   } catch (err) { }
 }

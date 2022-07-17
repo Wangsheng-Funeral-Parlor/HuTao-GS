@@ -26,10 +26,10 @@ export default class SkillDepot {
   }
 
   async init(userData: SkillDepotUserData) {
+    await this.update()
+
     const { skills, talents, energySkill } = this
     const { skillDataList, energySkillData } = userData
-
-    await this.update()
 
     for (let skill of skills) {
       const skillData = skillDataList.find(data => data.id === skill.id)
@@ -47,12 +47,11 @@ export default class SkillDepot {
   }
 
   async initNew() {
-    const { skills, talents, energySkill } = this
-
     await this.update()
 
-    for (let skill of skills) await skill.initNew()
+    const { skills, talents, energySkill } = this
 
+    for (let skill of skills) await skill.initNew()
     for (let talent of talents) await talent.init()
 
     await energySkill?.initNew()

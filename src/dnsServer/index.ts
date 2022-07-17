@@ -122,7 +122,7 @@ export default class DnsServer extends EventEmitter {
 
       for (let domain in domains) {
         const index = name.indexOf(domain)
-        if (index === -1 || index !== (name.length - domain.length) || name.indexOf('autopatchhk.') === 0) continue
+        if (index === -1 || index !== (name.length - domain.length) || name.indexOf('autopatch') === 0) continue
 
         this.createResponse(query, query.question[0], domain)
 

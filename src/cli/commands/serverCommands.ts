@@ -69,7 +69,7 @@ const serverCommands: CommandDefinition[] = [
 
       for (let clientID in clients) {
         const client = clients[clientID]
-        lines.push(`${client.uid.toString().padStart(6, '0') || '------'}|${client.state.toString(16).padStart(4, '0').toUpperCase()}|${clientID}`)
+        lines.push(`${client.uid?.toString()?.padStart(6, '0') || '------'}|${client.state.toString(16).padStart(4, '0').toUpperCase()}|${clientID}`)
       }
 
       if (lines.length === 0) {

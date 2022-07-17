@@ -32,7 +32,7 @@ export const hasJson = (path: string): boolean => existsSync(join(cwd(), path))
 export const getJsonAsync = (path: string, defValue: any = null): Promise<any> => {
   return new Promise(async resolve => {
     const jsonPath = join(cwd(), path)
-    if (!await fileExists(jsonPath)) return defValue
+    if (!await fileExists(jsonPath)) return resolve(defValue)
 
     try {
       parseAsync((await readFile(jsonPath)).toString(), async (err, data) => {
