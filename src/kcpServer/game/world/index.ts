@@ -1,27 +1,28 @@
 import BaseClass from '#/baseClass'
+import { PacketContext } from '#/packet'
+import ClientReconnect from '#/packets/ClientReconnect'
+import LeaveWorld from '#/packets/LeaveWorld'
+import PlayerQuitFromMp from '#/packets/PlayerQuitFromMp'
+import SceneKickPlayer from '#/packets/SceneKickPlayer'
+import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
+import WorldPlayerInfo from '#/packets/WorldPlayerInfo'
+import WorldPlayerLocation from '#/packets/WorldPlayerLocation'
+import WorldPlayerRTT from '#/packets/WorldPlayerRTT'
+import uidPrefix from '#/utils/uidPrefix'
+import ChatChannel from '$/chat/chatChannel'
+import SceneData from '$/gameData/data/SceneData'
+import WorldData from '$/gameData/data/WorldData'
 import Player from '$/player'
-import LastState from './lastState'
 import Scene from '$/scene'
-import { OnlinePlayerInfo } from '@/types/game/playerInfo'
+import Logger from '@/logger'
+import { SystemHintTypeEnum } from '@/types/enum/chat'
 import { ClientReconnectReasonEnum, QuitReasonEnum } from '@/types/enum/mp'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import PlayerQuitFromMp from '#/packets/PlayerQuitFromMp'
-import WorldPlayerRTT from '#/packets/WorldPlayerRTT'
-import { PacketContext } from '#/packet'
-import LeaveWorld from '#/packets/LeaveWorld'
-import WorldPlayerInfo from '#/packets/WorldPlayerInfo'
-import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
-import WorldPlayerLocation from '#/packets/WorldPlayerLocation'
-import ClientReconnect from '#/packets/ClientReconnect'
-import SceneKickPlayer from '#/packets/SceneKickPlayer'
-import Game from '..'
-import ChatChannel from '$/chat/chatChannel'
-import { SystemHintTypeEnum } from '@/types/enum/chat'
-import WorldData from '$/gameData/data/WorldData'
-import SceneData from '$/gameData/data/SceneData'
+import { OnlinePlayerInfo } from '@/types/game/playerInfo'
+import SceneUserData from '@/types/user/SceneUserData'
 import WorldUserData from '@/types/user/WorldUserData'
-import Logger from '@/logger'
-import uidPrefix from '#/utils/uidPrefix'
+import Game from '..'
+import LastState from './lastState'
 
 const logger = new Logger('GWORLD', 0xefc8cc)
 
@@ -31,6 +32,8 @@ export default class World extends BaseClass {
 
   id: number
   mainSceneId: number
+
+  sceneDataMap: { [sceneId: number]: SceneUserData }
 
   sceneList: Scene[]
   playerList: Player[]
@@ -48,6 +51,8 @@ export default class World extends BaseClass {
 
     this.game = hostPlayer.game
     this.host = hostPlayer
+
+    this.sceneDataMap = {}
 
     this.sceneList = []
     this.playerList = []
@@ -69,9 +74,10 @@ export default class World extends BaseClass {
   }
 
   async init(userData: WorldUserData) {
-    const { id, lastStateData } = userData
+    const { id, sceneDataMap, lastStateData } = userData || {}
 
     this.id = id
+    this.sceneDataMap = sceneDataMap || {}
     this.hostLastState.init(lastStateData)
   }
 
@@ -114,20 +120,25 @@ export default class World extends BaseClass {
   }
 
   async getScene(sceneId: number, fullInit: boolean = true) {
-    const { sceneList } = this
+    const { sceneDataMap, sceneList } = this
 
     // check if scene already loaded
     let scene = sceneList.find(s => s.id === sceneId)
-    if (scene) return scene
+    if (scene) {
+      if (fullInit && !scene.sceneBlockInit) await scene.initSceneBlocks()
+      return scene
+    }
 
     // check if scene data exists
     if (!await SceneData.getScene(sceneId)) return null
 
     // create new scene
     scene = new Scene(this, sceneId)
+    sceneList.push(scene)
 
-    if (fullInit) sceneList.push(scene)
-    await scene.initNew(fullInit)
+    const sceneData = sceneDataMap[sceneId]
+    if (sceneData == null) await scene.initNew(fullInit)
+    else await scene.init(sceneData, fullInit)
 
     return scene
   }
@@ -283,10 +294,11 @@ export default class World extends BaseClass {
   }
 
   exportUserData(): WorldUserData {
-    const { id, hostLastState } = this
+    const { id, sceneDataMap, hostLastState } = this
 
     return {
       id,
+      sceneDataMap,
       lastStateData: hostLastState.exportUserData()
     }
   }

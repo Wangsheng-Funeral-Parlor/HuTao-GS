@@ -1,4 +1,5 @@
 import { VectorInterface } from '../game/motion'
+import SceneUserData from './SceneUserData'
 
 export interface LastStateUserData {
   sceneId: number
@@ -8,5 +9,6 @@ export interface LastStateUserData {
 
 export default interface WorldUserData {
   id: number
+  sceneDataMap: { [sceneId: number]: SceneUserData }
   lastStateData: LastStateUserData
 }

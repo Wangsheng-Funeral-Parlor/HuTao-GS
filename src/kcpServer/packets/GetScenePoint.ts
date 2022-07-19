@@ -11,7 +11,7 @@ const unlockType = [
 
 export interface GetScenePointReq {
   sceneId: number
-  belongUid: number
+  belongUid?: number
 }
 
 export interface GetScenePointRsp {
@@ -37,10 +37,15 @@ class GetScenePointPacket extends Packet implements PacketInterface {
   }
 
   async request(context: PacketContext, data: GetScenePointReq): Promise<void> {
-    const { sceneId } = data
+    const { player } = context
+    const { hostWorld, currentWorld } = player
+    const { sceneId, belongUid } = data
+
+    const world = belongUid === currentWorld.host.uid ? currentWorld : hostWorld
+    const scene = await world.getScene(sceneId, false)
     const sceneData = await SceneData.getScene(sceneId)
 
-    if (sceneData == null) {
+    if (scene == null || sceneData == null) {
       await this.response(context, { retcode: RetcodeEnum.RET_UNKNOWN_ERROR })
       return
     }
@@ -55,6 +60,9 @@ class GetScenePointPacket extends Packet implements PacketInterface {
 
       pointList.push(pointId)
     }
+
+    // add unlocked points
+    pointList.push(...scene.unlockedPointList.filter(id => !pointList.includes(id)))
 
     for (let cityConfig of sceneData.City) areaList.push(...cityConfig.AreaIdVec)
 
