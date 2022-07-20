@@ -23,7 +23,7 @@
     ]
   },
   "author": "NotArandomGUY",
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "dependencies": {
     "denque": "^2.0.1",
     "hostile": "^1.3.3",
