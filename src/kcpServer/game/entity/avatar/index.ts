@@ -74,6 +74,7 @@ export default class Avatar extends Entity {
       weaponGuid,
       equipGuidList,
       flycloak,
+      costume,
       bornTime
     } = userData
     if (avatarId !== id) return this.initNew(undefined, false)
@@ -97,6 +98,7 @@ export default class Avatar extends Entity {
     }
 
     this.wearingFlycloakId = flycloak
+    this.costumeId = costume
     this.avatarType = type
     this.bornTime = bornTime
 
@@ -249,7 +251,7 @@ export default class Avatar extends Entity {
   }
 
   exportAvatarInfo(): AvatarInfo {
-    const { avatarId, guid, props, fightProps, skillDepot, fetterList, excelInfo, avatarType, lifeState, wearingFlycloakId, costumeId, bornTime } = this
+    const { avatarId, guid, props, fightProps, skillDepot, fetterList, /*excelInfo,*/ avatarType, lifeState, wearingFlycloakId, costumeId, bornTime } = this
     const { skillDepotId, inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap, talentIdList } = skillDepot.export()
 
     return {
@@ -269,7 +271,7 @@ export default class Avatar extends Entity {
       wearingFlycloakId,
       bornTime,
       costumeId,
-      excelInfo: excelInfo.export()
+      //excelInfo: excelInfo.export()
     }
   }
 
@@ -292,7 +294,7 @@ export default class Avatar extends Entity {
   }
 
   exportSceneAvatarInfo(): SceneAvatarInfo {
-    const { player, avatarId, guid, weapon, skillDepot, excelInfo, wearingFlycloakId, costumeId, bornTime } = this
+    const { player, avatarId, guid, weapon, skillDepot, /*excelInfo,*/ wearingFlycloakId, costumeId, bornTime } = this
     const { uid, peerId } = player
     const { skillDepotId, inherentProudSkillList, skillLevelMap, talentIdList } = skillDepot.export()
 
@@ -314,7 +316,7 @@ export default class Avatar extends Entity {
       wearingFlycloakId,
       bornTime,
       costumeId,
-      excelInfo: excelInfo.export()
+      //excelInfo: excelInfo.export()
     }
   }
 
@@ -354,6 +356,7 @@ export default class Avatar extends Entity {
       skillDepot,
       fetterList,
       wearingFlycloakId,
+      costumeId,
       bornTime
     } = this
 
@@ -365,6 +368,7 @@ export default class Avatar extends Entity {
       fettersData: fetterList.exportUserData(),
       equipGuidList: this.exportEquipList().map(equip => equip.guid.toString()),
       flycloak: wearingFlycloakId,
+      costume: costumeId,
       bornTime
     }, super.exportUserData())
   }

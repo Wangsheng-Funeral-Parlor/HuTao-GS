@@ -75,6 +75,7 @@ export default class SkillDepot {
       if (proudSkillOpen.NeedAvatarPromoteLevel != null && promoteLevel < proudSkillOpen.NeedAvatarPromoteLevel) continue
 
       const proudSkillData = await SkillData.getProudSkillByGroup(proudSkillOpen.ProudSkillGroupId)
+      if (proudSkillData == null) continue
 
       inherentProudSkills.push(new InherentProudSkill(this, proudSkillData.Id))
     }

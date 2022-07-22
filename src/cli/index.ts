@@ -160,7 +160,7 @@ export default class CLI {
       commandsAnnouncement.content += `<p style="white-space: pre-wrap;background: black;color: white;">◇ ${ansiToHTML(escapeHtml(helpFormatCommand(command, CLI.prefix)))}</p>`
     }
 
-    server.webServer.announcements.push(commandsAnnouncement)
+    server.webServer?.announcements.push(commandsAnnouncement)
   }
 
   static async execCommand(input: string, cmdInfo: CmdInfo): Promise<false | any[]> {

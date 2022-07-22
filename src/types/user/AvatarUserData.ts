@@ -12,5 +12,6 @@ export default interface AvatarUserData extends EntityUserData {
   weaponGuid?: string | false // compatibility
   equipGuidList: string[]
   flycloak: number
+  costume: number
   bornTime: number
 }

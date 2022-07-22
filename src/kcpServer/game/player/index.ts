@@ -279,6 +279,12 @@ export default class Player extends BaseClass {
     }))
     this.emojiCollection = (emojiIdList || []).filter(id => !isNaN(id))
 
+    // Unlock all new flycloaks
+    await this.unlockAllFlycloaks()
+
+    // Unlock all new costumes
+    await this.unlockAllCostumes()
+
     await hostWorld.init(worldData)
 
     this.godMode = !!godMode
@@ -286,7 +292,7 @@ export default class Player extends BaseClass {
   }
 
   async initNew(avatarId: number, nickName: string): Promise<void> {
-    const { profile, props, openState, inventory, teamManager, avatarList, flycloakList, costumeList, hostWorld } = this
+    const { profile, props, openState, inventory, teamManager, avatarList, hostWorld } = this
 
     profile.initNew(avatarId, nickName)
     props.initNew()
@@ -312,10 +318,10 @@ export default class Player extends BaseClass {
     await teamManager.initNew()
 
     // Unlock all flycloaks
-    flycloakList.push(...(await AvatarData.getFlycloakList()))
+    await this.unlockAllFlycloaks()
 
     // Unlock all costumes
-    costumeList.push(...(await AvatarData.getCostumeList()))
+    await this.unlockAllCostumes()
 
     // Initialize host world
     await hostWorld.initNew(1)
@@ -336,8 +342,8 @@ export default class Player extends BaseClass {
     const { avatarList } = this
     const newAvatars = (await AvatarData.getAvatarList())
       .filter(data => (
-        !avatarList.find(a => a.avatarId === data.Id) &&
-        data.UseType === 'AVATAR_FORMAL'
+        data.UseType === 'AVATAR_FORMAL' &&
+        !avatarList.find(a => a.avatarId === data.Id)
       ))
       .map(data => new Avatar(this, data.Id))
 
@@ -348,6 +354,28 @@ export default class Player extends BaseClass {
 
     // Add new avatars to avatar list
     avatarList.push(...newAvatars)
+  }
+
+  async unlockAllFlycloaks() {
+    const { flycloakList } = this
+    const newFlycloaks = (await AvatarData.getFlycloakList())
+      .filter(data => !flycloakList.find(f => f.Id === data.Id))
+
+    if (newFlycloaks.length === 0) return
+
+    // Add new flycloaks to flycloak list
+    flycloakList.push(...newFlycloaks)
+  }
+
+  async unlockAllCostumes() {
+    const { costumeList } = this
+    const newCostumes = (await AvatarData.getCostumeList())
+      .filter(data => !costumeList.find(c => c.Id === data.Id))
+
+    if (newCostumes.length === 0) return
+
+    // Add new costumes to costume list
+    costumeList.push(...newCostumes)
   }
 
   async changeAvatar(avatar: Avatar, pos?: Vector, seqId?: number): Promise<RetcodeEnum> {

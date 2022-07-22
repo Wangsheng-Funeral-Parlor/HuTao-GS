@@ -56,6 +56,9 @@ export default class Profile extends BaseClass {
     this.unlockedNameCardIdList = (Array.isArray(unlockedNameCardIdList) ? unlockedNameCardIdList : [])
     this.profilePicture = profilePicture || { avatarId: null }
     this.isShowAvatar = !!isShowAvatar
+
+    // unlock all new namecards
+    await this.unlockAllNamecards()
   }
 
   async initNew(avatarId: number, nickName: string) {
@@ -71,10 +74,23 @@ export default class Profile extends BaseClass {
     this.showNameCardIdList = []
     this.isShowAvatar = false
 
-    // unlock all namecard
-    this.unlockedNameCardIdList = (await MaterialData.getMaterialList())
-      .filter(data => data.MaterialType === 'MATERIAL_NAMECARD')
+    // unlock all namecards
+    await this.unlockAllNamecards()
+  }
+
+  async unlockAllNamecards() {
+    const { unlockedNameCardIdList } = this
+    const newNamecards = (await MaterialData.getMaterialList())
+      .filter(data => (
+        data.MaterialType === 'MATERIAL_NAMECARD' &&
+        !unlockedNameCardIdList.includes(data.Id)
+      ))
       .map(data => data.Id)
+
+    if (newNamecards.length === 0) return
+
+    // Add new namecards to namecard list
+    unlockedNameCardIdList.push(...newNamecards)
   }
 
   setShowAvatarInfo(avatarIdList: number[], isShowAvatar: boolean = false) {

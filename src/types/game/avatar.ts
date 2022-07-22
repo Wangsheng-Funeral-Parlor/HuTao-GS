@@ -65,7 +65,7 @@ export interface AvatarInfo {
   bornTime: number
   pendingPromoteRewardList?: number[]
   costumeId?: number
-  excelInfo: AvatarExcelInfo
+  excelInfo?: AvatarExcelInfo
   animHash?: number
 }
 
