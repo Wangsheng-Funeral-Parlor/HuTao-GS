@@ -12,16 +12,29 @@ import { cRGB } from './tty'
 import DnsServer from './dnsServer'
 import { waitMs } from '@/utils/asyncWait'
 import { Announcement } from './types/announcement'
-import config, { SUPPORT_VERSIONS } from './config'
+import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
+
+const {
+  version,
+  serverName,
+  dispatchRegion,
+  dispatchSeed,
+  dispatchKeyId,
+  autoPatch,
+  httpPort,
+  httpsPort,
+  recorderPort,
+  hosts
+} = config
 
 const requiredDirs = [
   //dispatch
-  'data/key/' + config.dispatchKeyId,
+  'data/key/' + dispatchKeyId,
 
   // game resource
-  'data/bin/' + config.version,
-  'data/proto/' + config.version,
-  'data/game/' + config.version,
+  'data/bin/' + version,
+  'data/proto/' + version,
+  'data/game/' + version,
 
   // log
   'data/log/server',
@@ -38,7 +51,7 @@ const requiredDirs = [
 const welcomeAnnouncement: Announcement = {
   type: 2, // Game
   subtitle: 'Welcome',
-  title: `Welcome to ${config.serverName}!`,
+  title: `Welcome to ${serverName}!`,
   banner: 'https://webstatic-sea.mihoyo.com/hk4e/announcement/img/banner/welcome.png',
   content: '<p style="white-space: pre-wrap;">Hello, have fun~~</p><img src="https://webstatic-sea.mihoyo.com/hk4e/announcement/img/fallen.png"><p style="white-space: pre-wrap;">Powered by: HuTao GS</p>',
   start: Date.now(),
@@ -58,20 +71,31 @@ export default class Server {
   webServer: WebServer
   kcpServer: KcpServer
 
+  readyToStart: boolean
+
   constructor() {
     // Window title
-    logger.write(`\x1b]0;${config.serverName}\x07`)
+    logger.write(`\x1b]0;${serverName}\x07`)
 
     // Start log capture
     Logger.startCapture()
 
     // Server build info
-    logger.info(`Name: ${cRGB(0xffffff, config.serverName)}`)
+    logger.info(`Name: ${cRGB(0xffffff, serverName)}`)
     logger.info(`Build: ${cRGB(0xffffff, process.env.NODE_ENV || 'development')}`)
-    logger.info(`Game version: ${cRGB(0xffffff, config.version)}`)
+    logger.info(`Game version: ${cRGB(0xffffff, version)}`)
+    logger.info(`Dispatch region: ${cRGB(0xffffff, dispatchRegion)}`)
+    logger.info(`Dispatch seed: ${cRGB(0xffffff, dispatchSeed)}`)
+    logger.info(`Dispatch key: ${cRGB(0xffffff, dispatchKeyId.toString())}`)
+    logger.info(`Auto patch: ${cRGB(0xffffff, autoPatch.toString())}`)
     logger.info(`Log level: ${cRGB(0xffffff, logger.getLogLevel().toString())}`)
 
-    if (!SUPPORT_VERSIONS.includes(config.version)) {
+    if (!SUPPORT_REGIONS.includes(dispatchRegion)) {
+      logger.error('Unsupported region.')
+      return
+    }
+
+    if (!SUPPORT_VERSIONS.includes(version)) {
       logger.error('Unsupported version.')
       return
     }
@@ -88,6 +112,8 @@ export default class Server {
     this.kcpServer = new KcpServer(this.globalState)
 
     this.webServer.announcements.push(welcomeAnnouncement)
+
+    this.readyToStart = true
   }
 
   get announcements() {
@@ -103,11 +129,11 @@ export default class Server {
   }
 
   async setHosts(): Promise<void> {
-    if (!config.hosts) return
+    if (!hosts) return
 
     logger.debug('Setting hosts...')
 
-    for (let host of config.hosts) {
+    for (let host of hosts) {
       for (let i = 1; i <= 10; i++) {
         try {
           hostile.set('127.0.0.1', host)
@@ -136,11 +162,11 @@ export default class Server {
   }
 
   async removeHosts(): Promise<void> {
-    if (!config.hosts) return
+    if (!hosts) return
 
     logger.debug('Removing hosts...')
 
-    for (let host of config.hosts) {
+    for (let host of hosts) {
       for (let i = 1; i <= 10; i++) {
         try {
           hostile.remove('127.0.0.1', host)
@@ -169,7 +195,8 @@ export default class Server {
   }
 
   async start(): Promise<void> {
-    const { observer, dnsServer, webServer, kcpServer } = this
+    const { observer, dnsServer, webServer, kcpServer, readyToStart } = this
+    if (!readyToStart) return
 
     observer.observe({ type: 'measure', buffered: true })
 
@@ -195,9 +222,9 @@ export default class Server {
     try {
       dnsServer.start()
       webServer.start([
-        { port: config.httpPort },
-        { port: config.httpsPort, useHttps: true },
-        { port: config.recorderPort }
+        { port: httpPort },
+        { port: httpsPort, useHttps: true },
+        { port: recorderPort }
       ])
       kcpServer.start()
     } catch (err) {
@@ -226,7 +253,8 @@ export default class Server {
   }
 
   async runShutdownTasks(fullShutdown: boolean = false) {
-    const { globalState, observer, dnsServer, webServer, kcpServer } = this
+    const { globalState, observer, dnsServer, webServer, kcpServer, readyToStart } = this
+    if (!readyToStart) return // Can't shutdown if it never started in the first place...
 
     await kcpServer.stop()
 

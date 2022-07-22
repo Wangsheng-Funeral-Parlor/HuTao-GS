@@ -6,11 +6,13 @@ import config from '@/config'
 import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import { cRGB } from '@/tty'
+import { QueryCurrRegionHttpRsp } from '@/types/dispatch/curRegion'
 import { ClientState } from '@/types/enum/state'
 import { PacketHead, SocketContext } from '@/types/kcp'
 import { waitTick } from '@/utils/asyncWait'
+import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile } from '@/utils/fileSystem'
-import ec2b from '@/utils/mhyCrypto/ec2b'
+import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
 import * as dgram from 'dgram'
 import { AddressInfo } from 'net'
 import { join } from 'path'
@@ -280,7 +282,7 @@ export default class KcpServer extends EventEmitter {
     try {
       const packetHead = await objToProtobuffer(head, PACKET_HEAD, true)
       const packetData = await objToProtobuffer(obj, getCmdIdByName(packetName) as number)
-      await this.send(client, packetName, packetHead as Buffer, packetData as Buffer, head.clientSequenceId)
+      await this.send(client, packetName, packetHead, packetData, head.clientSequenceId)
     } catch (err) {
       logger.error('Error sending packet:', err)
     }
@@ -293,10 +295,14 @@ export default class KcpServer extends EventEmitter {
   async getInitialKey(packet: Buffer): Promise<Buffer> {
     let key = Buffer.alloc(4096)
 
-    const binPath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
-    if (await fileExists(binPath)) {
-      const QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
-      key = ec2b(QueryCurrRegionHttpRsp.clientSecretKey)
+    if (config.autoPatch) {
+      const binPath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
+      if (await fileExists(binPath)) {
+        const curRegionRsp: QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+        key = getEc2bKey(Buffer.from(curRegionRsp.clientSecretKey))
+      }
+    } else {
+      key = await DispatchKey.getXorKey()
     }
 
     const expected = (packet.readUInt16BE(0) ^ 0x4567) === key.readUInt16BE(0)

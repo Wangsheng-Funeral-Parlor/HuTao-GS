@@ -23,8 +23,9 @@ class SetPlayerBirthdayPacket extends Packet implements PacketInterface {
   async request(context: PacketContext, data: SetPlayerBirthdayReq): Promise<void> {
     const { profile } = context.player
     const { birthday } = data
+    const { month, day } = birthday
 
-    profile.birthday = birthday
+    profile.birthday = { month, day }
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,

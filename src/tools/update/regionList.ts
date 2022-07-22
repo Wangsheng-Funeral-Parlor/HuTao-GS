@@ -11,7 +11,7 @@ import { cwd } from 'process'
 import * as protobuf from 'protobufjs'
 const { Resolver } = dns.promises
 
-const host = 'dispatchosglobal.yuanshen.com'
+const host = `dispatch${config.dispatchRegion.slice(0, 2).toLowerCase()}global.yuanshen.com` // change that later
 const protoPath = join(cwd(), `data/proto/QueryRegionListHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${config.version}/QueryRegionListHttpRsp.bin`)
 
@@ -19,7 +19,9 @@ const logger = new Logger('UPDATE')
 
 function query(ip: string) {
   return new Promise<void>((resolve, reject) => {
-    get(`https://${ip}/query_region_list?version=OSRELWin${config.version}&lang=3&platform=3&binary=1&time=543&channel_id=1&sub_channel_id=0`, {
+    const path = `/query_region_list?version=${config.dispatchRegion}Win${config.version}&lang=3&platform=3&binary=1&time=543&channel_id=1&sub_channel_id=0`
+    logger.debug('(QueryRegionList) Host:', host, 'Path:', path)
+    get(`https://${ip}${path}`, {
       headers: {
         'Host': host,
         'User-Agent': 'UnityPlayer/2017.4.30f1 (UnityWebRequest/1.0, libcurl/7.51.0-DEV)',

@@ -7,7 +7,7 @@ import { fileExists } from '@/utils/fileSystem'
 
 class WebstaticSeaHandler extends Handler {
   constructor() {
-    super(/^webstatic\-sea\./, /^\/.*$/)
+    super(/^webstatic.*?\./, /^\/.*$/)
   }
 
   async request(req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {

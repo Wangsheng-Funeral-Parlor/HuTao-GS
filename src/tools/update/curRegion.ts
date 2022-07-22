@@ -13,7 +13,12 @@ import { cwd } from 'process'
 import * as protobuf from 'protobufjs'
 const { Resolver } = dns.promises
 
-const host = 'osasiadispatch.yuanshen.com'
+const hostMap = {
+  'OSREL': 'osasiadispatch',
+  'CNCB': 'cnbeta01dispatch'
+}
+
+const host = `${hostMap[config.dispatchRegion]}.yuanshen.com`
 const protoPath = join(cwd(), `data/proto/QueryCurrRegionHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
 
@@ -41,7 +46,9 @@ function query(ip: string) {
   const keyId = dispatchKeyId ? `&key_id=${dispatchKeyId}` : ''
 
   return new Promise<void>((resolve, reject) => {
-    get(`https://${ip}/query_cur_region?version=OSRELWin${version}&lang=3&platform=3&binary=1&time=38&channel_id=1&sub_channel_id=0&account_type=1&dispatchSeed=${dispatchSeed}${keyId}`, {
+    const path = `/query_cur_region?version=${config.dispatchRegion}Win${version}&lang=3&platform=3&binary=1&time=38&channel_id=1&sub_channel_id=0&account_type=1&dispatchSeed=${dispatchSeed}${keyId}`
+    logger.debug('(QueryCurrRegion) Host:', host, 'Path:', path)
+    get(`https://${ip}${path}`, {
       headers: {
         'Host': host,
         'User-Agent': 'UnityPlayer/2017.4.30f1 (UnityWebRequest/1.0, libcurl/7.51.0-DEV)',

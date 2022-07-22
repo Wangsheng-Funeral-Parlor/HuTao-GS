@@ -1,4 +1,7 @@
 import { getJson } from '@/utils/json'
+import Logger from './logger'
+
+const logger = new Logger('CONFIG', 0xcacaff)
 
 interface Config {
   // server
@@ -10,8 +13,10 @@ interface Config {
   // dispatch
   dispatchHost: string | null
   dispatchSeed: string
+  dispatchRegion: string
   dispatchKeyId: number
   signingKeySize: number
+  autoPatch: boolean
 
   // port binding
   dnsPort: number
@@ -36,8 +41,10 @@ export const DEFAULT_CONFIG: Config = {
 
   dispatchHost: null,
   dispatchSeed: null,
+  dispatchRegion: 'OSREL',
   dispatchKeyId: 3,
   signingKeySize: 2048,
+  autoPatch: false,
 
   dnsPort: 53,
   httpPort: 80,
@@ -55,13 +62,26 @@ export const DEFAULT_CONFIG: Config = {
   hosts: null
 }
 
-export const SUPPORT_VERSIONS = [
-  '1.5.0',
-  '2.6.0',
-  '2.7.0',
-  '2.8.0'
+export const SUPPORT_REGIONS = [
+  'OSREL',
+  'CNCB'
 ]
 
-const config: Config = getJson('config.json', DEFAULT_CONFIG)
+export const SUPPORT_VERSIONS = [
+  '2.6.0',
+  '2.7.0',
+  '2.8.0',
+  '2.8.50',
+  '2.8.51'
+]
+
+const allConfigs = getJson('config.json', {})
+const curConfigName = allConfigs.current || 'default'
+const curConfig = allConfigs[curConfigName]
+
+if (curConfig == null) logger.error('Config not found:', curConfigName)
+else logger.info('Loaded config:', curConfigName)
+
+const config: Config = Object.assign({}, DEFAULT_CONFIG, curConfig || {})
 
 export default config

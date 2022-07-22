@@ -4,7 +4,7 @@ import { RetcodeEnum } from '@/types/enum/retcode'
 
 class ApiAccountHandler extends Handler {
   constructor() {
-    super(/^api\-account.*?\./, [
+    super(/.*?api\-account.*?\./, [
       '/account/risky/api/check'
     ])
   }

@@ -4,11 +4,11 @@ import { RetcodeEnum } from '@/types/enum/retcode'
 
 class SdkStaticHandler extends Handler {
   constructor() {
-    super(/sdk\-.*?static\./, [
+    super(/(sdk\-.*?static|api-beta-sdk)\./, [
       '/combo/box/api/config/sdk/combo',
       '/combo/box/api/config/sw/precache',
-      '/hk4e_global/mdk/shield/api/loadConfig',
-      '/hk4e_global/combo/granter/api/getConfig'
+      /\/hk4e_.*?\/mdk\/shield\/api\/loadConfig/,
+      /\/hk4e_.*?\/combo\/granter\/api\/getConfig/
     ])
   }
 

@@ -3,7 +3,7 @@ import { cwd } from 'process'
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import { dataToProtobuffer } from '#/utils/dataUtils'
 import { RetcodeEnum } from '@/types/enum/retcode'
-import { ResVersionConfig } from '@/types/dispatch/curRegion'
+import { QueryCurrRegionHttpRsp, ResVersionConfig } from '@/types/dispatch/curRegion'
 import config from '@/config'
 import { fileExists, readFile } from '@/utils/fileSystem'
 
@@ -135,10 +135,15 @@ class PlayerLoginPacket extends Packet implements PacketInterface {
   }
 
   async response(context: PacketContext): Promise<void> {
-    const binPath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
-    if (!await fileExists(binPath)) return
+    let curRegionData: QueryCurrRegionHttpRsp = { retcode: 0, regionInfo: {} }
 
-    const QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+    if (config.autoPatch) {
+      const binPath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
+      if (!await fileExists(binPath)) return
+
+      curRegionData = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+    }
+
     const {
       clientDataVersion,
       clientSilenceDataVersion,
@@ -147,7 +152,7 @@ class PlayerLoginPacket extends Packet implements PacketInterface {
       resVersionConfig,
       clientVersionSuffix,
       clientSilenceVersionSuffix
-    } = (QueryCurrRegionHttpRsp.regionInfo || {})
+    } = curRegionData.regionInfo
 
     const data: PlayerLoginRsp = {
       retcode: RetcodeEnum.RET_SUCC,

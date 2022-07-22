@@ -32,7 +32,7 @@ export function getDecryptVector(key: Buffer, crypt: Buffer, output: Buffer): vo
   }
 }
 
-export default function ec2b(buf: Buffer): Buffer {
+export function getEc2bKey(buf: Buffer): Buffer {
   const xorpad = Buffer.alloc(4096)
 
   if (!Buffer.isBuffer(buf) || buf.length < 8 || buf.readUint32LE() !== 0x62326345) return xorpad
@@ -51,4 +51,22 @@ export default function ec2b(buf: Buffer): Buffer {
   getDecryptVector(key, data, xorpad)
 
   return xorpad
+}
+
+export function genEc2b(keySize: number = 16, dataSize: number = 2048): Buffer {
+  const key = Buffer.alloc(keySize)
+  const data = Buffer.alloc(dataSize)
+
+  for (let i = 0; i < keySize; i++) key[i] = Math.floor(0x100 * Math.random())
+  for (let i = 0; i < dataSize; i++) data[i] = Math.floor(0x100 * Math.random())
+
+  const buf = Buffer.alloc(12 + keySize + dataSize)
+
+  buf.writeUInt32LE(0x62326345, 0)
+  buf.writeUInt32LE(keySize, 4)
+  key.copy(buf, 8)
+  buf.writeUint32LE(dataSize, 8 + keySize)
+  data.copy(buf, 12 + keySize)
+
+  return buf
 }

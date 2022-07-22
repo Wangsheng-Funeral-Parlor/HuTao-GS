@@ -63,7 +63,7 @@ export const getProtoType = async (proto: string, common: boolean = false): Prom
   return type
 }
 
-export const objToProtobuffer = async (obj: object, cmdId: number | string, common: boolean = false): Promise<Buffer | string> => {
+export const objToProtobuffer = async (obj: object, cmdId: number | string, common: boolean = false): Promise<Buffer> => {
   const protoName = getNameByCmdId(cmdId)
   try {
     const type = await getProtoType(protoName.toString(), common)

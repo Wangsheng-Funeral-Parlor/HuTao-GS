@@ -1,7 +1,6 @@
 import md5 from 'md5'
 import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { RetcodeEnum } from '@/types/enum/retcode'
 import priceTier from '../priceTier.json'
 import hash from '@/utils/hash'
 import { getJson } from '@/utils/json'
@@ -10,14 +9,14 @@ import config from '@/config'
 
 class Hk4eSdkHandler extends Handler {
   constructor() {
-    super(/^hk4e\-sdk.*?\./, [
-      '/hk4e_global/combo/granter/api/compareProtocolVersion',
-      '/hk4e_global/combo/granter/login/beforeVerify',
-      '/hk4e_global/combo/granter/login/v2/login',
-      '/hk4e_global/mdk/agreement/api/getAgreementInfos',
-      '/hk4e_global/mdk/shield/api/login',
-      '/hk4e_global/mdk/shield/api/verify',
-      '/hk4e_global/mdk/shopwindow/shopwindow/listPriceTier'
+    super(/^(hk4e-sdk|api-beta-sdk).*?\./, [
+      /\/hk4e_.*?\/combo\/granter\/api\/compareProtocolVersion/,
+      /\/hk4e_.*?\/combo\/granter\/login\/beforeVerify/,
+      /\/hk4e_.*?\/combo\/granter\/login\/v2\/login/,
+      /\/hk4e_.*?\/mdk\/agreement\/api\/getAgreementInfos/,
+      /\/hk4e_.*?\/mdk\/shield\/api\/login/,
+      /\/hk4e_.*?\/mdk\/shield\/api\/verify/,
+      /\/hk4e_.*?\/mdk\/shopwindow\/shopwindow\/listPriceTier/
     ])
   }
 
@@ -58,6 +57,7 @@ class Hk4eSdkHandler extends Handler {
         major = 11
         break
       case '2.8.0':
+      case '2.8.50':
         major = 13
         break
       default:
@@ -65,7 +65,7 @@ class Hk4eSdkHandler extends Handler {
     }
 
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         modified: true,
@@ -87,7 +87,7 @@ class Hk4eSdkHandler extends Handler {
 
   private async getAgreementInfos(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         marketing_agreements: []
@@ -97,7 +97,7 @@ class Hk4eSdkHandler extends Handler {
 
   private async beforeVerify(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         is_heartbeat_required: false,
@@ -115,7 +115,7 @@ class Hk4eSdkHandler extends Handler {
     const hash2 = md5(token + hash1)
 
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         combo_id: uid.slice(-8).padStart(8, '0'),
@@ -132,7 +132,12 @@ class Hk4eSdkHandler extends Handler {
     const { body } = req
     const { account, password, is_crypto } = body
 
-    const uid = hash(`HTGS:${account}:${password}:${Number(is_crypto)}`)
+    console.log(body)
+
+    const uid = hash(`HTGS:${account}:${password}:${Number(is_crypto)}`).slice(0, 9)
+    const tokenBuf = Buffer.alloc(3)
+    tokenBuf.writeUInt16LE(Math.floor(0x10000 * Math.random()))
+    tokenBuf.writeUInt8(Math.floor(0x100 * Math.random()))
 
     let name = 'New Player'
 
@@ -140,7 +145,7 @@ class Hk4eSdkHandler extends Handler {
     if (userData) name = userData.profileData.nickname
 
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         account: {
@@ -151,49 +156,7 @@ class Hk4eSdkHandler extends Handler {
           is_email_verify: '0',
           realname: '',
           identity_card: '',
-          token: '0',
-          safe_mobile: '',
-          facebook_name: '',
-          google_name: '',
-          twitter_name: '',
-          game_center_name: '',
-          apple_name: '',
-          sony_name: '',
-          tap_name: '',
-          country: 'HK',
-          reactivate_ticket: '',
-          area_code: '**'
-        },
-        device_grant_required: false,
-        safe_moblie_required: false,
-        realperson_required: false,
-        reactivate_required: false
-      }
-    })
-  }
-
-  private async tokenLogin(req: HttpRequest): Promise<HttpResponse> {
-    const { body } = req
-    const { uid, token } = body
-
-    let name = 'New Player'
-
-    const userData = this.loadUserData(uid)
-    if (userData) name = userData.profileData.nickname
-
-    return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
-      message: 'OK',
-      data: {
-        account: {
-          uid,
-          name: '',
-          email: name,
-          mobile: '',
-          is_email_verify: '0',
-          realname: '',
-          identity_card: '',
-          token: token,
+          token: tokenBuf.toString('base64'),
           safe_mobile: '',
           facebook_name: '',
           google_name: '',
@@ -210,6 +173,52 @@ class Hk4eSdkHandler extends Handler {
         },
         device_grant_required: false,
         safe_moblie_required: false,
+        reactivate_required: false,
+        realperson_required: false,
+        realname_operation: 'None'
+      }
+    })
+  }
+
+  private async tokenLogin(req: HttpRequest): Promise<HttpResponse> {
+    const { body } = req
+    const { uid, token } = body
+
+    let name = 'New Player'
+
+    const userData = this.loadUserData(uid)
+    if (userData) name = userData.profileData.nickname
+
+    return new HttpResponse({
+      retcode: 0,
+      message: 'OK',
+      data: {
+        account: {
+          uid,
+          name: '',
+          email: name,
+          mobile: '',
+          is_email_verify: '0',
+          realname: '',
+          identity_card: '',
+          token,
+          safe_mobile: '',
+          facebook_name: '',
+          google_name: '',
+          twitter_name: '',
+          game_center_name: '',
+          apple_name: '',
+          sony_name: '',
+          tap_name: '',
+          country: 'HK',
+          reactivate_ticket: '',
+          area_code: '**',
+          device_grant_ticket: '',
+          steam_name: ''
+        },
+        device_grant_required: false,
+        safe_moblie_required: false,
+        reactivate_required: false,
         realperson_required: false,
         realname_operation: 'None'
       }
@@ -218,7 +227,7 @@ class Hk4eSdkHandler extends Handler {
 
   private async listPriceTier(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: priceTier
     })

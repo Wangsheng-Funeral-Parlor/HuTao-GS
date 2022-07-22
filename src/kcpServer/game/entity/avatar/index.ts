@@ -182,11 +182,13 @@ export default class Avatar extends Entity {
   async changeCostume(costumeId: number): Promise<RetcodeEnum> {
     const { player, avatarId } = this
 
-    const costume = player.getCostume(avatarId, costumeId)
-    if (!costume) return RetcodeEnum.RET_NOT_HAS_COSTUME
+    if (costumeId) {
+      const costume = player.getCostume(avatarId, costumeId)
+      if (!costume) return RetcodeEnum.RET_NOT_HAS_COSTUME
+    }
 
     // Set costume id
-    this.costumeId = costume.Id
+    this.costumeId = costumeId
 
     const { context, currentScene } = player
 

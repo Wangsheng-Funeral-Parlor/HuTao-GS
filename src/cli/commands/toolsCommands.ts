@@ -1,3 +1,4 @@
+import { dumpEc2bKey } from '@/tools/ec2b'
 import keyGen from '@/tools/keyGen'
 import { decryptMetadata, encryptMetadata, patchMetadata } from '@/tools/metadata'
 import { update } from '@/tools/update'
@@ -13,6 +14,21 @@ const toolsCommands: CommandDefinition[] = [
     name: 'keygen',
     desc: 'Attempt to generate key from packet dumps',
     exec: async () => keyGen()
+  },
+  {
+    name: 'ec2b',
+    desc: 'Dump ec2b key',
+    args: [
+      { name: 'ver', type: 'str' },
+      { name: 'name', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print } = cli
+
+      const key = await dumpEc2bKey(args[0], args[1])
+      print(key.toString('hex'))
+    }
   },
   {
     name: 'metadec',

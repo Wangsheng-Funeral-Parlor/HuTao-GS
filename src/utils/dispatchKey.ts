@@ -1,10 +1,11 @@
 import config from '@/config'
 import { join } from 'path'
 import { cwd } from 'process'
-import { fileExists, readFile } from './fileSystem'
+import { fileExists, readFile, writeFile } from './fileSystem'
+import { genEc2b, getEc2bKey } from './mhyCrypto/ec2b'
 import OpenSSL from './openssl'
 
-const { dispatchKeyId, signingKeySize } = config
+const { version, dispatchKeyId, signingKeySize } = config
 
 interface Key {
   pem: string
@@ -62,5 +63,18 @@ export default class DispatchKey {
       encrypt: await DispatchKey.getEncryptKeyPair(keyId),
       signing: await DispatchKey.getSigningKeyPair(keyId)
     }
+  }
+
+  static async getEc2b(): Promise<Buffer> {
+    const binPath = join(cwd(), `data/bin/${version}`, 'ec2b.bin')
+
+    // Generate if missing
+    if (!await fileExists(binPath)) await writeFile(binPath, genEc2b())
+
+    return readFile(binPath)
+  }
+
+  static async getXorKey(): Promise<Buffer> {
+    return getEc2bKey(await this.getEc2b())
   }
 }
