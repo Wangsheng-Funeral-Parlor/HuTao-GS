@@ -1,5 +1,5 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { ClientState } from '@/types/enum/state'
 import DispatchKey from '@/utils/dispatchKey'
 import { rsaDecrypt, rsaEncrypt, rsaSign } from '@/utils/rsa'

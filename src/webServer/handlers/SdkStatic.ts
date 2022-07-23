@@ -1,6 +1,5 @@
 import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { RetcodeEnum } from '@/types/enum/retcode'
 
 class SdkStaticHandler extends Handler {
   constructor() {
@@ -30,7 +29,7 @@ class SdkStaticHandler extends Handler {
 
   private async sdkCombo(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         vals: {
@@ -44,7 +43,7 @@ class SdkStaticHandler extends Handler {
 
   private async swPrecache(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         vals: {
@@ -59,7 +58,7 @@ class SdkStaticHandler extends Handler {
     const { searchParams } = req
 
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         id: 6,
@@ -84,7 +83,7 @@ class SdkStaticHandler extends Handler {
 
   private async getConfig(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         protocol: true,

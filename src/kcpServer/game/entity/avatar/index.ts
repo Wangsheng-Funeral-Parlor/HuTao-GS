@@ -19,7 +19,7 @@ import AvatarChangeCostume from '#/packets/AvatarChangeCostume'
 import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import { EquipTypeEnum } from '@/types/enum/equip'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import AvatarUserData from '@/types/user/AvatarUserData'
 import { getTimeSeconds } from '@/utils/time'
 

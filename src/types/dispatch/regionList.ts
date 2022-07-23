@@ -1,4 +1,4 @@
-import { RetcodeEnum } from '../enum/retcode'
+import { RetcodeEnum } from '../enum/Retcode'
 
 export interface QueryRegionListHttpRsp {
   retcode: RetcodeEnum

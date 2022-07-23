@@ -1,6 +1,5 @@
-import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import GlobalState from '@/globalState'
 import { Announcement, AnnouncementType } from '@/types/announcement'
 import { getTimeSeconds, getTimestamp } from '@/utils/time'
 
@@ -17,10 +16,10 @@ class Hk4eApiHandler extends Handler {
   constructor() {
     super(/.*?hk4e\-api.*?\./, [
       '/common/apicdkey/api/exchangeCdkey',
-      '/common/hk4e_global/announcement/api/getAlertAnn',
-      '/common/hk4e_global/announcement/api/getAlertPic',
-      '/common/hk4e_global/announcement/api/getAnnContent',
-      '/common/hk4e_global/announcement/api/getAnnList'
+      /\/common\/hk4e_.*?\/announcement\/api\/getAlertAnn/,
+      /\/common\/hk4e_.*?\/announcement\/api\/getAlertPic/,
+      /\/common\/hk4e_.*?\/announcement\/api\/getAnnContent/,
+      /\/common\/hk4e_.*?\/announcement\/api\/getAnnList/
     ])
   }
 
@@ -102,7 +101,7 @@ class Hk4eApiHandler extends Handler {
 
   private async getAlertAnn(req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         alert: false,
@@ -115,7 +114,7 @@ class Hk4eApiHandler extends Handler {
 
   private async getAlertPic(req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         list: [],
@@ -128,7 +127,7 @@ class Hk4eApiHandler extends Handler {
     const { announcements } = req.webServer
 
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         list: announcements.map((a, i) => ({
@@ -150,7 +149,7 @@ class Hk4eApiHandler extends Handler {
     const { announcementTypes, announcements } = req.webServer
 
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         alert: false,

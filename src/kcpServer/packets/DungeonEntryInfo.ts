@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
 import DungeonEntry from '@/types/gameData/BinOutput/ScenePoint/Point/DungeonEntry'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { ClientState } from '@/types/enum/state'
 import { DungeonEntryInfo } from '@/types/game/dungeon'
 

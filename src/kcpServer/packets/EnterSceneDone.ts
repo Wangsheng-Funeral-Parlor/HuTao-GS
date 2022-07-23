@@ -1,5 +1,5 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { SceneEnterTypeEnum } from '@/types/enum/scene'
 import { ClientState } from '@/types/enum/state'
 import PlayerEyePointState from './PlayerEyePointState'

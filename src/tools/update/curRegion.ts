@@ -1,7 +1,7 @@
 import config from '@/config'
 import Logger from '@/logger'
 import { QueryCurrRegionHttpRsp } from '@/types/dispatch/curRegion'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists } from '@/utils/fileSystem'
 import { rsaDecrypt } from '@/utils/rsa'

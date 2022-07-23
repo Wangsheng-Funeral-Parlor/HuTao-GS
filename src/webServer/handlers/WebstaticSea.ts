@@ -1,9 +1,7 @@
-import fs from 'fs'
-const { readFile } = fs.promises
-import { join } from 'path'
-import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { fileExists } from '@/utils/fileSystem'
+import GlobalState from '@/globalState'
+import { fileExists, readFile } from '@/utils/fileSystem'
+import { join } from 'path'
 
 class WebstaticSeaHandler extends Handler {
   constructor() {

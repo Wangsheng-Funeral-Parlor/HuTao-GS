@@ -1,6 +1,5 @@
-import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import GlobalState from '@/globalState'
 
 class ApiAccountHandler extends Handler {
   constructor() {
@@ -11,7 +10,7 @@ class ApiAccountHandler extends Handler {
 
   async request(_req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
     return new HttpResponse({
-      retcode: RetcodeEnum.RET_SUCC,
+      retcode: 0,
       message: 'OK',
       data: {
         id: 'none',

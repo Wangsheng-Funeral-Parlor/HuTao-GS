@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Player from '$/player'
 import { ApplyEnterResultReasonEnum, MpSettingTypeEnum } from '@/types/enum/mp'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { OnlinePlayerInfo } from '@/types/game/playerInfo'
 import PlayerApplyEnterMpResult from './PlayerApplyEnterMpResult'
 import { PlayerPropEnum } from '@/types/enum/player'

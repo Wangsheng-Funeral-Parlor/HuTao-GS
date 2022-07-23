@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import PrivateChatChannel from '$/chat/privateChatChannel'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { ClientState } from '@/types/enum/state'
 import { ChatInfo } from '@/types/game/chat'
 

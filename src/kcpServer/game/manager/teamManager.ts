@@ -8,7 +8,7 @@ import { SceneTeamAvatar, TeamEntityInfo } from '@/types/game/team'
 import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
 import AvatarEquipChange from '#/packets/AvatarEquipChange'
 import { ProtEntityTypeEnum } from '@/types/enum/entity'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import TeamManagerUserData from '@/types/user/TeamManagerUserData'
 
 export default class TeamManager extends BaseClass {

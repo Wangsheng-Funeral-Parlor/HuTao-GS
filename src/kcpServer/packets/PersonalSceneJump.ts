@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
 import { VectorInterface } from '@/types/game/motion'
 import SceneData from '$/gameData/data/SceneData'

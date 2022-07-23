@@ -1,11 +1,11 @@
-import md5 from 'md5'
-import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import priceTier from '../priceTier.json'
+import config from '@/config'
+import GlobalState from '@/globalState'
+import UserData from '@/types/user'
 import hash from '@/utils/hash'
 import { getJson } from '@/utils/json'
-import UserData from '@/types/user'
-import config from '@/config'
+import md5 from 'md5'
+import priceTier from '../priceTier.json'
 
 class Hk4eSdkHandler extends Handler {
   constructor() {

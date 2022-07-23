@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Player from '$/player'
 import { ApplyEnterResultReasonEnum } from '@/types/enum/mp'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { ClientState } from '@/types/enum/state'
 
 export interface PlayerApplyEnterMpResultReq {

@@ -1,7 +1,7 @@
 import config from '@/config'
 import Logger from '@/logger'
 import { QueryRegionListHttpRsp } from '@/types/dispatch/regionList'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { fileExists } from '@/utils/fileSystem'
 import * as dns from 'dns'
 import { existsSync, writeFileSync } from 'fs'

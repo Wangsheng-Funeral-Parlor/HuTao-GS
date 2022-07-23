@@ -2,6 +2,7 @@ import BaseClass from '#/baseClass'
 import { Kcp } from '#/utils/kcp'
 import Player from '$/player'
 import Logger from '@/logger'
+import { ENetReasonEnum } from '@/types/enum/ENetReason'
 import { ClientState } from '@/types/enum/state'
 import { PacketHead, SocketContext } from '@/types/kcp'
 import MT19937 from '@/utils/mt19937'
@@ -64,7 +65,7 @@ export default class Client extends BaseClass {
   }
 
   // Destroy client
-  async destroy(reason: number = 5) {
+  async destroy(enetReason: ENetReasonEnum = ENetReasonEnum.ENET_SERVER_KICK) {
     const { server, player, conv, token, ctx } = this
     const { address, port } = ctx
 
@@ -75,7 +76,7 @@ export default class Client extends BaseClass {
 
     this.update()
 
-    const handshake = new Handshake(Handshake.MAGIC_DISCONNECT, conv, token, reason)
+    const handshake = new Handshake(Handshake.MAGIC_DISCONNECT, conv, token, enetReason)
     handshake.encode()
 
     server.socket.send(handshake.buffer, 0, handshake.buffer.length, port, address)

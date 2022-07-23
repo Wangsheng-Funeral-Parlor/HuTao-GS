@@ -21,6 +21,7 @@ import Player from '$/player'
 import World from '$/world'
 import config from '@/config'
 import Logger from '@/logger'
+import { ENetReasonEnum } from '@/types/enum/ENetReason'
 import { MpSettingTypeEnum } from '@/types/enum/mp'
 import { PlayerPropEnum } from '@/types/enum/player'
 import { ClientState } from '@/types/enum/state'
@@ -145,7 +146,9 @@ export default class Game {
     let player: Player = client.player
 
     // Logged in with another device
-    if (!player && !mpWorld && playerMap[auid]) await server.disconnect(playerMap[auid].client.id, 4)
+    if (!player && !mpWorld && playerMap[auid]) {
+      await server.disconnect(playerMap[auid].client.id, ENetReasonEnum.ENET_SERVER_RELOGIN)
+    }
 
     if (!player) {
       const userData = await this.loadUserData(auid)

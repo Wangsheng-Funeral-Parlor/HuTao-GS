@@ -1,11 +1,12 @@
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { dataToProtobuffer } from '#/utils/dataUtils'
+import config from '@/config'
+import { QueryCurrRegionHttpRsp, ResVersionConfig } from '@/types/dispatch/curRegion'
+import { ENetReasonEnum } from '@/types/enum/ENetReason'
+import { RetcodeEnum } from '@/types/enum/Retcode'
+import { fileExists, readFile } from '@/utils/fileSystem'
 import { join } from 'path'
 import { cwd } from 'process'
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { dataToProtobuffer } from '#/utils/dataUtils'
-import { RetcodeEnum } from '@/types/enum/retcode'
-import { QueryCurrRegionHttpRsp, ResVersionConfig } from '@/types/dispatch/curRegion'
-import config from '@/config'
-import { fileExists, readFile } from '@/utils/fileSystem'
 
 export interface AdjustTrackingInfo {
   idfa: string
@@ -131,7 +132,7 @@ class PlayerLoginPacket extends Packet implements PacketInterface {
   async request(context: PacketContext, _data: PlayerLoginReq): Promise<void> {
     const { server, game, client } = context
 
-    if (!await game.playerLogin(context)) server.disconnect(client.id)
+    if (!await game.playerLogin(context)) server.disconnect(client.id, ENetReasonEnum.ENET_LOGIN_UNFINISHED)
   }
 
   async response(context: PacketContext): Promise<void> {

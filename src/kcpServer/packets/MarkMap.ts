@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { MarkMapOperationEnum } from '@/types/enum/map'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
 import { MapMarkPoint } from '@/types/game/map'

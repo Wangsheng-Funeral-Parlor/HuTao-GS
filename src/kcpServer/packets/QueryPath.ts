@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import { QueryPathOptionTypeEnum, QueryPathStatusTypeEnum } from '@/types/enum/queryPath'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { VectorInterface } from '@/types/game/motion'
 
 export interface QueryPathReq {

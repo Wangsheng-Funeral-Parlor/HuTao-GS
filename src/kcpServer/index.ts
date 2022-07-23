@@ -7,6 +7,7 @@ import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import { cRGB } from '@/tty'
 import { QueryCurrRegionHttpRsp } from '@/types/dispatch/curRegion'
+import { ENetReasonEnum } from '@/types/enum/ENetReason'
 import { ClientState } from '@/types/enum/state'
 import { PacketHead, SocketContext } from '@/types/kcp'
 import { waitTick } from '@/utils/asyncWait'
@@ -102,7 +103,7 @@ export default class KcpServer extends EventEmitter {
     const { clients, loop } = this
 
     for (let clientID in clients) {
-      await this.disconnect(clientID, 0)
+      await this.disconnect(clientID, ENetReasonEnum.ENET_SERVER_SHUTDOWN)
     }
 
     clearInterval(loop)
@@ -115,25 +116,25 @@ export default class KcpServer extends EventEmitter {
     return this.socket.address()
   }
 
-  async disconnect(clientID: string, reason: number = 5) {
+  async disconnect(clientID: string, enetReason: ENetReasonEnum = ENetReasonEnum.ENET_SERVER_KICK) {
     const { clients } = this
     const client = clients[clientID]
 
     if (!client) return false
 
-    await client.destroy(reason)
+    await client.destroy(enetReason)
 
-    logger.info('Client disconnect:', clientID)
+    logger.info('Client disconnect:', clientID, 'Reason:', ENetReasonEnum[enetReason] || enetReason)
     delete clients[clientID]
 
     return true
   }
 
-  async disconnectUid(uid: number, reason: number = 5) {
+  async disconnectUid(uid: number, enetReason: ENetReasonEnum = ENetReasonEnum.ENET_SERVER_KICK) {
     const client = this.game.getPlayerByUid(uid)?.client
     if (!client) return false
 
-    return this.disconnect(client.id, reason)
+    return this.disconnect(client.id, enetReason)
   }
 
   update() {
@@ -163,20 +164,19 @@ export default class KcpServer extends EventEmitter {
 
     // Detect handshake
     if (data.length <= 20) {
-      const ret = handshake(data)
+      const hs = handshake(data)
 
-      switch (ret.Magic1) {
+      switch (hs.Magic1) {
         case 325: // 0x145 MAGIC_SEND_BACK_CONV
-          tokens.push(ret.Token)
+          tokens.push(hs.Token)
+          socket.send(hs.buffer, 0, hs.buffer.length, port, address)
           break
         case 404: // 0x194 MAGIC_DISCONNECT
-          this.disconnect(rinfo.address + '_' + rinfo.port + '_' + ret.Conv.toString(16), 0)
+          await this.disconnect(rinfo.address + '_' + rinfo.port + '_' + hs.Conv.toString(16), hs.Data)
           break
       }
 
-      socket.send(ret.buffer, 0, ret.buffer.length, port, address)
       Logger.measure('UDP Handshake', 'UDP')
-
       return
     }
 

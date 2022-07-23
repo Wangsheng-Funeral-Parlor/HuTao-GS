@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Entity from '$/entity'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { ClientState } from '@/types/enum/state'
 import { MotionInfoInterface } from '@/types/game/motion'
 

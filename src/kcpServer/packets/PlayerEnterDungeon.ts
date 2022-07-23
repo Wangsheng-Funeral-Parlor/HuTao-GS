@@ -2,7 +2,7 @@ import Packet, { PacketInterface, PacketContext } from '#/packet'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
 import { ClientState } from '@/types/enum/state'
 

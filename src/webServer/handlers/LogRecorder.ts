@@ -1,14 +1,12 @@
-import fs from 'fs'
-const { readFile, writeFile } = fs.promises
+import Handler, { HttpRequest, HttpResponse } from '#/handler'
+import GlobalState from '@/globalState'
+import Logger from '@/logger'
+import { RecorderLog, RecorderLogData } from '@/types/log/recorder'
+import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { join } from 'path'
 import { cwd } from 'process'
-import GlobalState from '@/globalState'
-import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { RecorderLog, RecorderLogData } from '@/types/log/recorder'
-import Logger from '@/logger'
-import { fileExists } from '@/utils/fileSystem'
 
-const logger = new Logger('ERRLOG', 0xffa0a0)
+const logger = new Logger('LOGREC', 0xa0ffa0)
 
 class LogRecorderHandler extends Handler {
   constructor() {
@@ -43,13 +41,13 @@ class LogRecorderHandler extends Handler {
       errorCategory
     } = <RecorderLogData>req.body
 
-    logger.warn(`[UID:${uid.toString() || '-'.repeat(6)}]`, logStr)
+    logger.debug(`[UID:${uid.toString() || '-'.repeat(6)}]`, logStr)
 
     if (globalState.get('SaveRecorder')) {
       const path = join(cwd(), 'data/log/client/recorder.json')
       const exists = await fileExists(path)
 
-      const log: RecorderLog = JSON.parse(exists ? await readFile(path, 'utf8') : null) || {}
+      const log: RecorderLog = JSON.parse(exists ? (await readFile(path)).toString() : null) || {}
       const { playerMap } = log[userName] = log[userName] || { name: userName, playerMap: {} }
       const { entryList } = playerMap[auid] = playerMap[auid] || { auid, uid, entryList: [] }
 

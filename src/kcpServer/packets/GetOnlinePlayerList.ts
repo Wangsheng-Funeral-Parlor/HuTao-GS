@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import { OnlinePlayerInfo } from '@/types/game/playerInfo'
-import { RetcodeEnum } from '@/types/enum/retcode'
+import { RetcodeEnum } from '@/types/enum/Retcode'
 
 export interface GetOnlinePlayerListReq { }
 
