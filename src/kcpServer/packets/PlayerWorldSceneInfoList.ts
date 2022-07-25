@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
-import { ClientState } from '@/types/enum/state'
-import { PlayerWorldSceneInfo } from '@/types/game/scene'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerWorldSceneInfo } from '@/types/proto'
 
 export interface PlayerWorldSceneInfoListNotify {
   infoList: PlayerWorldSceneInfo[]
@@ -13,7 +13,7 @@ class PlayerWorldSceneInfoListPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE | ClientState.PRE_SCENE_INIT_FINISH, false, 0xF0FF)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH, false, 0xF0FF)) return
 
     const { currentWorld } = context.player
 

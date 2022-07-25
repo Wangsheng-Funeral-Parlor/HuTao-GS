@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { AbilityInvokeEntry } from '@/types/game/invoke'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { AbilityInvokeEntry } from '@/types/proto'
 
 export interface ClientAbilityChangeNotify {
   entityId: number
@@ -11,7 +11,7 @@ export interface ClientAbilityChangeNotify {
 class ClientAbilityChangePacket extends Packet implements PacketInterface {
   constructor() {
     super('ClientAbilityChange', {
-      notifyWaitState: ClientState.ENTER_SCENE | ClientState.ENTER_SCENE_READY,
+      notifyWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
       notifyWaitStateMask: 0xF0FF,
       notifyWaitStatePass: true
     })

@@ -1,4 +1,4 @@
-import { EquipTypeEnum } from '../enum/equip'
+import { EquipTypeEnum } from '../enum'
 
 export default interface EquipUserData {
   guid: string

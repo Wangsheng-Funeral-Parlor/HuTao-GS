@@ -1,11 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { RetcodeEnum, SceneEnterTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EnterScenePeer from './EnterScenePeer'
-import { ClientState } from '@/types/enum/state'
 import PlayerPreEnterMp from './PlayerPreEnterMp'
-import { SceneEnterTypeEnum } from '@/types/enum/scene'
 import SceneEntityDisappear from './SceneEntityDisappear'
-import { VisionTypeEnum } from '@/types/enum/entity'
 
 export interface EnterSceneReadyReq {
   enterSceneToken: number
@@ -19,7 +17,7 @@ export interface EnterSceneReadyRsp {
 class EnterSceneReadyPacket extends Packet implements PacketInterface {
   constructor() {
     super('EnterSceneReady', {
-      reqWaitState: ClientState.ENTER_SCENE,
+      reqWaitState: ClientStateEnum.ENTER_SCENE,
       reqWaitStateMask: 0xF0FF
     })
   }
@@ -36,7 +34,7 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
     }
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_ENTER_SCENE_READY
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_ENTER_SCENE_READY
 
     if (!player.isHost() && player.sceneEnterType === SceneEnterTypeEnum.ENTER_OTHER) {
       const hostCtx = host.context
@@ -54,7 +52,7 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
     })
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.ENTER_SCENE_READY
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.ENTER_SCENE_READY
   }
 
   async response(context: PacketContext, data: EnterSceneReadyRsp): Promise<void> {

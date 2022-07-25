@@ -1,6 +1,6 @@
-import { ProtEntityTypeEnum } from '@/types/enum/entity'
 import Entity from '$/entity'
-import { SceneNpcInfo } from '@/types/game/npc'
+import { SceneNpcInfo } from '@/types/proto'
+import { ProtEntityTypeEnum } from '@/types/proto/enum'
 
 export default class Npc extends Entity {
   npcId: number

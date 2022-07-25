@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Entity from '$/entity'
-import { AuthorityChange } from '@/types/game/entity'
+import { AuthorityChange } from '@/types/proto'
 
 export interface EntityAuthorityChangeNotify {
   authorityChangeList: AuthorityChange[]

@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { AiSyncInfo } from '@/types/game/monster'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { AiSyncInfo } from '@/types/proto'
 
 export interface EntityAiSyncNotify {
   infoList: AiSyncInfo[]
@@ -10,7 +10,7 @@ export interface EntityAiSyncNotify {
 class EntityAiSyncPacket extends Packet implements PacketInterface {
   constructor() {
     super('EntityAiSync', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

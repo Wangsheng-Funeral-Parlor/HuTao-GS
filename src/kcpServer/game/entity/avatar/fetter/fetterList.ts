@@ -1,8 +1,8 @@
-import Fetter from './fetter'
-import Avatar from '..'
-import { AvatarFetterInfo } from '@/types/game/avatar'
 import AvatarData from '$/gameData/data/AvatarData'
+import { AvatarFetterInfo } from '@/types/proto'
 import FettersUserData from '@/types/user/FettersUserData'
+import Avatar from '..'
+import Fetter from './fetter'
 
 export default class FetterList {
   avatar: Avatar

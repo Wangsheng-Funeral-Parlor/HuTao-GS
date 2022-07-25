@@ -10,10 +10,11 @@ const stateFilePath = join(cwd(), 'data/state.json')
 const logger = new Logger('GSTATE', 0x5794ff)
 
 export interface GlobalStateData {
-  SaveLog: boolean,
-  SaveRecorder: boolean,
-  SaveReport: boolean,
-  ShowPacketId: boolean,
+  SaveLog: boolean
+  SaveRecorder: boolean
+  SaveReport: boolean
+  PacketDump: boolean
+  ShowPacketId: boolean
   UseProtoMatch: boolean
 }
 
@@ -28,6 +29,7 @@ export default class GlobalState extends EventEmitter {
       SaveLog: false,
       SaveRecorder: false,
       SaveReport: false,
+      PacketDump: false,
       ShowPacketId: false,
       UseProtoMatch: false
     }

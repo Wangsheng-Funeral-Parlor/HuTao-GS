@@ -1,14 +1,13 @@
 import BaseClass from '#/baseClass'
-import Entity from '$/entity'
-import Team from '$/player/team'
-import Player from '$/player'
-import Avatar from '$/entity/avatar'
-import Vector from '$/utils/vector'
-import { SceneTeamAvatar, TeamEntityInfo } from '@/types/game/team'
-import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
 import AvatarEquipChange from '#/packets/AvatarEquipChange'
-import { ProtEntityTypeEnum } from '@/types/enum/entity'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
+import Entity from '$/entity'
+import Avatar from '$/entity/avatar'
+import Player from '$/player'
+import Team from '$/player/team'
+import Vector from '$/utils/vector'
+import { SceneTeamAvatar, TeamEntityInfo } from '@/types/proto'
+import { ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import TeamManagerUserData from '@/types/user/TeamManagerUserData'
 
 export default class TeamManager extends BaseClass {
@@ -85,7 +84,7 @@ export default class TeamManager extends BaseClass {
     const { player } = this
     const { currentScene } = player
     const { entityManager } = currentScene
-    const { motionInfo } = avatar
+    const { motion } = avatar
 
     const oldAvatar = player.currentAvatar
 
@@ -94,8 +93,8 @@ export default class TeamManager extends BaseClass {
 
     player.currentAvatar = avatar
 
-    motionInfo.copy(oldAvatar.motionInfo)
-    if (pos != null) motionInfo.pos.copy(pos)
+    motion.copy(oldAvatar.motion)
+    if (pos != null) motion.pos.copy(pos)
 
     await entityManager.replace(oldAvatar, avatar, seqId)
 
@@ -129,7 +128,7 @@ export default class TeamManager extends BaseClass {
     await SceneTeamUpdate.sendNotify(context)
 
     if (!avatarList.includes(currentAvatar)) {
-      avatarList[0].motionInfo.copy(currentAvatar.motionInfo)
+      avatarList[0].motion.copy(currentAvatar.motion)
 
       player.currentAvatar = avatarList[0]
       currentScene.entityManager.replace(currentAvatar, avatarList[0], seqId)

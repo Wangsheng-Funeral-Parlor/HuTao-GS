@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface ChangeMpTeamAvatarReq {
   avatarGuidList: string[]
@@ -16,7 +16,7 @@ export interface ChangeMpTeamAvatarRsp {
 class ChangeMpTeamAvatarPacket extends Packet implements PacketInterface {
   constructor() {
     super('ChangeMpTeamAvatar', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStateMask: 0xF0FF
     })
   }
@@ -28,7 +28,7 @@ class ChangeMpTeamAvatarPacket extends Packet implements PacketInterface {
     const team = teamManager.getTeam()
 
     // Set client state
-    player.state = (state & 0xFF00) | ClientState.SETUP_TEAM
+    player.state = (state & 0xFF00) | ClientStateEnum.SETUP_TEAM
 
     try {
       const retcode = await team.setUpAvatarTeam({

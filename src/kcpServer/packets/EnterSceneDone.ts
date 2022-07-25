@@ -1,7 +1,6 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { RetcodeEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import PlayerEyePointState from './PlayerEyePointState'
 
 export interface EnterSceneDoneReq {
@@ -16,7 +15,7 @@ export interface EnterSceneDoneRsp {
 class EnterSceneDonePacket extends Packet implements PacketInterface {
   constructor() {
     super('EnterSceneDone', {
-      reqWaitState: ClientState.ENTER_SCENE | ClientState.SCENE_INIT_FINISH,
+      reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.SCENE_INIT_FINISH,
       reqWaitStateMask: 0xF0FF,
       reqWaitStatePass: true
     })
@@ -28,7 +27,7 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
     const { enterSceneToken } = currentScene
     const { enterSceneToken: token } = data
 
-    if (this.checkState(context, ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE, true, 0xF0FF, false)) {
+    if (this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE, true, 0xF0FF, false)) {
       await this.response(context, {
         retcode: RetcodeEnum.RET_SUCC,
         enterSceneToken
@@ -42,7 +41,7 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
     }
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_ENTER_SCENE_DONE
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_ENTER_SCENE_DONE
 
     // Emit player join event
     await currentScene.emit('PlayerJoin', player, sceneEnterType, seqId)
@@ -60,7 +59,7 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
     })
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.ENTER_SCENE_DONE
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.ENTER_SCENE_DONE
   }
 
   async response(context: PacketContext, data: EnterSceneDoneRsp): Promise<void> {

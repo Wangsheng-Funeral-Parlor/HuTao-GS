@@ -1,7 +1,7 @@
 import Avatar from '$/entity/avatar'
 import newGuid from '$/utils/newGuid'
-import { EquipTypeEnum } from '@/types/enum/equip'
-import { EquipInterface } from '@/types/game/item'
+import { EquipTypeEnum } from '@/types/enum'
+import { EquipInfo } from '@/types/proto'
 import EquipUserData from '@/types/user/EquipUserData'
 
 export default class Equip {
@@ -33,7 +33,7 @@ export default class Equip {
   }
 
   // placeholder
-  export(): EquipInterface { return null }
+  export(): EquipInfo { return null }
 
   exportUserData(): EquipUserData {
     const { guid, itemId, type, isLocked } = this

@@ -1,6 +1,6 @@
 import AvatarData from '$/gameData/data/AvatarData'
 import SkillData from '$/gameData/data/SkillData'
-import { PlayerPropEnum } from '@/types/enum/player'
+import { PlayerPropEnum } from '@/types/enum'
 import SkillDepotUserData from '@/types/user/SkillDepotUserData'
 import Avatar from '..'
 import InherentProudSkill from './inherentProudSkill'

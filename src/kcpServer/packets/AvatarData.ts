@@ -1,7 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { AvatarInfo } from '@/types/game/avatar'
-import { AvatarTeam } from '@/types/game/team'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { AvatarInfo, AvatarTeam } from '@/types/proto'
 
 export interface AvatarDataNotify {
   avatarList: AvatarInfo[]
@@ -19,7 +18,7 @@ class AvatarDataPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN)) return
 
     const { teamManager, avatarList, flycloakList, costumeList } = context.player
 

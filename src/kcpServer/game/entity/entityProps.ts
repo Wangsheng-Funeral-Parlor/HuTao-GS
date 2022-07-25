@@ -1,5 +1,5 @@
-import { PlayerPropEnum } from '@/types/enum/player'
-import { PropPair, PropValue } from '@/types/game/prop'
+import { PlayerPropEnum } from '@/types/enum'
+import { PropPair, PropValue } from '@/types/proto'
 import PropsUserData from '@/types/user/PropsUserData'
 import Entity from '.'
 

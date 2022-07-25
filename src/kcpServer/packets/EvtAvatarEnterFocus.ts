@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ForwardTypeEnum } from '@/types/enum/invoke'
-import { ClientState } from '@/types/enum/state'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { VectorInfo } from '@/types/proto'
+import { ForwardTypeEnum } from '@/types/proto/enum'
 
 export interface EvtAvatarEnterFocusNotify {
   forwardType: ForwardTypeEnum
@@ -12,7 +12,7 @@ export interface EvtAvatarEnterFocusNotify {
   useGyro: boolean
   canMove: boolean
   showCrossHair: boolean
-  focusForward: VectorInterface
+  focusForward: VectorInfo
   enterNormalFocusShoot: boolean
   enterHoldingFocusShoot: boolean
   disableAnim: boolean
@@ -21,7 +21,7 @@ export interface EvtAvatarEnterFocusNotify {
 class EvtAvatarEnterFocusPacket extends Packet implements PacketInterface {
   constructor() {
     super('EvtAvatarEnterFocus', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

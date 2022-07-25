@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { GachaInfo } from '@/types/enum/gacha'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { GachaInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetGachaInfoReq { }
 
@@ -14,7 +14,7 @@ export interface GetGachaInfoRsp {
 class GetGachaInfoPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetGachaInfo', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

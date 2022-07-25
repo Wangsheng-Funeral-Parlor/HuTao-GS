@@ -1,8 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Avatar from '$/entity/avatar'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { SceneEntityInfo } from '@/types/game/entity'
+import { ClientStateEnum } from '@/types/enum'
+import { SceneEntityInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface AvatarChangeCostumeReq {
   avatarGuid: string
@@ -22,7 +22,7 @@ export interface AvatarChangeCostumeNotify {
 class AvatarChangeCostumePacket extends Packet implements PacketInterface {
   constructor() {
     super('AvatarChangeCostume', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }

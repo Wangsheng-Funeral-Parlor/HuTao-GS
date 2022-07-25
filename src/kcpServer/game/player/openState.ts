@@ -1,5 +1,5 @@
 import OpenStateChange from '#/packets/OpenStateChange'
-import { OpenStateEnum } from '@/types/enum/openState'
+import { OpenStateEnum } from '@/types/proto/enum'
 import PropsUserData from '@/types/user/PropsUserData'
 import Player from '.'
 

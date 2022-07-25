@@ -1,0 +1,5 @@
+export enum MpSettingTypeEnum {
+  MP_SETTING_NO_ENTER = 0,
+  MP_SETTING_ENTER_FREELY = 1,
+  MP_SETTING_ENTER_AFTER_APPLY = 2
+}

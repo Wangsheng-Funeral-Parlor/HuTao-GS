@@ -1,27 +1,23 @@
+import AvatarChangeCostume from '#/packets/AvatarChangeCostume'
+import AvatarEquipChange, { AvatarEquipChangeNotify } from '#/packets/AvatarEquipChange'
+import AvatarFlycloakChange from '#/packets/AvatarFlycloakChange'
+import AvatarLifeStateChange from '#/packets/AvatarLifeStateChange'
 import Entity from '$/entity'
 import Equip from '$/equip'
-import Player from '$/player'
-import FetterList from './fetter/fetterList'
-import SkillDepot from './skill/skillDepot'
-import ExcelInfo from './excelInfo'
-import newGuid from '$/utils/newGuid'
-import Weapon from '$/equip/weapon'
 import Reliquary from '$/equip/reliquary'
-import { AvatarTypeEnum } from '@/types/enum/avatar'
-import { ProtEntityTypeEnum } from '@/types/enum/entity'
-import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo } from '@/types/game/avatar'
-import { SceneTeamAvatar } from '@/types/game/team'
-import AvatarFlycloakChange from '#/packets/AvatarFlycloakChange'
-import { PlayerPropEnum } from '@/types/enum/player'
-import AvatarLifeStateChange from '#/packets/AvatarLifeStateChange'
-import AvatarEquipChange, { AvatarEquipChangeNotify } from '#/packets/AvatarEquipChange'
-import AvatarChangeCostume from '#/packets/AvatarChangeCostume'
+import Weapon from '$/equip/weapon'
 import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
-import { EquipTypeEnum } from '@/types/enum/equip'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import Player from '$/player'
+import newGuid from '$/utils/newGuid'
+import { EquipTypeEnum, PlayerPropEnum } from '@/types/enum'
+import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo, SceneTeamAvatar } from '@/types/proto'
+import { AvatarTypeEnum, ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import AvatarUserData from '@/types/user/AvatarUserData'
 import { getTimeSeconds } from '@/utils/time'
+import ExcelInfo from './excelInfo'
+import FetterList from './fetter/fetterList'
+import SkillDepot from './skill/skillDepot'
 
 export default class Avatar extends Entity {
   player: Player
@@ -64,7 +60,7 @@ export default class Avatar extends Entity {
   }
 
   async init(userData: AvatarUserData) {
-    const { player, avatarId, skillDepot, fetterList, excelInfo, motionInfo } = this
+    const { player, avatarId, skillDepot, fetterList, excelInfo, motion } = this
     const { inventory } = player
     const {
       id,
@@ -85,7 +81,7 @@ export default class Avatar extends Entity {
     await fetterList.init(fettersData)
     await excelInfo.init()
 
-    motionInfo.standby()
+    motion.standby()
 
     const equipGuids = equipGuidList || []
     if (weaponGuid) equipGuids.push(weaponGuid) // compatibility
@@ -106,7 +102,7 @@ export default class Avatar extends Entity {
   }
 
   async initNew(avatarType: AvatarTypeEnum = AvatarTypeEnum.FORMAL, notify: boolean = true): Promise<void> {
-    const { player, avatarId, skillDepot, fetterList, excelInfo, motionInfo } = this
+    const { player, avatarId, skillDepot, fetterList, excelInfo, motion } = this
 
     await this.loadAvatarData()
 
@@ -114,7 +110,7 @@ export default class Avatar extends Entity {
     await fetterList.initNew()
     await excelInfo.init()
 
-    motionInfo.standby()
+    motion.standby()
 
     const weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon)
     await weapon.initNew()

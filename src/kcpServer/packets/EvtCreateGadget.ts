@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ForwardTypeEnum } from '@/types/enum/invoke'
-import { ClientState } from '@/types/enum/state'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { VectorInfo } from '@/types/proto'
+import { ForwardTypeEnum } from '@/types/proto/enum'
 
 interface EvtCreateGadgetNotify {
   forwardType: ForwardTypeEnum
@@ -9,8 +9,8 @@ interface EvtCreateGadgetNotify {
   configId: number
   campId: number
   campType: number
-  initPos: VectorInterface
-  initEulerAngles: VectorInterface
+  initPos: VectorInfo
+  initEulerAngles: VectorInfo
   guid: number
   ownerEntityId: number
   targetEntityId: number
@@ -24,7 +24,7 @@ interface EvtCreateGadgetNotify {
 class EvtCreateGadgetPacket extends Packet implements PacketInterface {
   constructor() {
     super('EvtCreateGadget', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

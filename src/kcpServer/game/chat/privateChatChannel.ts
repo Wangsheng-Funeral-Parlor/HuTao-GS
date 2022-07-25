@@ -1,7 +1,7 @@
 import PrivateChat, { PrivateChatReq } from '#/packets/PrivateChat'
 import { ChatManager } from '$/manager/chatManager'
 import Player from '$/player'
-import { ChatInfo } from '@/types/game/chat'
+import { ChatInfo } from '@/types/proto'
 import { getTimeSeconds } from '@/utils/time'
 import ChatChannel from './chatChannel'
 import CommandHandler from './commandHandler'

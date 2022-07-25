@@ -1,4 +1,4 @@
-import { AbilityAppliedAbility, AbilityEmbryo } from '@/types/game/ability'
+import { AbilityAppliedAbility, AbilityEmbryo } from '@/types/proto'
 import AbilityList from './abilityList'
 
 function abilityHash(str: string) {

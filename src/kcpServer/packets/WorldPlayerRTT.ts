@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { PlayerRTTInfo } from '@/types/game/world'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerRTTInfo } from '@/types/proto'
 
 export interface WorldPlayerRTTNotify {
   playerRttList: PlayerRTTInfo[]
@@ -12,7 +12,7 @@ class WorldPlayerRTTPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, data: WorldPlayerRTTNotify): Promise<void> {
-    if (!this.checkState(context, ClientState.IN_GAME, true)) return
+    if (!this.checkState(context, ClientStateEnum.IN_GAME, true)) return
 
     await super.sendNotify(context, data)
   }

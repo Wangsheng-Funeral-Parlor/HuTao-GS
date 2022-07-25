@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { AddWindBulletNotify, AreaNotify, RefreshNotify } from '@/types/game/windSeed'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { AddWindBulletNotify, AreaNotify, RefreshNotify } from '@/types/proto'
 
 export interface WindSeedClientNotify {
   refreshNotify?: RefreshNotify

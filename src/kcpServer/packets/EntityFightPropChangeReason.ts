@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, FightPropEnum, PropChangeReasonEnum } from '@/types/enum/fightProp'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum, FightPropEnum } from '@/types/enum'
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PropChangeReasonEnum } from '@/types/proto/enum'
 
 export interface EntityFightPropChangeReasonNotify {
   entityId: number
@@ -18,7 +18,7 @@ class EntityFightPropChangeReasonPacket extends Packet implements PacketInterfac
   }
 
   async sendNotify(context: PacketContext, data: EntityFightPropChangeReasonNotify): Promise<void> {
-    await this.waitState(context, ClientState.IN_GAME, true)
+    await this.waitState(context, ClientStateEnum.IN_GAME, true)
 
     await super.sendNotify(context, data)
   }

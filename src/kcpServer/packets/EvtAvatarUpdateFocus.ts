@@ -1,18 +1,18 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ForwardTypeEnum } from '@/types/enum/invoke'
-import { ClientState } from '@/types/enum/state'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { VectorInfo } from '@/types/proto'
+import { ForwardTypeEnum } from '@/types/proto/enum'
 
 export interface EvtAvatarUpdateFocusNotify {
   forwardType: ForwardTypeEnum
   entityId: number
-  focusForward: VectorInterface
+  focusForward: VectorInfo
 }
 
 class EvtAvatarUpdateFocusPacket extends Packet implements PacketInterface {
   constructor() {
     super('EvtAvatarUpdateFocus', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

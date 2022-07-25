@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import { EntityFightPropConfig } from '@/types/game/entity'
+import { EntityFightPropConfig } from '@/types/game'
 import MonsterDataGroup, { MonsterAffixData, MonsterData, MonsterDescribeData, MonsterSpecialNameData } from '@/types/gameData/MonsterData'
 
 class MonsterDataLoader extends Loader {

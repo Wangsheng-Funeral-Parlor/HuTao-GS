@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Entity from '$/entity'
-import { AbilityControlBlock } from '@/types/game/ability'
+import { AbilityControlBlock } from '@/types/proto'
 
 export interface AbilityChangeNotify {
   entityId: number

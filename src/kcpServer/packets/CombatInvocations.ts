@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { CombatInvokeEntry } from '@/types/game/invoke'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { CombatInvokeEntry } from '@/types/proto'
 
 export interface CombatInvocationsNotify {
   invokeList: CombatInvokeEntry[]
@@ -9,7 +9,7 @@ export interface CombatInvocationsNotify {
 class CombatInvocationsPacket extends Packet implements PacketInterface {
   constructor() {
     super('CombatInvocations', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

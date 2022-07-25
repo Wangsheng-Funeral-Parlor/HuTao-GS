@@ -9,9 +9,8 @@ import Player from '$/player'
 import Scene from '$/scene'
 import Vector from '$/utils/vector'
 import Logger from '@/logger'
-import { ProtEntityTypeEnum, VisionTypeEnum } from '@/types/enum/entity'
-import { SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { ProtEntityTypeEnum, SceneEnterTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 
 const logger = new Logger('ENTITY', 0x00a0ff)
 
@@ -99,7 +98,7 @@ export default class EntityManager extends BaseClass {
 
     return (
       entity.isOnScene &&
-      (state & 0xF0FF) >= (ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE) &&
+      (state & 0xF0FF) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE) &&
       entity.distanceTo2D(currentAvatar) <= viewDistance &&
       scene === currentScene &&
       (loaded || this.isGridAvailable(player, entity))
@@ -118,9 +117,9 @@ export default class EntityManager extends BaseClass {
 
   private addEntityToMap(entity: Entity) {
     const { entityGridMap, viewDistance } = this
-    const { entityId, entityType, motionInfo } = entity
-    const { grid } = motionInfo.pos
-    const { hash, X, Y, Z } = grid
+    const { entityId, entityType, motion } = entity
+    const { grid } = motion.pos
+    const { hash, x: X, y: Y, z: Z } = grid
 
     const { nearbyHash, entityTypeMap } = (entityGridMap[hash] = entityGridMap[hash] || {
       nearbyHash: [],
@@ -291,15 +290,15 @@ export default class EntityManager extends BaseClass {
 
     const { scene } = this
     const { playerList } = scene
-    const { entityId, motionInfo } = entity
+    const { entityId, motion } = entity
 
     this.addEntityToMap(entity)
 
     // Set entity state
     entity.isOnScene = true
 
-    motionInfo.sceneTime = null
-    motionInfo.reliableSeq = null
+    motion.sceneTime = null
+    motion.reliableSeq = null
 
     if (batch) logger.verbose('Add:', entityId)
     else logger.debug('Add:', entityId)
@@ -499,7 +498,7 @@ export default class EntityManager extends BaseClass {
     await this.add(currentAvatar, visionType, undefined, seqId)
 
     // Clear avatar motion params
-    currentAvatar.motionInfo.params = []
+    currentAvatar.motion.params = []
 
     const entityList = this.getNearbyEntityList(currentAvatar)
     for (let entity of entityList) this.playerLoadEntity(player, entity, visionType)

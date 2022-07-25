@@ -1,9 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Avatar from '$/entity/avatar'
-import { LifeStateEnum } from '@/types/enum/entity'
-import { PlayerDieTypeEnum } from '@/types/enum/player'
-import { ClientState } from '@/types/enum/state'
-import { ServerBuff } from '@/types/game/avatar'
+import { ClientStateEnum } from '@/types/enum'
+import { ServerBuff } from '@/types/proto'
+import { LifeStateEnum, PlayerDieTypeEnum } from '@/types/proto/enum'
 
 export interface AvatarLifeStateChangeNotify {
   avatarGuid: string
@@ -21,7 +20,7 @@ class AvatarLifeStateChangePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, avatar: Avatar): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN, true)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN, true)) return
 
     const { guid, lifeState, dieType, attackerId } = avatar
 

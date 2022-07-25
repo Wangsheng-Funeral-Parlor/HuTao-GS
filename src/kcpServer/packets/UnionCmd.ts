@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Logger from '@/logger'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 import { getNameByCmdId } from '#/cmdIds'
 import { waitTick } from '@/utils/asyncWait'
 
@@ -18,7 +18,7 @@ export interface UnionCmdNotify {
 class UnionCmdPacket extends Packet implements PacketInterface {
   constructor() {
     super('UnionCmd', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

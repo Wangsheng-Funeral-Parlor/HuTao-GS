@@ -1,7 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientReconnectReasonEnum, QuitReasonEnum } from '@/types/enum/mp'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ClientReconnectReasonEnum, QuitReasonEnum, RetcodeEnum } from '@/types/proto/enum'
 
 export interface BackMyWorldReq { }
 
@@ -12,7 +11,7 @@ export interface BackMyWorldRsp {
 class BackMyWorldPacket extends Packet implements PacketInterface {
   constructor() {
     super('BackMyWorld', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

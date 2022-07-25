@@ -1,10 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
-import { ClientState } from '@/types/enum/state'
+import Vector from '$/utils/vector'
+import { ClientStateEnum } from '@/types/enum'
 import SceneTransPoint from '@/types/gameData/BinOutput/ScenePoint/Point/SceneTransPoint'
+import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface SceneTransToPointReq {
   sceneId: number
@@ -20,7 +19,7 @@ export interface SceneTransToPointRsp {
 class SceneTransToPointPacket extends Packet implements PacketInterface {
   constructor() {
     super('SceneTransToPoint', {
-      reqWaitState: ClientState.IN_GAME | ClientState.SCENE_WORLD,
+      reqWaitState: ClientStateEnum.IN_GAME | ClientStateEnum.SCENE_WORLD,
       reqWaitStateMask: 0xFF00
     })
   }
@@ -47,10 +46,10 @@ class SceneTransToPointPacket extends Packet implements PacketInterface {
 
     let enterType = SceneEnterTypeEnum.ENTER_JUMP
     if (currentScene?.id === sceneId) {
-      currentAvatar.motionInfo.standby()
+      currentAvatar.motion.standby()
 
       if (Type === 'PORTAL') {
-        currentAvatar.motionInfo.params = [new Vector(), new Vector()]
+        currentAvatar.motion.params = [new Vector(), new Vector()]
         enterType = SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL
       } else {
         enterType = SceneEnterTypeEnum.ENTER_GOTO

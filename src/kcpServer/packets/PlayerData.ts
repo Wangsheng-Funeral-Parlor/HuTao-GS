@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { PropValue } from '@/types/game/prop'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { PropValue } from '@/types/proto'
 
 export interface PlayerDataNotify {
   nickName: string
@@ -16,7 +16,7 @@ class PlayerDataPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN)) return
 
     const { profile, props } = context.player
     const { nickname } = profile

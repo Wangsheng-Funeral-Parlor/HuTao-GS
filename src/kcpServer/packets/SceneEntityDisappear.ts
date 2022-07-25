@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { VisionTypeEnum } from '@/types/enum/entity'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { VisionTypeEnum } from '@/types/proto/enum'
 
 export interface SceneEntityDisappearNotify {
   entityList: number[]
@@ -13,7 +13,7 @@ class SceneEntityDisappearPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, entityIdList: number[], disappearType: VisionTypeEnum): Promise<void> {
-    await this.waitState(context, ClientState.POST_LOGIN, true)
+    await this.waitState(context, ClientStateEnum.POST_LOGIN, true)
 
     const notifyData: SceneEntityDisappearNotify = {
       entityList: entityIdList.filter((id, i, list) => list.indexOf(id) === i),

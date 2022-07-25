@@ -6,8 +6,8 @@ import SceneData from '$/gameData/data/SceneData'
 import WorldData from '$/gameData/data/WorldData'
 import Vector from '$/utils/vector'
 import Logger from '@/logger'
-import { VisionTypeEnum } from '@/types/enum/entity'
 import { SceneGadgetScriptConfig, SceneMonsterScriptConfig, SceneNpcScriptConfig, SceneSuiteScriptConfig } from '@/types/gameData/Script/SceneScriptConfig'
+import { VisionTypeEnum } from '@/types/proto/enum'
 import { WaitOnBlock } from '@/utils/asyncWait'
 import SceneBlock from './sceneBlock'
 
@@ -73,8 +73,8 @@ export default class SceneGroup {
       entity.poseId = PoseId || 0
       entity.isElite = !!IsElite
 
-      const { motionInfo, bornPos } = entity
-      const { pos, rot } = motionInfo
+      const { motion, bornPos } = entity
+      const { pos, rot } = motion
 
       pos.setData(Pos)
       rot.setData(Rot)
@@ -106,8 +106,8 @@ export default class SceneGroup {
         .filter(e => e.suite?.Npcs?.includes(ConfigId))
         .map(e => e.index + 1)
 
-      const { motionInfo, bornPos } = entity
-      const { pos, rot } = motionInfo
+      const { motion, bornPos } = entity
+      const { pos, rot } = motion
 
       pos.setData(Pos)
       rot.setData(Rot)
@@ -136,8 +136,8 @@ export default class SceneGroup {
       entity.blockId = blockId
       entity.interactId = InteractId || null
 
-      const { motionInfo, bornPos } = entity
-      const { pos, rot } = motionInfo
+      const { motion, bornPos } = entity
+      const { pos, rot } = motion
 
       pos.setData(Pos)
       rot.setData(Rot)

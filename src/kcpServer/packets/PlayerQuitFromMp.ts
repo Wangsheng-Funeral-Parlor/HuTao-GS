@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { QuitReasonEnum } from '@/types/enum/mp'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { QuitReasonEnum } from '@/types/proto/enum'
 
 export interface PlayerQuitFromMpNotify {
   reason: QuitReasonEnum
@@ -12,7 +12,7 @@ class PlayerQuitFromMpPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, reason: QuitReasonEnum): Promise<void> {
-    if (!this.checkState(context, ClientState.IN_GAME, true)) return
+    if (!this.checkState(context, ClientStateEnum.IN_GAME, true)) return
 
     const notifyData: PlayerQuitFromMpNotify = {
       reason

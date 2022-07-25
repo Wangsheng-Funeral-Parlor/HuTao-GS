@@ -1,8 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import PrivateChatChannel from '$/chat/privateChatChannel'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { ChatInfo } from '@/types/game/chat'
+import { ClientStateEnum } from '@/types/enum'
+import { ChatInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface PrivateChatReq {
   text?: string
@@ -23,7 +23,7 @@ export interface PrivateChatNotify {
 class PrivateChatPacket extends Packet implements PacketInterface {
   constructor() {
     super('PrivateChat', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

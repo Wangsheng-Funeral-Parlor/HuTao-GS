@@ -1,6 +1,6 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
 import { rsaDecrypt, rsaEncrypt, rsaSign } from '@/utils/rsa'
 
@@ -66,7 +66,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
     const { game, client } = context
     const { accountUid, accountToken, accountType, platformType, channelId, clientSeed, keyId } = data
 
-    const uid = await game.getUid(accountUid)
+    const { uid, userData } = await game.getPlayerInfo(accountUid)
     const seed = (
       BigInt(Math.floor(0x10000 * Math.random())) << 48n |
       BigInt(Math.floor(0x10000 * Math.random())) << 32n |
@@ -80,7 +80,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
       token: accountToken,
       accountType: accountType,
       accountUid: accountUid,
-      isProficientPlayer: true,
+      isProficientPlayer: !!userData,
       securityCmdBuffer: 'b39ETyh1gfpSg/6AVwTnilJQDLi8whrmKeORAAeLACQ=',
       platformType: platformType,
       channelId: channelId,
@@ -112,7 +112,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
     client.setUid(accountUid, uid)
 
     // Set client state
-    client.state = ClientState.EXCHANGE_TOKEN
+    client.state = ClientStateEnum.EXCHANGE_TOKEN
   }
 
   async response(context: PacketContext, data: GetPlayerTokenRsp) {

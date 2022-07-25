@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ObstacleInfo } from '@/types/game/obstacle'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ObstacleInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface PathfindingEnterSceneReq {
   sceneId?: number

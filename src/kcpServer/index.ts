@@ -6,13 +6,13 @@ import config from '@/config'
 import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import { cRGB } from '@/tty'
-import { QueryCurrRegionHttpRsp } from '@/types/dispatch/curRegion'
-import { ENetReasonEnum } from '@/types/enum/ENetReason'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 import { PacketHead, SocketContext } from '@/types/kcp'
+import { QueryCurrRegionHttpRsp } from '@/types/proto'
+import { ENetReasonEnum } from '@/types/proto/enum'
 import { waitTick } from '@/utils/asyncWait'
 import DispatchKey from '@/utils/dispatchKey'
-import { fileExists, readFile } from '@/utils/fileSystem'
+import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
 import * as dgram from 'dgram'
 import { AddressInfo } from 'net'
@@ -23,6 +23,13 @@ import { getCmdIdByName, getNameByCmdId, PACKET_HEAD } from './cmdIds'
 import Game from './game'
 import { PacketContext } from './packet'
 import uidPrefix from './utils/uidPrefix'
+
+const {
+  version,
+  packetsToDump,
+  autoPatch,
+  kcpPort
+} = config
 
 export const verbosePackets = [
   'AbilityInvocationsNotify',
@@ -91,7 +98,7 @@ export default class KcpServer extends EventEmitter {
   }
 
   start(): void {
-    this.socket.bind(config.kcpPort, () => {
+    this.socket.bind(kcpPort, () => {
       logger.debug(`Listening on port ${cRGB(0xffffff, this.address().port.toString())}`)
       this.emit('listening')
     })
@@ -153,6 +160,16 @@ export default class KcpServer extends EventEmitter {
     Logger.measure('Game tick', 'Tick')
   }
 
+  private async dump(name: string, data: Buffer) {
+    if (!this.globalState.get('PacketDump')) return
+
+    try {
+      const dumpPath = join(cwd(), 'data/log/dump', `${name}.bin`)
+      if (data.length <= 0 || (await fileExists(dumpPath) && (await readFile(dumpPath)).length >= data.length)) return
+      await writeFile(dumpPath, data)
+    } catch (err) { }
+  }
+
   private async handleMessage(data: Buffer, rinfo: dgram.RemoteInfo): Promise<void> {
     Logger.mark('UDP')
 
@@ -200,7 +217,7 @@ export default class KcpServer extends EventEmitter {
       client = clients[clientID] = new Client(this, clientID, conv, token, ctx)
 
       // Set client state
-      client.state = ClientState.CONNECTION
+      client.state = ClientStateEnum.CONNECTION
     }
 
     client.inputKcp(data)
@@ -215,14 +232,15 @@ export default class KcpServer extends EventEmitter {
     if (!packet) return false
 
     // obtain initial key if needed
-    if (!client.key) client.key = await this.getInitialKey(packet)
+    if (!client.key) client.key = await this.getDispatchKey(packet)
 
     // decrypt packet
     xorData(packet, client.key)
 
     // check if the recived data is a packet
     if (!this.isPacket(packet)) {
-      logger.warn('Invalid packet:', packet)
+      logger.warn('Invalid packet received, xor decrypt failed?')
+      await this.dump(`raw-${client.id}`, packet)
       return true
     }
 
@@ -252,7 +270,9 @@ export default class KcpServer extends EventEmitter {
     if (verbosePackets.includes(packetName)) logger.verbose(...log)
     else logger.debug(...log)
 
-    this.packetHandler.handle(packetID, packetName, data, context)
+    await this.packetHandler.handle(packetID, packetName, data, context)
+
+    if (packetsToDump.includes(packetName)) await this.dump(`recv-${packetName}-S${seqId || 0}-T${Date.now()}`, data)
   }
 
   async send(client: Client, packetName: string, packetHead: Buffer, packetData?: Buffer, seqId?: number): Promise<void> {
@@ -276,6 +296,8 @@ export default class KcpServer extends EventEmitter {
     else logger.debug(...log)
 
     client.sendKcp(packet)
+
+    if (packetsToDump.includes(packetName)) await this.dump(`send-${packetName}-S${seqId || 0}-T${Date.now()}`, packetData)
   }
 
   async sendProtobuf(client: Client, packetName: string, head: PacketHead, obj: object) {
@@ -292,11 +314,11 @@ export default class KcpServer extends EventEmitter {
     return packet.length > 5 && packet.readInt16BE(0) === 0x4567 && packet.readUInt16BE(packet.byteLength - 2) === 0x89AB
   }
 
-  async getInitialKey(packet: Buffer): Promise<Buffer> {
+  async getDispatchKey(packet: Buffer): Promise<Buffer> {
     let key = Buffer.alloc(4096)
 
-    if (config.autoPatch) {
-      const binPath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
+    if (autoPatch) {
+      const binPath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
       if (await fileExists(binPath)) {
         const curRegionRsp: QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
         key = getEc2bKey(Buffer.from(curRegionRsp.clientSecretKey))

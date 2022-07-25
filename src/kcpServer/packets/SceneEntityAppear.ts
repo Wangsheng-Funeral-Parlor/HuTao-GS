@@ -1,9 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Entity from '$/entity'
 import Npc from '$/entity/npc'
-import { ProtEntityTypeEnum, VisionTypeEnum } from '@/types/enum/entity'
-import { ClientState } from '@/types/enum/state'
-import { SceneEntityInfo } from '@/types/game/entity'
+import { ClientStateEnum } from '@/types/enum'
+import { SceneEntityInfo } from '@/types/proto'
+import { ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import GroupSuite from './GroupSuite'
 import SceneEntityMove from './SceneEntityMove'
 
@@ -19,7 +19,7 @@ class SceneEntityAppearPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, entityList: Entity[], appearType: VisionTypeEnum, param?: number): Promise<void> {
-    await this.waitState(context, ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_DONE, true, 0xF0FF)
+    await this.waitState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE, true, 0xF0FF)
 
     const notifyData: SceneEntityAppearNotify = {
       entityList: entityList.map(entity => entity.exportSceneEntityInfo()),

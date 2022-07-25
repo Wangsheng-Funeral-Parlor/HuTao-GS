@@ -1,10 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { MarkMapOperationEnum } from '@/types/enum/map'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { MapMarkPoint } from '@/types/game/map'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { MapMarkPoint } from '@/types/proto'
+import { MarkMapOperationEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface MarkMapReq {
   op: MarkMapOperationEnum
@@ -20,7 +18,7 @@ export interface MarkMapRsp {
 class MarkMapPacket extends Packet implements PacketInterface {
   constructor() {
     super('MarkMap', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }
@@ -49,7 +47,7 @@ class MarkMapPacket extends Packet implements PacketInterface {
       let posY = parseInt(name.split(':')[1])
       if (isNaN(posY)) posY = 512
 
-      await scene.join(context, new Vector(pos.X, posY, pos.Z), new Vector(), currentScene === scene ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
+      await scene.join(context, new Vector(pos.x, posY, pos.z), new Vector(), currentScene === scene ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
     }
 
     await this.response(context, {

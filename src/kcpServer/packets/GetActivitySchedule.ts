@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ActivityScheduleInfo } from '@/types/game/activity'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ActivityScheduleInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetActivityScheduleReq { }
 

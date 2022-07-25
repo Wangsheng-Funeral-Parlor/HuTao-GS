@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { FriendBrief } from '@/types/game/social'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { FriendBrief } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetPlayerFriendListReq { }
 
@@ -14,7 +14,7 @@ export interface GetPlayerFriendListRsp {
 class GetPlayerFriendListPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetPlayerFriendList', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

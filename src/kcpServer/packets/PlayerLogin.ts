@@ -1,48 +1,11 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
 import { dataToProtobuffer } from '#/utils/dataUtils'
 import config from '@/config'
-import { QueryCurrRegionHttpRsp, ResVersionConfig } from '@/types/dispatch/curRegion'
-import { ENetReasonEnum } from '@/types/enum/ENetReason'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { AdjustTrackingInfo, BlockInfo, FeatureBlockInfo, QueryCurrRegionHttpRsp, ResVersionConfig, ShortAbilityHashPair, TrackingIOInfo } from '@/types/proto'
+import { ENetReasonEnum, RetcodeEnum } from '@/types/proto/enum'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { join } from 'path'
 import { cwd } from 'process'
-
-export interface AdjustTrackingInfo {
-  idfa: string
-  gpsAdid: string
-  fireAdid: string
-  adid: string
-  event_token: string
-  appToken: string
-}
-
-export interface BlockInfo {
-  blockId: number
-  dataVersion: number
-  binData: string
-  isDirty: boolean
-}
-
-export interface FeatureBlockInfo {
-  featureType: number
-  endTime: number
-}
-
-export interface ShortAbilityHashPair {
-  abilityNameHash: number
-  abilityConfigHash: number
-}
-
-export interface TrackingIOInfo {
-  appid: string
-  deviceid: string
-  mac: string
-  rydevicetype: string
-  clientTz: string
-  currentCaid: string
-  cachedCaid: string
-}
 
 export interface PlayerLoginReq {
   token: string

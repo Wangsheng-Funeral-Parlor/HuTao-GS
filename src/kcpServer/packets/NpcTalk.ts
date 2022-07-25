@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface NpcTalkReq {
   npcEntityId?: number
@@ -18,7 +18,7 @@ export interface NpcTalkRsp {
 class NpcTalkPacket extends Packet implements PacketInterface {
   constructor() {
     super('NpcTalk', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }

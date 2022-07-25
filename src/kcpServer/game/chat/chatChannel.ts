@@ -1,8 +1,8 @@
 import BaseClass from '#/baseClass'
 import { ChatManager } from '$/manager/chatManager'
 import Player from '$/player'
-import { SystemHintTypeEnum } from '@/types/enum/chat'
-import { ChatInfo } from '@/types/game/chat'
+import { SystemHintTypeEnum } from '@/types/enum'
+import { ChatInfo } from '@/types/proto'
 import { getTimeSeconds } from '@/utils/time'
 
 export default class ChatChannel extends BaseClass {

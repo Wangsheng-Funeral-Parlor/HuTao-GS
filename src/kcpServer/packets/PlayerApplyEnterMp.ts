@@ -1,11 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Player from '$/player'
-import { ApplyEnterResultReasonEnum, MpSettingTypeEnum } from '@/types/enum/mp'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { OnlinePlayerInfo } from '@/types/game/playerInfo'
+import { ClientStateEnum, PlayerPropEnum } from '@/types/enum'
+import { OnlinePlayerInfo } from '@/types/proto'
+import { ApplyEnterResultReasonEnum, MpSettingTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import PlayerApplyEnterMpResult from './PlayerApplyEnterMpResult'
-import { PlayerPropEnum } from '@/types/enum/player'
-import { ClientState } from '@/types/enum/state'
 
 export interface PlayerApplyEnterMpReq {
   targetUid: number
@@ -26,7 +24,7 @@ export interface PlayerApplyEnterMpNotify {
 class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
   constructor() {
     super('PlayerApplyEnterMp', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

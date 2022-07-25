@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { PlayerLocationInfo, PlayerWorldLocationInfo } from '@/types/game/world'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerLocationInfo, PlayerWorldLocationInfo } from '@/types/proto'
 
 export interface WorldPlayerLocationNotify {
   playerLocList?: PlayerLocationInfo[]
@@ -13,7 +13,7 @@ class WorldPlayerLocationPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, data: WorldPlayerLocationNotify): Promise<void> {
-    if (!this.checkState(context, ClientState.IN_GAME, true)) return
+    if (!this.checkState(context, ClientStateEnum.IN_GAME, true)) return
 
     await super.sendNotify(context, data)
   }

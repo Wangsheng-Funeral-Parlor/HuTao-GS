@@ -1,5 +1,5 @@
 import Logger from '@/logger'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 import { PacketHead } from '@/types/kcp'
 import { WaitOnBlock } from '@/utils/asyncWait'
 import { verbosePackets } from '.'
@@ -11,15 +11,15 @@ const WAIT_TIMEOUT = 1800
 export interface PacketInterface {
   name: string
 
-  reqState: ClientState
-  notifyState: ClientState
+  reqState: ClientStateEnum
+  notifyState: ClientStateEnum
   reqStatePass: boolean
   notifyStatePass: boolean
   reqStateMask: number
   notifyStateMask: number
 
-  reqWaitState: ClientState
-  notifyWaitState: ClientState
+  reqWaitState: ClientStateEnum
+  notifyWaitState: ClientStateEnum
   reqWaitStatePass: boolean
   notifyWaitStatePass: boolean
   reqWaitStateMask: number
@@ -31,20 +31,20 @@ export interface PacketInterface {
   sendNotify?(context: PacketContext, data: any, ...any: any[]): Promise<void>
   broadcastNotify?(contextList: PacketContext[], ...data: any[]): Promise<void>
 
-  checkState(context: PacketContext, state: ClientState, pass?: boolean, mask?: number): boolean
-  waitState(context: PacketContext, state: ClientState, pass?: boolean, mask?: number): Promise<void>
+  checkState(context: PacketContext, state: ClientStateEnum, pass?: boolean, mask?: number): boolean
+  waitState(context: PacketContext, state: ClientStateEnum, pass?: boolean, mask?: number): Promise<void>
 }
 
 export interface PacketOption {
-  reqState?: ClientState
-  notifyState?: ClientState
+  reqState?: ClientStateEnum
+  notifyState?: ClientStateEnum
   reqStatePass?: boolean
   notifyStatePass?: boolean
   reqStateMask?: number
   notifyStateMask?: number
 
-  reqWaitState?: ClientState
-  notifyWaitState?: ClientState
+  reqWaitState?: ClientStateEnum
+  notifyWaitState?: ClientStateEnum
   reqWaitStatePass?: boolean
   notifyWaitStatePass?: boolean
   reqWaitStateMask?: number
@@ -78,15 +78,15 @@ export class PacketContext {
 export default class Packet implements PacketInterface {
   name: string
 
-  reqState: ClientState
-  notifyState: ClientState
+  reqState: ClientStateEnum
+  notifyState: ClientStateEnum
   reqStatePass: boolean
   notifyStatePass: boolean
   reqStateMask: number
   notifyStateMask: number
 
-  reqWaitState: ClientState
-  notifyWaitState: ClientState
+  reqWaitState: ClientStateEnum
+  notifyWaitState: ClientStateEnum
   reqWaitStatePass: boolean
   notifyWaitStatePass: boolean
   reqWaitStateMask: number
@@ -95,15 +95,15 @@ export default class Packet implements PacketInterface {
   constructor(name: string, opts: PacketOption = {}) {
     this.name = name
 
-    this.reqState = opts.reqState || ClientState.NONE
-    this.notifyState = opts.notifyState || ClientState.NONE
+    this.reqState = opts.reqState || ClientStateEnum.NONE
+    this.notifyState = opts.notifyState || ClientStateEnum.NONE
     this.reqStatePass = opts.reqStatePass || false
     this.notifyStatePass = opts.notifyStatePass || false
     this.reqStateMask = opts.reqStateMask || 0xFFFF
     this.notifyStateMask = opts.notifyStateMask || 0xFFFF
 
-    this.reqWaitState = opts.reqWaitState || ClientState.NONE
-    this.notifyWaitState = opts.notifyWaitState || ClientState.NONE
+    this.reqWaitState = opts.reqWaitState || ClientStateEnum.NONE
+    this.notifyWaitState = opts.notifyWaitState || ClientStateEnum.NONE
     this.reqWaitStatePass = opts.reqWaitStatePass || false
     this.notifyWaitStatePass = opts.notifyWaitStatePass || false
     this.reqWaitStateMask = opts.reqWaitStateMask || 0xFFFF
@@ -141,8 +141,8 @@ export default class Packet implements PacketInterface {
     for (let context of contextList) await this.sendNotify(context, ...(data as [any, ...any[]]))
   }
 
-  checkState(context: PacketContext, state: ClientState, pass: boolean = false, mask: number = 0xFFFF, log: boolean = true): boolean {
-    if (state === ClientState.NONE) return true
+  checkState(context: PacketContext, state: ClientStateEnum, pass: boolean = false, mask: number = 0xFFFF, log: boolean = true): boolean {
+    if (state === ClientStateEnum.NONE) return true
 
     const { state: curState } = context.client
     const maskedState = (curState & mask)
@@ -153,7 +153,7 @@ export default class Packet implements PacketInterface {
     return check
   }
 
-  async waitState(context: PacketContext, state: ClientState, pass: boolean = false, mask: number = 0xFFFF): Promise<void> {
+  async waitState(context: PacketContext, state: ClientStateEnum, pass: boolean = false, mask: number = 0xFFFF): Promise<void> {
     if (this.checkState(context, state, pass, mask, false)) return
 
     this.logState('WAIT')

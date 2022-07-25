@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { PropValue } from '@/types/game/prop'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { PropValue } from '@/types/proto'
 
 export enum DataType {
   DATA_NONE = 0,
@@ -18,7 +18,7 @@ class WorldDataPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE, false, 0xF000)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE, false, 0xF000)) return
 
     const { level, mpMode } = context.player.currentWorld
     const isInMpMode = Number(mpMode)

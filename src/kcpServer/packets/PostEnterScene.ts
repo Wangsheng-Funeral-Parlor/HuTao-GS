@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { RetcodeEnum } from '@/types/proto/enum'
 import GuestPostEnterScene from './GuestPostEnterScene'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface PostEnterSceneReq {
   enterSceneToken: number
@@ -15,7 +15,7 @@ export interface PostEnterSceneRsp {
 class PostEnterScenePacket extends Packet implements PacketInterface {
   constructor() {
     super('PostEnterScene', {
-      reqWaitState: ClientState.ENTER_SCENE | ClientState.ENTER_SCENE_DONE,
+      reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE,
       reqWaitStateMask: 0xF0FF
     })
   }
@@ -31,7 +31,7 @@ class PostEnterScenePacket extends Packet implements PacketInterface {
     }
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_POST_ENTER_SCENE
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_POST_ENTER_SCENE
 
     const hostCtx = currentWorld.host.context
     hostCtx.seqId = seqId
@@ -44,7 +44,7 @@ class PostEnterScenePacket extends Packet implements PacketInterface {
     })
 
     // Set client state
-    player.state = ClientState.IN_GAME | (state & 0x0F00) | ClientState.POST_ENTER_SCENE
+    player.state = ClientStateEnum.IN_GAME | (state & 0x0F00) | ClientStateEnum.POST_ENTER_SCENE
   }
 
   async response(context: PacketContext, data: PostEnterSceneRsp): Promise<void> {

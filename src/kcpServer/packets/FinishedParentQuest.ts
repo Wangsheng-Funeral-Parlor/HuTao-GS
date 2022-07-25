@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ParentQuest } from '@/types/game/quest'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ParentQuest } from '@/types/proto'
 import { getJson } from '@/utils/json'
 
 export interface FinishedParentQuestNotify {

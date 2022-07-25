@@ -1,7 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { AvatarEnterSceneInfo } from '@/types/game/avatar'
-import { MPLevelEntityInfo, TeamEnterSceneInfo } from '@/types/game/scene'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { AvatarEnterSceneInfo, MPLevelEntityInfo, TeamEnterSceneInfo } from '@/types/proto'
 
 export interface PlayerEnterSceneInfoNotify {
   curAvatarEntityId: number
@@ -17,7 +16,7 @@ class PlayerEnterSceneInfoPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE | ClientState.PRE_SCENE_INIT_FINISH, false, 0xF0FF)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH, false, 0xF0FF)) return
 
     await super.sendNotify(context, context.player.exportEnterSceneInfo())
   }

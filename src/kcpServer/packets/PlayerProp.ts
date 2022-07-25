@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { PropValue } from '@/types/game/prop'
+import { ClientStateEnum } from '@/types/enum'
+import { PropValue } from '@/types/proto'
 
 export interface PlayerPropNotify {
   propMap: { [type: number]: PropValue }
@@ -12,7 +12,7 @@ class PlayerPropPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, ...types: number[]): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN, true)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN, true)) return
 
     const notifyData: PlayerPropNotify = {
       propMap: Object.fromEntries(types.map(type => {

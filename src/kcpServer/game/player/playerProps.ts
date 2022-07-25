@@ -1,7 +1,7 @@
 import PlayerProp from '#/packets/PlayerProp'
-import { MpSettingTypeEnum } from '@/types/enum/mp'
-import { PlayerPropEnum } from '@/types/enum/player'
-import { PropPair, PropValue } from '@/types/game/prop'
+import { PlayerPropEnum } from '@/types/enum'
+import { PropPair, PropValue } from '@/types/proto'
+import { MpSettingTypeEnum } from '@/types/proto/enum'
 import PropsUserData from '@/types/user/PropsUserData'
 import Player from '.'
 
@@ -26,15 +26,11 @@ export default class PlayerProps {
   }
 
   initNew() {
-    this.set(PlayerPropEnum.PROP_PLAYER_LEVEL, 30)
-    this.set(PlayerPropEnum.PROP_PLAYER_EXP, 123)
-    this.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL, 3)
-    this.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL_LIMIT, 3)
     this.set(PlayerPropEnum.PROP_PLAYER_RESIN, 160)
     this.set(PlayerPropEnum.PROP_IS_SPRING_AUTO_USE, true)
     this.set(PlayerPropEnum.PROP_MAX_SPRING_VOLUME, 8000000)
     this.set(PlayerPropEnum.PROP_CUR_SPRING_VOLUME, 8000000)
-    this.set(PlayerPropEnum.PROP_SPRING_AUTO_USE_PERCENT, 1)
+    this.set(PlayerPropEnum.PROP_SPRING_AUTO_USE_PERCENT, 0.5)
     this.set(PlayerPropEnum.PROP_MAX_STAMINA, 24000)
     this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, 24000)
     this.set(PlayerPropEnum.PROP_IS_FLYABLE, true)

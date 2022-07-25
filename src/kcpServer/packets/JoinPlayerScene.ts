@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface JoinPlayerSceneReq {
   targetUid: number
@@ -13,7 +13,7 @@ export interface JoinPlayerSceneRsp {
 class JoinPlayerScenePacket extends Packet implements PacketInterface {
   constructor() {
     super('JoinPlayerScene', {
-      reqWaitState: ClientState.POST_LOGIN,
+      reqWaitState: ClientStateEnum.POST_LOGIN,
       reqWaitStatePass: true
     })
   }

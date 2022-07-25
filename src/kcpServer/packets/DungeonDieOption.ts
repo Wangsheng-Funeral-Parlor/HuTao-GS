@@ -1,8 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { PlayerDieOptionEnum } from '@/types/enum/player'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerDieOptionEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface DungeonDieOptionReq {
   dieOption: PlayerDieOptionEnum
@@ -18,7 +16,7 @@ export interface DungeonDieOptionRsp {
 class DungeonDieOptionPacket extends Packet implements PacketInterface {
   constructor() {
     super('DungeonDieOption', {
-      reqState: ClientState.IN_GAME | ClientState.SCENE_DUNGEON,
+      reqState: ClientStateEnum.IN_GAME | ClientStateEnum.SCENE_DUNGEON,
       reqStateMask: 0xFF00
     })
   }

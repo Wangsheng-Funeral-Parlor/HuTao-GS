@@ -1,26 +1,23 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import ChatChannel from '$/chat/chatChannel'
+import { ClientStateEnum, PlayerPropEnum, SystemHintTypeEnum } from '@/types/enum'
+import { RetcodeEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import AllMarkPoint from './AllMarkPoint'
 import HostPlayer from './HostPlayer'
 import PlayerEnterSceneInfo from './PlayerEnterSceneInfo'
 import PlayerGameTime from './PlayerGameTime'
+import PlayerProp from './PlayerProp'
 import PlayerWorldSceneInfoList from './PlayerWorldSceneInfoList'
+import SceneForceUnlock from './SceneForceUnlock'
 import ScenePlayBattleInfoList from './ScenePlayBattleInfoList'
 import ScenePlayerInfo from './ScenePlayerInfo'
 import SceneTeamUpdate from './SceneTeamUpdate'
 import SceneTime from './SceneTime'
+import ServerTime from './ServerTime'
 import SyncScenePlayTeamEntity from './SyncScenePlayTeamEntity'
 import SyncTeamEntity from './SyncTeamEntity'
 import WorldData from './WorldData'
 import WorldPlayerInfo from './WorldPlayerInfo'
-import ServerTime from './ServerTime'
-import SceneForceUnlock from './SceneForceUnlock'
-import ChatChannel from '$/chat/chatChannel'
-import { SystemHintTypeEnum } from '@/types/enum/chat'
-import { SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
-import PlayerProp from './PlayerProp'
-import { PlayerPropEnum } from '@/types/enum/player'
 
 export interface SceneInitFinishReq {
   enterSceneToken: number
@@ -34,7 +31,7 @@ export interface SceneInitFinishRsp {
 class SceneInitFinishPacket extends Packet implements PacketInterface {
   constructor() {
     super('SceneInitFinish', {
-      reqWaitState: ClientState.ENTER_SCENE | ClientState.ENTER_SCENE_READY,
+      reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
       reqWaitStateMask: 0xF0FF
     })
   }
@@ -53,7 +50,7 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
     for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.PRE_SCENE_INIT_FINISH
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_SCENE_INIT_FINISH
 
     await ServerTime.sendNotify(context)
     await WorldPlayerInfo.broadcastNotify(broadcastContextList)
@@ -87,7 +84,7 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
     })
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | (state & 0x0F00) | ClientState.SCENE_INIT_FINISH
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.SCENE_INIT_FINISH
   }
 
   async response(context: PacketContext, data: SceneInitFinishRsp): Promise<void> {

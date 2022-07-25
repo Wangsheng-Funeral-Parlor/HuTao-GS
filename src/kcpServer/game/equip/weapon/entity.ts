@@ -1,7 +1,7 @@
 import Entity from '$/entity'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import WeaponData from '$/gameData/data/WeaponData'
-import { ProtEntityTypeEnum } from '@/types/enum/entity'
+import { ProtEntityTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 import Weapon from '.'
 

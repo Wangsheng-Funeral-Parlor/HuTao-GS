@@ -1,7 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface WorldPlayerReviveReq { }
 
@@ -12,7 +11,7 @@ export interface WorldPlayerReviveRsp {
 class WorldPlayerRevivePacket extends Packet implements PacketInterface {
   constructor() {
     super('WorldPlayerRevive', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }

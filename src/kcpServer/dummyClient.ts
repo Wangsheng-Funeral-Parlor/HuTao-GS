@@ -5,7 +5,7 @@ import EnterSceneDone from './packets/EnterSceneDone'
 import { PlayerEnterSceneNotify } from './packets/PlayerEnterScene'
 import SetUpAvatarTeam from './packets/SetUpAvatarTeam'
 import PostEnterScene from './packets/PostEnterScene'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 import Client from './client'
 import { PacketHead } from '@/types/kcp'
 
@@ -83,7 +83,7 @@ export default class DummyClient extends Client {
       const { enterSceneToken } = data as PlayerEnterSceneNotify
 
       // Wait until state change
-      await EnterSceneReady.waitState(context, ClientState.ENTER_SCENE, false, 0xF0FF)
+      await EnterSceneReady.waitState(context, ClientStateEnum.ENTER_SCENE, false, 0xF0FF)
 
       await EnterSceneReady.request(context, { enterSceneToken })
       await SceneInitFinish.request(context, { enterSceneToken })

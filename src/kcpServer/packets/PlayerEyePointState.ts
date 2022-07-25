@@ -1,10 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { VectorInterface } from '@/types/game/motion';
-import { CylinderRegionSize, PolygonRegionSize } from '@/types/game/regionSize';
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { CylinderRegionSize, PolygonRegionSize, VectorInfo } from '@/types/proto'
 
 export interface PlayerEyePointStateNotify {
   isUseEyePoint?: boolean
-  eyePointPos?: VectorInterface
+  eyePointPos?: VectorInfo
   regionEntityId?: number
   regionGroupId?: number
   regionConfigId?: number
@@ -13,7 +12,7 @@ export interface PlayerEyePointStateNotify {
 
   // region_size
   sphereRadius?: number
-  cubicSize?: VectorInterface
+  cubicSize?: VectorInfo
   cylinderSize?: CylinderRegionSize
   polygonSize?: PolygonRegionSize
 }

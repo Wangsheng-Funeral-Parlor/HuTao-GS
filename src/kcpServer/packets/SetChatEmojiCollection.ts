@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { ChatEmojiCollectionData } from '@/types/game/chat'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ChatEmojiCollectionData } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface SetChatEmojiCollectionReq {
   chatEmojiCollectionData: ChatEmojiCollectionData
@@ -14,7 +14,7 @@ export interface SetChatEmojiCollectionRsp {
 class SetChatEmojiCollectionPacket extends Packet implements PacketInterface {
   constructor() {
     super('SetChatEmojiCollection', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

@@ -1,4 +1,4 @@
-import { AvatarTypeEnum } from '../enum/avatar'
+import { AvatarTypeEnum } from '../proto/enum'
 import EntityUserData from './EntityUserData'
 import FettersUserData from './FettersUserData'
 import SkillDepotUserData from './SkillDepotUserData'

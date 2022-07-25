@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { RetcodeEnum } from '@/types/proto/enum'
 import PlayerGameTime from './PlayerGameTime'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface ChangeGameTimeReq {
   gameTime: number
@@ -18,7 +18,7 @@ export interface ChangeGameTimeRsp {
 class ChangeGameTimePacket extends Packet implements PacketInterface {
   constructor() {
     super('ChangeGameTime', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }

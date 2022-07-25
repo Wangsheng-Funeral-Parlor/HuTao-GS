@@ -1,9 +1,9 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { RetcodeEnum } from '@/types/proto/enum'
 import ScenePlayerInfo from './ScenePlayerInfo'
 import SceneTeamUpdate from './SceneTeamUpdate'
 import WorldPlayerInfo from './WorldPlayerInfo'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface SetPlayerNameReq {
   nickName: string
@@ -17,7 +17,7 @@ export interface SetPlayerNameRsp {
 class SetPlayerNamePacket extends Packet implements PacketInterface {
   constructor() {
     super('SetPlayerName', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

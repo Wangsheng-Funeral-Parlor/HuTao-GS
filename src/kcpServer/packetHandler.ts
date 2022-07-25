@@ -3,7 +3,7 @@ import ProtoMatch from '#/protomatch'
 import KcpServer from '.'
 import Logger from '@/logger'
 import { PacketInterface, PacketContext } from './packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 const logger = new Logger('PACKET', 0x8810cd)
 
@@ -68,7 +68,7 @@ export default class PacketHandler {
           notifyState, notifyStatePass, notifyStateMask,
           notifyWaitState, notifyWaitStatePass, notifyWaitStateMask
         ]
-      }[type] as [ClientState, boolean, number, ClientState, boolean, number]
+      }[type] as [ClientStateEnum, boolean, number, ClientStateEnum, boolean, number]
 
       const data = await dataUtil.dataToProtobuffer(packetData, packetID)
 

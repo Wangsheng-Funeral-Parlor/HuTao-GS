@@ -1,7 +1,7 @@
 import PlayerChat from '#/packets/PlayerChat'
 import { ChatManager } from '$/manager/chatManager'
 import World from '$/world'
-import { ChatInfo } from '@/types/game/chat'
+import { ChatInfo } from '@/types/proto'
 import ChatChannel from './chatChannel'
 
 export default class PublicChatChannel extends ChatChannel {

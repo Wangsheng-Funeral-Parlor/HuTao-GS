@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { ActivityInfo } from '@/types/game/activity'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ActivityInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetActivityInfoReq {
   activityIdList: number[]
@@ -17,7 +17,7 @@ export interface GetActivityInfoRsp {
 class GetActivityInfoPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetActivityInfo', {
-      reqWaitState: ClientState.POST_LOGIN,
+      reqWaitState: ClientStateEnum.POST_LOGIN,
       reqWaitStatePass: true
     })
   }

@@ -1,10 +1,8 @@
 import Equip from '$/equip'
-import { EquipTypeEnum } from '@/types/enum/equip'
-import { SceneReliquaryInfo } from '@/types/game/reliquary'
-import { EquipInterface } from '@/types/game/item'
 import ReliquaryData from '$/gameData/data/ReliquaryData'
+import { EquipTypeEnum, FightPropEnum } from '@/types/enum'
+import { EquipInfo, SceneReliquaryInfo } from '@/types/proto'
 import ReliquaryUserData from '@/types/user/ReliquaryUserData'
-import { FightPropEnum } from '@/types/enum/fightProp'
 
 export default class Reliquary extends Equip {
   level: number
@@ -198,7 +196,7 @@ export default class Reliquary extends Equip {
     }
   }
 
-  export(): EquipInterface {
+  export(): EquipInfo {
     const { level, exp, mainPropId, appendPropIdList, isLocked } = this
     return {
       reliquary: {

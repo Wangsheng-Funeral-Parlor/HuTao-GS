@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface EntityFightPropUpdateNotify {
   entityId: number
@@ -12,7 +12,7 @@ class EntityFightPropUpdatePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, data: EntityFightPropUpdateNotify): Promise<void> {
-    await this.waitState(context, ClientState.IN_GAME, true)
+    await this.waitState(context, ClientStateEnum.IN_GAME, true)
 
     await super.sendNotify(context, data)
   }

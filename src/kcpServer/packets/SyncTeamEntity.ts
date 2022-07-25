@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { TeamEntityInfo } from '@/types/game/team'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { TeamEntityInfo } from '@/types/proto'
 
 export interface SyncTeamEntityNotify {
   sceneId: number
@@ -13,7 +13,7 @@ class SyncTeamEntityPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE, true)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE, true)) return
 
     const { player: targetPlayer } = context
     const { id, playerList } = targetPlayer.currentScene

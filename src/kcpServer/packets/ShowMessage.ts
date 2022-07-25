@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { SvrMsgIdEnum } from '@/types/enum/message'
-import { MsgParam } from '@/types/game/message'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { MsgParam } from '@/types/proto'
+import { SvrMsgIdEnum } from '@/types/proto/enum'
 
 export interface ShowMessageNotify {
   msgId: SvrMsgIdEnum

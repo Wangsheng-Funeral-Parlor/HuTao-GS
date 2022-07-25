@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Item from '$/player/inventory/item'
-import { StoreTypeEnum } from '@/types/enum/player'
+import { StoreTypeEnum } from '@/types/proto/enum'
 
 export interface StoreItemDelNotify {
   storeType: StoreTypeEnum

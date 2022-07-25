@@ -1,20 +1,19 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ChangeEnergyReasonEnum } from '@/types/enum/fightProp'
-import { ForwardTypeEnum } from '@/types/enum/invoke'
-import { ClientState } from '@/types/enum/state'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { VectorInfo } from '@/types/proto'
+import { ChangeEnergyReasonEnum, ForwardTypeEnum } from '@/types/proto/enum'
 
 export interface EvtDoSkillSuccNotify {
   forwardType: ForwardTypeEnum
   casterId: number
   skillId: number
-  forward: VectorInterface
+  forward: VectorInfo
 }
 
 class EvtDoSkillSuccPacket extends Packet implements PacketInterface {
   constructor() {
     super('EvtDoSkillSucc', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }

@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state';
-import { AnchorPointData, ClientCollectorData, LunchBoxData, OneoffGatherPointDetectorData, WidgetCoolDownData, WidgetSlotData } from '@/types/game/widget';
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { AnchorPointData, ClientCollectorData, LunchBoxData, OneoffGatherPointDetectorData, WidgetCoolDownData, WidgetSlotData } from '@/types/proto'
 
 export interface AllWidgetDataNotify {
   anchorPointList: AnchorPointData[]
@@ -19,7 +19,7 @@ class AllWidgetDataPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN, true) || !context.player) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN, true) || !context.player) return
     await super.sendNotify(context, context.player.widget.exportAll())
   }
 }

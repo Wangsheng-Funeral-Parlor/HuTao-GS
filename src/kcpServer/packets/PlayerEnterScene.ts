@@ -1,15 +1,15 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { SceneEnterTypeEnum } from '@/types/enum/scene'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { VectorInfo } from '@/types/proto'
+import { SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface PlayerEnterSceneNotify {
   sceneId: number
-  pos: VectorInterface
+  pos: VectorInfo
   sceneBeginTime: string
   type: SceneEnterTypeEnum
   targetUid: number
   prevSceneId?: number
-  prevPos?: VectorInterface
+  prevPos?: VectorInfo
   dungeonId?: number
   worldLevel: number
   enterSceneToken: number

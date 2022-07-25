@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { RetcodeEnum } from '@/types/proto/enum'
 import SceneData from '$/gameData/data/SceneData'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 const unlockType = [
   'SceneTransPoint',
@@ -31,7 +31,7 @@ export interface GetScenePointRsp {
 class GetScenePointPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetScenePoint', {
-      reqWaitState: ClientState.ENTER_SCENE | ClientState.PRE_SCENE_INIT_FINISH,
+      reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH,
       reqWaitStatePass: true
     })
   }

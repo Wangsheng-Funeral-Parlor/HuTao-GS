@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SocialDetail } from '@/types/game/social'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { SocialDetail } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetPlayerSocialDetailReq {
   uid: number
@@ -15,7 +15,7 @@ export interface GetPlayerSocialDetailRsp {
 class GetPlayerSocialDetailPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetPlayerSocialDetail', {
-      reqWaitState: ClientState.POST_LOGIN,
+      reqWaitState: ClientStateEnum.POST_LOGIN,
       reqWaitStatePass: true
     })
   }

@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Player from '$/player'
-import { PreEnterMpStateEnum } from '@/types/enum/mp'
+import { PreEnterMpStateEnum } from '@/types/proto/enum'
 
 export interface PlayerPreEnterMpNotify {
   uid: number

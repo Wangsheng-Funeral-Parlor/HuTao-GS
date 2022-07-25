@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientReconnectReasonEnum } from '@/types/enum/mp'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientReconnectReasonEnum } from '@/types/proto/enum'
 
 export interface ClientReconnectNotify {
   reason: ClientReconnectReasonEnum

@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ProfilePicture } from '@/types/game/profile'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ProfilePicture } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface SetPlayerHeadImageReq {
   avatarId: number
@@ -16,7 +16,7 @@ export interface SetPlayerHeadImageRsp {
 class SetPlayerHeadImagePacket extends Packet implements PacketInterface {
   constructor() {
     super('SetPlayerHeadImage', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

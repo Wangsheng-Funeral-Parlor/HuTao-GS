@@ -9,6 +9,7 @@ interface Config {
   hostIp: string
   sslDir: string
   version: string
+  packetsToDump: string[]
 
   // dispatch
   dispatchHost: string | null
@@ -38,6 +39,7 @@ export const DEFAULT_CONFIG: Config = {
   hostIp: '127.0.0.1',
   sslDir: './ssl',
   version: '2.7.0',
+  packetsToDump: [],
 
   dispatchHost: null,
   dispatchSeed: null,

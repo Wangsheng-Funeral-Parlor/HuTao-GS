@@ -1,14 +1,14 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { VectorInterface } from '@/types/game/motion'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 import WorldPlayerDie from './WorldPlayerDie'
+import { VectorInfo } from '@/types/proto'
 
 export interface AvatarDieAnimationEndReq {
   dieGuid: string
   skillId: number
-  rebornPos: VectorInterface
+  rebornPos: VectorInfo
 }
 
 export interface AvatarDieAnimationEndRsp {
@@ -20,7 +20,7 @@ export interface AvatarDieAnimationEndRsp {
 class AvatarDieAnimationEndPacket extends Packet implements PacketInterface {
   constructor() {
     super('AvatarDieAnimationEnd', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }
@@ -46,7 +46,7 @@ class AvatarDieAnimationEndPacket extends Packet implements PacketInterface {
 
     if (replacement) {
       // Replace current avatar
-      await player.changeAvatar(replacement, new Vector(rebornPos.X, rebornPos.Y, rebornPos.Z), seqId)
+      await player.changeAvatar(replacement, new Vector(rebornPos.x, rebornPos.y, rebornPos.z), seqId)
     } else {
       // Great, everyone is dead
       await WorldPlayerDie.sendNotify(context, currentAvatar)

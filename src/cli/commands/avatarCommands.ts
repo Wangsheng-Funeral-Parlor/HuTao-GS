@@ -1,4 +1,4 @@
-import { FightPropEnum } from '@/types/enum/fightProp'
+import { FightPropEnum } from '@/types/enum'
 import { CommandDefinition } from '.'
 
 const avatarCommands: CommandDefinition[] = [

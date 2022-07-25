@@ -31,7 +31,7 @@ const entityCommands: CommandDefinition[] = [
 
       const entity = new Monster(args[0])
 
-      entity.motionInfo.pos.copy(pos)
+      entity.motion.pos.copy(pos)
       entity.bornPos.copy(pos)
 
       entity.initNew(args[1])

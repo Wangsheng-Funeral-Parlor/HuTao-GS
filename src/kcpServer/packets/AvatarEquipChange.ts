@@ -1,8 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Avatar from '$/entity/avatar'
-import { EquipTypeEnum } from '@/types/enum/equip'
-import { SceneReliquaryInfo } from '@/types/game/reliquary'
-import { SceneWeaponInfo } from '@/types/game/weapon'
+import { EquipTypeEnum } from '@/types/enum'
+import { SceneReliquaryInfo, SceneWeaponInfo } from '@/types/proto'
 
 export interface AvatarEquipChangeNotify {
   avatarGuid: string

@@ -1,11 +1,11 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { StoreTypeEnum } from '@/types/enum/player'
-import { ClientState } from '@/types/enum/state'
-import { ItemInterface } from '@/types/game/item'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ItemInfo } from '@/types/proto'
+import { StoreTypeEnum } from '@/types/proto/enum'
 
 export interface PlayerStoreNotify {
   storeType: StoreTypeEnum
-  itemList: ItemInterface[]
+  itemList: ItemInfo[]
   weightLimit: number
 }
 
@@ -15,7 +15,7 @@ class PlayerStorePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN)) return
 
     const { inventory } = context.player
 

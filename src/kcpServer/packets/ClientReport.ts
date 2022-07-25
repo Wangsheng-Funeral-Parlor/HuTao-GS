@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import uidPrefix from '#/utils/uidPrefix'
 import Logger from '@/logger'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 const logger = new Logger('REPORT', 0xfff838)
 
@@ -26,7 +26,7 @@ export interface ClientReportNotify {
 class ClientReportPacket extends Packet implements PacketInterface {
   constructor() {
     super('ClientReport', {
-      notifyState: ClientState.LOGIN,
+      notifyState: ClientStateEnum.LOGIN,
       notifyStatePass: true
     })
   }

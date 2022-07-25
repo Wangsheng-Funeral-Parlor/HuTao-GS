@@ -2,7 +2,7 @@ import Avatar from '$/entity/avatar'
 import TeamManager from '$/manager/teamManager'
 import AvatarEquipChange from '#/packets/AvatarEquipChange'
 import { SetUpAvatarTeamReq } from '#/packets/SetUpAvatarTeam'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { RetcodeEnum } from '@/types/proto/enum'
 import AbilityChange from '#/packets/AbilityChange'
 import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
 import AvatarTeamUpdate from '#/packets/AvatarTeamUpdate'
@@ -90,7 +90,7 @@ export default class Team {
 
     const { currentAvatar } = player
     if (oldAvatar && currentAvatar !== oldAvatar) {
-      currentAvatar.motionInfo.copy(oldAvatar.motionInfo)
+      currentAvatar.motion.copy(oldAvatar.motion)
       currentScene?.entityManager?.replace(oldAvatar, currentAvatar, seqId)
     }
 

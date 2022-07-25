@@ -1,10 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface PlayerEnterDungeonReq {
   pointId: number
@@ -20,7 +19,7 @@ export interface PlayerEnterDungeonRsp {
 class PlayerEnterDungeonPacket extends Packet implements PacketInterface {
   constructor() {
     super('PlayerEnterDungeon', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

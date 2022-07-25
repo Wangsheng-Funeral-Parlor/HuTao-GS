@@ -1,8 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { CityInfo } from '@/types/game/city'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { CityInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetSceneAreaReq {
   sceneId: number
@@ -19,7 +19,7 @@ export interface GetSceneAreaRsp {
 class GetSceneAreaPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetSceneArea', {
-      reqWaitState: ClientState.ENTER_SCENE | ClientState.PRE_SCENE_INIT_FINISH,
+      reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH,
       reqWaitStatePass: true
     })
   }

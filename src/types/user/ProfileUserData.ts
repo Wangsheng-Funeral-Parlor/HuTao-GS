@@ -1,4 +1,4 @@
-import { Birthday, ProfilePicture } from '../game/profile'
+import { Birthday, ProfilePicture } from '../proto'
 
 export default interface ProfileUserData {
   nickname: string

@@ -1,7 +1,7 @@
 import Packet, { PacketContext } from '#/packet'
 import Player from '$/player'
-import { ForwardTypeEnum } from '@/types/enum/invoke'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { ForwardTypeEnum } from '@/types/proto/enum'
 
 export interface ForwardEntry {
   forwardType: ForwardTypeEnum
@@ -59,7 +59,7 @@ export default class ForwardBuffer {
     const { world, broadcastContextList } = currentScene
     const { host } = world
 
-    const contextList = broadcastContextList.filter(ctx => (ctx.client.state & 0xF0FF) >= (ClientState.ENTER_SCENE | ClientState.ENTER_SCENE_DONE))
+    const contextList = broadcastContextList.filter(ctx => (ctx.client.state & 0xF0FF) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE))
 
     switch (type) {
       case ForwardTypeEnum.FORWARD_TO_ALL:

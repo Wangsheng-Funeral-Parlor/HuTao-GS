@@ -1,7 +1,7 @@
 import ActivityManager from '$/manager/activityManager'
 import Player from '$/player'
-import { ActivityIdEnum } from '@/types/enum/activity'
-import { ActivityInfo, MusicGameRecord } from '@/types/game/activity'
+import { ActivityIdEnum } from '@/types/enum'
+import { ActivityInfo, MusicGameRecord } from '@/types/proto'
 import Activity from '.'
 
 const watcherIdList = [
@@ -24,7 +24,7 @@ export default class MusicGameActivity extends Activity {
   }
 
   exportActivityInfo(player: Player): ActivityInfo {
-    const info = super.exportActivityInfo(player)
+    const info: ActivityInfo = super.exportActivityInfo(player)
 
     info.watcherInfoList = watcherIdList.map(id => ({
       watcherId: id,

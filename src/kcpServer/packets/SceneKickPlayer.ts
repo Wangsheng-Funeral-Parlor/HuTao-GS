@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import Player from '$/player'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface SceneKickPlayerReq {
   targetUid: number
@@ -20,7 +20,7 @@ export interface SceneKickPlayerNotify {
 class SceneKickPlayerPacket extends Packet implements PacketInterface {
   constructor() {
     super('SceneKickPlayer', {
-      reqState: ClientState.ENTER_SCENE,
+      reqState: ClientStateEnum.ENTER_SCENE,
       reqStatePass: true
     })
   }

@@ -1,9 +1,9 @@
 import ShopData from '$/gameData/data/ShopData'
 import Player from '$/player'
 import { ShopData as ShopDataType } from '@/types/gameData/ShopData'
-import { Shop, ShopCardProduct, ShopGoods } from '@/types/game/shop'
-import Game from '..'
+import { Shop, ShopCardProduct, ShopGoods } from '@/types/proto'
 import { getTimeSeconds } from '@/utils/time'
+import Game from '..'
 
 const cardShopProducts: ShopCardProduct[] = [
   {

@@ -1,17 +1,17 @@
 import AvatarFightPropUpdate from '#/packets/AvatarFightPropUpdate'
 import EntityFightPropChangeReason, { EntityFightPropChangeReasonNotify } from '#/packets/EntityFightPropChangeReason'
 import EntityFightPropUpdate from '#/packets/EntityFightPropUpdate'
+import Reliquary from '$/equip/reliquary'
 import Weapon from '$/equip/weapon'
+import { CurveArithEnum, FightPropEnum } from '@/types/enum'
+import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
-import { CurveArithEnum, ProtEntityTypeEnum } from '@/types/enum/entity'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, FightPropEnum } from '@/types/enum/fightProp'
-import { PlayerDieTypeEnum } from '@/types/enum/player'
-import { FightPropPair } from '@/types/game/entity'
+import { FightPropPair } from '@/types/proto'
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import PropsUserData from '@/types/user/PropsUserData'
 import Entity from '.'
 import Avatar from './avatar'
 import Monster from './monster'
-import Reliquary from '$/equip/reliquary'
 
 const DYNAMIC_PROPS = [
   FightPropEnum.FIGHT_PROP_HP,
@@ -244,7 +244,7 @@ export default class FightProp {
   }
 
   private getPropCurve(prop: FightPropEnum): { Type: string, Value?: number } {
-    const { PropGrowCurves } = this.entity.config || {}
+    const { PropGrowCurves } = <EntityFightPropConfig>(this.entity.config || {})
     if (PropGrowCurves == null) return null
 
     const propCurve = PropGrowCurves.find(c => FightPropEnum[c.PropType] === prop)
@@ -289,28 +289,28 @@ export default class FightProp {
     return this.get(this.getCostElemType() + 1e3)
   }
 
-  async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum): Promise<void> {
+  async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     if (this.entity.godMode) return
 
     const type = this.getCostElemType() + 1e3
-    await this.set(type, 0, notify, { changeEnergyReason })
+    await this.set(type, 0, notify, { changeEnergyReason }, seqId)
   }
 
-  async gainEnergy(val: number, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum): Promise<void> {
+  async gainEnergy(val: number, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     const type = this.getCostElemType() + 1e3
     const gainAmount = Math.min(
       this.getCostElemVal() - this.get(type),
       Math.max(0, val)
     )
-    await this.add(type, gainAmount, notify, { changeEnergyReason })
+    await this.add(type, gainAmount, notify, { changeEnergyReason }, seqId)
   }
 
-  async rechargeEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum): Promise<void> {
+  async rechargeEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     const type = this.getCostElemType() + 1e3
-    await this.set(type, this.getCostElemVal(), notify, { changeEnergyReason })
+    await this.set(type, this.getCostElemVal(), notify, { changeEnergyReason }, seqId)
   }
 
-  async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum): Promise<void> {
+  async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
     if (this.entity.godMode) return
 
     const damage = Math.min(
@@ -320,7 +320,7 @@ export default class FightProp {
 
     if (damage <= 0) return
 
-    this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason })
+    this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason }, seqId)
 
     // Check if entity is dead
     if (this.get(FightPropEnum.FIGHT_PROP_CUR_HP) > 0) return
@@ -358,28 +358,28 @@ export default class FightProp {
     await this.entity.kill(attackerId, dieType)
   }
 
-  async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum): Promise<void> {
+  async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
     const healAmount = Math.min(
       this.get(FightPropEnum.FIGHT_PROP_MAX_HP) - this.get(FightPropEnum.FIGHT_PROP_CUR_HP)
       , Math.max(0, val)
     )
-    this.add(FightPropEnum.FIGHT_PROP_CUR_HP, healAmount, notify, { changeHpReason })
+    this.add(FightPropEnum.FIGHT_PROP_CUR_HP, healAmount, notify, { changeHpReason }, seqId)
   }
 
-  async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum): Promise<void> {
-    this.set(FightPropEnum.FIGHT_PROP_CUR_HP, this.get(FightPropEnum.FIGHT_PROP_MAX_HP), notify, { changeHpReason })
+  async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    this.set(FightPropEnum.FIGHT_PROP_CUR_HP, this.get(FightPropEnum.FIGHT_PROP_MAX_HP), notify, { changeHpReason }, seqId)
   }
 
   get(type: number) {
     return this.propMap[type] || 0
   }
 
-  async set(type: number, val: number, notify: boolean = false, changeReason?: FightPropChangeReason): Promise<void> {
+  async set(type: number, val: number, notify: boolean = false, changeReason?: FightPropChangeReason, seqId?: number): Promise<void> {
     const oldVal = this.get(type)
     this.propMap[type] = val
 
     if (!notify) return
-    await this.sendUpdateNotify({ [type]: val })
+    await this.sendUpdateNotify({ [type]: val }, seqId)
 
     const { manager, entityId } = this.entity
     if (!manager || !changeReason) return
@@ -396,11 +396,13 @@ export default class FightProp {
     else if (changeEnergyReason != null) notifyData.changeEnergyReason = changeEnergyReason
     else return
 
-    await EntityFightPropChangeReason.broadcastNotify(manager.scene.broadcastContextList, notifyData)
+    const broadcastContextList = manager.scene.broadcastContextList
+    for (let ctx of broadcastContextList) ctx.seqId = seqId
+    await EntityFightPropChangeReason.broadcastNotify(broadcastContextList, notifyData)
   }
 
-  async add(type: number, val: number, notify: boolean = false, changeReason?: FightPropChangeReason): Promise<void> {
-    await this.set(type, this.get(type) + val, notify, changeReason)
+  async add(type: number, val: number, notify: boolean = false, changeReason?: FightPropChangeReason, seqId?: number): Promise<void> {
+    await this.set(type, this.get(type) + val, notify, changeReason, seqId)
   }
 
   clear(dynamic: boolean = false) {
@@ -410,18 +412,18 @@ export default class FightProp {
     }
   }
 
-  async sendUpdateNotify(fightPropMap: { [id: number]: number }): Promise<void> {
+  async sendUpdateNotify(fightPropMap: { [id: number]: number }, seqId?: number): Promise<void> {
     const { entity } = this
     const { manager, entityId, isOnScene } = entity
 
     if (manager && isOnScene) {
-      await EntityFightPropUpdate.broadcastNotify(manager.scene.broadcastContextList, {
+      const broadcastContextList = manager.scene.broadcastContextList
+      for (let ctx of broadcastContextList) ctx.seqId = seqId
+      await EntityFightPropUpdate.broadcastNotify(broadcastContextList, {
         entityId,
         fightPropMap
       })
-    }
-
-    if (entity.entityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) {
+    } else if (entity.entityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) {
       await AvatarFightPropUpdate.sendNotify((entity as Avatar).player.context, {
         avatarGuid: (entity as Avatar).guid.toString(),
         fightPropMap

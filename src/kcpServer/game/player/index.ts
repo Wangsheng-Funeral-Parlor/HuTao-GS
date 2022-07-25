@@ -14,17 +14,10 @@ import Material from '$/material'
 import Scene from '$/scene'
 import Vector from '$/utils/vector'
 import World from '$/world'
-import { AvatarTypeEnum } from '@/types/enum/avatar'
-import { ChangeHpReasonEnum, FightPropEnum } from '@/types/enum/fightProp'
-import { PlatformTypeEnum, PlayerPropEnum } from '@/types/enum/player'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { FriendOnlineStateEnum } from '@/types/enum/social'
-import { ClientState } from '@/types/enum/state'
-import { OnlinePlayerInfo, ScenePlayerInfo } from '@/types/game/playerInfo'
-import { FriendBrief, SocialDetail } from '@/types/game/social'
-import { PlayerLocationInfo, PlayerRTTInfo, PlayerWorldLocationInfo } from '@/types/game/world'
+import { ClientStateEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
 import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
+import { FriendBrief, OnlinePlayerInfo, PlayerLocationInfo, PlayerRTTInfo, PlayerWorldLocationInfo, ScenePlayerInfo, SocialDetail } from '@/types/proto'
+import { AvatarTypeEnum, ChangeHpReasonEnum, FriendOnlineStateEnum, PlatformTypeEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import UserData from '@/types/user'
 import { waitUntil } from '@/utils/asyncWait'
 import { fileExists, readFile } from '@/utils/fileSystem'
@@ -132,7 +125,7 @@ export default class Player extends BaseClass {
     return this.client.uid
   }
 
-  get state(): ClientState {
+  get state(): ClientStateEnum {
     return this.client.state
   }
 
@@ -196,28 +189,28 @@ export default class Player extends BaseClass {
   }
 
   get pos(): Vector | null {
-    return this.currentAvatar?.motionInfo?.pos || null
+    return this.currentAvatar?.motion?.pos || null
   }
 
   get rot(): Vector | null {
-    return this.currentAvatar?.motionInfo?.rot || null
+    return this.currentAvatar?.motion?.rot || null
   }
 
   get hasLastSafeState(): boolean {
-    return !!this.currentAvatar?.motionInfo?.hasLastSafeState
+    return !!this.currentAvatar?.motion?.hasLastSafeState
   }
 
   get lastSafePos(): Vector | null {
-    return this.currentAvatar?.motionInfo?.lastSafePos || null
+    return this.currentAvatar?.motion?.lastSafePos || null
   }
 
   get lastSafeRot(): Vector | null {
-    return this.currentAvatar?.motionInfo?.lastSafeRot || null
+    return this.currentAvatar?.motion?.lastSafeRot || null
   }
 
   // Setter
 
-  set state(v: ClientState) {
+  set state(v: ClientStateEnum) {
     this.client.state = v
   }
 
@@ -297,6 +290,9 @@ export default class Player extends BaseClass {
     profile.initNew(avatarId, nickName)
     props.initNew()
     openState.initNew()
+
+    // Set initial level
+    this.setLevel(1)
 
     inventory.add(await Material.create(221, 1000000), false)
     inventory.add(await Material.create(222, 1000000), false)
@@ -515,7 +511,7 @@ export default class Player extends BaseClass {
     const now = Date.now()
 
     if (!currentWorld || !currentScene || !currentAvatar?.isAlive() || draggingBack) return
-    const { lastSafePos, lastSafeRot } = currentAvatar.motionInfo
+    const { lastSafePos, lastSafeRot } = currentAvatar.motion
 
     const continuousFall = lastDragBack != null && now - lastDragBack < 10e3
     if (continuousFall) {
@@ -529,7 +525,7 @@ export default class Player extends BaseClass {
     this.draggingBack = true
     if (continuousFall && this.dragBackCount >= 3 && prevScene) {
       // Still falling into the void, go back to last scene
-      await this.returnToPrevScene((state & 0x0F00) === ClientState.SCENE_DUNGEON ? SceneEnterReasonEnum.DUNGEON_QUIT : SceneEnterReasonEnum.FORCE_QUIT_SCENE)
+      await this.returnToPrevScene((state & 0x0F00) === ClientStateEnum.SCENE_DUNGEON ? SceneEnterReasonEnum.DUNGEON_QUIT : SceneEnterReasonEnum.FORCE_QUIT_SCENE)
       return
     }
 
@@ -722,7 +718,7 @@ export default class Player extends BaseClass {
     if (!this.isInMp() || this.isHost()) this.emit('WorldUpdate')
 
     const { state, currentScene, pos } = this
-    if ((state & 0xF0FF) === ClientState.IN_GAME && pos && pos.Y <= currentScene?.dieY) this.dragBack()
+    if ((state & 0xF0FF) === ClientStateEnum.IN_GAME && pos && pos.y <= currentScene?.dieY) this.dragBack()
   }
 
   // SceneJoin
@@ -761,7 +757,7 @@ export default class Player extends BaseClass {
       prevSceneRot.copy(rot)
 
       // Prevent player from falling through the ground
-      prevScenePos.Y += 1.5
+      prevScenePos.y += 1.5
     }
 
     await DelTeamEntity.sendNotify(context, scene, [teamEntityId])

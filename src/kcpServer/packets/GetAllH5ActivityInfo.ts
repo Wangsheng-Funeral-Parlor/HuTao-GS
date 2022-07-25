@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { H5ActivityInfo } from '@/types/game/activity'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { H5ActivityInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetAllH5ActivityInfoReq { }
 

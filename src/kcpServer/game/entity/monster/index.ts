@@ -1,10 +1,9 @@
-import { ProtEntityTypeEnum } from '@/types/enum/entity'
 import Entity from '$/entity'
-import { SceneMonsterInfo } from '@/types/game/monster'
 import Weapon from '$/equip/weapon'
-import { MonsterBornTypeEnum } from '@/types/enum/monster'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import MonsterData from '$/gameData/data/MonsterData'
+import { SceneMonsterInfo } from '@/types/proto'
+import { MonsterBornTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 
 export default class Monster extends Entity {

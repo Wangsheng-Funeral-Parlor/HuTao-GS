@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface SceneAudioNotify {
   sourceUid: number
@@ -12,7 +12,7 @@ export interface SceneAudioNotify {
 class SceneAudioPacket extends Packet implements PacketInterface {
   constructor() {
     super('SceneAudio', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStateMask: 0xF0FF
     })
   }

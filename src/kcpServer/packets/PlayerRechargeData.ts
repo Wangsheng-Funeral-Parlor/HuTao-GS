@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ProductPriceTier } from '@/types/game/shop'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ProductPriceTier } from '@/types/proto'
 
 export interface PlayerRechargeDataNotify {
   cardProductRemainDays?: number

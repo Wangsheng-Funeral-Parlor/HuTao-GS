@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface MusicGameSettleReq {
   musicBasicId?: number

@@ -3,8 +3,8 @@ import Reliquary from '$/equip/reliquary'
 import Weapon from '$/equip/weapon'
 import Material from '$/material'
 import newGuid from '$/utils/newGuid'
-import { EquipTypeEnum } from '@/types/enum/equip'
-import { ItemInterface } from '@/types/game/item'
+import { EquipTypeEnum } from '@/types/enum'
+import { ItemInfo } from '@/types/proto'
 import EquipUserData from '@/types/user/EquipUserData'
 import { ItemTypeEnum, ItemUserData } from '@/types/user/InventoryUserData'
 import MaterialUserData from '@/types/user/MaterialUserData'
@@ -97,7 +97,7 @@ export default class Item {
 
   export() {
     const { itemId, guid, material, equip, furniture } = this
-    const ret: ItemInterface = {
+    const ret: ItemInfo = {
       itemId,
       guid: guid.toString()
     }

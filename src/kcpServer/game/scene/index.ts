@@ -13,11 +13,9 @@ import Player from '$/player'
 import Vector from '$/utils/vector'
 import World from '$/world'
 import Logger from '@/logger'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
-import { ScenePlayerInfo } from '@/types/game/playerInfo'
-import { PlayerWorldSceneInfo } from '@/types/game/scene'
-import { SceneTeamAvatar } from '@/types/game/team'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerWorldSceneInfo, ScenePlayerInfo, SceneTeamAvatar } from '@/types/proto'
+import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import SceneUserData from '@/types/user/SceneUserData'
 import { getTimeSeconds } from '@/utils/time'
 import SceneBlock from './sceneBlock'
@@ -230,21 +228,21 @@ export default class Scene extends BaseClass {
     let sceneType = (state & 0x0F00)
     switch (enterReason) {
       case SceneEnterReasonEnum.DUNGEON_ENTER:
-        sceneType = ClientState.SCENE_DUNGEON
+        sceneType = ClientStateEnum.SCENE_DUNGEON
         break
       case SceneEnterReasonEnum.DUNGEON_QUIT:
-        sceneType = ClientState.SCENE_WORLD
+        sceneType = ClientStateEnum.SCENE_WORLD
         break
     }
 
     // Set client state
-    player.state = ClientState.PRE_ENTER_SCENE | sceneType
+    player.state = ClientStateEnum.PRE_ENTER_SCENE | sceneType
 
     player.nextScene = this
 
     if (currentScene) await player.currentScene.leave(context)
 
-    logger.debug(uidPrefix('JOIN', host, 0xefef00), `UID: ${player.uid} ID: ${id} Pos: [${Math.floor(pos.X)},${Math.floor(pos.Y)},${Math.floor(pos.Z)}] Type: ${SceneEnterTypeEnum[enterType]} Reason: ${SceneEnterReasonEnum[enterReason]}`)
+    logger.debug(uidPrefix('JOIN', host, 0xefef00), `UID: ${player.uid} ID: ${id} Pos: [${Math.floor(pos.x)},${Math.floor(pos.y)},${Math.floor(pos.z)}] Type: ${SceneEnterTypeEnum[enterType]} Reason: ${SceneEnterReasonEnum[enterReason]}`)
 
     if (!world.isHost(player)) await GuestBeginEnterScene.sendNotify(host.context, this, player)
 
@@ -289,7 +287,7 @@ export default class Scene extends BaseClass {
     await player.emit('SceneJoin', this, context)
 
     // Set client state
-    player.state = ClientState.ENTER_SCENE | sceneType
+    player.state = ClientStateEnum.ENTER_SCENE | sceneType
 
     return true
   }
@@ -305,7 +303,7 @@ export default class Scene extends BaseClass {
     logger.debug(uidPrefix('QUIT', host, 0xffff00), `UID: ${uid} ID: ${id}`)
 
     // Set client state
-    player.state = ClientState.POST_LOGIN | (player.state & 0x0F00)
+    player.state = ClientStateEnum.POST_LOGIN | (player.state & 0x0F00)
 
     player.currentScene = null
     playerList.splice(playerList.indexOf(player), 1)

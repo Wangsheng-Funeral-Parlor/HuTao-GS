@@ -21,11 +21,10 @@ import Player from '$/player'
 import World from '$/world'
 import config from '@/config'
 import Logger from '@/logger'
-import { ENetReasonEnum } from '@/types/enum/ENetReason'
-import { MpSettingTypeEnum } from '@/types/enum/mp'
-import { PlayerPropEnum } from '@/types/enum/player'
-import { ClientState } from '@/types/enum/state'
-import { OnlinePlayerInfo } from '@/types/game/playerInfo'
+import { ClientStateEnum, PlayerPropEnum } from '@/types/enum'
+import { PlayerInfo } from '@/types/game'
+import { OnlinePlayerInfo } from '@/types/proto'
+import { ENetReasonEnum, MpSettingTypeEnum } from '@/types/proto/enum'
 import UserData from '@/types/user'
 import { getJsonAsync, setJsonAsync } from '@/utils/json'
 import KcpServer from '..'
@@ -78,8 +77,8 @@ export default class Game {
       // set born location
       player.hostWorld.hostLastState.init({
         sceneId: 3,
-        pos: { X: -657.9599609375, Y: 219.54281616210938, Z: 266.7440490722656 },
-        rot: { Y: 180 }
+        pos: { x: -657.9599609375, y: 219.54281616210938, z: 266.7440490722656 },
+        rot: { y: 180 }
       })
 
       // set avatar data
@@ -120,7 +119,7 @@ export default class Game {
     await PlayerLogin.response(context)
 
     // Set client state
-    client.state = ClientState.PICK_TWIN
+    client.state = ClientStateEnum.PICK_TWIN
 
     const player = new Player(this, client)
 
@@ -130,11 +129,14 @@ export default class Game {
     return player
   }
 
-  async getUid(auid: string) {
+  async getPlayerInfo(auid: string): Promise<PlayerInfo> {
     const userData = await this.loadUserData(auid)
-    if (!userData) return parseInt('1' + hash(auid).slice(0, 5))
+    const uid = userData ? userData.uid : parseInt('1' + hash(auid).slice(0, 5))
 
-    return userData.uid
+    return {
+      uid,
+      userData
+    }
   }
 
   async playerLogin(context: PacketContext, mpWorld?: World): Promise<Player> {
@@ -171,7 +173,7 @@ export default class Game {
     Logger.mark(loginPerfMark)
 
     // Set client state
-    client.state = ClientState.LOGIN
+    client.state = ClientStateEnum.LOGIN
 
     await player.windyRce('login')
 
@@ -197,7 +199,7 @@ export default class Game {
     await CoopData.sendNotify(context)
 
     // Set client state
-    client.state = ClientState.POST_LOGIN | ClientState.SCENE_WORLD
+    client.state = ClientStateEnum.POST_LOGIN | ClientStateEnum.SCENE_WORLD
     client.readyToSave = true
 
     // Join world
@@ -225,7 +227,7 @@ export default class Game {
     await player.destroy()
 
     // Set client state
-    client.state = ClientState.NONE
+    client.state = ClientStateEnum.NONE
 
     delete playerMap[auid]
     client.player = null

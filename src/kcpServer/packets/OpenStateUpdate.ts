@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface OpenStateUpdateNotify {
   openStateMap: { [key: number]: number }
@@ -11,7 +11,7 @@ class OpenStateUpdatePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN)) return
 
     const notifyData: OpenStateUpdateNotify = {
       openStateMap: context.player.openState.exportOpenStateMap()

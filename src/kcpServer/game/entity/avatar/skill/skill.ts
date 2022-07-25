@@ -1,8 +1,8 @@
-import { ElemTypeEnum } from '@/types/enum/skill'
-import SkillDepot from './skillDepot'
-import ProudSkill from './proudSkill'
 import SkillData from '$/gameData/data/SkillData'
+import { ElemTypeEnum } from '@/types/enum'
 import SkillUserData from '@/types/user/SkillUserData'
+import ProudSkill from './proudSkill'
+import SkillDepot from './skillDepot'
 
 export default class Skill {
   depot: SkillDepot

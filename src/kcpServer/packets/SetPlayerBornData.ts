@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface SetPlayerBornDataReq {
   avatarId: number
@@ -14,7 +14,7 @@ export interface SetPlayerBornDataRsp {
 class SetPlayerBornDataPacket extends Packet implements PacketInterface {
   constructor() {
     super('SetPlayerBornData', {
-      reqState: ClientState.PICK_TWIN
+      reqState: ClientStateEnum.PICK_TWIN
     })
   }
 
@@ -22,9 +22,9 @@ class SetPlayerBornDataPacket extends Packet implements PacketInterface {
     const { game, player } = context
 
     await player.initNew(data.avatarId, data.nickName)
+    await game.playerLogin(context)
 
     await this.response(context, { retcode: RetcodeEnum.RET_SUCC })
-    await game.playerLogin(context)
   }
 
   async response(context: PacketContext, data: SetPlayerBornDataRsp): Promise<void> {

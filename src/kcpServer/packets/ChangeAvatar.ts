@@ -1,14 +1,14 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { VectorInterface } from '@/types/game/motion'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { VectorInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface ChangeAvatarReq {
   guid: string
   skillId: number
   isMove: boolean
-  movePos: VectorInterface
+  movePos: VectorInfo
 }
 
 export interface ChangeAvatarRsp {
@@ -20,7 +20,7 @@ export interface ChangeAvatarRsp {
 class ChangeAvatarPacket extends Packet implements PacketInterface {
   constructor() {
     super('ChangeAvatar', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStateMask: 0xF0FF
     })
   }
@@ -31,11 +31,11 @@ class ChangeAvatarPacket extends Packet implements PacketInterface {
     const { guid, skillId, isMove, movePos } = data
 
     // Set client state
-    player.state = (state & 0xFF00) | ClientState.CHANGE_AVATAR
+    player.state = (state & 0xFF00) | ClientStateEnum.CHANGE_AVATAR
 
     const team = player.teamManager.getTeam()
     const avatar = team.getAvatar(BigInt(guid))
-    const retcode = await player.changeAvatar(avatar, isMove ? new Vector(movePos.X, movePos.Y, movePos.Z) : undefined, seqId)
+    const retcode = await player.changeAvatar(avatar, isMove ? new Vector(movePos.x, movePos.y, movePos.z) : undefined, seqId)
 
     await this.response(context, {
       retcode,

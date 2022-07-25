@@ -5,9 +5,8 @@ import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import curRegion from '@/tools/update/curRegion'
 import regionList from '@/tools/update/regionList'
-import { QueryCurrRegionHttpRsp } from '@/types/dispatch/curRegion'
-import { QueryRegionListHttpRsp } from '@/types/dispatch/regionList'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import { QueryCurrRegionHttpRsp, QueryRegionListHttpRsp } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { rsaEncrypt, rsaSign } from '@/utils/rsa'
@@ -30,7 +29,11 @@ const clientCustomConfig = {
   checkdevice: false,
   showexception: false,
   regionConfig: 'pm|fk|add',
-  downloadMode: '0'
+  downloadMode: '0',
+
+  // probably useless, but who cares
+  debugmenu: true,
+  debuglog: true
 }
 
 class DispatchHandler extends Handler {

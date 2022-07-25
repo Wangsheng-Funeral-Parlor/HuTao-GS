@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { ActivityInfo } from '@/types/game/activity'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ActivityInfo } from '@/types/proto'
 
 export interface ActivityInfoNotify {
   activityInfo: ActivityInfo
@@ -12,7 +12,7 @@ class ActivityInfoPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, id: number): Promise<void> {
-    await this.waitState(context, ClientState.LOGIN, true)
+    await this.waitState(context, ClientStateEnum.LOGIN, true)
 
     const { game, player } = context
     const { activityManager } = game

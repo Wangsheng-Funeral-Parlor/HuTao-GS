@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { MapMarkPoint } from '@/types/game/map'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { MapMarkPoint } from '@/types/proto'
 
 export interface AllMarkPointNotify {
   markList: MapMarkPoint[]

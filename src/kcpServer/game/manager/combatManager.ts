@@ -1,15 +1,12 @@
 import BaseClass from '#/baseClass'
-import dataUtils from '#/utils/dataUtils'
-import Logger from '@/logger'
-import Player from '$/player'
-import { CombatTypeArgumentEnum } from '@/types/enum/invoke'
-import { CombatInvokeEntry } from '@/types/game/invoke'
-import { EntityMoveInfo, EvtBeingHitInfo } from '@/types/game/combat'
 import CombatInvocations from '#/packets/CombatInvocations'
-import { ChangeHpReasonEnum, FightPropEnum } from '@/types/enum/fightProp'
-import { MotionStateEnum, ProtEntityTypeEnum } from '@/types/enum/entity'
+import dataUtils from '#/utils/dataUtils'
 import Entity from '$/entity'
-import { ClientState } from '@/types/enum/state'
+import Player from '$/player'
+import Logger from '@/logger'
+import { ClientStateEnum, FightPropEnum } from '@/types/enum'
+import { CombatInvokeEntry, EntityMoveInfo, EvtBeingHitInfo } from '@/types/proto'
+import { ChangeHpReasonEnum, CombatTypeArgumentEnum, MotionStateEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 
 const fallDamageConfig = {
   fall: {
@@ -76,10 +73,10 @@ export default class CombatManager extends BaseClass {
 
     logger.verbose(proto)
 
-    await this.emit(proto, await dataUtils.dataToProtobuffer(Buffer.from(combatData, 'base64'), proto))
+    await this.emit(proto, await dataUtils.dataToProtobuffer(Buffer.from(combatData, 'base64'), proto), seqId)
   }
 
-  private async takeFallDamage(entity: Entity, speedInfo: [number, number, number], plungeFall: boolean): Promise<void> {
+  private async takeFallDamage(entity: Entity, speedInfo: [number, number, number], plungeFall: boolean, seqId: number): Promise<void> {
     const { index, sign, threshold, multiplier } = fallDamageConfig[plungeFall ? 'plunge' : 'fall']
     const speed = speedInfo[index] * sign
 
@@ -97,7 +94,7 @@ export default class CombatManager extends BaseClass {
     const { fightProps } = entity
     const damage = fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * mul
 
-    await fightProps.takeDamage(0, damage, true, ChangeHpReasonEnum.CHANGE_HP_SUB_FALL)
+    await fightProps.takeDamage(0, damage, true, ChangeHpReasonEnum.CHANGE_HP_SUB_FALL, seqId)
   }
 
   /**Combat Events**/
@@ -107,7 +104,7 @@ export default class CombatManager extends BaseClass {
   // EvtAnimatorStateChangedInfo
 
   // EvtBeingHitInfo
-  async handleEvtBeingHitInfo(data: EvtBeingHitInfo) {
+  async handleEvtBeingHitInfo(data: EvtBeingHitInfo, seqId: number) {
     const { player } = this
     const { currentScene } = player
     if (!currentScene) return
@@ -133,7 +130,7 @@ export default class CombatManager extends BaseClass {
     }
 
     // Take attack damage
-    await target.fightProps.takeDamage(attackerId, damage, true, reason)
+    await target.fightProps.takeDamage(attackerId, damage, true, reason, seqId)
   }
 
   // EvtCombatForceSetPosInfo
@@ -141,27 +138,27 @@ export default class CombatManager extends BaseClass {
   // EvtSetAttackTargetInfo
 
   // EntityMoveInfo
-  async handleEntityMoveInfo(data: EntityMoveInfo) {
+  async handleEntityMoveInfo(data: EntityMoveInfo, seqId: number) {
     const { player, landSpeedInfoMap } = this
     const { state, currentScene } = player
     const { entityId, motionInfo, sceneTime, reliableSeq } = data
     const { state: motionState, speed, params } = motionInfo
 
-    if ((state & 0xF000) !== ClientState.IN_GAME) return
+    if ((state & 0xF000) !== ClientStateEnum.IN_GAME) return
 
     const { entityManager } = currentScene
     const entity = entityManager.getEntity(entityId)
     if (!entity) return
 
     // Update entity motion info
-    entity.motionInfo.update(motionInfo, sceneTime, reliableSeq)
+    entity.motion.update(motionInfo, sceneTime, reliableSeq)
 
-    if (entity.motionInfo.pos.grid.hasChanged()) entityManager.updateEntity(entity)
+    if (entity.motion.pos.grid.hasChanged()) entityManager.updateEntity(entity)
 
     switch (motionState) {
       // Save landing speed
       case MotionStateEnum.MOTION_LAND_SPEED: {
-        landSpeedInfoMap[entityId] = [speed.Y, params[0]?.X || 0, Date.now()]
+        landSpeedInfoMap[entityId] = [speed.y, params[0]?.x || 0, Date.now()]
         break
       }
 
@@ -171,7 +168,7 @@ export default class CombatManager extends BaseClass {
         const speedInfo = landSpeedInfoMap[entityId]
         if (speedInfo == null || Date.now() - speedInfo[2] > 500) break
 
-        await this.takeFallDamage(entity, speedInfo, motionState === MotionStateEnum.MOTION_FIGHT)
+        await this.takeFallDamage(entity, speedInfo, motionState === MotionStateEnum.MOTION_FIGHT, seqId)
         break
       }
     }

@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { TowerCurLevelRecord, TowerFloorRecord, TowerMonthlyBrief } from '@/types/game/tower'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { TowerCurLevelRecord, TowerFloorRecord, TowerMonthlyBrief } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 import { getTimeSeconds } from '@/utils/time'
 
 export interface TowerAllDataReq {

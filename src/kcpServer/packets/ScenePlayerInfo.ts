@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { ScenePlayerInfo } from '@/types/game/playerInfo'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ScenePlayerInfo } from '@/types/proto'
 
 export interface ScenePlayerInfoNotify {
   playerInfoList: ScenePlayerInfo[]
@@ -12,7 +12,7 @@ class ScenePlayerInfoPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE | ClientState.PRE_SCENE_INIT_FINISH, true)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH, true)) return
 
     const notifyData: ScenePlayerInfoNotify = {
       playerInfoList: context.player.currentScene.exportScenePlayerInfoList()

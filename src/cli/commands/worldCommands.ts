@@ -1,6 +1,6 @@
 import SceneData from '$/gameData/data/SceneData'
 import Vector from '$/utils/vector'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
+import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import { CommandDefinition } from '.'
 
 const worldCommands: CommandDefinition[] = [
@@ -53,7 +53,7 @@ const worldCommands: CommandDefinition[] = [
         return
       }
 
-      print('Scene:', player.currentScene?.id || '?', 'X:', pos.X, 'Y:', pos.Y, 'Z:', pos.Z)
+      print('Scene:', player.currentScene?.id || '?', 'X:', pos.x, 'Y:', pos.y, 'Z:', pos.z)
     }
   },
   {

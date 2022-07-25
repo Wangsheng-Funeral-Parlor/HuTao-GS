@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { MapAreaInfo } from '@/types/game/map'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import MapAreaData from '$/gameData/data/MapAreaData'
+import { MapAreaInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetMapAreaReq { }
 

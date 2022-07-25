@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface SceneTimeNotify {
   sceneId: number
@@ -13,7 +13,7 @@ class SceneTimePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE, true)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE, true)) return
 
     const { id, sceneTime, paused } = context.player.currentScene
 

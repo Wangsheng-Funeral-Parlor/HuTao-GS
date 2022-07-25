@@ -3,7 +3,7 @@ import PrivateChatChannel from '$/chat/privateChatChannel'
 import PublicChatChannel from '$/chat/publicChatChannel'
 import Player from '$/player'
 import World from '$/world'
-import { ChatInfo } from '@/types/game/chat'
+import { ChatInfo } from '@/types/proto'
 import Game from '..'
 
 export class ChatManager extends BaseClass {

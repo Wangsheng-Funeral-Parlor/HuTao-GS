@@ -1,7 +1,6 @@
 import WeaponData from '$/gameData/data/WeaponData'
-import { EquipTypeEnum } from '@/types/enum/equip'
-import { EquipInterface } from '@/types/game/item'
-import { SceneWeaponInfo } from '@/types/game/weapon'
+import { EquipTypeEnum } from '@/types/enum'
+import { EquipInfo, SceneWeaponInfo } from '@/types/proto'
 import WeaponUserData from '@/types/user/WeaponUserData'
 import Equip from '..'
 import Affix from './affix'
@@ -110,7 +109,7 @@ export default class Weapon extends Equip {
     }
   }
 
-  export(): EquipInterface {
+  export(): EquipInfo {
     const { level, exp, promoteLevel, isLocked } = this
     return {
       weapon: {

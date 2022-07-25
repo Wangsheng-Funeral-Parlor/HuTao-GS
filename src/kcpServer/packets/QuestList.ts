@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { Quest } from '@/types/game/quest'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { Quest } from '@/types/proto'
 import { getTimeSeconds } from '@/utils/time'
 
 export interface QuestListNotify {

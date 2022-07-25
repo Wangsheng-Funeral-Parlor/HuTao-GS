@@ -64,12 +64,12 @@ export default class SceneBlock extends BaseClass {
     if (rect == null || !pos) return false
 
     const { min, max } = rect
-    const { X, Z } = pos
+    const { x: X, z: Z } = pos
 
-    const minX = Math.min(min.X, max.X)
-    const maxX = Math.max(min.X, max.X)
-    const minZ = Math.min(min.Z, max.Z)
-    const maxZ = Math.max(min.Z, max.Z)
+    const minX = Math.min(min.x, max.x)
+    const maxX = Math.max(min.x, max.x)
+    const minZ = Math.min(min.z, max.z)
+    const maxZ = Math.max(min.z, max.z)
 
     return (X >= minX && X <= maxX && Z >= minZ && Z <= maxZ)
   }

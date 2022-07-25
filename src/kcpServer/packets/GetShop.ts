@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { Shop } from '@/types/game/shop'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { Shop } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetShopReq {
   shopType: number
@@ -15,7 +15,7 @@ export interface GetShopRsp {
 class GetShopPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetShop', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

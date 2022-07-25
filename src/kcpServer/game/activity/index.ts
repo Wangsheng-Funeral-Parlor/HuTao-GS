@@ -1,6 +1,6 @@
 import ActivityManager from '$/manager/activityManager'
 import Player from '$/player'
-import { ActivityInfo, ActivityScheduleInfo } from '@/types/game/activity'
+import { ActivityInfo, ActivityScheduleInfo } from '@/types/proto'
 import { getTimeSeconds } from '@/utils/time'
 
 export default class Activity {

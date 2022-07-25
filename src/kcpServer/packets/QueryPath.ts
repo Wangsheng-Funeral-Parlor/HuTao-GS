@@ -1,27 +1,26 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { QueryPathOptionTypeEnum, QueryPathStatusTypeEnum } from '@/types/enum/queryPath'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { VectorInfo } from '@/types/proto'
+import { QueryPathOptionTypeEnum, QueryPathStatusTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 
 export interface QueryPathReq {
   queryType: QueryPathOptionTypeEnum
   queryId: number
   sceneId: number
-  sourcePos: VectorInterface
-  destinationPos: VectorInterface[]
+  sourcePos: VectorInfo
+  destinationPos: VectorInfo[]
   filter?: {
     typeId: number
     areaMask: number
   }
-  destinationExtend?: VectorInterface
-  sourceExtend?: VectorInterface
+  destinationExtend?: VectorInfo
+  sourceExtend?: VectorInfo
 }
 
 export interface QueryPathRsp {
   retcode: RetcodeEnum
   queryId: number
   queryStatus: QueryPathStatusTypeEnum
-  corners: VectorInterface[]
+  corners: VectorInfo[]
 }
 
 class QueryPathPacket extends Packet implements PacketInterface {

@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Entity from '$/entity'
-import { PlayerDieTypeEnum } from '@/types/enum/player'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerDieTypeEnum } from '@/types/proto/enum'
 
 export interface WorldPlayerDieNotify {
   monsterId?: number
@@ -17,7 +17,7 @@ class WorldPlayerDiePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, targetEntity: Entity): Promise<void> {
-    if (!this.checkState(context, ClientState.IN_GAME, true)) return
+    if (!this.checkState(context, ClientStateEnum.IN_GAME, true)) return
 
     const { dieType, attackerId } = targetEntity
 

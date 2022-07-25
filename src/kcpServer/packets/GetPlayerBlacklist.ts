@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { FriendBrief } from '@/types/game/social'
-import { RetcodeEnum } from '@/types/enum/Retcode'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { FriendBrief } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface GetPlayerBlacklistReq { }
 

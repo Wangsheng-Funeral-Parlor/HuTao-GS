@@ -1,6 +1,6 @@
 import Loader from '$/gameData/loader'
+import { EntityFightPropConfig } from '@/types/game'
 import AvatarDataGroup, { AvatarData, CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
-import { EntityFightPropConfig } from '@/types/game/entity'
 
 class AvatarDataLoader extends Loader {
   declare data: AvatarDataGroup

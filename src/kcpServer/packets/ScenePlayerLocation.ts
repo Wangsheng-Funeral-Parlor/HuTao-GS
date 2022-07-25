@@ -1,7 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { VehicleLocationInfo } from '@/types/game/vehicle'
-import { PlayerLocationInfo } from '@/types/game/world'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { PlayerLocationInfo, VehicleLocationInfo } from '@/types/proto'
 
 export interface ScenePlayerLocationNotify {
   sceneId: number
@@ -15,7 +14,7 @@ class ScenePlayerLocationPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, data: ScenePlayerLocationNotify): Promise<void> {
-    if (!this.checkState(context, ClientState.IN_GAME, true)) return
+    if (!this.checkState(context, ClientStateEnum.IN_GAME, true)) return
 
     await super.sendNotify(context, data)
   }

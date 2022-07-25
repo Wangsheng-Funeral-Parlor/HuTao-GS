@@ -6,6 +6,7 @@
   "bin": "buildRel/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "tsc --noEmit",
     "build-dev": "node ./build -mode:dev",
     "build-rel": "node ./build -mode:rel",
     "build": "node ./build",
@@ -28,7 +29,6 @@
     "denque": "^2.0.1",
     "hostile": "^1.3.3",
     "md5": "^2.3.0",
-    "node-rsa": "^1.1.1",
     "promise-events": "^0.2.4",
     "protobufjs": "^6.11.2",
     "verror": "^1.10.1",

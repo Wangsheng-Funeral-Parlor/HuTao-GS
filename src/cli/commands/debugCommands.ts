@@ -36,6 +36,11 @@ const debugCommands: CommandDefinition[] = [
     exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('SaveReport')
   },
   {
+    name: 'packetDump',
+    desc: 'Enable/Disable packet dump',
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('PacketDump')
+  },
+  {
     name: 'packetId',
     desc: 'Show/Hide packetId',
     exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('ShowPacketId')

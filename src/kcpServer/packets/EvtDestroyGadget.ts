@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ForwardTypeEnum } from '@/types/enum/invoke'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ForwardTypeEnum } from '@/types/proto/enum'
 
 interface EvtDestroyGadgetNotify {
   forwardType: ForwardTypeEnum
@@ -10,14 +10,14 @@ interface EvtDestroyGadgetNotify {
 class EvtDestroyGadgetPacket extends Packet implements PacketInterface {
   constructor() {
     super('EvtDestroyGadget', {
-      notifyState: ClientState.IN_GAME,
+      notifyState: ClientStateEnum.IN_GAME,
       notifyStatePass: true
     })
   }
 
   async recvNotify(context: PacketContext, data: EvtDestroyGadgetNotify): Promise<void> {
     const { player, seqId } = context
-    const { forwardBuffer, currentScene } = player
+    const { forwardBuffer } = player
 
     forwardBuffer.addEntry(this, data, seqId)
     await forwardBuffer.sendAll()

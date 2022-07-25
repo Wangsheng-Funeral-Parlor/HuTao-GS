@@ -1,7 +1,7 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
 import SceneTransPoint from '@/types/gameData/BinOutput/ScenePoint/Point/SceneTransPoint'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface EnterTransPointRegionNotify {
   sceneId: number
@@ -11,7 +11,7 @@ export interface EnterTransPointRegionNotify {
 class EnterTransPointRegionPacket extends Packet implements PacketInterface {
   constructor() {
     super('EnterTransPointRegion', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStateMask: 0xF000
     })
   }

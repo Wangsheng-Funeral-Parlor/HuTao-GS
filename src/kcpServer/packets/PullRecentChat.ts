@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { ChatInfo } from '@/types/game/chat'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { ChatInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface PullRecentChatReq {
   beginSequence: number
@@ -16,7 +16,7 @@ export interface PullRecentChatRsp {
 class PullRecentChatPacket extends Packet implements PacketInterface {
   constructor() {
     super('PullRecentChat', {
-      reqState: ClientState.POST_LOGIN,
+      reqState: ClientStateEnum.POST_LOGIN,
       reqStatePass: true
     })
   }

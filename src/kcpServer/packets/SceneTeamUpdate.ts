@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { SceneTeamAvatar } from '@/types/game/team'
+import { ClientStateEnum } from '@/types/enum'
+import { SceneTeamAvatar } from '@/types/proto'
 
 export interface SceneTeamUpdateNotify {
   sceneTeamAvatarList: SceneTeamAvatar[]
@@ -13,7 +13,7 @@ class SceneTeamUpdatePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.ENTER_SCENE | ClientState.PRE_SCENE_INIT_FINISH, true)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH, true)) return
 
     const notifyData: SceneTeamUpdateNotify = {
       sceneTeamAvatarList: context.player.currentScene.exportSceneTeamAvatarList(),

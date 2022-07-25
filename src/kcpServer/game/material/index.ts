@@ -1,6 +1,6 @@
-import newGuid from '$/utils/newGuid'
-import { MaterialInterface } from '@/types/game/item'
 import MaterialData from '$/gameData/data/MaterialData'
+import newGuid from '$/utils/newGuid'
+import { MaterialInfo } from '@/types/proto'
 import MaterialUserData from '@/types/user/MaterialUserData'
 
 export default class Material {
@@ -71,7 +71,7 @@ export default class Material {
     return leftover
   }
 
-  export(): MaterialInterface {
+  export(): MaterialInfo {
     return {
       count: this.count
     }

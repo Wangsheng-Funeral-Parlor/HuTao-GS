@@ -1,6 +1,6 @@
 import Logger from '@/logger'
-import Tcp from 'net'
 import * as dgram from 'dgram'
+import Tcp from 'net'
 import DnsServer from '.'
 import DnsPacket from './packet'
 import { readStream } from './utils'

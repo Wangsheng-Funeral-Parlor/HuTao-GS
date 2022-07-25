@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface GetAllUnlockNameCardReq { }
 
@@ -12,7 +12,7 @@ export interface GetAllUnlockNameCardRsp {
 class GetAllUnlockNameCardPacket extends Packet implements PacketInterface {
   constructor() {
     super('GetAllUnlockNameCard', {
-      reqWaitState: ClientState.POST_LOGIN,
+      reqWaitState: ClientStateEnum.POST_LOGIN,
       reqWaitStatePass: true
     })
   }

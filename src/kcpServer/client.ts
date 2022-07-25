@@ -2,15 +2,21 @@ import BaseClass from '#/baseClass'
 import { Kcp } from '#/utils/kcp'
 import Player from '$/player'
 import Logger from '@/logger'
-import { ENetReasonEnum } from '@/types/enum/ENetReason'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 import { PacketHead, SocketContext } from '@/types/kcp'
+import { ENetReasonEnum } from '@/types/proto/enum'
 import MT19937 from '@/utils/mt19937'
 import KcpServer from './'
 import { Handshake } from './handshake'
 import protoCleanup from './utils/protoCleanup'
 
 const logger = new Logger('CLIENT', 0xffdb4a)
+
+const noCleanupPackets = [
+  "AvatarFightPropUpdateNotify",
+  "EntityFightPropChangeReasonNotify",
+  "EntityFightPropUpdateNotify"
+]
 
 export default class Client extends BaseClass {
   private conv: number
@@ -23,7 +29,7 @@ export default class Client extends BaseClass {
 
   id: string
 
-  state: ClientState
+  state: ClientStateEnum
 
   key: Buffer
   seqId: number
@@ -41,7 +47,7 @@ export default class Client extends BaseClass {
 
     this.id = id
 
-    this.state = ClientState.NONE
+    this.state = ClientStateEnum.NONE
 
     this.player = null
     this.key = null
@@ -86,8 +92,8 @@ export default class Client extends BaseClass {
   update() {
     const { server, kcp, player, state } = this
 
-    if (state > ClientState.DEADLINK && kcp.isDeadLink()) {
-      this.state = ClientState.DEADLINK
+    if (state > ClientStateEnum.DEADLINK && kcp.isDeadLink()) {
+      this.state = ClientStateEnum.DEADLINK
       server.disconnect(this.id)
     }
 
@@ -164,6 +170,6 @@ export default class Client extends BaseClass {
 
   // Send protobuf packet
   async sendProtobuf(packetName: string, packetHead: PacketHead, obj: object) {
-    await this.server.sendProtobuf(this, packetName, packetHead, protoCleanup(obj))
+    await this.server.sendProtobuf(this, packetName, packetHead, noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj))
   }
 }

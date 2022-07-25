@@ -1,10 +1,10 @@
 import DataVector from '@/types/gameData/BinOutput/Common/Vector'
-import { VectorInterface } from '@/types/game/motion'
+import { VectorInfo } from '@/types/proto'
 
 export default class Vector {
-  X: number
-  Y: number
-  Z: number
+  x: number
+  y: number
+  z: number
 
   lastX: number
   lastY: number
@@ -25,19 +25,19 @@ export default class Vector {
   }
 
   private updateHash() {
-    const { X, Y, Z } = this
-    this.hash = 1 * X + 12 * Y + 123 * Z
+    const { x, y, z } = this
+    this.hash = 1 * x + 12 * y + 123 * z
   }
 
   private updateGrid() {
-    const { X, Y, Z, grid, gridSize } = this
+    const { x, y, z, grid, gridSize } = this
     if (gridSize == null) return
 
-    grid?.set(Math.floor(X / gridSize), Math.floor(Y / gridSize), Math.floor(Z / gridSize))
+    grid?.set(Math.floor(x / gridSize), Math.floor(y / gridSize), Math.floor(z / gridSize))
   }
 
   set(x?: number, y?: number, z?: number): Vector {
-    const { X, Y, Z, initLast } = this
+    const { x: X, y: Y, z: Z, initLast } = this
 
     if (initLast) {
       this.lastX = x || 0
@@ -50,9 +50,9 @@ export default class Vector {
       this.lastZ = Z || 0
     }
 
-    this.X = x || 0
-    this.Y = y || 0
-    this.Z = z || 0
+    this.x = x || 0
+    this.y = y || 0
+    this.z = z || 0
 
     this.updateHash()
     this.updateGrid()
@@ -69,46 +69,49 @@ export default class Vector {
     return this
   }
 
-  setData(vec: DataVector | VectorInterface | Vector) {
-    const { X, Y, Z } = vec || {}
+  setData(vec: DataVector | VectorInfo | Vector) {
+    const v = vec || {}
+    const x = (<VectorInfo | Vector>v).x || (<DataVector>v).X
+    const y = (<VectorInfo | Vector>v).y || (<DataVector>v).Y
+    const z = (<VectorInfo | Vector>v).z || (<DataVector>v).Z
 
     this.set(
-      typeof X === 'number' ? X : X?.[1],
-      typeof Y === 'number' ? Y : Y?.[1],
-      typeof Z === 'number' ? Z : Z?.[1]
+      typeof x === 'number' ? x : x?.[1],
+      typeof y === 'number' ? y : y?.[1],
+      typeof z === 'number' ? z : z?.[1]
     )
 
     return this
   }
 
   distanceTo(vec: Vector): number {
-    const { X, Y, Z } = this
-    return Math.sqrt(((vec.X - X) ** 2) + ((vec.Y - Y) ** 2) + ((vec.Z - Z) ** 2))
+    const { x, y, z } = this
+    return Math.sqrt(((vec.x - x) ** 2) + ((vec.y - y) ** 2) + ((vec.z - z) ** 2))
   }
 
   distanceTo2D(vec: Vector): number {
-    const { X, Z } = this
-    return Math.sqrt(((vec.X - X) ** 2) + ((vec.Z - Z) ** 2))
+    const { x, z } = this
+    return Math.sqrt(((vec.x - x) ** 2) + ((vec.z - z) ** 2))
   }
 
   hasChanged(): boolean {
-    const { X, Y, Z, lastX, lastY, lastZ } = this
+    const { x, y, z, lastX, lastY, lastZ } = this
     return (
-      X !== lastX ||
-      Y !== lastY ||
-      Z !== lastZ
+      x !== lastX ||
+      y !== lastY ||
+      z !== lastZ
     )
   }
 
   equal(vec: Vector): boolean {
-    const { X, Y, Z } = this
-    const { X: x, Y: y, Z: z } = vec
+    const { x: X, y: Y, z: Z } = this
+    const { x, y, z } = vec
     return X === x && Y === y && Z === z
   }
 
   copy(vec: Vector): Vector {
-    const { X, Y, Z } = vec
-    this.set(X, Y, Z)
+    const { x, y, z } = vec
+    this.set(x, y, z)
     return this
   }
 
@@ -118,52 +121,52 @@ export default class Vector {
 
   // vector math
   add(vec: Vector): Vector {
-    const { X, Y, Z } = this
-    const { X: x, Y: y, Z: z } = vec
+    const { x: X, y: Y, z: Z } = this
+    const { x, y, z } = vec
     return this.set(X + x, Y + y, Z + z)
   }
 
   sub(vec: Vector): Vector {
-    const { X, Y, Z } = this
-    const { X: x, Y: y, Z: z } = vec
+    const { x: X, y: Y, z: Z } = this
+    const { x, y, z } = vec
     return this.set(X - x, Y - y, Z - z)
   }
 
   mul(vec: Vector): Vector {
-    const { X, Y, Z } = this
-    const { X: x, Y: y, Z: z } = vec
+    const { x: X, y: Y, z: Z } = this
+    const { x, y, z } = vec
     return this.set(X * x, Y * y, Z * z)
   }
 
   div(vec: Vector): Vector {
-    const { X, Y, Z } = this
-    const { X: x, Y: y, Z: z } = vec
+    const { x: X, y: Y, z: Z } = this
+    const { x, y, z } = vec
     return this.set(X / x, Y / y, Z / z)
   }
 
   // scalar math
   addScalar(n: number): Vector {
-    const { X, Y, Z } = this
-    return this.set(X + n, Y + n, Z + n)
+    const { x, y, z } = this
+    return this.set(x + n, y + n, z + n)
   }
 
   subScalar(n: number): Vector {
-    const { X, Y, Z } = this
-    return this.set(X - n, Y - n, Z - n)
+    const { x, y, z } = this
+    return this.set(x - n, y - n, z - n)
   }
 
   mulScalar(n: number): Vector {
-    const { X, Y, Z } = this
-    return this.set(X * n, Y * n, Z * n)
+    const { x, y, z } = this
+    return this.set(x * n, y * n, z * n)
   }
 
   divScalar(n: number): Vector {
-    const { X, Y, Z } = this
-    return this.set(X / n, Y / n, Z / n)
+    const { x, y, z } = this
+    return this.set(x / n, y / n, z / n)
   }
 
-  export(): VectorInterface {
-    const props = ['X', 'Y', 'Z']
+  export(): VectorInfo {
+    const props = ['x', 'y', 'z']
     const ret = {}
 
     for (let prop of props) {

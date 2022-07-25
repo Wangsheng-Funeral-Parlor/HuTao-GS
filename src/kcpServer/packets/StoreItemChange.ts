@@ -1,11 +1,11 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Item from '$/player/inventory/item'
-import { StoreTypeEnum } from '@/types/enum/player'
-import { ItemInterface } from '@/types/game/item'
+import { ItemInfo } from '@/types/proto'
+import { StoreTypeEnum } from '@/types/proto/enum'
 
 export interface StoreItemChangeNotify {
   storeType: StoreTypeEnum
-  itemList: ItemInterface[]
+  itemList: ItemInfo[]
 }
 
 class StoreItemChangePacket extends Packet implements PacketInterface {

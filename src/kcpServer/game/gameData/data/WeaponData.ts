@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import { EntityFightPropConfig } from '@/types/game/entity'
+import { EntityFightPropConfig } from '@/types/game'
 import WeaponDataGroup, { WeaponData } from '@/types/gameData/WeaponData'
 
 class WeaponDataLoader extends Loader {

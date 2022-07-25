@@ -70,7 +70,7 @@ export default function keyGen() {
     else progressBuf = Buffer.alloc(512)
 
     for (let dumpFile of readdirSync(dumpDirPath)) {
-      if (dumpFile.indexOf('packet-') !== 0) continue
+      if (dumpFile.indexOf('raw-') !== 0) continue
 
       try {
         const dumpFilePath = join(dumpDirPath, dumpFile)

@@ -1,12 +1,12 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Entity from '$/entity'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
-import { MotionInfoInterface } from '@/types/game/motion'
+import { ClientStateEnum } from '@/types/enum'
+import { MotionInfo } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface SceneEntityMoveReq {
   entityId: number
-  motionInfo: MotionInfoInterface
+  motionInfo: MotionInfo
   sceneTime: number
   reliableSeq: number
 }
@@ -14,14 +14,14 @@ export interface SceneEntityMoveReq {
 export interface SceneEntityMoveRsp {
   retcode: RetcodeEnum
   entityId?: number
-  failMotion?: MotionInfoInterface
+  failMotion?: MotionInfo
   sceneTime?: number
   reliableSeq?: number
 }
 
 export interface SceneEntityMoveNotify {
   entityId: number
-  motionInfo: MotionInfoInterface
+  motionInfo: MotionInfo
   sceneTime: number
   reliableSeq: number
 }
@@ -29,7 +29,7 @@ export interface SceneEntityMoveNotify {
 class SceneEntityMovePacket extends Packet implements PacketInterface {
   constructor() {
     super('SceneEntityMove', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }
@@ -45,7 +45,7 @@ class SceneEntityMovePacket extends Packet implements PacketInterface {
       return
     }
 
-    entity.motionInfo.update(motionInfo, sceneTime, reliableSeq)
+    entity.motion.update(motionInfo, sceneTime, reliableSeq)
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
@@ -63,12 +63,12 @@ class SceneEntityMovePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, entity: Entity): Promise<void> {
-    const { entityId, motionInfo } = entity
-    const { sceneTime, reliableSeq } = motionInfo
+    const { entityId, motion } = entity
+    const { sceneTime, reliableSeq } = motion
 
     const notifyData: SceneEntityMoveNotify = {
       entityId: entityId,
-      motionInfo: motionInfo.export(),
+      motionInfo: motion.export(),
       sceneTime,
       reliableSeq
     }

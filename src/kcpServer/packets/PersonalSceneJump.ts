@@ -1,11 +1,10 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/enum/scene'
-import { VectorInterface } from '@/types/game/motion'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
+import Vector from '$/utils/vector'
+import { ClientStateEnum } from '@/types/enum'
 import PersonalSceneJumpPoint from '@/types/gameData/BinOutput/ScenePoint/Point/PersonalSceneJumpPoint'
-import { ClientState } from '@/types/enum/state'
+import { VectorInfo } from '@/types/proto'
+import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface PersonalSceneJumpReq {
   pointId: number
@@ -14,13 +13,13 @@ export interface PersonalSceneJumpReq {
 export interface PersonalSceneJumpRsp {
   retcode: RetcodeEnum
   destSceneId?: number
-  destPos?: VectorInterface
+  destPos?: VectorInfo
 }
 
 class PersonalSceneJumpPacket extends Packet implements PacketInterface {
   constructor() {
     super('PersonalSceneJump', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }

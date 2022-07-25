@@ -1,6 +1,6 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { ClientState } from '@/types/enum/state'
+import { RetcodeEnum } from '@/types/proto/enum'
+import { ClientStateEnum } from '@/types/enum'
 import StoreItemChange from './StoreItemChange'
 
 export interface SetEquipLockStateReq {
@@ -17,7 +17,7 @@ export interface SetEquipLockStateRsp {
 class SetEquipLockStatePacket extends Packet implements PacketInterface {
   constructor() {
     super('SetEquipLockState', {
-      reqState: ClientState.IN_GAME,
+      reqState: ClientStateEnum.IN_GAME,
       reqStatePass: true
     })
   }

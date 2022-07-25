@@ -1,7 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { SceneEnterReasonEnum } from '@/types/enum/scene'
-import { ClientState } from '@/types/enum/state'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { RetcodeEnum, SceneEnterReasonEnum } from '@/types/proto/enum'
 
 export interface PlayerQuitDungeonReq {
   pointId: number
@@ -15,7 +14,7 @@ export interface PlayerQuitDungeonRsp {
 class PlayerQuitDungeonPacket extends Packet implements PacketInterface {
   constructor() {
     super('PlayerQuitDungeon', {
-      reqState: ClientState.IN_GAME | ClientState.SCENE_DUNGEON,
+      reqState: ClientStateEnum.IN_GAME | ClientStateEnum.SCENE_DUNGEON,
       reqStateMask: 0xFF00
     })
   }

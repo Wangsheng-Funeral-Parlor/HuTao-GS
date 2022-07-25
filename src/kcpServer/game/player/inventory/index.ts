@@ -1,6 +1,6 @@
 import StoreItemChange from '#/packets/StoreItemChange'
 import StoreItemDel from '#/packets/StoreItemDel'
-import { ItemInterface } from '@/types/game/item'
+import { ItemInfo } from '@/types/proto'
 import InventoryUserData from '@/types/user/InventoryUserData'
 import Player from '..'
 import Equip from '../../equip'
@@ -124,7 +124,7 @@ export default class Inventory {
     return this.itemList.find(item => item.guid === guid)
   }
 
-  exportItemList(): ItemInterface[] {
+  exportItemList(): ItemInfo[] {
     return this.itemList.map(item => item.export())
   }
 

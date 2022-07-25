@@ -153,85 +153,85 @@ export default class BufferCursor {
   }
 
   readUInt8() {
-    var ret = this.buffer.readUInt8(this._pos)
+    const ret = this.buffer.readUInt8(this._pos)
     this._move(1)
     return ret
   }
 
   readInt8() {
-    var ret = this.buffer.readInt8(this._pos)
+    const ret = this.buffer.readInt8(this._pos)
     this._move(1)
     return ret
   }
 
   readInt16BE() {
-    var ret = this.buffer.readInt16BE(this._pos)
+    const ret = this.buffer.readInt16BE(this._pos)
     this._move(2)
     return ret
   }
 
   readInt16LE() {
-    var ret = this.buffer.readInt16LE(this._pos)
+    const ret = this.buffer.readInt16LE(this._pos)
     this._move(2)
     return ret
   }
 
   readUInt16BE() {
-    var ret = this.buffer.readUInt16BE(this._pos)
+    const ret = this.buffer.readUInt16BE(this._pos)
     this._move(2)
     return ret
   }
 
   readUInt16LE() {
-    var ret = this.buffer.readUInt16LE(this._pos)
+    const ret = this.buffer.readUInt16LE(this._pos)
     this._move(2)
     return ret
   }
 
   readUInt32LE() {
-    var ret = this.buffer.readUInt32LE(this._pos)
+    const ret = this.buffer.readUInt32LE(this._pos)
     this._move(4)
     return ret
   }
 
   readUInt32BE() {
-    var ret = this.buffer.readUInt32BE(this._pos)
+    const ret = this.buffer.readUInt32BE(this._pos)
     this._move(4)
     return ret
   }
 
   readInt32LE() {
-    var ret = this.buffer.readInt32LE(this._pos)
+    const ret = this.buffer.readInt32LE(this._pos)
     this._move(4)
     return ret
   }
 
   readInt32BE() {
-    var ret = this.buffer.readInt32BE(this._pos)
+    const ret = this.buffer.readInt32BE(this._pos)
     this._move(4)
     return ret
   }
 
   readFloatBE() {
-    var ret = this.buffer.readFloatBE(this._pos)
+    const ret = this.buffer.readFloatBE(this._pos)
     this._move(4)
     return ret
   }
 
   readFloatLE() {
-    var ret = this.buffer.readFloatLE(this._pos)
+    const ret = this.buffer.readFloatLE(this._pos)
     this._move(4)
     return ret
   }
 
   readDoubleBE() {
-    var ret = this.buffer.readDoubleBE(this._pos)
+    const ret = this.buffer.readDoubleBE(this._pos)
     this._move(8)
     return ret
   }
 
   readDoubleLE() {
-    var ret = this.buffer.readDoubleLE(this._pos)
+    const ret = this.buffer.readDoubleLE(this._pos)
     this._move(8)
     return ret
   }

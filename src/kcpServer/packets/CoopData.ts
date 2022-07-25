@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { CoopChapter } from '@/types/game/quest'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { CoopChapter } from '@/types/proto'
 
 export interface CoopDataNotify {
   chapterList: CoopChapter[]

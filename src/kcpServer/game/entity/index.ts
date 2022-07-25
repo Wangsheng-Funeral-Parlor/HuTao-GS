@@ -1,21 +1,17 @@
 import BaseClass from '#/baseClass'
-import Vector from '$/utils/vector'
-import EntityManager from '$/manager/entityManager'
-import MotionInfo from './motionInfo'
-import FightProp from './fightProps'
-import EntityProps from './entityProps'
-import AbilityList from '../ability/abilityList'
-import { LifeStateEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/enum/entity'
-import { FightPropEnum } from '@/types/enum/fightProp'
-import { PlayerDieTypeEnum, PlayerPropEnum } from '@/types/enum/player'
-import { SceneAvatarInfo } from '@/types/game/avatar'
-import { EntityAuthorityInfo, EntityFightPropConfig, SceneEntityInfo } from '@/types/game/entity'
-import { SceneGadgetInfo } from '@/types/game/gadget'
-import { SceneMonsterInfo } from '@/types/game/monster'
-import { SceneNpcInfo } from '@/types/game/npc'
 import LifeStateChange from '#/packets/LifeStateChange'
+import EntityManager from '$/manager/entityManager'
+import Vector from '$/utils/vector'
+import { FightPropEnum, PlayerPropEnum } from '@/types/enum'
+import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
+import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
+import { LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
+import AbilityList from '../ability/abilityList'
+import EntityProps from './entityProps'
+import FightProp from './fightProps'
+import Motion from './motion'
 
 export default class Entity extends BaseClass {
   manager?: EntityManager
@@ -35,7 +31,7 @@ export default class Entity extends BaseClass {
   abilityList: AbilityList
   props: EntityProps
   fightProps: FightProp
-  motionInfo: MotionInfo
+  motion: Motion
 
   authorityPeerId: number
 
@@ -58,7 +54,7 @@ export default class Entity extends BaseClass {
     this.abilityList = new AbilityList(this)
     this.props = new EntityProps(this)
     this.fightProps = new FightProp(this)
-    this.motionInfo = new MotionInfo()
+    this.motion = new Motion()
 
     this.authorityPeerId = null
 
@@ -128,15 +124,15 @@ export default class Entity extends BaseClass {
   }
 
   distanceTo(entity: Entity) {
-    return this.motionInfo.distanceTo(entity.motionInfo)
+    return this.motion.distanceTo(entity.motion)
   }
 
   distanceTo2D(entity: Entity) {
-    return this.motionInfo.distanceTo2D(entity.motionInfo)
+    return this.motion.distanceTo2D(entity.motion)
   }
 
   gridEqual(grid: Vector) {
-    return this.motionInfo.pos.grid.equal(grid)
+    return this.motion.pos.grid.equal(grid)
   }
 
   updateAuthorityPeer(): boolean {
@@ -214,13 +210,13 @@ export default class Entity extends BaseClass {
   exportSceneGadgetInfo(): SceneGadgetInfo { return null }
 
   exportSceneEntityInfo(): SceneEntityInfo {
-    const { entityId, entityType, motionInfo, props, fightProps, lifeState } = this
-    const { sceneTime, reliableSeq } = motionInfo
+    const { entityId, entityType, motion, props, fightProps, lifeState } = this
+    const { sceneTime, reliableSeq } = motion
 
     const sceneEntityInfo: SceneEntityInfo = {
       entityType,
       entityId,
-      motionInfo: motionInfo.export(),
+      motionInfo: motion.export(),
       propList: [
         props.exportPropPair(PlayerPropEnum.PROP_LEVEL)
       ],

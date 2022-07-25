@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/enum/Retcode'
-import { LockedPersonallineData } from '@/types/game/quest'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { LockedPersonallineData } from '@/types/proto'
+import { RetcodeEnum } from '@/types/proto/enum'
 
 export interface PersonalLineAllDataReq { }
 

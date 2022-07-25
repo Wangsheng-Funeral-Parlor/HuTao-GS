@@ -1,10 +1,9 @@
 import BaseClass from '#/baseClass'
-import Player from '.'
 import Avatar from '$/entity/avatar'
-import { Birthday, ProfilePicture } from '@/types/game/profile'
-import { SocialShowAvatarInfo } from '@/types/game/social'
 import MaterialData from '$/gameData/data/MaterialData'
+import { Birthday, ProfilePicture, SocialShowAvatarInfo } from '@/types/proto'
 import ProfileUserData from '@/types/user/ProfileUserData'
+import Player from '.'
 
 export default class Profile extends BaseClass {
   player: Player

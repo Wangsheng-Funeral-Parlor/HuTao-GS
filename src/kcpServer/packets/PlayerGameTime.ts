@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface PlayerGameTimeNotify {
   gameTime: number
@@ -13,7 +13,7 @@ class PlayerGameTimePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientState.LOGIN, true)) return
+    if (!this.checkState(context, ClientStateEnum.LOGIN, true)) return
 
     const { player } = context
     const { uid, gameTime } = player.currentWorld?.host || player

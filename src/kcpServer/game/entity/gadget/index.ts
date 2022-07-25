@@ -1,6 +1,6 @@
-import { ProtEntityTypeEnum } from '@/types/enum/entity'
 import Entity from '$/entity'
-import { SceneGadgetInfo } from '@/types/game/gadget'
+import { SceneGadgetInfo } from '@/types/proto'
+import { ProtEntityTypeEnum } from '@/types/proto/enum'
 
 export default class Gadget extends Entity {
   gadgetId: number

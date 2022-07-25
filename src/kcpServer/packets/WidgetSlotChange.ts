@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { WidgetSlotOpEnum } from '@/types/enum/widget'
-import { WidgetSlotData } from '@/types/game/widget'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { WidgetSlotData } from '@/types/proto'
+import { WidgetSlotOpEnum } from '@/types/proto/enum'
 
 export interface WidgetSlotChangeNotify {
   op: WidgetSlotOpEnum

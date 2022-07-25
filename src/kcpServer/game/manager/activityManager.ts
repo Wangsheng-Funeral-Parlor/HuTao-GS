@@ -3,7 +3,7 @@ import ActivityInfoPacket from '#/packets/ActivityInfo'
 import Activity from '$/activity'
 import MusicGameActivity from '$/activity/musicGameActivity'
 import Player from '$/player'
-import { ActivityInfo, ActivityScheduleInfo } from '@/types/game/activity'
+import { ActivityInfo, ActivityScheduleInfo } from '@/types/proto'
 import { getTimeSeconds } from '@/utils/time'
 import Game from '..'
 

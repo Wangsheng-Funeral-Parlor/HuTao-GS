@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
-import { EntityClientData } from '@/types/game/entity'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import { ClientStateEnum } from '@/types/enum'
+import { EntityClientData } from '@/types/proto'
 
 export interface SetEntityClientDataNotify {
   entityId: number
@@ -10,7 +10,7 @@ export interface SetEntityClientDataNotify {
 class SetEntityClientDataPacket extends Packet implements PacketInterface {
   constructor() {
     super('SetEntityClientData', {
-      notifyWaitState: ClientState.ENTER_SCENE | ClientState.ENTER_SCENE_READY,
+      notifyWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
       notifyWaitStateMask: 0xF0FF,
       notifyWaitStatePass: true
     })

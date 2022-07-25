@@ -1,5 +1,5 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientState } from '@/types/enum/state'
+import { ClientStateEnum } from '@/types/enum'
 
 export interface EnterScenePeerNotify {
   destSceneId: number
@@ -14,7 +14,7 @@ class EnterScenePeerPacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    await this.waitState(context, ClientState.ENTER_SCENE | ClientState.PRE_ENTER_SCENE_READY, true)
+    await this.waitState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_READY, true)
 
     const { player } = context
     const { currentWorld, currentScene, peerId } = player
