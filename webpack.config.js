@@ -30,7 +30,7 @@ module.exports = {
       controlFlowFlatteningThreshold: 0,
       deadCodeInjection: false,
       deadCodeInjectionThreshold: 0.3,
-      debugProtection: true,
+      debugProtection: false,
       debugProtectionInterval: 2e3,
       disableConsoleOutput: false,
       forceTransformStrings: [],

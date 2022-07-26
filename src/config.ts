@@ -77,6 +77,8 @@ export const SUPPORT_VERSIONS = [
   '2.8.51'
 ]
 
+logger.info('Loading config...')
+
 const allConfigs = getJson('config.json', {})
 const curConfigName = allConfigs.current || 'default'
 const curConfig = allConfigs[curConfigName]

@@ -198,7 +198,7 @@ export default class Server {
     const { observer, dnsServer, webServer, kcpServer, readyToStart } = this
     if (!readyToStart) return
 
-    observer.observe({ type: 'measure', buffered: true })
+    observer.observe({ entryTypes: ['measure'], buffered: true })
 
     Logger.mark('Start')
 
