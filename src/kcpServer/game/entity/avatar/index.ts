@@ -10,7 +10,7 @@ import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import Player from '$/player'
 import newGuid from '$/utils/newGuid'
-import { EquipTypeEnum, PlayerPropEnum } from '@/types/enum'
+import { EntityTypeEnum, EquipTypeEnum, PlayerPropEnum } from '@/types/enum'
 import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo, SceneTeamAvatar } from '@/types/proto'
 import { AvatarTypeEnum, ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import AvatarUserData from '@/types/user/AvatarUserData'
@@ -49,7 +49,8 @@ export default class Avatar extends Entity {
     this.fetterList = new FetterList(this)
     this.excelInfo = new ExcelInfo(this)
 
-    this.entityType = ProtEntityTypeEnum.PROT_ENTITY_AVATAR
+    this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_AVATAR
+    this.entityType = EntityTypeEnum.Avatar
 
     super.initHandlers(this)
   }
@@ -371,7 +372,7 @@ export default class Avatar extends Entity {
     }, super.exportUserData())
   }
 
-  /**Internal Events**/
+  /**Events**/
 
   // Register
   async handleRegister() {

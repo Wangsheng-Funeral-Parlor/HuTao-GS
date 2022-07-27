@@ -119,7 +119,7 @@ export default class CombatManager extends BaseClass {
 
     let reason: ChangeHpReasonEnum = ChangeHpReasonEnum.CHANGE_HP_SUB_ENVIR
     if (attacker) {
-      switch (attacker.entityType) {
+      switch (attacker.protEntityType) {
         case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
           reason = ChangeHpReasonEnum.CHANGE_HP_SUB_AVATAR
           break

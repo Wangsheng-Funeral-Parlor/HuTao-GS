@@ -1,6 +1,7 @@
 import Entity from '$/entity'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import WeaponData from '$/gameData/data/WeaponData'
+import { EntityTypeEnum } from '@/types/enum'
 import { ProtEntityTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 import Weapon from '.'
@@ -8,12 +9,13 @@ import Weapon from '.'
 export class WeaponEntity extends Entity {
   weapon: Weapon
 
-  constructor(weapon: Weapon) {
+  constructor(weapon: Weapon, monsterEquip: boolean = false) {
     super()
 
     this.weapon = weapon
 
-    this.entityType = ProtEntityTypeEnum.PROT_ENTITY_WEAPON
+    this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_WEAPON
+    this.entityType = monsterEquip ? EntityTypeEnum.MonsterEquip : EntityTypeEnum.Equip
   }
 
   private async loadWeaponData() {

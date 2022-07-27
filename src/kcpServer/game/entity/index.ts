@@ -2,7 +2,7 @@ import BaseClass from '#/baseClass'
 import LifeStateChange from '#/packets/LifeStateChange'
 import EntityManager from '$/manager/entityManager'
 import Vector from '$/utils/vector'
-import { FightPropEnum, PlayerPropEnum } from '@/types/enum'
+import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
 import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
@@ -16,8 +16,9 @@ import Motion from './motion'
 export default class Entity extends BaseClass {
   manager?: EntityManager
 
-  entityType: ProtEntityTypeEnum
   entityId: number
+  entityType: EntityTypeEnum
+  protEntityType: ProtEntityTypeEnum
 
   name?: string
 
@@ -136,11 +137,11 @@ export default class Entity extends BaseClass {
   }
 
   updateAuthorityPeer(): boolean {
-    const { manager, entityId, entityType, authorityPeerId } = this
+    const { manager, entityId, protEntityType, authorityPeerId } = this
     const { world, playerList } = manager?.scene || {}
 
     if (
-      entityType !== ProtEntityTypeEnum.PROT_ENTITY_MONSTER ||
+      protEntityType !== ProtEntityTypeEnum.PROT_ENTITY_MONSTER ||
       world?.getPeer(authorityPeerId)?.loadedEntityIdList?.includes(entityId)
     ) return false
 
@@ -154,7 +155,7 @@ export default class Entity extends BaseClass {
 
   async kill(attackerId: number, dieType: PlayerDieTypeEnum): Promise<void> {
     // Can't die again if you are dead
-    if (!this.isAlive()) return
+    if (this.isDead()) return
 
     // Change life state
     this.lifeState = LifeStateEnum.LIFE_DEAD
@@ -210,11 +211,11 @@ export default class Entity extends BaseClass {
   exportSceneGadgetInfo(): SceneGadgetInfo { return null }
 
   exportSceneEntityInfo(): SceneEntityInfo {
-    const { entityId, entityType, motion, props, fightProps, lifeState } = this
+    const { entityId, protEntityType, motion, props, fightProps, lifeState } = this
     const { sceneTime, reliableSeq } = motion
 
     const sceneEntityInfo: SceneEntityInfo = {
-      entityType,
+      entityType: protEntityType,
       entityId,
       motionInfo: motion.export(),
       propList: [
@@ -230,7 +231,7 @@ export default class Entity extends BaseClass {
     if (sceneTime != null) sceneEntityInfo.lastMoveSceneTimeMs = sceneTime
     if (reliableSeq != null) sceneEntityInfo.lastMoveReliableSeq = reliableSeq
 
-    switch (entityType) {
+    switch (protEntityType) {
       case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
         sceneEntityInfo.avatar = this.exportSceneAvatarInfo()
         break
@@ -261,7 +262,7 @@ export default class Entity extends BaseClass {
     }
   }
 
-  /**Internal Events**/
+  /**Events**/
 
   // Death
   async handleDeath() {

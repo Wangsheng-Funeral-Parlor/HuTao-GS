@@ -6,6 +6,7 @@ import Avatar from '$/entity/avatar'
 import Player from '$/player'
 import Team from '$/player/team'
 import Vector from '$/utils/vector'
+import { EntityTypeEnum } from '@/types/enum'
 import { SceneTeamAvatar, TeamEntityInfo } from '@/types/proto'
 import { ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import TeamManagerUserData from '@/types/user/TeamManagerUserData'
@@ -24,7 +25,8 @@ export default class TeamManager extends BaseClass {
     this.player = player
 
     this.entity = new Entity()
-    this.entity.entityType = ProtEntityTypeEnum.PROT_ENTITY_TEAM
+    this.entity.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_TEAM
+    this.entity.entityType = EntityTypeEnum.Team
 
     this.teamList = [
       new Team(this), // mp team

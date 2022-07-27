@@ -9,7 +9,7 @@ import Player from '$/player'
 import Scene from '$/scene'
 import Vector from '$/utils/vector'
 import Logger from '@/logger'
-import { ClientStateEnum } from '@/types/enum'
+import { ClientStateEnum, EntityTypeEnum } from '@/types/enum'
 import { ProtEntityTypeEnum, SceneEnterTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 
 const logger = new Logger('ENTITY', 0x00a0ff)
@@ -19,9 +19,9 @@ export const DEFAULT_VIEW_DIST = 256
 export const GRID_SIZE = 64
 export const DEFAULT_ENTITY_LIMIT = 32
 export const ENTITY_LIMIT = {
-  [ProtEntityTypeEnum.PROT_ENTITY_MONSTER]: 12,
-  [ProtEntityTypeEnum.PROT_ENTITY_GADGET]: 128,
-  [ProtEntityTypeEnum.PROT_ENTITY_NPC]: 128
+  [EntityTypeEnum.Monster]: 12,
+  [EntityTypeEnum.Gadget]: 128,
+  [EntityTypeEnum.Chest]: 128
 }
 
 interface EntityLoadState {
@@ -258,7 +258,7 @@ export default class EntityManager extends BaseClass {
     if (manager) await manager.unregister(entity)
 
     entity.manager = this
-    entity.entityId = this.getNextEntityId(entity.entityType)
+    entity.entityId = this.getNextEntityId(entity.protEntityType)
 
     const { entityId } = entity
 
@@ -375,7 +375,7 @@ export default class EntityManager extends BaseClass {
       }
     }
 
-    if (entityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) this.updateAllEntity((<Avatar>entity).player)
+    if (entityType === EntityTypeEnum.Avatar) this.updateAllEntity((<Avatar>entity).player)
   }
 
   updateAllEntity(player: Player) {

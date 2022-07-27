@@ -12,17 +12,17 @@ export default class Weapon extends Equip {
   gadgetId: number
   affixList: Affix[]
 
-  constructor(itemId: number, guid?: bigint) {
+  constructor(itemId: number, guid?: bigint, monsterEquip: boolean = false) {
     super(itemId, guid, EquipTypeEnum.EQUIP_WEAPON)
 
-    this.entity = new WeaponEntity(this)
+    this.entity = new WeaponEntity(this, monsterEquip)
 
     this.gadgetId = 0
     this.affixList = []
   }
 
-  static createByGadgetId(gadgetId: number): Weapon {
-    const weapon = new Weapon(0)
+  static createByGadgetId(gadgetId: number, monsterEquip: boolean = false): Weapon {
+    const weapon = new Weapon(0, undefined, monsterEquip)
     weapon.gadgetId = gadgetId
     return weapon
   }

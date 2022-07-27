@@ -711,7 +711,7 @@ export default class Player extends BaseClass {
     }
   }
 
-  /**Internal Events**/
+  /**Events**/
 
   // Update
   async handleUpdate() {

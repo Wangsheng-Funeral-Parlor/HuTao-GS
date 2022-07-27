@@ -78,7 +78,7 @@ export default class FightProp {
 
     this.clear(true)
 
-    if (this.entity.entityType === ProtEntityTypeEnum.PROT_ENTITY_WEAPON) {
+    if (this.entity.protEntityType === ProtEntityTypeEnum.PROT_ENTITY_WEAPON) {
       this.updateWeaponStats(curve)
       return
     }
@@ -108,7 +108,7 @@ export default class FightProp {
     this.set(FightPropEnum.FIGHT_PROP_BASE_ATTACK, this.calcBaseAttack(curve))
     this.set(FightPropEnum.FIGHT_PROP_BASE_DEFENSE, this.calcBaseDefense(curve))
 
-    if (this.entity.entityType !== ProtEntityTypeEnum.PROT_ENTITY_AVATAR) return
+    if (this.entity.protEntityType !== ProtEntityTypeEnum.PROT_ENTITY_AVATAR) return
 
     const { Critical, CriticalHurt } = this.entity.config
 
@@ -203,7 +203,7 @@ export default class FightProp {
     const { AttackBase } = this.entity.config
     const curveType = this.getPropCurve(FightPropEnum.FIGHT_PROP_BASE_ATTACK)?.Type
     const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
-    if (!curveInfo) return 0
+    if (!curveInfo) return AttackBase
     return this.applyCurve(AttackBase, CurveArithEnum[curveInfo.Arith], curveInfo.Value)
   }
 
@@ -211,7 +211,7 @@ export default class FightProp {
     const { DefenseBase } = this.entity.config
     const curveType = this.getPropCurve(FightPropEnum.FIGHT_PROP_BASE_DEFENSE)?.Type
     const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
-    if (!curveInfo) return 0
+    if (!curveInfo) return DefenseBase
     return this.applyCurve(DefenseBase, CurveArithEnum[curveInfo.Arith], curveInfo.Value)
   }
 
@@ -219,7 +219,7 @@ export default class FightProp {
     const { HpBase } = this.entity.config
     const curveType = this.getPropCurve(FightPropEnum.FIGHT_PROP_BASE_HP)?.Type
     const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
-    if (!curveInfo) return 0
+    if (!curveInfo) return HpBase
     return this.applyCurve(HpBase, CurveArithEnum[curveInfo.Arith], curveInfo.Value)
   }
 
@@ -256,7 +256,7 @@ export default class FightProp {
 
   private getWeaponList(): Weapon[] {
     const { entity } = this
-    const { entityType } = entity
+    const { protEntityType: entityType } = entity
 
     switch (entityType) {
       case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
@@ -270,7 +270,7 @@ export default class FightProp {
 
   private getRelicList(): Reliquary[] {
     const { entity } = this
-    const { entityType } = entity
+    const { protEntityType: entityType } = entity
 
     if (entityType !== ProtEntityTypeEnum.PROT_ENTITY_AVATAR) return []
 
@@ -311,16 +311,14 @@ export default class FightProp {
   }
 
   async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    if (this.entity.godMode) return
+    if (this.entity.godMode || !this.entity.isAlive()) return
 
     const damage = Math.min(
       this.get(FightPropEnum.FIGHT_PROP_CUR_HP),
       Math.max(0, val)
     )
 
-    if (damage <= 0) return
-
-    this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason }, seqId)
+    if (isFinite(damage) && damage > 0) this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason }, seqId)
 
     // Check if entity is dead
     if (this.get(FightPropEnum.FIGHT_PROP_CUR_HP) > 0) return
@@ -423,7 +421,7 @@ export default class FightProp {
         entityId,
         fightPropMap
       })
-    } else if (entity.entityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) {
+    } else if (entity.protEntityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) {
       await AvatarFightPropUpdate.sendNotify((entity as Avatar).player.context, {
         avatarGuid: (entity as Avatar).guid.toString(),
         fightPropMap

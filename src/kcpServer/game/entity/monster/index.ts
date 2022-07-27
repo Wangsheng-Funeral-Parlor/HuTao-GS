@@ -2,6 +2,7 @@ import Entity from '$/entity'
 import Weapon from '$/equip/weapon'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import MonsterData from '$/gameData/data/MonsterData'
+import { EntityTypeEnum } from '@/types/enum'
 import { SceneMonsterInfo } from '@/types/proto'
 import { MonsterBornTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
@@ -25,14 +26,15 @@ export default class Monster extends Entity {
 
     this.monsterId = monsterId
 
-    this.entityType = ProtEntityTypeEnum.PROT_ENTITY_MONSTER
-
     this.affixList = []
     this.weaponList = []
     this.bornType = MonsterBornTypeEnum.MONSTER_BORN_DEFAULT
 
     this.poseId = 0
     this.isElite = false
+
+    this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_MONSTER
+    this.entityType = EntityTypeEnum.Monster
 
     super.initHandlers(this)
   }
@@ -47,7 +49,7 @@ export default class Monster extends Entity {
     if (!monsterData) return
 
     this.affixList = monsterData.Affix || []
-    this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id))
+    this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id, true))
 
     for (let weapon of this.weaponList) await weapon.initNew()
 
@@ -86,7 +88,7 @@ export default class Monster extends Entity {
     }
   }
 
-  /**Internal Events**/
+  /**Events**/
 
   // Register
   async handleRegister() {

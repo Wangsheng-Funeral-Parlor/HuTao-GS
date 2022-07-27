@@ -1,4 +1,5 @@
 import Entity from '$/entity'
+import { EntityTypeEnum } from '@/types/enum'
 import { SceneNpcInfo } from '@/types/proto'
 import { ProtEntityTypeEnum } from '@/types/proto/enum'
 
@@ -17,11 +18,12 @@ export default class Npc extends Entity {
     this.config = { PropGrowCurves: [] }
     this.growCurve = []
 
-    this.entityType = ProtEntityTypeEnum.PROT_ENTITY_NPC
-
     this.parentQuestId = 0
     this.roomId = 0
     this.suitIdList = []
+
+    this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_NPC
+    this.entityType = EntityTypeEnum.NPC
 
     super.initHandlers(this)
   }

@@ -302,7 +302,7 @@ export default class World extends BaseClass {
     }
   }
 
-  /**Internal Events**/
+  /**Events**/
 
   // WorldUpdate
   async handleWorldUpdate() {

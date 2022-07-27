@@ -30,7 +30,7 @@ export default class AbilityList {
   async update() {
     this.clear()
 
-    switch (this.entity.entityType) {
+    switch (this.entity.protEntityType) {
       case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
         await this.addAvatarAbilities()
         break
