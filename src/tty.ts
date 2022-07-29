@@ -2,6 +2,8 @@ import EventEmitter from 'promise-events'
 import { formatWithOptions } from 'util'
 import { ReadStream, WriteStream } from 'tty'
 
+const MAX_HISTORY_COUNT = 10
+
 export const ColorPalette = [
   0x000000, 0x800000, 0x008000, 0x808000, 0x000080, 0x800080, 0x008080, 0xC0C0C0, 0x808080, 0xFF0000, 0x00FF00, 0xFFFF00, 0x0000FF, 0xFF00FF, 0x00FFFF, 0xFFFFFF,
   0x000000, 0x00005F, 0x000087, 0x0000AF, 0x0000D7, 0x0000FF, 0x005F00, 0x005F5F, 0x005F87, 0x005FAF, 0x005FD7, 0x005FFF, 0x008700, 0x00875F, 0x008787, 0x0087AF,
@@ -89,6 +91,8 @@ export class TTY extends EventEmitter {
     cursor: number
     rowSpan: number
     buffer: string[]
+    history: string[]
+    historyIndex: number
   }
 
   constructor(stdin?: ReadStream, stdout?: WriteStream) {
@@ -101,7 +105,9 @@ export class TTY extends EventEmitter {
       prompt: '>>',
       cursor: 0,
       rowSpan: 0,
-      buffer: []
+      buffer: [],
+      history: [],
+      historyIndex: null
     }
 
     this.stdin.setRawMode(true)
@@ -154,9 +160,56 @@ export class TTY extends EventEmitter {
     input.rowSpan = Math.floor(((prompt.length + buffer.join('').length) - 1) / columns) + 1
   }
 
+  prevCmd() {
+    const { input } = this
+    const { buffer, history, historyIndex } = input
+
+    if (history.length <= 0) return
+
+    // clear buffer
+    buffer.splice(0)
+
+    const index = Math.max(0, historyIndex == null ? history.length - 1 : historyIndex - 1)
+    input.historyIndex = index
+    input.cursor = 0
+
+    buffer.push(...history[index].split(''))
+
+    this.updateInput()
+  }
+
+  nextCmd() {
+    const { input } = this
+    const { buffer, history, historyIndex } = input
+
+    if (history.length <= 0 || historyIndex == null) return
+
+    // clear buffer
+    buffer.splice(0)
+
+    const index = historyIndex + 1
+    input.historyIndex = index >= history.length ? null : index
+    input.cursor = 0
+
+    if (index < history.length) buffer.push(...history[index].split(''))
+
+    this.updateInput()
+  }
+
+  pushHistory(line: string) {
+    if (line.trim().length <= 0) return
+
+    const { history } = this.input
+
+    while (history.length > MAX_HISTORY_COUNT) history.shift()
+    history.push(line)
+  }
+
   handleInput(data: string) {
     const { input } = this
     const { cursor, buffer } = input
+
+    let resetHI = true
 
     switch (data) {
       case '\x03': { // ctrl-c
@@ -179,16 +232,27 @@ export class TTY extends EventEmitter {
         input.cursor = 0
 
         this.emit('line', line)
+
+        this.pushHistory(line)
         this.updateInput()
         break
       }
-      case '\x09':     // tab
-      case '\x1b[A':   // cursor up
+      case '\x09': { // tab
+        resetHI = false
+        break
+      }
+      case '\x1b[A': { // cursor up
+        resetHI = false
+        this.prevCmd()
+        break
+      }
       case '\x1b[B': { // cursor down
-        // ignore
+        resetHI = false
+        this.nextCmd()
         break
       }
       case '\x1b[C': { // cursor forward
+        resetHI = false
         if (cursor >= buffer.length) break
 
         input.cursor++
@@ -196,6 +260,7 @@ export class TTY extends EventEmitter {
         break
       }
       case '\x1b[D': { // cursor back
+        resetHI = false
         if (cursor <= 0) break
 
         input.cursor--
@@ -211,6 +276,8 @@ export class TTY extends EventEmitter {
         this.updateInput()
       }
     }
+
+    if (resetHI) input.historyIndex = null
   }
 
   handleResize() {
