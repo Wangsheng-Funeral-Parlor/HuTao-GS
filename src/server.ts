@@ -82,7 +82,7 @@ export default class Server {
 
     // Server build info
     logger.info(`Name: ${cRGB(0xffffff, serverName)}`)
-    logger.info(`Build: ${cRGB(0xffffff, process.env.NODE_ENV || 'development')}`)
+    logger.info(`Build: ${cRGB(0xffffff, process.env.BUILD_INFO || 'development')}`)
     logger.info(`Game version: ${cRGB(0xffffff, version)}`)
     logger.info(`Dispatch region: ${cRGB(0xffffff, dispatchRegion)}`)
     logger.info(`Dispatch seed: ${cRGB(0xffffff, dispatchSeed)}`)

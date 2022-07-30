@@ -1,7 +1,7 @@
 {
   "name": "hutao-gs",
   "version": "1.0.0",
-  "description": "A DNS proxy server",
+  "description": "HuTao GS",
   "main": "src/index.ts",
   "bin": "buildRel/index.js",
   "scripts": {

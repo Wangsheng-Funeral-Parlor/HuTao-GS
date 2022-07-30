@@ -1,6 +1,19 @@
+const { execSync } = require('child_process')
 const path = require('path')
 const { DefinePlugin } = require('webpack')
 const WebpackObfuscator = require('webpack-obfuscator')
+
+const { version } = require('./package.json')
+const commitHash = (() => {
+  try {
+    return execSync('git rev-parse --short HEAD')
+      .toString()
+      .trim()
+  } catch (err) {
+    console.log(err)
+    return 'unknown'
+  }
+})()
 
 module.exports = {
   mode: 'production',
@@ -21,7 +34,7 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       'process.env': {
-        NODE_ENV: '"production"'
+        BUILD_INFO: `"production v${version} [${commitHash}]"`
       }
     }),
     new WebpackObfuscator({
