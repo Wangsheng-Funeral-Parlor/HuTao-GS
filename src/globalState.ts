@@ -77,7 +77,7 @@ export default class GlobalState extends EventEmitter {
 
       const saved = JSON.parse(readFileSync(stateFilePath, 'utf8'))
 
-      for (let key in state) {
+      for (const key in state) {
         if (saved[key] != null) this.set(key, saved[key])
       }
       this.modified = false

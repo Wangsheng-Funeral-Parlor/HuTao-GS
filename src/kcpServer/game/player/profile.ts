@@ -98,7 +98,7 @@ export default class Profile extends BaseClass {
 
     while (showAvatarList.length > 0) showAvatarList.shift()
 
-    for (let id of avatarIdList) {
+    for (const id of avatarIdList) {
       const avatar = avatarList.find(a => a.avatarId === id)
       if (!avatar) continue
 

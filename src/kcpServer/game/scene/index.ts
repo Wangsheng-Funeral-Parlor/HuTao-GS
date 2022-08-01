@@ -7,14 +7,14 @@ import SceneTime from '#/packets/SceneTime'
 import uidPrefix from '#/utils/uidPrefix'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
-import AbilityManager from '$/manager/abilityManager'
+import CombatManager from '$/manager/combatManager'
 import EntityManager from '$/manager/entityManager'
 import Player from '$/player'
 import Vector from '$/utils/vector'
 import World from '$/world'
 import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
-import { PlayerWorldSceneInfo, ScenePlayerInfo, SceneTeamAvatar } from '@/types/proto'
+import { AbilityInvokeEntry, CombatInvokeEntry, PlayerWorldSceneInfo, ScenePlayerInfo, SceneTeamAvatar } from '@/types/proto'
 import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import SceneUserData from '@/types/user/SceneUserData'
 import { getTimeSeconds } from '@/utils/time'
@@ -35,8 +35,9 @@ export default class Scene extends BaseClass {
   sceneTagList: SceneTag[]
   sceneBlockList: SceneBlock[]
 
-  abilitymanager: AbilityManager
   entityManager: EntityManager
+  combatManager: CombatManager
+
   playerList: Player[]
 
   timestampSceneTime: number
@@ -67,8 +68,8 @@ export default class Scene extends BaseClass {
     this.sceneTagList = []
     this.sceneBlockList = []
 
-    this.abilitymanager = new AbilityManager(this)
     this.entityManager = new EntityManager(this)
+    this.combatManager = new CombatManager(this)
 
     this.playerList = []
 
@@ -123,7 +124,7 @@ export default class Scene extends BaseClass {
     entityManager.init()
 
     if (Array.isArray(unlockedPointList)) {
-      for (let pointId of unlockedPointList) this.unlockPoint(pointId)
+      for (const pointId of unlockedPointList) this.unlockPoint(pointId)
     }
 
     this.beginTime = Date.now()
@@ -163,7 +164,7 @@ export default class Scene extends BaseClass {
     sceneDataMap[id] = this.exportUserData()
     await entityManager.destroy()
 
-    for (let sceneBlock of sceneBlockList) await sceneBlock.unload()
+    for (const sceneBlock of sceneBlockList) await sceneBlock.unload()
 
     if (sceneList.includes(this)) sceneList.splice(sceneList.indexOf(this), 1)
   }
@@ -177,7 +178,7 @@ export default class Scene extends BaseClass {
     logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
     Logger.mark('SceneLoadBlock')
 
-    for (let block of sceneBlockList) {
+    for (const block of sceneBlockList) {
       if (this.destroyed) {
         logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Abort load non dynamic groups.')
         Logger.clearMarks('SceneLoadBlock')
@@ -212,6 +213,49 @@ export default class Scene extends BaseClass {
 
     this.paused = false
     this.sceneTime = timestampSceneTime
+  }
+
+  async abilityInvoke(context: PacketContext, invokes: AbilityInvokeEntry[]) {
+    if (invokes == null || invokes.length === 0) return
+
+    const { entityManager } = this
+    for (const entry of invokes) {
+      const entity = entityManager.getEntity(entry?.entityId)
+      await entity?.abilityManager?.emit('AbilityInvoke', context, entry)
+    }
+  }
+
+  async clientAbilityChange(context: PacketContext, invokes: AbilityInvokeEntry[], entityId: number, flag: boolean) {
+    if (invokes == null || invokes.length === 0) return
+
+    const { entityManager } = this
+    const { player, seqId } = context
+    const { forwardBuffer } = player
+    const entity = entityManager.getEntity(entityId)
+
+    forwardBuffer.setAdditionalData(seqId, entityId, !!flag)
+
+    for (const entry of invokes) await entity?.abilityManager?.emit('ClientAbilityChange', context, entry)
+  }
+
+  async clientAbilityInitFinish(context: PacketContext, invokes: AbilityInvokeEntry[], entityId: number) {
+    if (invokes == null || invokes.length === 0) return
+
+    const { entityManager } = this
+    const { player, seqId } = context
+    const { forwardBuffer } = player
+    const entity = entityManager.getEntity(entityId)
+
+    forwardBuffer.setAdditionalData(seqId, entityId)
+
+    for (const entry of invokes) await entity?.abilityManager?.emit('ClientAbilityInitFinish', context, entry)
+  }
+
+  async combatInvoke(context: PacketContext, invokes: CombatInvokeEntry[]) {
+    if (invokes == null || invokes.length === 0) return
+
+    const { combatManager } = this
+    for (const entry of invokes) await combatManager.emit('CombatInvoke', context, entry)
   }
 
   async join(
@@ -351,7 +395,7 @@ export default class Scene extends BaseClass {
   async handleSceneUpdate() {
     const { id, sceneBlockList, playerList, broadcastContextList, lastLocUpdate, lastTimeUpdate } = this
 
-    for (let sceneBlock of sceneBlockList) await sceneBlock.emit('Update')
+    for (const sceneBlock of sceneBlockList) await sceneBlock.emit('Update')
 
     if (lastLocUpdate == null || Date.now() - lastLocUpdate > 5e3) {
       this.lastLocUpdate = Date.now()

@@ -19,7 +19,7 @@ class SyncTeamEntityPacket extends Packet implements PacketInterface {
     const { id, playerList } = targetPlayer.currentScene
     const teamEntityInfoList = []
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       if (player === targetPlayer) continue
       teamEntityInfoList.push(player.teamManager.exportTeamEntityInfo())
     }

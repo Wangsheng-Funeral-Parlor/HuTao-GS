@@ -42,7 +42,7 @@ class SetPlayerNamePacket extends Packet implements PacketInterface {
 
     if (player.isInMp()) {
       const { broadcastContextList } = currentScene
-      for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+      for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
       await WorldPlayerInfo.broadcastNotify(broadcastContextList)
       await ScenePlayerInfo.broadcastNotify(broadcastContextList)

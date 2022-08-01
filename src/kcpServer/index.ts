@@ -109,7 +109,7 @@ export default class KcpServer extends EventEmitter {
   async stop(): Promise<void> {
     const { clients, loop } = this
 
-    for (let clientID in clients) {
+    for (const clientID in clients) {
       await this.disconnect(clientID, ENetReasonEnum.ENET_SERVER_SHUTDOWN)
     }
 

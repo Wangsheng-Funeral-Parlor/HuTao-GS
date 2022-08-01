@@ -59,7 +59,7 @@ export default class ShopManager {
     const now = getTimeSeconds()
 
     const goodsList: ShopGoods[] = []
-    for (let data of dataList) {
+    for (const data of dataList) {
       if (data.EndTime <= now) continue
 
       goodsList.push(<ShopGoods>Object.fromEntries(Object.entries(<ShopGoods>{

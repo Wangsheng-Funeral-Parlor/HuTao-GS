@@ -47,7 +47,7 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
       return
     }
 
-    for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+    for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
     // Set client state
     player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_SCENE_INIT_FINISH

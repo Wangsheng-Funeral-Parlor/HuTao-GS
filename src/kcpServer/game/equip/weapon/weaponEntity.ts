@@ -6,7 +6,7 @@ import { ProtEntityTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 import Weapon from '.'
 
-export class WeaponEntity extends Entity {
+export default class WeaponEntity extends Entity {
   weapon: Weapon
 
   constructor(weapon: Weapon, monsterEquip: boolean = false) {

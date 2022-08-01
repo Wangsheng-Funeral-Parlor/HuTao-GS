@@ -26,7 +26,7 @@ export default class Fetter {
 
     let condMatch = true
 
-    for (let cond of openConds) {
+    for (const cond of openConds) {
       const { CondType, ParamList } = cond
 
       if (CondType == null) continue

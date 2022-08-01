@@ -1,5 +1,6 @@
 import BaseClass from '#/baseClass'
 import LifeStateChange from '#/packets/LifeStateChange'
+import AbilityManager from '$/manager/abilityManager'
 import EntityManager from '$/manager/entityManager'
 import Vector from '$/utils/vector'
 import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
@@ -8,7 +9,6 @@ import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConf
 import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
 import { LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
-import AbilityList from '../ability/abilityList'
 import EntityProps from './entityProps'
 import FightProp from './fightProps'
 import Motion from './motion'
@@ -29,7 +29,7 @@ export default class Entity extends BaseClass {
   config: EntityFightPropConfig
   growCurve: CurveExcelConfig[]
 
-  abilityList: AbilityList
+  abilityManager: AbilityManager
   props: EntityProps
   fightProps: FightProp
   motion: Motion
@@ -52,7 +52,7 @@ export default class Entity extends BaseClass {
   constructor() {
     super()
 
-    this.abilityList = new AbilityList(this)
+    this.abilityManager = new AbilityManager(this)
     this.props = new EntityProps(this)
     this.fightProps = new FightProp(this)
     this.motion = new Motion()
@@ -69,7 +69,7 @@ export default class Entity extends BaseClass {
   }
 
   async init(userData: EntityUserData) {
-    const { props, abilityList, fightProps } = this
+    const { props, fightProps } = this
     const { lifeState, propsData, fightPropsData } = userData
 
     this.lifeState = typeof lifeState === 'number' ? lifeState : LifeStateEnum.LIFE_ALIVE
@@ -77,18 +77,16 @@ export default class Entity extends BaseClass {
     props.init(propsData)
     fightProps.init(fightPropsData)
 
-    await abilityList.update()
     await fightProps.update()
   }
 
   async initNew(level: number = 1) {
-    const { props, abilityList, fightProps } = this
+    const { props, fightProps } = this
 
     this.lifeState = LifeStateEnum.LIFE_ALIVE
 
     props.initNew(level)
 
-    await abilityList.update()
     await fightProps.update()
   }
 
@@ -273,15 +271,5 @@ export default class Entity extends BaseClass {
 
     await LifeStateChange.broadcastNotify(manager.scene.broadcastContextList, this)
     await manager.remove(this, VisionTypeEnum.VISION_DIE)
-  }
-
-  async handleRegister() {
-    const { manager, abilityList } = this
-    abilityList.register(manager?.scene?.abilitymanager)
-  }
-
-  async handleUnregister() {
-    const { manager, abilityList } = this
-    abilityList.unregister(manager?.scene?.abilitymanager)
   }
 }

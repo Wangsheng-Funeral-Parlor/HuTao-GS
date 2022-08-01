@@ -169,7 +169,7 @@ export default class Vector {
     const props = ['x', 'y', 'z']
     const ret = {}
 
-    for (let prop of props) {
+    for (const prop of props) {
       if (this[prop] != null) ret[prop] = this[prop]
     }
 

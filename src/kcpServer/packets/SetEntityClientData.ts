@@ -20,7 +20,7 @@ class SetEntityClientDataPacket extends Packet implements PacketInterface {
     const { player } = context
     const { broadcastContextList } = player.currentScene
 
-    for (let ctx of broadcastContextList) ctx.seqId = context.seqId
+    for (const ctx of broadcastContextList) ctx.seqId = context.seqId
 
     await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), data)
   }

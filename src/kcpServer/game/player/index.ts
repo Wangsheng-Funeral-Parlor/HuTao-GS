@@ -8,7 +8,6 @@ import WindSeedClient from '#/packets/WindSeedClient'
 import Avatar from '$/entity/avatar'
 import Equip from '$/equip'
 import AvatarData from '$/gameData/data/AvatarData'
-import CombatManager from '$/manager/combatManager'
 import TeamManager from '$/manager/teamManager'
 import Material from '$/material'
 import Scene from '$/scene'
@@ -40,7 +39,6 @@ export default class Player extends BaseClass {
   profile: Profile
   props: PlayerProps
 
-  combatManager: CombatManager
   forwardBuffer: ForwardBuffer
 
   openState: OpenState
@@ -89,7 +87,6 @@ export default class Player extends BaseClass {
     this.game = game
     this.client = client
 
-    this.combatManager = new CombatManager(this)
     this.forwardBuffer = new ForwardBuffer(this)
 
     this.profile = new Profile(this)
@@ -224,7 +221,7 @@ export default class Player extends BaseClass {
 
   set godMode(v: boolean) {
     const { avatarList } = this
-    for (let avatar of avatarList) avatar.godMode = v
+    for (const avatar of avatarList) avatar.godMode = v
   }
 
   async init(userData: UserData): Promise<void> {
@@ -251,7 +248,7 @@ export default class Player extends BaseClass {
     await inventory.init(inventoryData)
     widget.init(widgetData)
 
-    for (let avatarData of avatarDataList) {
+    for (const avatarData of avatarDataList) {
       const avatar = new Avatar(this, avatarData.id, BigInt(avatarData.guid))
       await avatar.init(avatarData)
 
@@ -346,7 +343,7 @@ export default class Player extends BaseClass {
     if (newAvatars.length === 0) return
 
     // Initialize all new avatars
-    for (let avatar of newAvatars) await avatar.initNew(AvatarTypeEnum.FORMAL, false)
+    for (const avatar of newAvatars) await avatar.initNew(AvatarTypeEnum.FORMAL, false)
 
     // Add new avatars to avatar list
     avatarList.push(...newAvatars)
@@ -532,7 +529,7 @@ export default class Player extends BaseClass {
     // Falling into the void, go back to last safe pos
     const team = teamManager.getTeam()
     const avatarList = team.getAliveAvatarList()
-    for (let avatar of avatarList) {
+    for (const avatar of avatarList) {
       const { fightProps } = avatar
       await fightProps.drainEnergy(true)
       await fightProps.takeDamage(0, fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS)
@@ -731,7 +728,7 @@ export default class Player extends BaseClass {
 
     // Register entities
     await entityManager.register(teamManager.entity)
-    for (let avatar of avatarList) await entityManager.register(avatar)
+    for (const avatar of avatarList) await entityManager.register(avatar)
   }
 
   // SceneLeave
@@ -746,7 +743,7 @@ export default class Player extends BaseClass {
 
     // Unregister entities
     await entityManager.unregister(teamManager.entity)
-    for (let avatar of avatarList) await entityManager.unregister(avatar)
+    for (const avatar of avatarList) await entityManager.unregister(avatar)
 
     // Set previous scene
     this.prevScene = scene

@@ -45,7 +45,7 @@ export default class SceneGroup {
 
     if (entityList.length === 0) return false
 
-    for (let entity of entityList) {
+    for (const entity of entityList) {
       if (entity.isDead()) continue
       await entityManager.add(entity, VisionTypeEnum.VISION_MEET, undefined, undefined, true)
     }
@@ -63,7 +63,7 @@ export default class SceneGroup {
     const worldLevelData = await WorldData.getWorldLevel(world.level)
     const levelOffset = worldLevelData == null ? 0 : (worldLevelData.MonsterLevel - 22)
 
-    for (let monster of monsters) {
+    for (const monster of monsters) {
       const { MonsterId, ConfigId, PoseId, IsElite, Level, Pos, Rot } = monster
       const entity = new Monster(MonsterId)
 
@@ -94,7 +94,7 @@ export default class SceneGroup {
 
     if (await this.reloadList(npcList)) return
 
-    for (let npc of npcs) {
+    for (const npc of npcs) {
       const { NpcId, ConfigId, Pos, Rot } = npc
       const entity = new Npc(NpcId)
 
@@ -127,7 +127,7 @@ export default class SceneGroup {
 
     if (await this.reloadList(gadgetList)) return
 
-    for (let gadget of gadgets) {
+    for (const gadget of gadgets) {
       const { GadgetId, ConfigId, Level, Pos, Rot, InteractId } = gadget
       const entity = new Gadget(GadgetId)
 
@@ -155,7 +155,7 @@ export default class SceneGroup {
     const { scene } = block
     const { entityManager } = scene
 
-    for (let entity of entityList) await entityManager.remove(entity, undefined, undefined, true)
+    for (const entity of entityList) await entityManager.remove(entity, undefined, undefined, true)
   }
 
   async load(wob: WaitOnBlock) {

@@ -84,7 +84,7 @@ export default class WebServer extends EventEmitter {
       return
     }
 
-    for (let serverConfig of configs) {
+    for (const serverConfig of configs) {
       const { port, useHttps } = serverConfig
 
       let server: http.Server | https.Server
@@ -107,7 +107,7 @@ export default class WebServer extends EventEmitter {
   }
 
   stop(): void {
-    for (let server of this.servers) server.close()
+    for (const server of this.servers) server.close()
   }
 
   async requestListener(req: http.IncomingMessage, rsp: http.ServerResponse): Promise<void> {
@@ -123,7 +123,7 @@ export default class WebServer extends EventEmitter {
 
       let response: HttpResponse
       let isVerbose = false
-      for (let handler of handlers) {
+      for (const handler of handlers) {
         if (!handler.matchUrl(url)) continue
 
         response = await handler.request(request, globalState)

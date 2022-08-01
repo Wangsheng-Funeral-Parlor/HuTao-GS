@@ -70,7 +70,7 @@ export default class SSL {
 
     logger.info('Validating ca files...')
 
-    for (let key in caFiles) {
+    for (const key in caFiles) {
       if (!await fileExists(join(workDir, caFiles[key]))) {
         logger.warn('Missing ca files.')
         return false
@@ -87,7 +87,7 @@ export default class SSL {
 
     logger.info('Validating srv files...')
 
-    for (let key in srvFiles) {
+    for (const key in srvFiles) {
       if (!await fileExists(join(workDir, srvFiles[key]))) {
         logger.warn('Missing srv files.')
         return false

@@ -54,7 +54,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
     const areaList = []
 
     const scenePointMap = await SceneData.getScenePointMap(sceneId)
-    for (let pointId in scenePointMap) {
+    for (const pointId in scenePointMap) {
       const { $type, Unlocked } = scenePointMap[pointId]
       if (!unlockType.includes($type) || Unlocked) continue
 
@@ -64,7 +64,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
     // add unlocked points
     pointList.push(...scene.unlockedPointList.filter(id => !pointList.includes(id)))
 
-    for (let cityConfig of sceneData.City) areaList.push(...cityConfig.AreaIdVec)
+    for (const cityConfig of sceneData.City) areaList.push(...cityConfig.AreaIdVec)
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,

@@ -39,7 +39,7 @@ export default class Inventory {
 
     let remaining = amount
 
-    for (let item of itemList) {
+    for (const item of itemList) {
       if (remaining <= 0) break
       if (item.itemId !== itemId) continue
 
@@ -68,7 +68,7 @@ export default class Inventory {
     const { itemDataList } = userData
     if (!Array.isArray(itemDataList)) return
 
-    for (let itemData of itemDataList) {
+    for (const itemData of itemDataList) {
       const item = new Item()
       await item.init(itemData)
 
@@ -82,7 +82,7 @@ export default class Inventory {
     const newItem = new Item(obj)
     const changedItemList = []
 
-    for (let item of itemList) {
+    for (const item of itemList) {
       if (newItem.count <= 0) break
       if (item.stack(newItem)) changedItemList.push(item)
     }
@@ -109,7 +109,7 @@ export default class Inventory {
     const { player, itemList } = this
     const deletedItemList = []
 
-    for (let item of itemList) {
+    for (const item of itemList) {
       if (item.guid !== guid) continue
 
       deletedItemList.push(item)

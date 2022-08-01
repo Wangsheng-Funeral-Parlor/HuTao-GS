@@ -155,7 +155,7 @@ export default class CLI {
       this.server.stop()
     })
 
-    for (let command of commands) {
+    for (const command of commands) {
       if (!command.allowPlayer) continue
       commandsAnnouncement.content += `<p style="white-space: pre-wrap;background: black;color: white;">◇ ${ansiToHTML(escapeHtml(helpFormatCommand(command, CLI.prefix)))}</p>`
     }

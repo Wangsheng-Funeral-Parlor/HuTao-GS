@@ -126,7 +126,7 @@ export default class Logger {
   }
 
   performance(list: PerformanceObserverEntryList) {
-    for (let perfEntry of list.getEntries()) {
+    for (const perfEntry of list.getEntries()) {
       const { name, duration } = perfEntry
       const entry = entryMap[name] || (entryMap[name] = [1, 0])
 
@@ -138,7 +138,7 @@ export default class Logger {
 
     const now = Date.now()
 
-    for (let name in entryMap) {
+    for (const name in entryMap) {
       const entry = entryMap[name]
 
       if (entry[0] === 0 || now - entry[1] < 3e3) continue

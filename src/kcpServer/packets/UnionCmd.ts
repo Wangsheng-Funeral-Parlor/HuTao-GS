@@ -25,12 +25,12 @@ class UnionCmdPacket extends Packet implements PacketInterface {
 
   async recvNotify(context: PacketContext, data: UnionCmdNotify): Promise<void> {
     const { server, player, seqId } = context
-    const { currentScene } = player
+    const { currentScene, forwardBuffer } = player
     const { entityManager } = currentScene
     const { cmdList } = data
 
     let i = 0
-    for (let cmd of cmdList) {
+    for (const cmd of cmdList) {
       if (++i % 3 === 0) await waitTick()
 
       const { messageId, body } = cmd
@@ -41,7 +41,7 @@ class UnionCmdPacket extends Packet implements PacketInterface {
       await server.packetHandler.handle(messageId, packetName, Buffer.from(body, 'base64'), context)
     }
 
-    await player.forwardBuffer.sendAll()
+    await forwardBuffer.sendAll()
     await entityManager.flushAll(seqId)
   }
 }

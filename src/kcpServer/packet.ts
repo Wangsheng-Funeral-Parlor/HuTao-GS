@@ -138,7 +138,7 @@ export default class Packet implements PacketInterface {
   }
 
   async broadcastNotify(contextList: PacketContext[], ...data: any[]): Promise<void> {
-    for (let context of contextList) await this.sendNotify(context, ...(data as [any, ...any[]]))
+    for (const context of contextList) await this.sendNotify(context, ...(data as [any, ...any[]]))
   }
 
   checkState(context: PacketContext, state: ClientStateEnum, pass: boolean = false, mask: number = 0xFFFF, log: boolean = true): boolean {

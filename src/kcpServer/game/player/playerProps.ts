@@ -19,7 +19,7 @@ export default class PlayerProps {
   }
 
   init(userData: PropsUserData) {
-    for (let type in userData) {
+    for (const type in userData) {
       if (isNaN(parseInt(type))) continue
       this.set(parseInt(type), userData[type])
     }
@@ -52,7 +52,7 @@ export default class PlayerProps {
 
   clear() {
     const { propMap } = this
-    for (let type in PlayerPropEnum) {
+    for (const type in PlayerPropEnum) {
       if (!isNaN(Number(type))) continue
       propMap[PlayerPropEnum[type]] = 0
     }
@@ -62,7 +62,7 @@ export default class PlayerProps {
     const { propMap } = this
     const map: { [type: number]: PropValue } = {}
 
-    for (let type in propMap) {
+    for (const type in propMap) {
       map[type] = this.exportPropValue(parseInt(type))
     }
 

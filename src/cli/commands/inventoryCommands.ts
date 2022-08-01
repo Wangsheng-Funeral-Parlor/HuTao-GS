@@ -98,7 +98,7 @@ const inventoryCommands: CommandDefinition[] = [
       print('Give artifact set:', `(${setId})x${count}`)
 
       for (let i = 0; i < count; i++) {
-        for (let id of artIdList) {
+        for (const id of artIdList) {
           const reliquary = new Reliquary(id)
           await reliquary.initNew()
           player.inventory.add(reliquary)

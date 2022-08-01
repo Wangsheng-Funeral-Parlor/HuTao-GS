@@ -24,16 +24,14 @@ class ClientAbilityChangePacket extends Packet implements PacketInterface {
 
     if (invokes.length === 0) {
       const { broadcastContextList } = currentScene
-      for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+      for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
       await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), [], entityId, !!flag)
       return
     }
 
-    for (let invokeEntry of invokes) forwardBuffer.addEntry(this, invokeEntry, seqId)
-    forwardBuffer.setAdditionalData(seqId, entityId, !!flag)
-
-    forwardBuffer.sendAll()
+    await currentScene.clientAbilityChange(context, invokes, entityId, flag)
+    await forwardBuffer.sendAll()
   }
 
   async sendNotify(context: PacketContext, data: ClientAbilityChangeNotify): Promise<void> {

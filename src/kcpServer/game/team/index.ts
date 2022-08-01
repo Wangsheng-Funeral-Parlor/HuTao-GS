@@ -1,11 +1,11 @@
+import AbilityChange from '#/packets/AbilityChange'
+import AvatarEquipChange from '#/packets/AvatarEquipChange'
+import AvatarTeamUpdate from '#/packets/AvatarTeamUpdate'
+import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
+import { SetUpAvatarTeamReq } from '#/packets/SetUpAvatarTeam'
 import Avatar from '$/entity/avatar'
 import TeamManager from '$/manager/teamManager'
-import AvatarEquipChange from '#/packets/AvatarEquipChange'
-import { SetUpAvatarTeamReq } from '#/packets/SetUpAvatarTeam'
 import { RetcodeEnum } from '@/types/proto/enum'
-import AbilityChange from '#/packets/AbilityChange'
-import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
-import AvatarTeamUpdate from '#/packets/AvatarTeamUpdate'
 
 export default class Team {
   teamManager: TeamManager
@@ -26,9 +26,9 @@ export default class Team {
     const { context, currentScene } = player
 
     const broadcastContextList = currentScene?.broadcastContextList || [context]
-    for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+    for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
-    for (let avatar of avatarList) {
+    for (const avatar of avatarList) {
       await AbilityChange.broadcastNotify(broadcastContextList, avatar)
       await AvatarEquipChange.broadcastNotify(broadcastContextList, avatar)
     }
@@ -100,7 +100,7 @@ export default class Team {
   async reviveAllAvatar(): Promise<void> {
     const avatarList = this.getAvatarList()
 
-    for (let avatar of avatarList) {
+    for (const avatar of avatarList) {
       if (!avatar.isAlive()) await avatar.revive()
     }
   }

@@ -20,7 +20,7 @@ function keepValue(val: any): boolean {
 export default function protoCleanup(obj: any) {
   obj = Object.assign({}, obj) // clone
 
-  for (let k in obj) {
+  for (const k in obj) {
     const v = obj[k]
 
     if (!keepValue(v)) {

@@ -20,7 +20,7 @@ class PlayerWorldSceneInfoListPacket extends Packet implements PacketInterface {
     const sceneDataList = await SceneData.getSceneList()
     const infoList: PlayerWorldSceneInfo[] = []
 
-    for (let sceneData of sceneDataList) {
+    for (const sceneData of sceneDataList) {
       const { Id, IsMainScene } = sceneData
       if (!IsMainScene) continue
 

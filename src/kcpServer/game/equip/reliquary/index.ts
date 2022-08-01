@@ -74,7 +74,7 @@ export default class Reliquary extends Equip {
     const mainPropType = (await ReliquaryData.getMainProp(mainPropId))?.PropType
     if (mainPropType != null) blackList.push(mainPropType)
 
-    for (let appendPropId of appendPropIdList) {
+    for (const appendPropId of appendPropIdList) {
       const propType = (await ReliquaryData.getAffix(appendPropId))?.PropType
       if (propType == null || blackList.includes(propType)) continue
 
@@ -95,7 +95,7 @@ export default class Reliquary extends Equip {
     const { appendDepotId, appendPropIdList } = this
     const whitelist: string[] = []
 
-    for (let appendPropId of appendPropIdList) {
+    for (const appendPropId of appendPropIdList) {
       const propType = (await ReliquaryData.getAffix(appendPropId))?.PropType
       if (propType == null || whitelist.includes(propType)) continue
 
@@ -135,9 +135,9 @@ export default class Reliquary extends Equip {
     const { appendPropIdList, subStatMap } = this
 
     // clear stats
-    for (let type in subStatMap) delete subStatMap[type]
+    for (const type in subStatMap) delete subStatMap[type]
 
-    for (let appendPropId of appendPropIdList) {
+    for (const appendPropId of appendPropIdList) {
       const affixData = await ReliquaryData.getAffix(appendPropId)
       const type = FightPropEnum[affixData?.PropType] || FightPropEnum.FIGHT_PROP_NONE
       const value = parseFloat(<any>affixData?.PropValue) || 0

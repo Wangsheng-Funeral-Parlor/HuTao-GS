@@ -66,7 +66,7 @@ export default class FightProp {
   }
 
   init(userData: PropsUserData) {
-    for (let type in userData) {
+    for (const type in userData) {
       if (isNaN(parseInt(type))) continue
       this.set(parseInt(type), userData[type])
     }
@@ -88,10 +88,10 @@ export default class FightProp {
     this.updateBaseStats(curve)
 
     const weaponList = this.getWeaponList()
-    for (let weapon of weaponList) this.applyWeaponStats(weapon)
+    for (const weapon of weaponList) this.applyWeaponStats(weapon)
 
     const relicList = this.getRelicList()
-    for (let relic of relicList) this.applyRelicStats(relic)
+    for (const relic of relicList) this.applyRelicStats(relic)
 
     this.updateHpStats()
     this.updateAtkStats()
@@ -159,7 +159,7 @@ export default class FightProp {
 
   private applyWeaponStats(weapon: Weapon) {
     const propList = weapon.entity.fightProps.exportPropList()
-    for (let prop of propList) {
+    for (const prop of propList) {
       const { propType, propValue } = prop
       this.add(propType, propValue)
     }
@@ -180,7 +180,7 @@ export default class FightProp {
   private applyRelicSubStats(reliquary: Reliquary) {
     const { subStatMap } = reliquary
 
-    for (let key in subStatMap) {
+    for (const key in subStatMap) {
       const type = parseInt(key)
       if (isNaN(type) || type === FightPropEnum.FIGHT_PROP_NONE) continue
 
@@ -224,7 +224,7 @@ export default class FightProp {
   }
 
   private updateWeaponStats(curve: CurveExcelConfig) {
-    for (let id in FightPropEnum) {
+    for (const id in FightPropEnum) {
       const prop = parseInt(id)
       if (isNaN(prop)) continue
 
@@ -395,7 +395,7 @@ export default class FightProp {
     else return
 
     const broadcastContextList = manager.scene.broadcastContextList
-    for (let ctx of broadcastContextList) ctx.seqId = seqId
+    for (const ctx of broadcastContextList) ctx.seqId = seqId
     await EntityFightPropChangeReason.broadcastNotify(broadcastContextList, notifyData)
   }
 
@@ -405,7 +405,7 @@ export default class FightProp {
 
   clear(dynamic: boolean = false) {
     const { propMap } = this
-    for (let type in propMap) {
+    for (const type in propMap) {
       if (!dynamic || DYNAMIC_PROPS.includes(parseInt(type))) delete propMap[type]
     }
   }
@@ -416,7 +416,7 @@ export default class FightProp {
 
     if (manager && isOnScene) {
       const broadcastContextList = manager.scene.broadcastContextList
-      for (let ctx of broadcastContextList) ctx.seqId = seqId
+      for (const ctx of broadcastContextList) ctx.seqId = seqId
       await EntityFightPropUpdate.broadcastNotify(broadcastContextList, {
         entityId,
         fightPropMap
@@ -433,7 +433,7 @@ export default class FightProp {
     const { propMap } = this
     const list = []
 
-    for (let type in propMap) {
+    for (const type in propMap) {
       list.push({
         propType: type,
         propValue: propMap[type]

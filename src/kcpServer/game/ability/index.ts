@@ -1,5 +1,5 @@
+import AbilityManager from '$/manager/abilityManager'
 import { AbilityAppliedAbility, AbilityEmbryo } from '@/types/proto'
-import AbilityList from './abilityList'
 
 function abilityHash(str: string) {
   let hash = 0
@@ -10,24 +10,26 @@ function abilityHash(str: string) {
 }
 
 export default class Ability {
-  abilityList: AbilityList
-
+  manager: AbilityManager
   id: number
+  instancedId: number
+
   name: string
   overrideName: string
 
-  constructor(abilityList: AbilityList, name: string, overrideName: string) {
-    this.abilityList = abilityList
+  constructor(name: string = 'Default', overrideName: string = 'Default') {
+    this.manager = null
+    this.id = null
+    this.instancedId = null
 
-    this.id = 0
     this.name = name
     this.overrideName = overrideName
   }
 
   exportAppliedAbility(): AbilityAppliedAbility {
-    const { id, name, overrideName } = this
+    const { instancedId, name, overrideName } = this
     return {
-      instancedAbilityId: id,
+      instancedAbilityId: instancedId,
       abilityName: { hash: abilityHash(name) },
       abilityOverride: { hash: abilityHash(overrideName) },
       overrideMap: []

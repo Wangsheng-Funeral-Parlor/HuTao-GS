@@ -34,7 +34,7 @@ class SceneEntityAppearPacket extends Packet implements PacketInterface {
     if (npcList.length > 0) await GroupSuite.sendNotify(context, <Npc[]>npcList)
 
     if (appearType !== VisionTypeEnum.VISION_BORN) return
-    for (let entity of entityList) await SceneEntityMove.sendNotify(context, entity)
+    for (const entity of entityList) await SceneEntityMove.sendNotify(context, entity)
   }
 }
 

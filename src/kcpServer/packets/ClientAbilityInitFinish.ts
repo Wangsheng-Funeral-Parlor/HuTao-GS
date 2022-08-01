@@ -23,16 +23,14 @@ class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
 
     if (invokes.length === 0) {
       const { broadcastContextList } = currentScene
-      for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+      for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
       await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), [], entityId)
       return
     }
 
-    for (let invokeEntry of invokes) forwardBuffer.addEntry(this, invokeEntry, seqId)
-    forwardBuffer.setAdditionalData(seqId, entityId)
-
-    forwardBuffer.sendAll()
+    await currentScene.clientAbilityInitFinish(context, invokes, entityId)
+    await forwardBuffer.sendAll()
   }
 
   async sendNotify(context: PacketContext, data: ClientAbilityInitFinishNotify): Promise<void> {

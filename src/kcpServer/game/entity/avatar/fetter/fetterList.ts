@@ -32,7 +32,7 @@ export default class FetterList {
     this.expLevel = expLevel || 1
     this.rewardedFetterLevelList = Array.isArray(rewarded) ? rewarded : []
 
-    for (let fetter of fetterList) fetter.update()
+    for (const fetter of fetterList) fetter.update()
   }
 
   async initNew() {
@@ -43,7 +43,7 @@ export default class FetterList {
     this.expLevel = 1
     this.rewardedFetterLevelList = []
 
-    for (let fetter of fetterList) fetter.update()
+    for (const fetter of fetterList) fetter.update()
   }
 
   export(): AvatarFetterInfo {

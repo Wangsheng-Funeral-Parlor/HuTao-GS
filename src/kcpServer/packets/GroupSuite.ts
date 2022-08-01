@@ -12,7 +12,7 @@ class GroupSuitePacket extends Packet implements PacketInterface {
 
   async sendNotify(context: PacketContext, npcList: Npc[]): Promise<void> {
     const groupSuitIdListMap: { [groupId: number]: number[] } = {}
-    for (let npc of npcList) {
+    for (const npc of npcList) {
       const { groupId, suitIdList } = npc
       const groupSuitIdList = groupSuitIdListMap[groupId]
       if (groupSuitIdList) {

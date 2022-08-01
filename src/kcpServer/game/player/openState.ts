@@ -17,7 +17,7 @@ export default class OpenState {
   init(userData: PropsUserData) {
     if (userData == null) return this.initNew()
 
-    for (let key in userData) {
+    for (const key in userData) {
       if (isNaN(Number(key))) continue
 
       this.openStateMap[Number(key)] = !!userData[key]
@@ -25,7 +25,7 @@ export default class OpenState {
   }
 
   initNew() {
-    for (let key in OpenStateEnum) {
+    for (const key in OpenStateEnum) {
       if (!isNaN(Number(key)) || key.indexOf('_GUIDE') >= 0) continue
 
       this.openStateMap[OpenStateEnum[key]] = true

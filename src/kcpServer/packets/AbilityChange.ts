@@ -13,12 +13,12 @@ class AbilityChangePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, entity: Entity): Promise<void> {
-    const { entityId } = entity
+    const { entityId, abilityManager } = entity
 
     const notifyData: AbilityChangeNotify = {
       entityId,
       abilityControlBlock: {
-        abilityEmbryoList: entity.abilityList.exportEmbryoList()
+        abilityEmbryoList: abilityManager.exportEmbryoList()
       }
     }
 

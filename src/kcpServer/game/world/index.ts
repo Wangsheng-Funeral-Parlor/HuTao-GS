@@ -221,7 +221,7 @@ export default class World extends BaseClass {
     await LeaveWorld.sendNotify(context)
 
     const { broadcastContextList } = this
-    for (let broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
+    for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
     await WorldPlayerInfo.broadcastNotify(broadcastContextList)
     await SceneTeamUpdate.broadcastNotify(broadcastContextList)
@@ -250,7 +250,7 @@ export default class World extends BaseClass {
     const { playerList, mpMode } = this
     if (!mpMode) return
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       const { teamManager } = player
       const mpTeam = teamManager.getTeam()
 
@@ -283,7 +283,7 @@ export default class World extends BaseClass {
 
     logger.debug(uidPrefix('MODE', host), 'MP -> SP')
 
-    for (let player of playerList) await this.kick(player.uid)
+    for (const player of playerList) await this.kick(player.uid)
 
     await this.leave(host.context, QuitReasonEnum.HOST_NO_OTHER_PLAYER, ClientReconnectReasonEnum.CLIENT_RECONNNECT_QUIT_MP)
   }
@@ -309,7 +309,7 @@ export default class World extends BaseClass {
     const { playerList, mpMode, sceneList, broadcastContextList, lastRttNotify, lastLocNotify } = this
     const now = Date.now()
 
-    for (let scene of sceneList) scene.emit('SceneUpdate')
+    for (const scene of sceneList) scene.emit('SceneUpdate')
 
     if (lastRttNotify == null || now - lastRttNotify > 1e3) {
       this.lastRttNotify = now

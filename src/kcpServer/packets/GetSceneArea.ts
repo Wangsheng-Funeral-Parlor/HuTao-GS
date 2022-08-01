@@ -36,7 +36,7 @@ class GetSceneAreaPacket extends Packet implements PacketInterface {
     const areaIdList = []
     const cityInfoList = []
 
-    for (let cityConfig of sceneData.City) {
+    for (const cityConfig of sceneData.City) {
       const { Id, AreaIdVec } = cityConfig
 
       areaIdList.push(...AreaIdVec)

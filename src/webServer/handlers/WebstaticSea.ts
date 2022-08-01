@@ -19,7 +19,7 @@ class WebstaticSeaHandler extends Handler {
     ]
 
     let filePath: string
-    for (let path of pathList) {
+    for (const path of pathList) {
       if (!await fileExists(path)) continue
       filePath = path
     }

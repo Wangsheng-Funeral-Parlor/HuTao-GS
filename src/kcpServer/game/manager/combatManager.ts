@@ -1,8 +1,9 @@
 import BaseClass from '#/baseClass'
+import { PacketContext } from '#/packet'
 import CombatInvocations from '#/packets/CombatInvocations'
-import dataUtils from '#/utils/dataUtils'
+import { dataToProtobuffer } from '#/utils/dataUtils'
 import Entity from '$/entity'
-import Player from '$/player'
+import Scene from '$/scene'
 import Logger from '@/logger'
 import { ClientStateEnum, FightPropEnum } from '@/types/enum'
 import { CombatInvokeEntry, EntityMoveInfo, EvtBeingHitInfo } from '@/types/proto'
@@ -45,35 +46,18 @@ const protoLookupTable = {
 const logger = new Logger('COMBAT', 0xff1010)
 
 export default class CombatManager extends BaseClass {
-  player: Player
+  scene: Scene
 
   landSpeedInfoMap: { [entityId: number]: [number, number, number] }
 
-  constructor(player: Player) {
+  constructor(scene: Scene) {
     super()
 
-    this.player = player
+    this.scene = scene
 
     this.landSpeedInfoMap = {}
 
     super.initHandlers(this)
-  }
-
-  async handleInvokeEntry(invokeEntry: CombatInvokeEntry, seqId: number) {
-    const { forwardBuffer } = this.player
-    const { argumentType, combatData } = invokeEntry
-    const proto = protoLookupTable[CombatTypeArgumentEnum[argumentType]]
-
-    forwardBuffer.addEntry(CombatInvocations, invokeEntry, seqId)
-
-    if (proto == null) {
-      logger.warn('No proto for argument type:', argumentType, CombatTypeArgumentEnum[argumentType])
-      return
-    }
-
-    logger.verbose(proto)
-
-    await this.emit(proto, await dataUtils.dataToProtobuffer(Buffer.from(combatData, 'base64'), proto), seqId)
   }
 
   private async takeFallDamage(entity: Entity, speedInfo: [number, number, number], plungeFall: boolean, seqId: number): Promise<void> {
@@ -97,6 +81,26 @@ export default class CombatManager extends BaseClass {
     await fightProps.takeDamage(0, damage, true, ChangeHpReasonEnum.CHANGE_HP_SUB_FALL, seqId)
   }
 
+  /**Events**/
+
+  // CombatInvoke
+  async handleCombatInvoke(context: PacketContext, entry: CombatInvokeEntry) {
+    const { player, seqId } = context
+    const { argumentType, combatData } = entry
+    const proto = protoLookupTable[CombatTypeArgumentEnum[argumentType]]
+
+    player?.forwardBuffer?.addEntry(CombatInvocations, entry, seqId)
+
+    if (proto == null) {
+      logger.warn('No proto for argument type:', argumentType, CombatTypeArgumentEnum[argumentType], combatData)
+      return
+    }
+
+    logger.verbose(proto)
+
+    await this.emit(proto, context, await dataToProtobuffer(Buffer.from(combatData, 'base64'), proto))
+  }
+
   /**Combat Events**/
 
   // EvtAnimatorParameterInfo
@@ -104,8 +108,8 @@ export default class CombatManager extends BaseClass {
   // EvtAnimatorStateChangedInfo
 
   // EvtBeingHitInfo
-  async handleEvtBeingHitInfo(data: EvtBeingHitInfo, seqId: number) {
-    const { player } = this
+  async handleEvtBeingHitInfo(context: PacketContext, data: EvtBeingHitInfo) {
+    const { player, seqId } = context
     const { currentScene } = player
     if (!currentScene) return
 
@@ -138,8 +142,9 @@ export default class CombatManager extends BaseClass {
   // EvtSetAttackTargetInfo
 
   // EntityMoveInfo
-  async handleEntityMoveInfo(data: EntityMoveInfo, seqId: number) {
-    const { player, landSpeedInfoMap } = this
+  async handleEntityMoveInfo(context: PacketContext, data: EntityMoveInfo) {
+    const { landSpeedInfoMap } = this
+    const { player, seqId } = context
     const { state, currentScene } = player
     const { entityId, motionInfo, sceneTime, reliableSeq } = data
     const { state: motionState, speed, params } = motionInfo

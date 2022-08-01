@@ -38,7 +38,7 @@ export default class ForwardBuffer {
         .map(e => e[2])
         .filter((seqId, j, self) => self.indexOf(seqId) === j)
 
-      for (let seqId of seqIds) {
+      for (const seqId of seqIds) {
         ret.push([
           packetList[i],
           entryList.filter(e => e[0] === i && e[2] === seqId).map(e => e[1]),
@@ -80,11 +80,11 @@ export default class ForwardBuffer {
     const { additionalDataMap } = this
     const entryList = this.getEntryList(type)
 
-    for (let entry of entryList) {
+    for (const entry of entryList) {
       const [packet, entries, seqId] = entry
       const contextList = this.getContextList(type)
 
-      for (let ctx of contextList) ctx.seqId = seqId
+      for (const ctx of contextList) ctx.seqId = seqId
 
       await packet.broadcastNotify(
         contextList,
@@ -115,12 +115,12 @@ export default class ForwardBuffer {
   async sendAll(): Promise<void> {
     const { additionalDataMap } = this
 
-    for (let type in ForwardTypeEnum) {
+    for (const type in ForwardTypeEnum) {
       if (isNaN(parseInt(type))) continue
       await this.send(parseInt(type))
     }
 
     // clear additional data
-    for (let seqId in additionalDataMap) delete additionalDataMap[seqId]
+    for (const seqId in additionalDataMap) delete additionalDataMap[seqId]
   }
 }

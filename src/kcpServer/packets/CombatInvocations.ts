@@ -15,11 +15,11 @@ class CombatInvocationsPacket extends Packet implements PacketInterface {
   }
 
   async recvNotify(context: PacketContext, data: CombatInvocationsNotify): Promise<void> {
-    const { player, seqId } = context
-    const { combatManager } = player
+    const { player } = context
+    const { currentScene } = player
     const { invokeList } = data
 
-    for (let invokeEntry of invokeList) await combatManager.handleInvokeEntry(invokeEntry, seqId)
+    await currentScene.combatInvoke(context, invokeList)
   }
 
   async sendNotify(context: PacketContext, data: CombatInvocationsNotify): Promise<void> {

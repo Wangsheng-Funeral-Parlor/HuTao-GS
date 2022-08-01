@@ -78,7 +78,7 @@ export default class SceneBlock extends BaseClass {
     const { scene } = this
     const { playerList } = scene
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       if (this.inBoundingRect(player)) return true
     }
 
@@ -98,7 +98,7 @@ export default class SceneBlock extends BaseClass {
 
     const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
-    for (let group of groupList) {
+    for (const group of groupList) {
       if (group.dynamicLoad) continue
       await group.load(wob)
     }
@@ -117,7 +117,7 @@ export default class SceneBlock extends BaseClass {
 
     const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
-    for (let group of groupList) {
+    for (const group of groupList) {
       if (!group.dynamicLoad) continue
       await group.load(wob)
     }
@@ -136,7 +136,7 @@ export default class SceneBlock extends BaseClass {
 
     const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
-    for (let group of groupList) {
+    for (const group of groupList) {
       if (!group.dynamicLoad) continue
       await group.unload()
       await wob.waitTick()

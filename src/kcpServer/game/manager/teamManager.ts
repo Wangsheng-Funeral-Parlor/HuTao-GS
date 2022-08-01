@@ -4,11 +4,11 @@ import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
 import Entity from '$/entity'
 import Avatar from '$/entity/avatar'
 import Player from '$/player'
-import Team from '$/player/team'
+import Team from '$/team'
+import TeamEntity from '$/team/teamEntity'
 import Vector from '$/utils/vector'
-import { EntityTypeEnum } from '@/types/enum'
 import { SceneTeamAvatar, TeamEntityInfo } from '@/types/proto'
-import { ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
+import { RetcodeEnum } from '@/types/proto/enum'
 import TeamManagerUserData from '@/types/user/TeamManagerUserData'
 
 export default class TeamManager extends BaseClass {
@@ -24,10 +24,7 @@ export default class TeamManager extends BaseClass {
 
     this.player = player
 
-    this.entity = new Entity()
-    this.entity.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_TEAM
-    this.entity.entityType = EntityTypeEnum.Team
-
+    this.entity = new TeamEntity(this)
     this.teamList = [
       new Team(this), // mp team
       new Team(this), // team 1
@@ -125,7 +122,7 @@ export default class TeamManager extends BaseClass {
     const avatarList = this.getTeam().getAvatarList()
 
     // Send equip change
-    for (let avatar of avatarList) await AvatarEquipChange.sendNotify(context, avatar)
+    for (const avatar of avatarList) await AvatarEquipChange.sendNotify(context, avatar)
 
     await SceneTeamUpdate.sendNotify(context)
 

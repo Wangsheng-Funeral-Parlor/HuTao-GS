@@ -34,9 +34,9 @@ class SceneDataLoader extends Loader {
   async getDungeonEntry(entryPointId: number): Promise<DungeonEntry> {
     const sceneData = await this.getData()
 
-    for (let sceneId in sceneData) {
+    for (const sceneId in sceneData) {
       const pointMap = await this.getScenePointMap(parseInt(sceneId))
-      for (let pointId in pointMap) {
+      for (const pointId in pointMap) {
         const point = pointMap[pointId]
         if (!point || parseInt(pointId) !== entryPointId || point.$type !== 'DungeonEntry') continue
 

@@ -4,7 +4,7 @@ import { EquipInfo, SceneWeaponInfo } from '@/types/proto'
 import WeaponUserData from '@/types/user/WeaponUserData'
 import Equip from '..'
 import Affix from './affix'
-import { WeaponEntity } from './entity'
+import WeaponEntity from './weaponEntity'
 
 export default class Weapon extends Equip {
   entity: WeaponEntity
@@ -59,7 +59,7 @@ export default class Weapon extends Equip {
 
     this.gadgetId = gadgetId || 0
 
-    for (let affixData of affixDataList) {
+    for (const affixData of affixDataList) {
       const affix = new Affix(this, affixData.id)
 
       affix.init(affixData)
@@ -78,7 +78,7 @@ export default class Weapon extends Equip {
     if (weaponData != null) {
       this.gadgetId = weaponData.GadgetId
 
-      for (let affixId of weaponData.SkillAffix) {
+      for (const affixId of weaponData.SkillAffix) {
         if (affixId === 0) continue
 
         const affix = new Affix(this, affixId)

@@ -26,7 +26,7 @@ export default class OpenSSL {
     const output = {}
 
     let lastKey = null
-    for (let line of lines) {
+    for (const line of lines) {
       const keyMatch = line.match(/^[a-zA-Z]([a-zA-Z\d\s])*?:/)
 
       let key: string = keyMatch?.[0]

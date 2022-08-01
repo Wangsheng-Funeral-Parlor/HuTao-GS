@@ -29,7 +29,7 @@ class SetWidgetSlotPacket extends Packet implements PacketInterface {
 
     if (tagList.length === 0) tagList.push(WidgetSlotTagEnum.WIDGET_SLOT_QUICK_USE)
 
-    for (let tag of tagList) {
+    for (const tag of tagList) {
       switch (op) {
         case WidgetSlotOpEnum.ATTACH:
           await widget.attach(tag, materialId)

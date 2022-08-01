@@ -178,7 +178,7 @@ class ProtoMatch {
 
     if (hasError || data.parts.length === 0) return { count: -1, array: [] }
 
-    for (let protoName in protos) {
+    for (const protoName in protos) {
       const proto = protos[protoName]
       const result = this.compare(proto, data.parts)
       if (!result) continue
@@ -202,7 +202,7 @@ class ProtoMatch {
     const propEntries = Object.entries(props)
     const ret = {}
 
-    for (let field of data) {
+    for (const field of data) {
       const propEntry = propEntries.find(e => field.fieldId === e[1].id)
 
       // field not found
@@ -357,7 +357,7 @@ class ProtoMatch {
   }
 
   replaceProto(obj, protos) {
-    for (let key in obj) {
+    for (const key in obj) {
       const value = obj[key]
       if (typeof value === 'object') this.replaceProto(value, protos)
       if (key !== 'proto' || typeof value !== 'string') continue
@@ -501,7 +501,7 @@ class ProtoMatch {
   parseField(ref, ret, type, repeated) {
     let name
 
-    for (let typeId in TYPE_NAMES) {
+    for (const typeId in TYPE_NAMES) {
       let tid = parseInt(typeId)
 
       const types = TYPE_NAMES[tid]
@@ -614,7 +614,7 @@ class ProtoMatch {
       reader.restore()
     }
 
-    for (let field of parts) field.repeat = parts.filter(f => f.fieldId === field.fieldId).length > 1
+    for (const field of parts) field.repeat = parts.filter(f => f.fieldId === field.fieldId).length > 1
 
     return {
       parts,

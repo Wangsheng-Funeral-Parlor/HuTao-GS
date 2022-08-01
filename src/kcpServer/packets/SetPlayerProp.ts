@@ -24,7 +24,7 @@ class SetPlayerPropPacket extends Packet implements PacketInterface {
     const { propList } = data
     if (!propList) return
 
-    for (let prop of propList) props.set(prop.type, prop.ival != null ? prop.ival : prop.fval)
+    for (const prop of propList) props.set(prop.type, prop.ival != null ? prop.ival : prop.fval)
 
     await this.response(context, { retcode: RetcodeEnum.RET_SUCC })
   }

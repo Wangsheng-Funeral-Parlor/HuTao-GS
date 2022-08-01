@@ -86,7 +86,7 @@ export class ChatManager extends BaseClass {
     const chatHistory: ChatInfo[] = []
 
     // Pull all private chat history
-    for (let channel of privateChatList) {
+    for (const channel of privateChatList) {
       if (!channel.playerList.includes(player)) continue
       chatHistory.push(...channel.pull())
     }

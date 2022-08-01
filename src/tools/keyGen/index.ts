@@ -69,7 +69,7 @@ export default function keyGen() {
     if (existsSync(progressPath)) progressBuf = readFileSync(progressPath)
     else progressBuf = Buffer.alloc(512)
 
-    for (let dumpFile of readdirSync(dumpDirPath)) {
+    for (const dumpFile of readdirSync(dumpDirPath)) {
       if (dumpFile.indexOf('raw-') !== 0) continue
 
       try {

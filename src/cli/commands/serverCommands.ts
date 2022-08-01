@@ -37,7 +37,7 @@ const serverCommands: CommandDefinition[] = [
       const head = `[HELP][${page}/${pageCount}]`
 
       print(`${head}${'='.repeat(maxLength - head.length)}`)
-      for (let line of lines) print(line)
+      for (const line of lines) print(line)
       print('='.repeat(maxLength))
     }
   },
@@ -67,7 +67,7 @@ const serverCommands: CommandDefinition[] = [
       const { clients } = kcpServer
       const lines = []
 
-      for (let clientID in clients) {
+      for (const clientID in clients) {
         const client = clients[clientID]
         lines.push(`${client.uid?.toString()?.padStart(6, '0') || '------'}|${client.state.toString(16).padStart(4, '0').toUpperCase()}|${clientID}`)
       }
@@ -82,7 +82,7 @@ const serverCommands: CommandDefinition[] = [
       print('='.repeat(maxLength))
       print(' UID  | CS | clientID')
       print('='.repeat(maxLength))
-      for (let line of lines) print(line)
+      for (const line of lines) print(line)
       print('='.repeat(maxLength))
     }
   },

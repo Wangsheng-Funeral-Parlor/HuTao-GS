@@ -2,6 +2,7 @@ import AvatarChangeCostume from '#/packets/AvatarChangeCostume'
 import AvatarEquipChange, { AvatarEquipChangeNotify } from '#/packets/AvatarEquipChange'
 import AvatarFlycloakChange from '#/packets/AvatarFlycloakChange'
 import AvatarLifeStateChange from '#/packets/AvatarLifeStateChange'
+import Ability from '$/ability'
 import Entity from '$/entity'
 import Equip from '$/equip'
 import Reliquary from '$/equip/reliquary'
@@ -18,6 +19,16 @@ import { getTimeSeconds } from '@/utils/time'
 import ExcelInfo from './excelInfo'
 import FetterList from './fetter/fetterList'
 import SkillDepot from './skill/skillDepot'
+
+const AvatarDefaultAbilities = [
+  'Avatar_DefaultAbility_VisionReplaceDieInvincible',
+  'Avatar_DefaultAbility_AvartarInShaderChange',
+  'Avatar_SprintBS_Invincible',
+  'Avatar_Freeze_Duration_Reducer',
+  'Avatar_Attack_ReviveEnergy',
+  'Avatar_Component_Initializer',
+  'Avatar_FallAnthem_Achievement_Listener'
+]
 
 export default class Avatar extends Entity {
   player: Player
@@ -56,8 +67,20 @@ export default class Avatar extends Entity {
   }
 
   async loadAvatarData() {
-    this.config = await AvatarData.getFightPropConfig(this.avatarId)
+    const { avatarId, abilityManager } = this
+
+    this.config = await AvatarData.getFightPropConfig(avatarId)
     this.growCurve = await GrowCurveData.getGrowCurve('Avatar')
+
+    const avatarData = await AvatarData.getAvatar(avatarId)
+    if (!avatarData) return
+
+    // Default abilities
+    for (const name of AvatarDefaultAbilities) abilityManager.register(new Ability(name))
+
+    for (const ability of avatarData.Config.Abilities) {
+      abilityManager.register(new Ability(ability.AbilityName, ability.AbilityOverride || 'Default'))
+    }
   }
 
   async init(userData: AvatarUserData) {
@@ -87,7 +110,7 @@ export default class Avatar extends Entity {
     const equipGuids = equipGuidList || []
     if (weaponGuid) equipGuids.push(weaponGuid) // compatibility
 
-    for (let equipGuid of equipGuids) {
+    for (const equipGuid of equipGuids) {
       const item = inventory.getItem(BigInt(equipGuid))
       if (!item?.equip) continue
 
@@ -320,7 +343,7 @@ export default class Avatar extends Entity {
   }
 
   exportSceneTeamAvatar(): SceneTeamAvatar {
-    const { player, entityId, guid, weapon, abilityList, isOnScene } = this
+    const { player, entityId, guid, weapon, abilityManager, isOnScene } = this
     const { uid, currentScene, currentAvatar } = player
 
     const data: SceneTeamAvatar = {
@@ -336,7 +359,7 @@ export default class Avatar extends Entity {
       weaponEntityId: weapon.entity.entityId,
       weaponAbilityInfo: {},
       abilityControlBlock: {
-        abilityEmbryoList: abilityList.exportEmbryoList()
+        abilityEmbryoList: abilityManager.exportEmbryoList()
       },
       isPlayerCurAvatar: (currentAvatar === this),
       isOnScene
@@ -376,16 +399,12 @@ export default class Avatar extends Entity {
 
   // Register
   async handleRegister() {
-    await super.handleRegister()
-
     const { manager, weapon } = this
     if (weapon) await manager.register(weapon.entity)
   }
 
   // Unregister
   async handleUnregister() {
-    await super.handleUnregister()
-
     const { manager, weapon } = this
     if (weapon) await manager?.unregister(weapon.entity)
   }

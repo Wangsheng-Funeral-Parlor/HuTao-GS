@@ -139,7 +139,7 @@ class DispatchHandler extends Handler {
 
     const host = dispatchHost || hostIp
 
-    for (let region of regionListData.regionList) {
+    for (const region of regionListData.regionList) {
       region.title = serverName
       region.dispatchUrl = `https://${host}/query_cur_region`
     }

@@ -60,7 +60,7 @@ export default class DnsServer extends EventEmitter {
   stop(): void {
     const { nsMap, tcp, udp } = this
 
-    for (let addr in nsMap) {
+    for (const addr in nsMap) {
       nsMap[addr].destroy()
       delete nsMap[addr]
     }
@@ -120,7 +120,7 @@ export default class DnsServer extends EventEmitter {
 
       logger.verbose(`Qry: ${name} (${typeName})`)
 
-      for (let domain in domains) {
+      for (const domain in domains) {
         const index = name.indexOf(domain)
         if (index === -1 || index !== (name.length - domain.length) || name.indexOf('autopatch') === 0) continue
 
@@ -131,7 +131,7 @@ export default class DnsServer extends EventEmitter {
         return rsp
       }
 
-      for (let ns of nameservers) {
+      for (const ns of nameservers) {
         const rsp = await this.queryNS(ns, query.header.id, false, msg)
         if (rsp == null) continue
 

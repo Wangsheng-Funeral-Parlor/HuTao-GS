@@ -22,7 +22,7 @@ export const listAnswer = (response: Buffer): string => {
   const results = []
   const res = DnsPacket.parse(response)
 
-  for (let r of res.answer) {
+  for (const r of res.answer) {
     results.push(`${QTYPE_TO_NAME[r.type] || r.type}:${getAnsValue(r)}`)
   }
 

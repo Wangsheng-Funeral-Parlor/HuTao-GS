@@ -75,7 +75,7 @@ export class HttpResponse {
       rsp.setHeader('Cache-Control', 'no-store')
 
       if (headers != null) {
-        for (let header in headers) rsp.setHeader(header, headers[header])
+        for (const header in headers) rsp.setHeader(header, headers[header])
       }
     }
 

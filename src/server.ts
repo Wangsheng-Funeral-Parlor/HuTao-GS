@@ -133,7 +133,7 @@ export default class Server {
 
     logger.debug('Setting hosts...')
 
-    for (let host of hosts) {
+    for (const host of hosts) {
       for (let i = 1; i <= 10; i++) {
         try {
           hostile.set('127.0.0.1', host)
@@ -166,7 +166,7 @@ export default class Server {
 
     logger.debug('Removing hosts...')
 
-    for (let host of hosts) {
+    for (const host of hosts) {
       for (let i = 1; i <= 10; i++) {
         try {
           hostile.remove('127.0.0.1', host)
@@ -277,7 +277,7 @@ export default class Server {
   }
 
   checkDirs() {
-    for (let path of requiredDirs) {
+    for (const path of requiredDirs) {
       try { if (statSync(join(cwd(), path))) continue } catch (err) { }
       try {
         logger.info('Creating directory:', path)

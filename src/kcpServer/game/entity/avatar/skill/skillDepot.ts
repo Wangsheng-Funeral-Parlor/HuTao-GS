@@ -31,14 +31,14 @@ export default class SkillDepot {
     const { skills, talents, energySkill } = this
     const { skillDataList, energySkillData } = userData
 
-    for (let skill of skills) {
+    for (const skill of skills) {
       const skillData = skillDataList.find(data => data.id === skill.id)
       if (!skillData) continue
 
       await skill.init(skillData)
     }
 
-    for (let talent of talents) await talent.init()
+    for (const talent of talents) await talent.init()
 
     if (!energySkill) return
 
@@ -51,8 +51,8 @@ export default class SkillDepot {
 
     const { skills, talents, energySkill } = this
 
-    for (let skill of skills) await skill.initNew()
-    for (let talent of talents) await talent.init()
+    for (const skill of skills) await skill.initNew()
+    for (const talent of talents) await talent.init()
 
     await energySkill?.initNew()
   }
@@ -70,7 +70,7 @@ export default class SkillDepot {
     this.id = depotData.Id
 
     // inherentProudSkills
-    for (let proudSkillOpen of depotData.InherentProudSkillOpens) {
+    for (const proudSkillOpen of depotData.InherentProudSkillOpens) {
       if (proudSkillOpen.ProudSkillGroupId == null) continue
       if (proudSkillOpen.NeedAvatarPromoteLevel != null && promoteLevel < proudSkillOpen.NeedAvatarPromoteLevel) continue
 

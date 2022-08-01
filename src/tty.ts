@@ -117,7 +117,7 @@ export class TTY extends EventEmitter {
     this.stdout.on('resize', this.handleResize.bind(this))
 
     const ownPropNames = Object.getOwnPropertyNames(this.constructor.prototype)
-    for (let name of ownPropNames) {
+    for (const name of ownPropNames) {
       if (typeof this[name] === 'function') this[name] = this[name].bind(this)
     }
   }

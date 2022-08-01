@@ -31,7 +31,7 @@ export default class BaseClass extends EventEmitter {
   bindHandlers() {
     const ownPropNames = getPropNames(this.constructor.prototype)
 
-    for (let name of ownPropNames) {
+    for (const name of ownPropNames) {
       if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
       this[name] = this[name].bind(this)
     }
@@ -42,7 +42,7 @@ export default class BaseClass extends EventEmitter {
 
     const ownPropNames = getPropNames(this.constructor.prototype)
 
-    for (let name of ownPropNames) {
+    for (const name of ownPropNames) {
       if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
       target.on(name.slice(6), this[name])
     }
@@ -53,7 +53,7 @@ export default class BaseClass extends EventEmitter {
 
     const ownPropNames = getPropNames(this.constructor.prototype)
 
-    for (let name of ownPropNames) {
+    for (const name of ownPropNames) {
       if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
       target.off(name.slice(6), this[name])
     }

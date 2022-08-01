@@ -94,7 +94,7 @@ export class PacketHeader {
     this.nscount = 0
     this.arcount = 0
 
-    for (let k in header) {
+    for (const k in header) {
       if (this[k] != null) this[k] = header[k]
     }
   }
@@ -268,7 +268,7 @@ export class ResA extends PacketResource {
   encode(buf: BufferCursor, _index?: LableIndex): BufferCursor {
     const parts = this.address.split('.')
     buf.writeUInt16BE(parts.length)
-    for (let part of parts) buf.writeUInt8(parseInt(part))
+    for (const part of parts) buf.writeUInt8(parseInt(part))
     return buf
   }
 }
@@ -316,7 +316,7 @@ export class ResAAAA extends PacketResource {
   encode(buf: BufferCursor, _index?: LableIndex): BufferCursor {
     const parts = this.address.split(':')
     buf.writeUInt16BE(parts.length * 2)
-    for (let part of parts) buf.writeUInt16BE(parseInt(part, 16))
+    for (const part of parts) buf.writeUInt16BE(parseInt(part, 16))
     return buf
   }
 }
@@ -405,7 +405,7 @@ export class ResTXT extends PacketResource {
 
     buf.writeUInt16BE(len + characterStringBuffers.length)
 
-    for (let csBuf of characterStringBuffers) {
+    for (const csBuf of characterStringBuffers) {
       buf.writeUInt8(csBuf.length)
       buf.copy(csBuf, 0)
     }
@@ -546,7 +546,7 @@ export class ResEDNS extends PacketResource {
     const { rdata } = this
     const rdBuf = new BufferCursor(1024)
 
-    for (let rd of rdata) {
+    for (const rd of rdata) {
       const optName = EDNS_TO_NAME[rd.ednsCode]
       if (!(optName in ResEDNS)) continue
 
@@ -690,7 +690,7 @@ export class ResSVCB extends PacketResource {
 
     buf.writeUInt16BE(priority)
     namePack(target, buf, index)
-    for (let key in fields) {
+    for (const key in fields) {
       buf.writeUInt16BE(parseInt(key))
       buf.writeUInt16BE(fields[key].length)
       buf.copy(fields[key])
@@ -793,10 +793,10 @@ export default class DnsPacket {
     packet.header.toBuffer(msg)
 
     const index: LableIndex = {}
-    for (let p of parsers) {
+    for (const p of parsers) {
       const { prop } = p
 
-      for (let res of <(PacketQuestion | PacketResource)[]>packet[prop]) {
+      for (const res of <(PacketQuestion | PacketResource)[]>packet[prop]) {
         res.toBuffer(msg, index)
       }
     }
@@ -810,7 +810,7 @@ export default class DnsPacket {
 
     packet.header = PacketHeader.parse(msg)
 
-    for (let p of parsers) {
+    for (const p of parsers) {
       const { prop, parser, headerProp } = p
       const count = packet.header[headerProp] || 0
 

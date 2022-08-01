@@ -51,7 +51,7 @@ export default class Monster extends Entity {
     this.affixList = monsterData.Affix || []
     this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id, true))
 
-    for (let weapon of this.weaponList) await weapon.initNew()
+    for (const weapon of this.weaponList) await weapon.initNew()
 
     const describeData = await MonsterData.getDescribe(monsterData.DescribeId)
     if (!describeData) return
@@ -93,12 +93,12 @@ export default class Monster extends Entity {
   // Register
   async handleRegister() {
     const { manager, weaponList } = this
-    for (let weapon of weaponList) await manager?.register(weapon.entity)
+    for (const weapon of weaponList) await manager?.register(weapon.entity)
   }
 
   // Unregister
   async handleUnregister() {
     const { manager, weaponList } = this
-    for (let weapon of weaponList) await manager?.unregister(weapon.entity)
+    for (const weapon of weaponList) await manager?.unregister(weapon.entity)
   }
 }

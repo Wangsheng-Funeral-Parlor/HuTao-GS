@@ -1,7 +1,7 @@
 function reverseMap(src: any): any {
   const dst = {}
 
-  for (let k in src) {
+  for (const k in src) {
     const v = src[k]
     if (v != null) dst[v] = k
   }

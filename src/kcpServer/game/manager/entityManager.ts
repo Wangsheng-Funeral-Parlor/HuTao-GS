@@ -220,7 +220,7 @@ export default class EntityManager extends BaseClass {
 
   async destroy() {
     const { registeredEntityMap } = this
-    for (let key in registeredEntityMap) await this.unregister(registeredEntityMap[key], true)
+    for (const key in registeredEntityMap) await this.unregister(registeredEntityMap[key], true)
   }
 
   getEntity(entityId: number): Entity | null {
@@ -240,12 +240,12 @@ export default class EntityManager extends BaseClass {
     const { nearbyHash } = entityGrid
     const nearbyEntityMap = {}
 
-    for (let hash of nearbyHash) {
+    for (const hash of nearbyHash) {
       const grid = entityGridMap[hash]
       if (!grid) continue
 
       const { entityTypeMap } = grid
-      for (let type in entityTypeMap) Object.assign(nearbyEntityMap, entityTypeMap[type] || {})
+      for (const type in entityTypeMap) Object.assign(nearbyEntityMap, entityTypeMap[type] || {})
     }
 
     return Object.values(nearbyEntityMap)
@@ -303,7 +303,7 @@ export default class EntityManager extends BaseClass {
     if (batch) logger.verbose('Add:', entityId)
     else logger.debug('Add:', entityId)
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       const { stateChanged } = this.playerLoadEntity(player, entity, visionType, param)
       if (stateChanged && !batch) await this.appearQueueFlush(player, seqId)
     }
@@ -325,7 +325,7 @@ export default class EntityManager extends BaseClass {
     if (batch) logger.verbose('Remove:', entityId)
     else logger.debug('Remove:', entityId)
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       const { stateChanged } = this.playerUnloadEntity(player, targetEntity, visionType, true)
       if (stateChanged) {
         this.updateAllEntity(player)
@@ -358,7 +358,7 @@ export default class EntityManager extends BaseClass {
 
     const { gridHash: newHash } = entity
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       const { entityGridCountMap } = player
 
       const oldEntityCountMap = entityGridCountMap[oldHash]
@@ -384,7 +384,7 @@ export default class EntityManager extends BaseClass {
     const nearbyEntityList = this.getNearbyEntityList(currentAvatar)
     const seenEntityIdList: number[] = []
 
-    for (let entity of nearbyEntityList) {
+    for (const entity of nearbyEntityList) {
       const { entityId } = entity
 
       if (loadedEntityIdList.includes(entityId)) this.playerUnloadEntity(player, entity, VisionTypeEnum.VISION_MISS)
@@ -394,7 +394,7 @@ export default class EntityManager extends BaseClass {
     }
 
     const missingEntityIdList = loadedEntityIdList.filter(entityId => !seenEntityIdList.includes(entityId))
-    for (let entityId of missingEntityIdList) {
+    for (const entityId of missingEntityIdList) {
       const entity = this.getEntity(entityId)
       if (!entity) continue
 
@@ -431,13 +431,13 @@ export default class EntityManager extends BaseClass {
 
     context.seqId = seqId || null
 
-    for (let visionType in appearQueue) {
+    for (const visionType in appearQueue) {
       const param = paramBuffer[visionType]
       const queue = appearQueue[visionType].splice(0).filter(entity => entity.manager === this)
       if (queue.length === 0) continue
 
       if (queue.length <= 4) {
-        for (let entity of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'A', 'EntityID:', entity.entityId)
+        for (const entity of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'A', 'EntityID:', entity.entityId)
       } else {
         logger.debug(getPrefix(player, parseInt(visionType)), 'A', `x${queue.length}`)
       }
@@ -452,12 +452,12 @@ export default class EntityManager extends BaseClass {
 
     context.seqId = seqId || null
 
-    for (let visionType in disappearQueue) {
+    for (const visionType in disappearQueue) {
       const queue = disappearQueue[visionType]
       if (queue.length === 0) continue
 
       if (queue.length <= 4) {
-        for (let entityId of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'D', 'EntityID:', entityId)
+        for (const entityId of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'D', 'EntityID:', entityId)
       } else {
         logger.debug(getPrefix(player, parseInt(visionType)), 'D', `x${queue.length}`)
       }
@@ -470,7 +470,7 @@ export default class EntityManager extends BaseClass {
     const { scene } = this
     const { playerList } = scene
 
-    for (let player of playerList) {
+    for (const player of playerList) {
       await this.disappearQueueFlush(player, seqId)
       await this.appearQueueFlush(player, seqId)
     }
@@ -501,7 +501,7 @@ export default class EntityManager extends BaseClass {
     currentAvatar.motion.params = []
 
     const entityList = this.getNearbyEntityList(currentAvatar)
-    for (let entity of entityList) this.playerLoadEntity(player, entity, visionType)
+    for (const entity of entityList) this.playerLoadEntity(player, entity, visionType)
 
     // Send notify
     await this.appearQueueFlush(player, seqId)
@@ -515,7 +515,7 @@ export default class EntityManager extends BaseClass {
 
     const entityList = loadedEntityIdList.splice(0)
 
-    for (let entityId of entityList) {
+    for (const entityId of entityList) {
       const entity = this.getEntity(entityId)
       if (!entity) continue
 
@@ -524,7 +524,7 @@ export default class EntityManager extends BaseClass {
 
     missedEntityIdList.push(...entityList)
 
-    for (let hash in entityGridCountMap) delete entityGridCountMap[hash]
+    for (const hash in entityGridCountMap) delete entityGridCountMap[hash]
 
     // Send notify
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)

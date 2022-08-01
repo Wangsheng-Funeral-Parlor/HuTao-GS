@@ -44,7 +44,7 @@ const avatarCommands: CommandDefinition[] = [
       print('Healed all avatar.')
 
       const avatarList = player.teamManager.getTeam()?.avatarList || []
-      for (let avatar of avatarList) {
+      for (const avatar of avatarList) {
         if (!avatar.isAlive()) await avatar.revive()
         await avatar.fightProps.fullHeal(true)
       }
@@ -70,7 +70,7 @@ const avatarCommands: CommandDefinition[] = [
       print('Recharged energy.')
 
       const avatarList = player.teamManager.getTeam()?.avatarList || []
-      for (let avatar of avatarList) avatar.fightProps.rechargeEnergy(true)
+      for (const avatar of avatarList) avatar.fightProps.rechargeEnergy(true)
     }
   },
   {

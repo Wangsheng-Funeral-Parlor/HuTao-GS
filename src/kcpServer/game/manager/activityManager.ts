@@ -30,7 +30,7 @@ export default class ActivityManager {
 
   async sendAllActivityInfo(context: PacketContext): Promise<void> {
     const { activityList } = this
-    for (let activity of activityList) await ActivityInfoPacket.sendNotify(context, activity.id)
+    for (const activity of activityList) await ActivityInfoPacket.sendNotify(context, activity.id)
   }
 
   exportActivityInfo(player: Player, id: number): ActivityInfo {
