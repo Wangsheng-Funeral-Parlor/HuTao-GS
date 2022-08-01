@@ -49,18 +49,36 @@ function getTargetInfo(target) {
   }
 }
 
+function checkExistingBuild(builtPath, versionSegments) {
+  const buildVersion = `${versionSegments[0]}.${versionSegments[1]}.${versionSegments[2]}.${versionSegments[3]}`
+
+  if (!existsSync(builtPath)) return false
+
+  const builtExe = ResEdit.NtExecutable.from(readFileSync(builtPath))
+  const builtRes = ResEdit.NtExecutableResource.from(builtExe)
+
+  const builtViList = ResEdit.Resource.VersionInfo.fromEntries(builtRes.entries)
+  const builtVersion = builtViList[0].getStringValues({ lang: 1033, codepage: 1200 })?.['FileVersion']
+
+  if (buildVersion === builtVersion) {
+    console.log('Using existing build')
+    return true
+  }
+
+  console.log('Version changed, rebuilding...')
+  return false
+}
+
 module.exports = async () => {
   const targets = packageConfig.pkg.targets.map(getTargetInfo)
 
   for (let target of targets) {
     const { nodeVersion, fetchedPath, builtPath, url } = target
+    const versionSegments = `${packageConfig.version}.0`.split('.').map(v => parseInt(v))
 
     console.log('Target:', nodeVersion)
 
-    if (existsSync(builtPath)) {
-      console.log('Using existing build')
-      continue
-    }
+    if (checkExistingBuild(builtPath, versionSegments)) continue
 
     if (!existsSync(fetchedPath)) {
       console.log('Downloading file...')
@@ -75,7 +93,7 @@ module.exports = async () => {
         console.error(e)
         process.exit(1)
       }
-      console.log('Downloaded file.');
+      console.log('Downloaded file.')
     } else {
       console.log('Using existing file')
     }
@@ -90,17 +108,15 @@ module.exports = async () => {
 
     console.log(vi.data.strings)
 
-    const theversion = `${packageConfig.version}.0`.split('.')
-
     console.log('Removing OriginalFilename')
     vi.removeStringValue({ lang: 1033, codepage: 1200 }, 'OriginalFilename')
     console.log('Removing InternalName')
     vi.removeStringValue({ lang: 1033, codepage: 1200 }, 'InternalName')
 
     console.log('Setting Product Version')
-    vi.setProductVersion(theversion[0], theversion[1], theversion[2], theversion[3], 1033)
+    vi.setProductVersion(versionSegments[0], versionSegments[1], versionSegments[2], versionSegments[3], 1033)
     console.log('Setting File Version')
-    vi.setFileVersion(theversion[0], theversion[1], theversion[2], theversion[3], 1033)
+    vi.setFileVersion(versionSegments[0], versionSegments[1], versionSegments[2], versionSegments[3], 1033)
 
     console.log('Setting File Info')
     vi.setStringValues(
