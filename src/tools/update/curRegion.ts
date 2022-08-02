@@ -13,14 +13,15 @@ import { cwd } from 'process'
 import * as protobuf from 'protobufjs'
 const { Resolver } = dns.promises
 
+const { version, nameservers, dispatchRegion, dispatchSeed, dispatchKeyId } = config
 const hostMap = {
   'OSREL': 'osasiadispatch',
   'CNCB': 'cnbeta01dispatch'
 }
 
-const host = `${hostMap[config.dispatchRegion]}.yuanshen.com`
+const host = `${hostMap[dispatchRegion]}.yuanshen.com`
 const protoPath = join(cwd(), `data/proto/QueryCurrRegionHttpRsp.proto`)
-const binFilePath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
+const binFilePath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
 
 const logger = new Logger('UPDATE')
 
@@ -41,12 +42,11 @@ async function decryptResponse(keyId: number, data: string): Promise<string> {
   }
 }
 
-function query(ip: string) {
-  const { version, dispatchSeed, dispatchKeyId } = config
+function query(ip: string, overrideSeed?: string) {
   const keyId = dispatchKeyId ? `&key_id=${dispatchKeyId}` : ''
 
   return new Promise<void>((resolve, reject) => {
-    const path = `/query_cur_region?version=${config.dispatchRegion}Win${version}&lang=3&platform=3&binary=1&time=38&channel_id=1&sub_channel_id=0&account_type=1&dispatchSeed=${dispatchSeed}${keyId}`
+    const path = `/query_cur_region?version=${dispatchRegion}Win${version}&lang=3&platform=3&binary=1&time=38&channel_id=1&sub_channel_id=0&account_type=1&dispatchSeed=${overrideSeed == null ? dispatchSeed : overrideSeed}${keyId}`
     logger.debug('(QueryCurrRegion) Host:', host, 'Path:', path)
     get(`https://${ip}${path}`, {
       headers: {
@@ -94,25 +94,25 @@ function query(ip: string) {
   })
 }
 
-export const checkForUpdate = async (): Promise<boolean> => {
+export const checkForUpdate = async (overrideSeed?: string): Promise<boolean> => {
   if (existsSync(binFilePath)) return true
 
-  return update()
+  return update(overrideSeed)
 }
 
-export const update = async (): Promise<boolean> => {
+export const update = async (overrideSeed?: string): Promise<boolean> => {
   try {
     if (!await fileExists(protoPath)) throw new Error('Missing proto file.')
-    if (config.dispatchSeed == null) throw new Error('Missing dispatch seed.')
+    if (dispatchSeed == null && overrideSeed == null) throw new Error('Missing dispatch seed.')
 
     const r = new Resolver()
 
-    r.setServers(config.nameservers)
+    r.setServers(nameservers)
 
     const ip = (await r.resolve4(host))?.[0]
     logger.debug('(QueryCurrRegion) Resolved:', ip)
 
-    await query(ip)
+    await query(ip, overrideSeed)
 
     return true
   } catch (err) {

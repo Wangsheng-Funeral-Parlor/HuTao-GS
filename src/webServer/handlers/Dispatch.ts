@@ -89,7 +89,7 @@ class DispatchHandler extends Handler {
       case clientVersion >= 0x020732: { // >= 2.7.50
         const keyId = parseInt(searchParams.get('key_id')) || 0
         const keyPairs = await DispatchKey.getKeyPairs(keyId)
-        const encoded = await this.curRegionRsp()
+        const encoded = await this.curRegionRsp(searchParams.get('dispatchSeed'))
 
         response = {
           content: rsaEncrypt(keyPairs.encrypt.public.pem, encoded).toString('base64'),
@@ -98,7 +98,7 @@ class DispatchHandler extends Handler {
         break
       }
       case clientVersion >= 0x010000: { // >= 1.0.0
-        response = (await this.curRegionRsp()).toString('base64')
+        response = (await this.curRegionRsp(searchParams.get('dispatchSeed'))).toString('base64')
         break
       }
       default: {
@@ -113,7 +113,7 @@ class DispatchHandler extends Handler {
     let regionListData: QueryRegionListHttpRsp
 
     if (autoPatch) {
-      if (!regionList.checkForUpdate()) throw new Error('Update failed')
+      if (!await regionList.checkForUpdate()) throw new Error('Update failed')
 
       const binPath = join(cwd(), `data/bin/${version}/QueryRegionListHttpRsp.bin`)
       if (!await fileExists(binPath)) throw new Error('Missing bin file.')
@@ -157,11 +157,11 @@ class DispatchHandler extends Handler {
     })
   }
 
-  private async curRegionRsp(): Promise<Buffer> {
+  private async curRegionRsp(seed?: string): Promise<Buffer> {
     let curRegionData: QueryCurrRegionHttpRsp
 
     if (autoPatch) {
-      if (!await curRegion.checkForUpdate()) throw new Error('Update failed')
+      if (!await curRegion.checkForUpdate(seed)) throw new Error('Update failed')
 
       const binPath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
       if (!await fileExists(binPath)) throw new Error('Missing bin file.')
