@@ -75,7 +75,8 @@ export const SUPPORT_VERSIONS = [
   '2.8.0',
   '2.8.50',
   '2.8.51',
-  '2.8.52'
+  '2.8.52',
+  '2.8.53'
 ]
 
 logger.info('Loading config...')
