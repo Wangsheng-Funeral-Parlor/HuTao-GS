@@ -1,6 +1,7 @@
 import Equip from '$/equip'
 import ReliquaryData from '$/gameData/data/ReliquaryData'
-import { EquipTypeEnum, FightPropEnum } from '@/types/enum'
+import Player from '$/player'
+import { EquipTypeEnum, FightPropEnum, ItemTypeEnum } from '@/types/enum'
 import { EquipInfo, SceneReliquaryInfo } from '@/types/proto'
 import ReliquaryUserData from '@/types/user/ReliquaryUserData'
 
@@ -23,8 +24,8 @@ export default class Reliquary extends Equip {
   mainPropValue: number
   subStatMap: { [propType: number]: number }
 
-  constructor(itemId: number, guid?: bigint) {
-    super(itemId, guid, EquipTypeEnum.EQUIP_NONE)
+  constructor(itemId: number, player: Player) {
+    super(itemId, player, ItemTypeEnum.ITEM_RELIQUARY, EquipTypeEnum.EQUIP_NONE)
 
     this.mainPropId = 0
     this.appendPropIdList = []
@@ -37,6 +38,8 @@ export default class Reliquary extends Equip {
   private async loadReliquaryData() {
     const { itemId } = this
     const reliquaryData = await ReliquaryData.getReliquary(itemId)
+
+    this.gadgetId = reliquaryData?.GadgetId || 0
 
     this.maxLevel = reliquaryData?.MaxLevel || 1
     this.rankLevel = reliquaryData?.RankLevel || 0

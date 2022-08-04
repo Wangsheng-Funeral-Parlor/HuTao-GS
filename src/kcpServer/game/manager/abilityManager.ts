@@ -4,29 +4,33 @@ import AbilityInvocations from '#/packets/AbilityInvocations'
 import ClientAbilityChange from '#/packets/ClientAbilityChange'
 import ClientAbilityInitFinish from '#/packets/ClientAbilityInitFinish'
 import { dataToProtobuffer } from '#/utils/dataUtils'
-import Ability from '$/ability'
+import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
+import AppliedAbility from '$/ability/appliedAbility'
+import AppliedModifier from '$/ability/appliedModifier'
+import Embryo from '$/ability/embryo'
 import Entity from '$/entity'
+import AbilityStringManager from '$/manager/abilityStringManager'
 import Logger from '@/logger'
-import { AbilityAppliedAbility, AbilityAppliedModifier, AbilityEmbryo, AbilityInvokeEntry } from '@/types/proto'
-import { AbilityInvokeArgumentEnum } from '@/types/proto/enum'
+import { AbilityActionGenerateElemBall, AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaReInitOverrideMap, AbilityScalarValueEntry, AbilitySyncStateInfo } from '@/types/proto'
+import { AbilityInvokeArgumentEnum, ModifierActionEnum } from '@/types/proto/enum'
 
 const protoLookupTable = {
   ABILITY_NONE: null,
   ABILITY_META_MODIFIER_CHANGE: 'AbilityMetaModifierChange',
   ABILITY_META_COMMAND_MODIFIER_CHANGE_REQUEST: null,
   ABILITY_META_SPECIAL_FLOAT_ARGUMENT: 'AbilityMetaSpecialFloatArgument',
-  ABILITY_META_OVERRIDE_PARAM: null,
+  ABILITY_META_OVERRIDE_PARAM: 'AbilityScalarValueEntry',
   ABILITY_META_CLEAR_OVERRIDE_PARAM: null,
   ABILITY_META_REINIT_OVERRIDEMAP: 'AbilityMetaReInitOverrideMap',
   ABILITY_META_GLOBAL_FLOAT_VALUE: 'AbilityScalarValueEntry',
-  ABILITY_META_CLEAR_GLOBAL_FLOAT_VALUE: null,
+  ABILITY_META_CLEAR_GLOBAL_FLOAT_VALUE: 'AbilityString',
   ABILITY_META_ABILITY_ELEMENT_STRENGTH: null,
   ABILITY_META_ADD_OR_GET_ABILITY_AND_TRIGGER: 'AbilityMetaAddOrGetAbilityAndTrigger',
   ABILITY_META_SET_KILLED_SETATE: 'AbilityMetaSetKilledState',
   ABILITY_META_SET_ABILITY_TRIGGER: 'AbilityMetaSetAbilityTrigger',
-  ABILITY_META_ADD_NEW_ABILITY: null,
-  ABILITY_META_REMOVE_ABILITY: null,
-  ABILITY_META_SET_MODIFIER_APPLY_ENTITY: null,
+  ABILITY_META_ADD_NEW_ABILITY: 'AbilityMetaAddAbility',
+  ABILITY_META_REMOVE_ABILITY: '',
+  ABILITY_META_SET_MODIFIER_APPLY_ENTITY: 'AbilityMetaSetModifierApplyEntityId',
   ABILITY_META_MODIFIER_DURABILITY_CHANGE: 'AbilityMetaModifierDurabilityChange',
   ABILITY_META_ELEMENT_REACTION_VISUAL: 'AbilityMetaElementReactionVisual',
   ABILITY_META_SET_POSE_PARAMETER: 'AbilityMetaSetPoseParameter',
@@ -61,92 +65,159 @@ const protoLookupTable = {
   ABILITY_MIXIN_WIDGET_MP_SUPPORT: 'AbilityMixinWidgetMpSupport'
 }
 
-const logger = new Logger('ABILIT', 0xa0a0ff)
+const logger = new Logger('ABILIT', 0x10ff10)
 
 export default class AbilityManager extends BaseClass {
   entity: Entity
 
-  usedId: number[]
-  abilityList: Ability[]
+  stringManager: AbilityStringManager
+
+  dynamicValueMapContainer: AbilityScalarValueContainer
+  sgvDynamicValueMapContainer: AbilityScalarValueContainer
+
+  embryoList: Embryo[]
+  abilityList: AppliedAbility[]
+  modifierList: AppliedModifier[]
+
+  initialized: boolean
 
   constructor(entity: Entity) {
     super()
 
     this.entity = entity
 
-    this.usedId = []
+    this.stringManager = new AbilityStringManager()
+
+    this.dynamicValueMapContainer = new AbilityScalarValueContainer()
+    this.sgvDynamicValueMapContainer = new AbilityScalarValueContainer()
+
+    this.embryoList = []
     this.abilityList = []
+    this.modifierList = []
+
+    this.initialized = false
 
     super.initHandlers(this)
   }
 
   private getNewId(): number {
-    const { usedId } = this
+    const { embryoList } = this
 
     let id = 0
-    while (usedId.includes(++id));
+    while (embryoList.find(e => e.id === id)) id++
 
-    usedId.push(id)
     return id
   }
 
-  private freeId(id: number) {
-    const { usedId } = this
-    if (usedId.includes(id)) usedId.splice(usedId.indexOf(id), 1)
+  private async parseEntry(entry: AbilityInvokeEntry): Promise<{ type: string, head: AbilityInvokeEntryHead, data: any, buf: Buffer }> {
+    const { head, argumentType, abilityData } = entry
+    const argType = AbilityInvokeArgumentEnum[argumentType]
+    const buf = Buffer.from(abilityData, 'base64')
+    const proto = protoLookupTable[argType]
+
+    if (proto == null) {
+      if (argumentType !== AbilityInvokeArgumentEnum.ABILITY_NONE) {
+        logger.warn('No proto for argument type:', argumentType, argType, buf.toString('base64'))
+      }
+      return null
+    }
+
+    return {
+      type: argType.replace(/(?<=(^|_)[A-Z]).*?(?=($|_))/g, v => v.toLowerCase()).replace(/_/g, ''),
+      head,
+      data: await dataToProtobuffer(buf, proto),
+      buf
+    }
   }
 
-  register(ability: Ability) {
-    const { abilityList } = this
-    const { manager, name, overrideName } = ability
-
-    if (manager) manager.unregister(ability)
-
+  async addEmbryo(name: string = 'Default', overrideName: string = 'Default') {
     const id = this.getNewId()
+    const embryo = new Embryo(this, id, name, overrideName)
 
-    ability.manager = this
-    ability.id = id
-
-    abilityList.push(ability)
+    await embryo.initNew()
+    this.embryoList.push(embryo)
 
     logger.verbose('Register:', id, '->', `${name}[${overrideName}]`)
   }
 
-  unregister(ability: Ability) {
-    const { abilityList } = this
-    const { manager, id, name, overrideName } = ability
-
+  removeEmbryo(embryo: Embryo) {
+    const { embryoList } = this
+    const { manager, id, name, overrideName } = embryo
     if (manager !== this) return
 
-    ability.manager = null
-    ability.id = null
-    ability.instancedId = null
-
-    abilityList.splice(abilityList.indexOf(ability), 1)
-
-    this.freeId(id)
+    embryoList.splice(embryoList.indexOf(embryo), 1)
 
     logger.verbose('Unregister:', id, '->', `${name}[${overrideName}]`)
   }
 
-  registerList(abilityList: Ability[]) {
-    for (const ability of abilityList) this.register(ability)
+  clearEmbryo() {
+    const { embryoList } = this
+    for (const embryo of embryoList) this.removeEmbryo(embryo)
   }
 
-  unregisterAll() {
+  getEmbryo(id: number): Embryo {
+    return this.embryoList.find(embryo => embryo.id === id) || null
+  }
+
+  addAbility(id: number): AppliedAbility {
+    let ability = this.getAbility(id)
+    if (ability) return ability
+
+    ability = new AppliedAbility(this, id)
+    this.abilityList.push(ability)
+
+    return ability
+  }
+
+  removeAbility(id: number) {
     const { abilityList } = this
-    for (const ability of abilityList) this.unregister(ability)
+    const ability = this.getAbility(id)
+    if (ability == null) return
+
+    abilityList.splice(abilityList.indexOf(ability), 1)
   }
 
-  exportAppliedAbilityList(): AbilityAppliedAbility[] {
-    return []
+  getAbility(id: number): AppliedAbility {
+    return this.abilityList.find(ability => ability.id === id) || null
   }
 
-  exportAppliedModifierList(): AbilityAppliedModifier[] {
-    return []
+  addModifier(id: number): AppliedModifier {
+    let modifier = this.getModifier(id)
+    if (modifier) return modifier
+
+    modifier = new AppliedModifier(this, id)
+    this.modifierList.push(modifier)
+
+    return modifier
+  }
+
+  removeModifier(id: number) {
+    const { modifierList } = this
+    const modifier = this.getModifier(id)
+    if (modifier == null) return
+
+    modifierList.splice(modifierList.indexOf(modifier), 1)
+  }
+
+  getModifier(id: number): AppliedModifier {
+    return this.modifierList.find(modifier => modifier.id === id) || null
+  }
+
+  exportAbilitySyncStateInfo(): AbilitySyncStateInfo {
+    const { dynamicValueMapContainer, sgvDynamicValueMapContainer, abilityList, modifierList, initialized } = this
+    if (!initialized) return {}
+
+    return {
+      isInited: true,
+      dynamicValueMap: dynamicValueMapContainer.export(),
+      appliedAbilities: abilityList.map(ability => ability.export()),
+      appliedModifiers: modifierList.map(modifier => modifier.export()),
+      sgvDynamicValueMap: sgvDynamicValueMapContainer.export()
+    }
   }
 
   exportEmbryoList(): AbilityEmbryo[] {
-    return this.abilityList.map(ability => ability.exportEmbryo())
+    return this.embryoList.map(embryo => embryo.export())
   }
 
   /**Events**/
@@ -154,30 +225,125 @@ export default class AbilityManager extends BaseClass {
   // AbilityInvoke
   async handleAbilityInvoke(context: PacketContext, entry: AbilityInvokeEntry) {
     const { player, seqId } = context
-    const { argumentType, abilityData } = entry
-    const proto = protoLookupTable[AbilityInvokeArgumentEnum[argumentType]]
 
     player?.forwardBuffer?.addEntry(AbilityInvocations, entry, seqId)
 
-    if (proto == null) {
-      logger.warn('No proto for argument type:', argumentType, AbilityInvokeArgumentEnum[argumentType], abilityData)
-      return
-    }
+    const parsed = await this.parseEntry(entry)
+    if (parsed == null) return
+    const { type, head, data, buf } = parsed
 
-    logger.verbose(proto)
+    logger.verbose(type)
 
-    await this.emit(proto, await dataToProtobuffer(Buffer.from(abilityData, 'base64'), proto), seqId)
+    await this.emit(type, context, head, data, buf)
   }
 
   // ClientAbilityChange
   async handleClientAbilityChange(context: PacketContext, entry: AbilityInvokeEntry) {
     const { player, seqId } = context
+
     player?.forwardBuffer?.addEntry(ClientAbilityChange, entry, seqId)
+
+    const parsed = await this.parseEntry(entry)
+    if (parsed == null) return
+    const { type, head, data, buf } = parsed
+
+    await this.emit(type, context, head, data, buf)
   }
 
   // ClientAbilityInitFinish
   async handleClientAbilityInitFinish(context: PacketContext, entry: AbilityInvokeEntry) {
     const { player, seqId } = context
+
     player?.forwardBuffer?.addEntry(ClientAbilityInitFinish, entry, seqId)
+
+    this.initialized = true
+
+    const parsed = await this.parseEntry(entry)
+    if (parsed == null) return
+    const { type, head, data, buf } = parsed
+
+    await this.emit(type, context, head, data, buf)
+  }
+
+  /**Ability Events**/
+
+  // AbilityMetaAddNewAbility
+  async handleAbilityMetaAddNewAbility(_context: PacketContext, _head: AbilityInvokeEntryHead, data: AbilityMetaAddAbility) {
+    const { instancedAbilityId, abilityName, abilityOverride, overrideMap } = data?.ability || {}
+    if (instancedAbilityId == null) return
+
+    const ability = this.addAbility(instancedAbilityId)
+
+    await ability.setAbilityName(abilityName)
+    await ability.setAbilityOverride(abilityOverride)
+    ability.setOverrideMap(overrideMap)
+  }
+
+  // AbilityMetaRemoveAbility
+  async handleAbilityMetaRemoveAbility(_context: PacketContext, head: AbilityInvokeEntryHead) {
+    const { instancedAbilityId } = head
+    if (instancedAbilityId == null) return
+
+    this.removeAbility(instancedAbilityId)
+  }
+
+  // AbilityMetaGlobalFloatValue
+  async handleAbilityMetaGlobalFloatValue(_context: PacketContext, _head: AbilityInvokeEntryHead, data: AbilityScalarValueEntry) {
+    this.dynamicValueMapContainer.setValue(data)
+  }
+
+  // AbilityMetaReinitOverridemap
+  async handleAbilityMetaReinitOverridemap(_context: PacketContext, head: AbilityInvokeEntryHead, data: AbilityMetaReInitOverrideMap) {
+    const { instancedAbilityId } = head
+    const { overrideMap } = data
+    const ability = this.getAbility(instancedAbilityId)
+    if (ability == null) return
+
+    ability.setOverrideMap(overrideMap)
+  }
+
+  // AbilityMetaModifierChange
+  async handleAbilityMetaModifierChange(_context: PacketContext, head: AbilityInvokeEntryHead, data: AbilityMetaModifierChange) {
+    const { instancedAbilityId, instancedModifierId, modifierConfigLocalId } = head
+    const { action, isAttachedParentAbility } = data
+    const ability = this.getAbility(instancedAbilityId)
+
+    switch (action || ModifierActionEnum.ADDED) {
+      case ModifierActionEnum.ADDED: {
+        const modifier = this.addModifier(instancedModifierId)
+
+        modifier.setAbility(ability)
+        modifier.setLocalId(modifierConfigLocalId)
+        modifier.setAttachedParent(isAttachedParentAbility)
+
+        await modifier.emit('Added')
+        break
+      }
+      case ModifierActionEnum.REMOVED: {
+        const modifier = this.getModifier(instancedModifierId)
+        if (modifier == null) return
+
+        await modifier.emit('Removed')
+
+        this.removeModifier(instancedModifierId)
+        break
+      }
+      default:
+        logger.warn('Unknown action:', action)
+    }
+  }
+
+  // AbilityMetaLoseHp
+  async handleAbilityMetaLoseHp(_context: PacketContext, head: AbilityInvokeEntryHead, data: AbilityMetaLoseHp) {
+    logger.debug('MetaLoseHp', head, data)
+  }
+
+  // AbilityActionGenerateElemBall
+  async handleAbilityActionGenerateElemBall(_context: PacketContext, head: AbilityInvokeEntryHead, data: AbilityActionGenerateElemBall, buf: Buffer) {
+    const { instancedAbilityId } = head
+    const ability = this.getAbility(instancedAbilityId)
+    if (ability == null) return
+
+    logger.debug('ActionGenerateElemBall', ability.abilityName, head, data, buf.toString('base64'))
   }
 }

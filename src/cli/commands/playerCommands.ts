@@ -19,7 +19,7 @@ const playerCommands: CommandDefinition[] = [
         return
       }
 
-      player.setLevel(args[0])
+      await player.setLevel(args[0])
       print(`Adventure rank set to: ${player.level}`)
     }
   },

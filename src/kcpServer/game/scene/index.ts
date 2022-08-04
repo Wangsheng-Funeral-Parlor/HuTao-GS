@@ -220,7 +220,7 @@ export default class Scene extends BaseClass {
 
     const { entityManager } = this
     for (const entry of invokes) {
-      const entity = entityManager.getEntity(entry?.entityId)
+      const entity = entityManager.getEntity(entry?.entityId, true)
       await entity?.abilityManager?.emit('AbilityInvoke', context, entry)
     }
   }
@@ -256,6 +256,11 @@ export default class Scene extends BaseClass {
 
     const { combatManager } = this
     for (const entry of invokes) await combatManager.emit('CombatInvoke', context, entry)
+  }
+
+  async spawnDropsById(pos: Vector, dropId: number, seqId?: number) {
+    const { playerList } = this
+    for (const player of playerList) player.energyManager.spawnDropsById(pos, dropId, seqId)
   }
 
   async join(

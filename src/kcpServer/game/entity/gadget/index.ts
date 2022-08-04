@@ -1,9 +1,11 @@
+import { GadgetInteractRsp } from '#/packets/GadgetInteract'
 import Entity from '$/entity'
 import GadgetData from '$/gameData/data/GadgetData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
+import Player from '$/player'
 import { EntityTypeEnum } from '@/types/enum'
 import { SceneGadgetInfo } from '@/types/proto'
-import { LifeStateEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
+import { InteractTypeEnum, InterOpTypeEnum, LifeStateEnum, ProtEntityTypeEnum, ResinCostTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 
 export const destructibleGadgetNameList = [
@@ -65,6 +67,17 @@ export default class Gadget extends Entity {
     super.initNew(level)
 
     if (!this.destructible) this.lifeState = LifeStateEnum.LIFE_NONE
+  }
+
+  async interact(_player: Player, opType: InterOpTypeEnum, gadgetId: number, _isUseCondenseResin: boolean, _resinCostType: ResinCostTypeEnum): Promise<GadgetInteractRsp> {
+    const { entityId } = this
+    return {
+      retcode: RetcodeEnum.RET_SUCC,
+      gadgetEntityId: entityId,
+      interactType: InteractTypeEnum.INTERACT_TYPE_NONE,
+      opType,
+      gadgetId
+    }
   }
 
   exportSceneGadgetInfo(): SceneGadgetInfo {

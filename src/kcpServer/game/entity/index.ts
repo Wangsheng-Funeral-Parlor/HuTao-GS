@@ -7,7 +7,7 @@ import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
 import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
-import { LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
+import { ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 import EntityProps from './entityProps'
 import FightProp from './fightProps'
@@ -101,23 +101,20 @@ export default class Entity extends BaseClass {
   get level() {
     return this.props.get(PlayerPropEnum.PROP_LEVEL)
   }
+  set level(v: number) {
+    this.props.set(PlayerPropEnum.PROP_LEVEL, v)
+  }
 
   get exp() {
     return this.props.get(PlayerPropEnum.PROP_EXP)
+  }
+  set exp(v: number) {
+    this.props.set(PlayerPropEnum.PROP_EXP, v)
   }
 
   get promoteLevel() {
     return this.props.get(PlayerPropEnum.PROP_BREAK_LEVEL)
   }
-
-  set level(v: number) {
-    this.props.set(PlayerPropEnum.PROP_LEVEL, v)
-  }
-
-  set exp(v: number) {
-    this.props.set(PlayerPropEnum.PROP_EXP, v)
-  }
-
   set promoteLevel(v: number) {
     this.props.set(PlayerPropEnum.PROP_BREAK_LEVEL, v)
   }
@@ -151,7 +148,11 @@ export default class Entity extends BaseClass {
     return authorityPeerId != null
   }
 
-  async kill(attackerId: number, dieType: PlayerDieTypeEnum): Promise<void> {
+  async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    await this.fightProps.takeDamage(attackerId, val, notify, changeHpReason, seqId)
+  }
+
+  async kill(attackerId: number, dieType: PlayerDieTypeEnum, seqId?: number): Promise<void> {
     // Can't die again if you are dead
     if (this.isDead()) return
 
@@ -163,7 +164,7 @@ export default class Entity extends BaseClass {
     this.attackerId = attackerId
 
     // Emit death event
-    await this.emit('Death')
+    await this.emit('Death', seqId)
   }
 
   async revive(val?: number): Promise<void> {
@@ -186,10 +187,10 @@ export default class Entity extends BaseClass {
   }
 
   exportEntityAuthorityInfo(): EntityAuthorityInfo {
-    const { bornPos } = this
+    const { abilityManager, bornPos } = this
 
     return {
-      abilityInfo: {},
+      abilityInfo: abilityManager.exportAbilitySyncStateInfo(),
       rendererChangedInfo: {},
       aiInfo: {
         isAiOpen: true,

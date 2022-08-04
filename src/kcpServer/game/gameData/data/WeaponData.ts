@@ -17,6 +17,10 @@ class WeaponDataLoader extends Loader {
     return (await this.getWeaponList()).find(data => data.Id === id)
   }
 
+  async getWeaponByGadgetId(gadgetId: number): Promise<WeaponData> {
+    return (await this.getWeaponList()).find(data => data.GadgetId === gadgetId)
+  }
+
   async getWeaponList(): Promise<WeaponData[]> {
     return (await this.getData())?.Weapon || []
   }

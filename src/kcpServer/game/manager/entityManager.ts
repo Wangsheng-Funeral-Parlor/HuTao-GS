@@ -223,9 +223,9 @@ export default class EntityManager extends BaseClass {
     for (const key in registeredEntityMap) await this.unregister(registeredEntityMap[key], true)
   }
 
-  getEntity(entityId: number): Entity | null {
+  getEntity(entityId: number, onScene: boolean = false): Entity | null {
     const entity = this.registeredEntityMap[entityId]
-    if (!entity || !entity.isOnScene) return null
+    if (!entity || (onScene && !entity.isOnScene)) return null
 
     return entity
   }
@@ -273,7 +273,7 @@ export default class EntityManager extends BaseClass {
     const { manager, entityId } = entity
 
     if (manager !== this) return
-    if (this.getEntity(entityId)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, verbose)
+    if (this.getEntity(entityId, true)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, verbose)
 
     logger.verbose('Unregister:', entityId)
 
@@ -395,7 +395,7 @@ export default class EntityManager extends BaseClass {
 
     const missingEntityIdList = loadedEntityIdList.filter(entityId => !seenEntityIdList.includes(entityId))
     for (const entityId of missingEntityIdList) {
-      const entity = this.getEntity(entityId)
+      const entity = this.getEntity(entityId, true)
       if (!entity) continue
 
       this.playerUnloadEntity(player, entity, VisionTypeEnum.VISION_MISS)
@@ -516,7 +516,7 @@ export default class EntityManager extends BaseClass {
     const entityList = loadedEntityIdList.splice(0)
 
     for (const entityId of entityList) {
-      const entity = this.getEntity(entityId)
+      const entity = this.getEntity(entityId, true)
       if (!entity) continue
 
       if (entity.updateAuthorityPeer()) EntityAuthorityChange.addEntity(entity)

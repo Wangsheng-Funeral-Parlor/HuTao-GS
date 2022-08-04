@@ -2,7 +2,6 @@ import AvatarChangeCostume from '#/packets/AvatarChangeCostume'
 import AvatarEquipChange, { AvatarEquipChangeNotify } from '#/packets/AvatarEquipChange'
 import AvatarFlycloakChange from '#/packets/AvatarFlycloakChange'
 import AvatarLifeStateChange from '#/packets/AvatarLifeStateChange'
-import Ability from '$/ability'
 import Entity from '$/entity'
 import Equip from '$/equip'
 import Reliquary from '$/equip/reliquary'
@@ -10,7 +9,6 @@ import Weapon from '$/equip/weapon'
 import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import Player from '$/player'
-import newGuid from '$/utils/newGuid'
 import { EntityTypeEnum, EquipTypeEnum, PlayerPropEnum } from '@/types/enum'
 import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo, SceneTeamAvatar } from '@/types/proto'
 import { AvatarTypeEnum, ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
@@ -52,7 +50,7 @@ export default class Avatar extends Entity {
 
     this.player = player
     this.avatarId = avatarId
-    this.guid = guid || newGuid()
+    this.guid = player.guidManager.getGuid(guid)
 
     this.equipMap = {}
 
@@ -75,11 +73,13 @@ export default class Avatar extends Entity {
     const avatarData = await AvatarData.getAvatar(avatarId)
     if (!avatarData) return
 
+    this.name = avatarData.Name || null
+
     // Default abilities
-    for (const name of AvatarDefaultAbilities) abilityManager.register(new Ability(name))
+    for (const name of AvatarDefaultAbilities) await abilityManager.addEmbryo(name)
 
     for (const ability of avatarData.Config.Abilities) {
-      abilityManager.register(new Ability(ability.AbilityName, ability.AbilityOverride || 'Default'))
+      await abilityManager.addEmbryo(ability.AbilityName || undefined, ability.AbilityOverride || undefined)
     }
   }
 
@@ -136,7 +136,7 @@ export default class Avatar extends Entity {
 
     motion.standby()
 
-    const weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon)
+    const weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon, player)
     await weapon.initNew()
 
     await player.inventory.add(weapon, notify)

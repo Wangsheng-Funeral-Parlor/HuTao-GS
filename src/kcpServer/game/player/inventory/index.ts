@@ -1,5 +1,6 @@
 import StoreItemChange from '#/packets/StoreItemChange'
 import StoreItemDel from '#/packets/StoreItemDel'
+import { ItemTypeEnum, ItemUseOpEnum } from '@/types/enum'
 import { ItemInfo } from '@/types/proto'
 import InventoryUserData from '@/types/user/InventoryUserData'
 import Player from '..'
@@ -16,6 +17,39 @@ export default class Inventory {
     this.player = player
 
     this.itemList = []
+  }
+
+  private async addVirtualItem(item: Item): Promise<boolean> {
+    const { player } = this
+    const { itemId, count } = item
+
+    switch (itemId) {
+      case 101: // Character exp
+        break
+      case 102: // Adventure exp
+        break
+      case 105: // Companionship exp
+        break
+      case 106: // Resin
+        break
+      case 107:  // Legendary Key
+        break
+      case 201: // Primogem
+        await player.addPrimogem(count)
+        break
+      case 202: // Mora
+        await player.addMora(count)
+        break
+      case 203: // Genesis Crystals
+        await player.addGenesisCrystal(count)
+        break
+      case 204: // Home Coin
+        break
+      default:
+        return false
+    }
+
+    return true
   }
 
   private async removeItem(item: Item, commit: boolean = true, notify: boolean = true) {
@@ -64,32 +98,39 @@ export default class Inventory {
   }
 
   async init(userData: InventoryUserData) {
-    const { itemList } = this
+    const { player, itemList } = this
     const { itemDataList } = userData
     if (!Array.isArray(itemDataList)) return
 
     for (const itemData of itemDataList) {
       const item = new Item()
-      await item.init(itemData)
+      await item.init(itemData, player)
 
       itemList.push(item)
     }
   }
 
   async add(obj: Material | Equip, notify: boolean = true): Promise<void> {
-    const { player, itemList } = this
+    await this.addItem(new Item(obj), notify)
+  }
 
-    const newItem = new Item(obj)
+  async addItem(item: Item, notify: boolean = true) {
+    const { player, itemList } = this
+    const { itemType, material } = item
+
+    if (material?.useOnGain) return this.useItem(item)
+    if (itemType === ItemTypeEnum.ITEM_VIRTUAL && await this.addVirtualItem(item)) return
+
     const changedItemList = []
 
-    for (const item of itemList) {
-      if (newItem.count <= 0) break
-      if (item.stack(newItem)) changedItemList.push(item)
+    for (const invItem of itemList) {
+      if (item.count <= 0) break
+      if (invItem.stack(item)) changedItemList.push(invItem)
     }
 
-    if (newItem.count > 0) {
-      itemList.push(newItem)
-      changedItemList.push(newItem)
+    if (item.count > 0) {
+      itemList.push(item)
+      changedItemList.push(item)
     }
 
     if (notify) await StoreItemChange.sendNotify(player.context, changedItemList)
@@ -109,6 +150,8 @@ export default class Inventory {
     const { player, itemList } = this
     const deletedItemList = []
 
+    guid = player.guidManager.getGuid(guid)
+
     for (const item of itemList) {
       if (item.guid !== guid) continue
 
@@ -120,8 +163,30 @@ export default class Inventory {
     this.itemList = itemList.filter(item => !deletedItemList.includes(item))
   }
 
+  async useItem(item: Item) {
+    const { material } = item
+    if (material == null) return
+
+    const { player } = this
+    const { energyManager } = player
+    const { useList } = material
+    for (const use of useList) {
+      const { op, param } = use
+      switch (op) {
+        case ItemUseOpEnum.ITEM_USE_ADD_ALL_ENERGY:
+          await energyManager.addAllEnergy(...param)
+          break
+        case ItemUseOpEnum.ITEM_USE_ADD_ELEM_ENERGY:
+          await energyManager.addElemEnergy(...param)
+          break
+      }
+    }
+  }
+
   getItem(guid: bigint) {
-    return this.itemList.find(item => item.guid === guid)
+    const { player, itemList } = this
+    guid = player.guidManager.getGuid(guid)
+    return itemList.find(item => item.guid === guid)
   }
 
   exportItemList(): ItemInfo[] {

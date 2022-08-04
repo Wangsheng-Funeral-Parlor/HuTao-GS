@@ -9,13 +9,13 @@ import Weapon from '.'
 export default class WeaponEntity extends Entity {
   weapon: Weapon
 
-  constructor(weapon: Weapon, monsterEquip: boolean = false) {
+  constructor(weapon: Weapon) {
     super()
 
     this.weapon = weapon
 
     this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_WEAPON
-    this.entityType = monsterEquip ? EntityTypeEnum.MonsterEquip : EntityTypeEnum.Equip
+    this.entityType = weapon.monsterEquip ? EntityTypeEnum.MonsterEquip : EntityTypeEnum.Equip
   }
 
   private async loadWeaponData() {

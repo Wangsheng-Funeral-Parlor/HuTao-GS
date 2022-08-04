@@ -29,7 +29,7 @@ const entityCommands: CommandDefinition[] = [
 
       print('Attempt to spawn monster:', args[0])
 
-      const entity = new Monster(args[0])
+      const entity = new Monster(args[0], player)
 
       entity.motion.pos.copy(pos)
       entity.bornPos.copy(pos)

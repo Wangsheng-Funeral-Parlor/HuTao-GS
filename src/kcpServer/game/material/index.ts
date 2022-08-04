@@ -1,16 +1,26 @@
 import MaterialData from '$/gameData/data/MaterialData'
-import newGuid from '$/utils/newGuid'
+import Player from '$/player'
+import { ItemTypeEnum, ItemUseOpEnum, MaterialTypeEnum } from '@/types/enum'
 import { MaterialInfo } from '@/types/proto'
 import MaterialUserData from '@/types/user/MaterialUserData'
 
 export default class Material {
+  player: Player
+
   guid: bigint
   itemId: number
+  gadgetId: number
+  itemType: ItemTypeEnum
 
+  materialType: MaterialTypeEnum
   count: number
   stackLimit: number
+  useList: { op: ItemUseOpEnum, param: number[] }[]
+  useOnGain: boolean
 
-  constructor(itemId: number) {
+  constructor(player: Player, itemId: number) {
+    this.player = player
+
     this.itemId = itemId
   }
 
@@ -18,11 +28,22 @@ export default class Material {
     const { itemId } = this
     const materialData = await MaterialData.getMaterial(itemId)
 
+    this.gadgetId = materialData?.GadgetId || 0
+
+    this.itemType = ItemTypeEnum[materialData?.ItemType] || ItemTypeEnum.ITEM_NONE
+    this.materialType = MaterialTypeEnum[materialData?.MaterialType] || MaterialTypeEnum.MATERIAL_NONE
+
     this.stackLimit = materialData?.StackLimit || 1
+
+    this.useList = (materialData?.ItemUse || []).filter(u => u.UseOp).map(u => ({
+      op: ItemUseOpEnum[u.UseOp],
+      param: u.UseParam.filter(p => p).map(p => parseInt(p))
+    }))
+    this.useOnGain = !!materialData?.UseOnGain
   }
 
-  static async create(itemId: number, count: number = 1): Promise<Material> {
-    const material = new Material(itemId)
+  static async create(player: Player, itemId: number, count: number = 1): Promise<Material> {
+    const material = new Material(player, itemId)
     await material.initNew(count)
     return material
   }
@@ -30,20 +51,22 @@ export default class Material {
   async init(userData: MaterialUserData) {
     await this.loadMaterialData()
 
-    const { itemId: id, stackLimit } = this
+    const { player, itemId: id, stackLimit } = this
     const { guid, itemId, count } = userData
 
     if (itemId !== id) return // Mismatch item id
 
-    this.guid = BigInt(guid) || newGuid()
+    this.guid = player.guidManager.getGuid(BigInt(guid || 0))
     this.count = Math.min(stackLimit, count || 1)
   }
 
-  async initNew(count: number = 1, guid?: bigint) {
+  async initNew(count: number = 1) {
     await this.loadMaterialData()
 
-    this.guid = guid || newGuid()
-    this.count = Math.min(this.stackLimit, count)
+    const { player, stackLimit } = this
+
+    this.guid = player.guidManager.getGuid()
+    this.count = Math.min(stackLimit, count)
   }
 
   stack(material: Material): boolean {

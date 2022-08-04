@@ -1,7 +1,7 @@
 import EquipUserData from "./EquipUserData"
 import MaterialUserData from "./MaterialUserData"
 
-export enum ItemTypeEnum {
+export enum ItemDataTypeEnum {
   NONE = 0,
   MATERIAL = 1,
   EQUIP = 2,
@@ -9,9 +9,9 @@ export enum ItemTypeEnum {
 }
 
 export interface ItemUserData {
-  guid: string
   itemId: number
-  type: ItemTypeEnum
+  gadgetId: number
+  type: ItemDataTypeEnum
   data: EquipUserData | MaterialUserData
 }
 

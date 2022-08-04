@@ -1,9 +1,12 @@
 export enum ElemTypeEnum {
-  FIRE = 0,
-  ELECTRIC = 1,
+  NONE = 0,
+  FIRE = 1,
   WATER = 2,
   GRASS = 3,
-  WIND = 4,
+  ELECTRIC = 4,
   ICE = 5,
-  ROCK = 6
+  FROZEN = 6,
+  WIND = 7,
+  ROCK = 8,
+  ANTIFIRE = 9
 }

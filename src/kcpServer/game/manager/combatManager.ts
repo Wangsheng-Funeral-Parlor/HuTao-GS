@@ -87,28 +87,37 @@ export default class CombatManager extends BaseClass {
   async handleCombatInvoke(context: PacketContext, entry: CombatInvokeEntry) {
     const { player, seqId } = context
     const { argumentType, combatData } = entry
-    const proto = protoLookupTable[CombatTypeArgumentEnum[argumentType]]
+    const argType = CombatTypeArgumentEnum[argumentType]
+    const buf = Buffer.from(combatData, 'base64')
+    const proto = protoLookupTable[argType]
 
     player?.forwardBuffer?.addEntry(CombatInvocations, entry, seqId)
 
     if (proto == null) {
-      logger.warn('No proto for argument type:', argumentType, CombatTypeArgumentEnum[argumentType], combatData)
+      if (argumentType !== CombatTypeArgumentEnum.COMBAT_NONE) {
+        logger.warn('No proto for argument type:', argumentType, argType, buf.toString('base64'))
+      }
       return
     }
 
-    logger.verbose(proto)
+    logger.verbose(argType)
 
-    await this.emit(proto, context, await dataToProtobuffer(Buffer.from(combatData, 'base64'), proto))
+    await this.emit(
+      argType.replace(/(?<=(^|_)[A-Z]).*?(?=($|_))/g, v => v.toLowerCase()).replace(/_/g, ''),
+      context,
+      await dataToProtobuffer(buf, proto),
+      buf
+    )
   }
 
   /**Combat Events**/
 
-  // EvtAnimatorParameterInfo
+  // CombatAnimatorParameterChanged
 
-  // EvtAnimatorStateChangedInfo
+  // CombatAnimatorStateChanged
 
-  // EvtBeingHitInfo
-  async handleEvtBeingHitInfo(context: PacketContext, data: EvtBeingHitInfo) {
+  // CombatEvtBeingHit
+  async handleCombatEvtBeingHit(context: PacketContext, data: EvtBeingHitInfo) {
     const { player, seqId } = context
     const { currentScene } = player
     if (!currentScene) return
@@ -117,8 +126,8 @@ export default class CombatManager extends BaseClass {
     const { attackResult } = data
     const { attackerId, defenseId, damage } = attackResult
 
-    const attacker = entityManager.getEntity(attackerId)
-    const target = entityManager.getEntity(defenseId)
+    const attacker = entityManager.getEntity(attackerId, true)
+    const target = entityManager.getEntity(defenseId, true)
     if (!target || !target.isAlive()) return
 
     let reason: ChangeHpReasonEnum = ChangeHpReasonEnum.CHANGE_HP_SUB_ENVIR
@@ -137,12 +146,12 @@ export default class CombatManager extends BaseClass {
     await target.fightProps.takeDamage(attackerId, damage, true, reason, seqId)
   }
 
-  // EvtCombatForceSetPosInfo
+  // CombatForceSetPosInfo
 
-  // EvtSetAttackTargetInfo
+  // CombatSetAttackTarget
 
-  // EntityMoveInfo
-  async handleEntityMoveInfo(context: PacketContext, data: EntityMoveInfo) {
+  // EntityMove
+  async handleEntityMove(context: PacketContext, data: EntityMoveInfo) {
     const { landSpeedInfoMap } = this
     const { player, seqId } = context
     const { state, currentScene } = player
@@ -152,7 +161,7 @@ export default class CombatManager extends BaseClass {
     if ((state & 0xF000) !== ClientStateEnum.IN_GAME) return
 
     const { entityManager } = currentScene
-    const entity = entityManager.getEntity(entityId)
+    const entity = entityManager.getEntity(entityId, true)
     if (!entity) return
 
     // Update entity motion info

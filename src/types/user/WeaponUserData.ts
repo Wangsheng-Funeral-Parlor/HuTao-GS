@@ -7,7 +7,6 @@ export interface WeaponAffixUserData {
 }
 
 export default interface WeaponUserData extends EquipUserData {
-  gadgetId: number
   affixDataList: WeaponAffixUserData[]
   entityData: EntityUserData
 }

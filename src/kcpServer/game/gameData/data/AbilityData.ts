@@ -13,8 +13,12 @@ class AbilityDataLoader extends Loader {
     return super.getData()
   }
 
-  async getAbility(group: string, name: string): Promise<AbilityConfig[]> {
-    return (await this.getData())?.[group]?.[name] || []
+  async getAbility(listGroup: string, listName: string, name: string): Promise<AbilityConfig> {
+    return (await this.getAbilityList(listGroup, listName)).find(config => config?.Default?.AbilityName === name)
+  }
+
+  async getAbilityList(listGroup: string, listName: string): Promise<AbilityConfig[]> {
+    return (await this.getData())?.[listGroup]?.[listName] || []
   }
 }
 

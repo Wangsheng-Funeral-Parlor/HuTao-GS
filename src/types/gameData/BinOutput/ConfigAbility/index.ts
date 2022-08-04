@@ -21,13 +21,13 @@ export default interface AbilityConfig {
         Properties?: { [key: string]: number }
         State?: string
 
-        OnAdded?: ActionConfig
-        OnRemoved?: ActionConfig
+        OnAdded?: ActionConfig[]
+        OnRemoved?: ActionConfig[]
 
-        OnAttackLanded?: ActionConfig
+        OnAttackLanded?: ActionConfig[]
 
         ThinkInterval?: number
-        OnThinkInterval?: ActionConfig
+        OnThinkInterval?: ActionConfig[]
       }
     }
     OnAbilityStart?: ActionConfig[]

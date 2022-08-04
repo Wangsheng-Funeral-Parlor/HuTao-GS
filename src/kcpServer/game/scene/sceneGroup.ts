@@ -65,7 +65,7 @@ export default class SceneGroup {
 
     for (const monster of monsters) {
       const { MonsterId, ConfigId, PoseId, IsElite, Level, Pos, Rot } = monster
-      const entity = new Monster(MonsterId)
+      const entity = new Monster(MonsterId, block.scene.host)
 
       entity.groupId = groupId
       entity.configId = ConfigId || 0
@@ -80,7 +80,7 @@ export default class SceneGroup {
       rot.setData(Rot)
       bornPos.setData(Pos)
 
-      entity.initNew(Math.max(1, Math.min(100, Level + levelOffset)))
+      await entity.initNew(Math.max(1, Math.min(100, Level + levelOffset)))
 
       monsterList.push(entity)
       await entityManager.add(entity, undefined, undefined, undefined, true)
@@ -113,7 +113,7 @@ export default class SceneGroup {
       rot.setData(Rot)
       bornPos.setData(Pos)
 
-      entity.initNew()
+      await entity.initNew()
 
       npcList.push(entity)
       await entityManager.add(entity, undefined, undefined, undefined, true)
@@ -143,7 +143,7 @@ export default class SceneGroup {
       rot.setData(Rot)
       bornPos.setData(Pos)
 
-      entity.initNew(Level)
+      await entity.initNew(Level)
 
       gadgetList.push(entity)
       await entityManager.add(entity, undefined, undefined, undefined, true)

@@ -20,16 +20,17 @@ class SceneEntityDrownPacket extends Packet implements PacketInterface {
   }
 
   async request(context: PacketContext, data: SceneEntityDrownReq): Promise<void> {
-    const { entityManager } = context.player.currentScene || {}
+    const { player, seqId } = context
+    const { entityManager } = player.currentScene || {}
     const { entityId } = data
 
-    const entity = entityManager?.getEntity(entityId)
+    const entity = entityManager?.getEntity(entityId, true)
     if (!entity) {
       await this.response(context, { retcode: RetcodeEnum.RET_ENTITY_NOT_EXIST })
       return
     }
 
-    entity.kill(0, PlayerDieTypeEnum.PLAYER_DIE_NONE)
+    entity.kill(0, PlayerDieTypeEnum.PLAYER_DIE_NONE, seqId)
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,

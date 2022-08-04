@@ -3,7 +3,7 @@ import EntityFightPropChangeReason, { EntityFightPropChangeReasonNotify } from '
 import EntityFightPropUpdate from '#/packets/EntityFightPropUpdate'
 import Reliquary from '$/equip/reliquary'
 import Weapon from '$/equip/weapon'
-import { CurveArithEnum, FightPropEnum } from '@/types/enum'
+import { CurveArithEnum, ElemTypeEnum, FightPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
 import { FightPropPair } from '@/types/proto'
@@ -12,6 +12,26 @@ import PropsUserData from '@/types/user/PropsUserData'
 import Entity from '.'
 import Avatar from './avatar'
 import Monster from './monster'
+
+const ElemTypeFightPropMaxEnergyMap = {
+  [ElemTypeEnum.FIRE]: FightPropEnum.FIGHT_PROP_MAX_FIRE_ENERGY,
+  [ElemTypeEnum.ELECTRIC]: FightPropEnum.FIGHT_PROP_MAX_ELEC_ENERGY,
+  [ElemTypeEnum.WATER]: FightPropEnum.FIGHT_PROP_MAX_WATER_ENERGY,
+  [ElemTypeEnum.GRASS]: FightPropEnum.FIGHT_PROP_MAX_GRASS_ENERGY,
+  [ElemTypeEnum.WIND]: FightPropEnum.FIGHT_PROP_MAX_WIND_ENERGY,
+  [ElemTypeEnum.ICE]: FightPropEnum.FIGHT_PROP_MAX_ICE_ENERGY,
+  [ElemTypeEnum.ROCK]: FightPropEnum.FIGHT_PROP_MAX_ROCK_ENERGY
+}
+
+const ElemTypeFightPropCurEnergyMap = {
+  [ElemTypeEnum.FIRE]: FightPropEnum.FIGHT_PROP_CUR_FIRE_ENERGY,
+  [ElemTypeEnum.ELECTRIC]: FightPropEnum.FIGHT_PROP_CUR_ELEC_ENERGY,
+  [ElemTypeEnum.WATER]: FightPropEnum.FIGHT_PROP_CUR_WATER_ENERGY,
+  [ElemTypeEnum.GRASS]: FightPropEnum.FIGHT_PROP_CUR_GRASS_ENERGY,
+  [ElemTypeEnum.WIND]: FightPropEnum.FIGHT_PROP_CUR_WIND_ENERGY,
+  [ElemTypeEnum.ICE]: FightPropEnum.FIGHT_PROP_CUR_ICE_ENERGY,
+  [ElemTypeEnum.ROCK]: FightPropEnum.FIGHT_PROP_CUR_ROCK_ENERGY
+}
 
 const DYNAMIC_PROPS = [
   FightPropEnum.FIGHT_PROP_HP,
@@ -148,13 +168,13 @@ export default class FightProp {
   private updateEnergyStats() {
     const costElemType = this.getCostElemType()
     const maxEnergy = this.getCostElemVal()
-    const energyPercent = this.get(costElemType + 70) > 0 ? (this.getEnergy() / this.get(costElemType + 70)) : 1
+    const energyPercent = this.getMaxEnergy() > 0 ? (this.getCurEnergy() / this.getMaxEnergy()) : 1
 
     // Max energy
-    this.set(costElemType + 70, maxEnergy)
+    this.set(ElemTypeFightPropMaxEnergyMap[costElemType], maxEnergy)
 
     // Current energy
-    this.set(costElemType + 1e3, maxEnergy * energyPercent)
+    this.set(ElemTypeFightPropCurEnergyMap[costElemType], maxEnergy * energyPercent)
   }
 
   private applyWeaponStats(weapon: Weapon) {
@@ -281,32 +301,36 @@ export default class FightProp {
     return (this.entity as Avatar).skillDepot?.getCostElemVal() || 0
   }
 
-  private getCostElemType(): number {
-    return (this.entity as Avatar).skillDepot?.getCostElemType() || 0
+  private getCostElemType(): ElemTypeEnum {
+    return (this.entity as Avatar).skillDepot?.getCostElemType() || ElemTypeEnum.NONE
   }
 
-  private getEnergy(): number {
-    return this.get(this.getCostElemType() + 1e3)
+  private getMaxEnergy(): number {
+    return this.get(ElemTypeFightPropMaxEnergyMap[this.getCostElemType()])
+  }
+
+  private getCurEnergy(): number {
+    return this.get(ElemTypeFightPropCurEnergyMap[this.getCostElemType()])
   }
 
   async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     if (this.entity.godMode) return
 
-    const type = this.getCostElemType() + 1e3
+    const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     await this.set(type, 0, notify, { changeEnergyReason }, seqId)
   }
 
-  async gainEnergy(val: number, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
-    const type = this.getCostElemType() + 1e3
+  async gainEnergy(val: number, flat: boolean = false, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+    const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     const gainAmount = Math.min(
       this.getCostElemVal() - this.get(type),
       Math.max(0, val)
-    )
+    ) * (flat ? 1 : this.get(FightPropEnum.FIGHT_PROP_CHARGE_EFFICIENCY))
     await this.add(type, gainAmount, notify, { changeEnergyReason }, seqId)
   }
 
   async rechargeEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
-    const type = this.getCostElemType() + 1e3
+    const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     await this.set(type, this.getCostElemVal(), notify, { changeEnergyReason }, seqId)
   }
 
@@ -353,7 +377,7 @@ export default class FightProp {
         dieType = PlayerDieTypeEnum.PLAYER_DIE_NONE
     }
 
-    await this.entity.kill(attackerId, dieType)
+    await this.entity.kill(attackerId, dieType, seqId)
   }
 
   async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {

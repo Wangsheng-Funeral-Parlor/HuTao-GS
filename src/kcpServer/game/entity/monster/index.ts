@@ -2,16 +2,22 @@ import Entity from '$/entity'
 import Weapon from '$/equip/weapon'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import MonsterData from '$/gameData/data/MonsterData'
-import { EntityTypeEnum } from '@/types/enum'
+import Player from '$/player'
+import { EntityTypeEnum, FightPropEnum } from '@/types/enum'
 import { SceneMonsterInfo } from '@/types/proto'
-import { MonsterBornTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
+import { ChangeHpReasonEnum, MonsterBornTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 
 export default class Monster extends Entity {
+  player: Player
+
   monsterId: number
 
   affixList: number[]
   weaponList: Weapon[]
+
+  hpDropList: { id: number, hp: number }[]
+  killDropId: number
 
   poseId: number
   isElite: boolean
@@ -21,13 +27,19 @@ export default class Monster extends Entity {
   titleId: number
   specialNameId: number
 
-  constructor(monsterId: number) {
+  constructor(monsterId: number, player: Player) {
     super()
+
+    this.player = player
 
     this.monsterId = monsterId
 
     this.affixList = []
     this.weaponList = []
+
+    this.hpDropList = []
+    this.killDropId = 0
+
     this.bornType = MonsterBornTypeEnum.MONSTER_BORN_DEFAULT
 
     this.poseId = 0
@@ -40,7 +52,7 @@ export default class Monster extends Entity {
   }
 
   private async loadMonsterData() {
-    const { monsterId } = this
+    const { player, monsterId } = this
 
     this.config = await MonsterData.getFightPropConfig(monsterId)
     this.growCurve = await GrowCurveData.getGrowCurve('Monster')
@@ -49,9 +61,12 @@ export default class Monster extends Entity {
     if (!monsterData) return
 
     this.affixList = monsterData.Affix || []
-    this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id, true))
+    this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id, player, true))
 
     for (const weapon of this.weaponList) await weapon.initNew()
+
+    this.hpDropList = (monsterData.HpDrops || []).map(d => ({ id: d.DropId || 0, hp: (d.HpPercent || 0) / 100 }))
+    this.killDropId = monsterData.KillDropId || 0
 
     const describeData = await MonsterData.getDescribe(monsterData.DescribeId)
     if (!describeData) return
@@ -62,12 +77,28 @@ export default class Monster extends Entity {
 
   async init(userData: EntityUserData): Promise<void> {
     await this.loadMonsterData()
-    super.init(userData)
+    await super.init(userData)
   }
 
   async initNew(level?: number): Promise<void> {
     await this.loadMonsterData()
-    super.initNew(level)
+    await super.initNew(level)
+  }
+
+  async takeDamage(attackerId: number, val: number, notify?: boolean, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    const { manager, motion, fightProps, hpDropList } = this
+
+    const maxHp = fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP)
+    const hpBefore = fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) / maxHp
+    await super.takeDamage(attackerId, val, notify, changeHpReason, seqId)
+    const hpAfter = fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) / maxHp
+
+    for (const hpDrop of hpDropList) {
+      const { id, hp } = hpDrop
+      if (hpBefore <= hp || hpAfter > hp) continue
+
+      await manager?.scene?.spawnDropsById(motion.pos, id, seqId)
+    }
   }
 
   exportSceneMonsterInfo(): SceneMonsterInfo {
@@ -98,7 +129,20 @@ export default class Monster extends Entity {
 
   // Unregister
   async handleUnregister() {
-    const { manager, weaponList } = this
-    for (const weapon of weaponList) await manager?.unregister(weapon.entity)
+    const { player, manager, weaponList } = this
+    const { guidManager } = player
+
+    for (const weapon of weaponList) {
+      await manager?.unregister(weapon.entity)
+      guidManager.freeGuid(weapon.guid)
+    }
+  }
+
+  // Death
+  async handleDeath(seqId?: number) {
+    const { manager, motion, killDropId } = this
+
+    await manager?.scene?.spawnDropsById(motion.pos, killDropId, seqId)
+    await super.handleDeath()
   }
 }

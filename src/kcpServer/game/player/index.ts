@@ -8,6 +8,8 @@ import WindSeedClient from '#/packets/WindSeedClient'
 import Avatar from '$/entity/avatar'
 import Equip from '$/equip'
 import AvatarData from '$/gameData/data/AvatarData'
+import EnergyManager from '$/manager/energyManager'
+import GuidManager from '$/manager/guidManager'
 import TeamManager from '$/manager/teamManager'
 import Material from '$/material'
 import Scene from '$/scene'
@@ -44,7 +46,10 @@ export default class Player extends BaseClass {
   openState: OpenState
   inventory: Inventory
   widget: Widget
+
+  guidManager: GuidManager
   teamManager: TeamManager
+  energyManager: EnergyManager
 
   avatarList: Avatar[]
   flycloakList: FlycloakData[]
@@ -95,7 +100,10 @@ export default class Player extends BaseClass {
     this.openState = new OpenState(this)
     this.inventory = new Inventory(this)
     this.widget = new Widget(this)
+
+    this.guidManager = new GuidManager(this)
     this.teamManager = new TeamManager(this)
+    this.energyManager = new EnergyManager(this)
 
     this.hostWorld = new World(this)
 
@@ -116,18 +124,38 @@ export default class Player extends BaseClass {
     super.initHandlers(this)
   }
 
-  // Getter
-
-  get uid(): number {
-    return this.client.uid
-  }
+  // Getter/Setter
 
   get state(): ClientStateEnum {
     return this.client.state
   }
+  set state(v: ClientStateEnum) {
+    this.client.state = v
+  }
 
   get godMode(): boolean {
     return !!this.currentAvatar?.godMode
+  }
+  set godMode(v: boolean) {
+    const { avatarList } = this
+    for (const avatar of avatarList) avatar.godMode = v
+  }
+
+  get gameTime(): number {
+    const { timestampGameTime, timestamp, paused } = this
+    if (paused) return timestampGameTime
+    return Math.floor(timestampGameTime + ((Date.now() - timestamp) / 1e3))
+  }
+  set gameTime(v: number) {
+    this.timestampGameTime = v
+    this.timestamp = Date.now()
+
+    if (!this.currentScene) return
+    PlayerGameTime.broadcastNotify(this.currentScene.broadcastContextList)
+  }
+
+  get uid(): number {
+    return this.client.uid
   }
 
   get mora(): number {
@@ -171,12 +199,6 @@ export default class Player extends BaseClass {
     return this.gameTime % 1440
   }
 
-  get gameTime(): number {
-    const { timestampGameTime, timestamp, paused } = this
-    if (paused) return timestampGameTime
-    return Math.floor(timestampGameTime + ((Date.now() - timestamp) / 1e3))
-  }
-
   get rtt(): number {
     return this.client.rtt
   }
@@ -205,29 +227,11 @@ export default class Player extends BaseClass {
     return this.currentAvatar?.motion?.lastSafeRot || null
   }
 
-  // Setter
-
-  set state(v: ClientStateEnum) {
-    this.client.state = v
-  }
-
-  set gameTime(v: number) {
-    this.timestampGameTime = v
-    this.timestamp = Date.now()
-
-    if (!this.currentScene) return
-    PlayerGameTime.broadcastNotify(this.currentScene.broadcastContextList)
-  }
-
-  set godMode(v: boolean) {
-    const { avatarList } = this
-    for (const avatar of avatarList) avatar.godMode = v
-  }
-
   async init(userData: UserData): Promise<void> {
-    const { profile, props, openState, inventory, widget, teamManager, avatarList, hostWorld } = this
+    const { guidManager, profile, props, openState, inventory, widget, teamManager, avatarList, hostWorld } = this
     const {
       worldData,
+      guidData,
       profileData,
       propsData,
       openStateData,
@@ -242,6 +246,7 @@ export default class Player extends BaseClass {
       gameTime
     } = userData || {}
 
+    guidManager.init(guidData)
     profile.init(profileData)
     props.init(propsData)
     openState.init(openStateData)
@@ -262,11 +267,11 @@ export default class Player extends BaseClass {
 
     this.flycloakList = (flycloakDataList || []).map(data => ({
       Id: data.id
-    }))
+    })).filter(data => !isNaN(data.Id))
     this.costumeList = (costumeDataList || []).map(data => ({
       Id: data.id,
       AvatarId: data.avatarId
-    }))
+    })).filter(data => !isNaN(data.Id) && !isNaN(data.AvatarId))
     this.emojiCollection = (emojiIdList || []).filter(id => !isNaN(id))
 
     // Unlock all new flycloaks
@@ -289,15 +294,15 @@ export default class Player extends BaseClass {
     openState.initNew()
 
     // Set initial level
-    this.setLevel(1)
+    await this.setLevel(1)
 
-    inventory.add(await Material.create(221, 1000000), false)
-    inventory.add(await Material.create(222, 1000000), false)
+    inventory.add(await Material.create(this, 221, 1000000), false)
+    inventory.add(await Material.create(this, 222, 1000000), false)
 
     // Give all music instrument
-    inventory.add(await Material.create(220025), false) // lyre
-    inventory.add(await Material.create(220044), false) // zither
-    inventory.add(await Material.create(220051), false) // drum
+    inventory.add(await Material.create(this, 220025), false) // lyre
+    inventory.add(await Material.create(this, 220044), false) // zither
+    inventory.add(await Material.create(this, 220051), false) // drum
 
     // Add main avatar
     const mainAvatar = new Avatar(this, avatarId)
@@ -390,7 +395,9 @@ export default class Player extends BaseClass {
   }
 
   getAvatar(guid: bigint): Avatar {
-    return this.avatarList.find(avatar => avatar.guid === guid)
+    const { guidManager, avatarList } = this
+    guid = guidManager.getGuid(guid)
+    return avatarList.find(avatar => avatar.guid === guid)
   }
 
   getCostume(avatarId: number, id: number): CostumeData {
@@ -410,40 +417,40 @@ export default class Player extends BaseClass {
     return this.inventory.getItem(guid)
   }
 
-  setMora(v: number, notify: boolean = true) {
-    this.props.set(PlayerPropEnum.PROP_PLAYER_SCOIN, v, notify)
+  async setMora(v: number, notify: boolean = true) {
+    await this.props.set(PlayerPropEnum.PROP_PLAYER_SCOIN, v, notify)
   }
 
-  setPrimogem(v: number, notify: boolean = true) {
-    this.props.set(PlayerPropEnum.PROP_PLAYER_HCOIN, v, notify)
+  async setPrimogem(v: number, notify: boolean = true) {
+    await this.props.set(PlayerPropEnum.PROP_PLAYER_HCOIN, v, notify)
   }
 
-  setGenesisCrystal(v: number, notify: boolean = true) {
-    this.props.set(PlayerPropEnum.PROP_PLAYER_MCOIN, v, notify)
+  async setGenesisCrystal(v: number, notify: boolean = true) {
+    await this.props.set(PlayerPropEnum.PROP_PLAYER_MCOIN, v, notify)
   }
 
-  addMora(v: number, notify: boolean = true) {
-    this.setMora(this.mora + v, notify)
+  async addMora(v: number, notify: boolean = true) {
+    await this.setMora(this.mora + v, notify)
   }
 
-  addPrimogem(v: number, notify: boolean = true) {
-    this.setPrimogem(this.primogem + v, notify)
+  async addPrimogem(v: number, notify: boolean = true) {
+    await this.setPrimogem(this.primogem + v, notify)
   }
 
-  addGenesisCrystal(v: number, notify: boolean = true) {
-    this.setGenesisCrystal(this.genesisCrystal + v, notify)
+  async addGenesisCrystal(v: number, notify: boolean = true) {
+    await this.setGenesisCrystal(this.genesisCrystal + v, notify)
   }
 
-  setLevel(v: number, notify: boolean = true) {
+  async setLevel(v: number, notify: boolean = true) {
     const { props, worldLevelLimit, worldLevelAdjusted } = this
 
-    props.set(PlayerPropEnum.PROP_PLAYER_LEVEL, v, notify)
+    await props.set(PlayerPropEnum.PROP_PLAYER_LEVEL, v, notify)
 
     const newLimit = Math.max(0, Math.min(8, Math.floor((v - 15) / 5)))
     if (worldLevelLimit === newLimit) return
 
-    props.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL_LIMIT, newLimit, notify)
-    props.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL, Math.max(0, worldLevelAdjusted ? newLimit - 1 : newLimit), notify)
+    await props.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL_LIMIT, newLimit, notify)
+    await props.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL, Math.max(0, worldLevelAdjusted ? newLimit - 1 : newLimit), notify)
   }
 
   setGameTime(time: number, days: number = 0) {
@@ -671,6 +678,7 @@ export default class Player extends BaseClass {
     const {
       uid,
       hostWorld,
+      guidManager,
       profile,
       props,
       openState,
@@ -687,6 +695,7 @@ export default class Player extends BaseClass {
 
     return {
       uid,
+      guidData: guidManager.exportUserData(),
       profileData: profile.exportUserData(),
       propsData: props.exportUserData(),
       openStateData: openState.exportUserData(),

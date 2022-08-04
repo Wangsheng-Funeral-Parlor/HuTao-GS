@@ -1,6 +1,6 @@
 import AvatarData from '$/gameData/data/AvatarData'
 import SkillData from '$/gameData/data/SkillData'
-import { PlayerPropEnum } from '@/types/enum'
+import { ElemTypeEnum, PlayerPropEnum } from '@/types/enum'
 import SkillDepotUserData from '@/types/user/SkillDepotUserData'
 import Avatar from '..'
 import InherentProudSkill from './inherentProudSkill'
@@ -92,8 +92,8 @@ export default class SkillDepot {
     return this.energySkill?.costElemVal || 0
   }
 
-  getCostElemType(): number {
-    return this.energySkill?.costElemType || 0
+  getCostElemType(): ElemTypeEnum {
+    return this.energySkill?.costElemType || ElemTypeEnum.NONE
   }
 
   exportSkillLevelMap() {

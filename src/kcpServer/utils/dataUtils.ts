@@ -13,7 +13,7 @@ const protoTypeCache: { [proto: string]: protobuf.Type } = {}
 const logBlacklist: (string | number)[] = []
 
 function canLogProto(name: string | number): boolean {
-  if (logBlacklist.includes(name)) return false
+  if ((typeof name === 'string' && name.length <= 0) || logBlacklist.includes(name)) return false
   logBlacklist.push(name)
   return true
 }

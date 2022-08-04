@@ -30,7 +30,7 @@ const inventoryCommands: CommandDefinition[] = [
       print('Give weapon:', `(${id})x${count}`)
 
       for (let i = 0; i < count; i++) {
-        const weapon = new Weapon(id)
+        const weapon = new Weapon(id, player)
         await weapon.initNew()
         player.inventory.add(weapon)
       }
@@ -61,7 +61,7 @@ const inventoryCommands: CommandDefinition[] = [
       print('Give artifact:', `(${id})x${count}`)
 
       for (let i = 0; i < count; i++) {
-        const reliquary = new Reliquary(id)
+        const reliquary = new Reliquary(id, player)
         await reliquary.initNew()
         player.inventory.add(reliquary)
       }
@@ -99,7 +99,7 @@ const inventoryCommands: CommandDefinition[] = [
 
       for (let i = 0; i < count; i++) {
         for (const id of artIdList) {
-          const reliquary = new Reliquary(id)
+          const reliquary = new Reliquary(id, player)
           await reliquary.initNew()
           player.inventory.add(reliquary)
         }
@@ -128,7 +128,7 @@ const inventoryCommands: CommandDefinition[] = [
       const id = args[0]
       const count = args[1] || 1
 
-      const material = await Material.create(id, count)
+      const material = await Material.create(player, id, count)
       player.inventory.add(material)
 
       print('Give material:', `(${id})x${material.count}`)

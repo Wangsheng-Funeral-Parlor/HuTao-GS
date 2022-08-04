@@ -56,6 +56,7 @@ export default class Team {
   }
 
   getAvatar(guid: bigint) {
+    guid = this.teamManager.player.guidManager.getGuid(guid)
     return this.getAvatarList().find(avatar => avatar.guid === guid)
   }
 
@@ -71,7 +72,8 @@ export default class Team {
 
     this.initialized = true
 
-    const avatarTeamList = avatarTeamGuidList.map(guid => player.getAvatar(BigInt(guid)))
+    const avatarTeamList = avatarTeamGuidList.map(guid => player.getAvatar(BigInt(guid))).filter(avatar => avatar != null)
+    if (avatarTeamList.length === 0) avatarTeamList.push(player.avatarList[0])
     if (!avatarTeamList.find(avatar => avatar.isAlive())) return RetcodeEnum.RET_AVATAR_NOT_ALIVE
 
     avatarList.splice(0)
@@ -85,7 +87,7 @@ export default class Team {
     if (!avatarTeamGuidList.includes(curAvatarGuid)) {
       player.currentAvatar = this.getAliveAvatar()
     } else if (oldAvatar?.guid !== BigInt(curAvatarGuid)) {
-      player.currentAvatar = this.getAvatar(BigInt(curAvatarGuid))
+      player.currentAvatar = this.getAvatar(BigInt(curAvatarGuid)) || this.getAliveAvatar()
     }
 
     const { currentAvatar } = player
