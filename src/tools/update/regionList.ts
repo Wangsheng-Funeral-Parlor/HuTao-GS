@@ -1,3 +1,4 @@
+import { dataToProtobuffer } from '#/utils/dataUtils'
 import config from '@/config'
 import Logger from '@/logger'
 import { QueryRegionListHttpRsp } from '@/types/proto'
@@ -8,10 +9,9 @@ import { existsSync, writeFileSync } from 'fs'
 import { get } from 'https'
 import { join } from 'path'
 import { cwd } from 'process'
-import * as protobuf from 'protobufjs'
 const { Resolver } = dns.promises
 
-const host = `dispatch${config.dispatchRegion.slice(0, 2).toLowerCase()}global.yuanshen.com` // change that later
+const host = `dispatch${config.dispatchRegion.slice(0, 2).toLowerCase()}global.yuanshen.com`
 const protoPath = join(cwd(), `data/proto/QueryRegionListHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${config.version}/QueryRegionListHttpRsp.bin`)
 
@@ -47,11 +47,7 @@ function query(ip: string) {
       res.on('end', async () => {
         try {
           const buf = Buffer.from(data, 'base64')
-
-          const root = await protobuf.load(protoPath)
-          const type = root.lookupType('QueryRegionListHttpRsp')
-          const message = type.decode(buf)
-          const regionListRsp = <QueryRegionListHttpRsp>message.toJSON()
+          const regionListRsp = <QueryRegionListHttpRsp>await dataToProtobuffer(buf, 'QueryRegionListHttpRsp', true)
 
           const retcode = regionListRsp.retcode || 0
           if (retcode !== RetcodeEnum.RET_SUCC) return reject(`Query failed: ${RetcodeEnum[retcode]}`)

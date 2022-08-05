@@ -1,3 +1,4 @@
+import { dataToProtobuffer } from '#/utils/dataUtils'
 import config from '@/config'
 import Logger from '@/logger'
 import { QueryCurrRegionHttpRsp } from '@/types/proto'
@@ -10,7 +11,6 @@ import { existsSync, writeFileSync } from 'fs'
 import { get } from 'https'
 import { join } from 'path'
 import { cwd } from 'process'
-import * as protobuf from 'protobufjs'
 const { Resolver } = dns.promises
 
 const { version, nameservers, dispatchRegion, dispatchSeed, dispatchKeyId } = config
@@ -74,11 +74,7 @@ function query(ip: string, overrideSeed?: string) {
       res.on('end', async () => {
         try {
           const buf = Buffer.from(await decryptResponse(dispatchKeyId, data), 'base64')
-
-          const root = await protobuf.load(protoPath)
-          const type = root.lookupType('QueryCurrRegionHttpRsp')
-          const message = type.decode(buf)
-          const curRegionRsp = <QueryCurrRegionHttpRsp>message.toJSON()
+          const curRegionRsp = <QueryCurrRegionHttpRsp>await dataToProtobuffer(buf, 'QueryCurrRegionHttpRsp', true)
 
           const retcode = curRegionRsp.retcode || 0
           if (retcode !== RetcodeEnum.RET_SUCC) return reject(`Query failed: ${RetcodeEnum[retcode]}`)

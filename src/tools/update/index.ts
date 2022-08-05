@@ -6,8 +6,8 @@ const logger = new Logger('UPDATE')
 
 export const checkForUpdate = async (): Promise<void> => {
   logger.info('Checking for updates...')
-  await QueryCurRegion.checkForUpdate()
   await QueryRegionList.checkForUpdate()
+  await QueryCurRegion.checkForUpdate()
   logger.info('Update complete.')
 }
 
