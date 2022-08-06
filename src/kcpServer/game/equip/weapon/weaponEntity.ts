@@ -10,7 +10,7 @@ export default class WeaponEntity extends Entity {
   weapon: Weapon
 
   constructor(weapon: Weapon) {
-    super()
+    super(true)
 
     this.weapon = weapon
 

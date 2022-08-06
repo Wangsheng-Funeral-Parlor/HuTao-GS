@@ -77,6 +77,15 @@ export default class TeamManager extends BaseClass {
     }
   }
 
+  destroy() {
+    const { teamList } = this
+
+    delete this.entity
+    while (teamList.length > 0) teamList.shift().clear()
+
+    this.unregisterHandlers()
+  }
+
   async changeAvatar(avatar: Avatar, pos?: Vector, seqId?: number): Promise<RetcodeEnum> {
     if (!avatar) return RetcodeEnum.RET_CAN_NOT_FIND_AVATAR
 

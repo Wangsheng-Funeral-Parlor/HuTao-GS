@@ -10,6 +10,7 @@ import SceneGroup from './sceneGroup'
 const logger = new Logger('GSCENE', 0xefa8ec)
 
 const MAX_BLOCK_MS = 10
+const NON_DYNAMIC_LOAD_DISTANCE = 512
 
 export default class SceneBlock extends BaseClass {
   scene: Scene
@@ -22,8 +23,9 @@ export default class SceneBlock extends BaseClass {
   } | false
 
   groupList: SceneGroup[]
+  wob: WaitOnBlock
 
-  private loaded: boolean
+  loaded: boolean
 
   constructor(scene: Scene, blockId: number) {
     super()
@@ -33,6 +35,7 @@ export default class SceneBlock extends BaseClass {
     this.id = blockId
 
     this.groupList = []
+    this.wob = new WaitOnBlock(MAX_BLOCK_MS)
 
     super.initHandlers(this)
   }
@@ -92,30 +95,33 @@ export default class SceneBlock extends BaseClass {
 
   async initNew() {
     await this.loadSceneBlockData()
+  }
 
-    const { scene, groupList } = this
-    const { entityManager } = scene
-
-    const wob = new WaitOnBlock(MAX_BLOCK_MS)
+  async updateNonDynamic() {
+    const { scene, groupList, wob } = this
+    const { playerList, entityManager } = scene
 
     for (const group of groupList) {
-      if (group.dynamicLoad) continue
-      await group.load(wob)
+      const { pos, dynamicLoad, loaded } = group
+      if (dynamicLoad) continue
+
+      const canLoad = playerList.find(player => player.pos != null && pos.distanceTo2D(player.pos) <= NON_DYNAMIC_LOAD_DISTANCE) != null
+
+      if (!loaded && canLoad) await group.load(wob)
+      if (loaded && !canLoad) await group.unload()
     }
 
     await entityManager.flushAll()
   }
 
   async load() {
-    const { scene, id, groupList, loaded } = this
+    const { scene, id, groupList, wob, loaded } = this
     const { entityManager } = scene
 
     if (loaded) return
     this.loaded = true
 
     logger.debug('Load block:', id)
-
-    const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
     for (const group of groupList) {
       if (!group.dynamicLoad) continue
@@ -126,15 +132,13 @@ export default class SceneBlock extends BaseClass {
   }
 
   async unload() {
-    const { scene, id, groupList, loaded } = this
+    const { scene, id, groupList, wob, loaded } = this
     const { entityManager } = scene
 
     if (!loaded) return
     this.loaded = false
 
     logger.debug('Unload block:', id)
-
-    const wob = new WaitOnBlock(MAX_BLOCK_MS)
 
     for (const group of groupList) {
       if (!group.dynamicLoad) continue

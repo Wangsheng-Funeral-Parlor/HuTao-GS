@@ -269,11 +269,11 @@ export default class EntityManager extends BaseClass {
     logger.verbose('Register:', entityId)
   }
 
-  async unregister(entity: Entity, verbose: boolean = false): Promise<void> {
+  async unregister(entity: Entity, batch: boolean = false): Promise<void> {
     const { manager, entityId } = entity
 
     if (manager !== this) return
-    if (this.getEntity(entityId, true)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, verbose)
+    if (this.getEntity(entityId, true)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, batch)
 
     logger.verbose('Unregister:', entityId)
 
@@ -376,6 +376,8 @@ export default class EntityManager extends BaseClass {
     }
 
     if (entityType === EntityTypeEnum.Avatar) this.updateAllEntity((<Avatar>entity).player)
+
+    scene.emit('EntityUpdate', entity)
   }
 
   updateAllEntity(player: Player) {

@@ -328,10 +328,15 @@ export default class Player extends BaseClass {
   }
 
   async destroy() {
+    const { profile, teamManager } = this
+
     if (this.isInMp() && this.currentWorld) await this.currentWorld.leave(this.context)
     await this.hostWorld.destroy()
 
     await this.game.save(this.client)
+
+    profile.destroy()
+    teamManager.destroy()
 
     this.unregisterHandlers()
   }

@@ -8,7 +8,7 @@ export default class TeamEntity extends Entity {
   teamManager: TeamManager
 
   constructor(manager: TeamManager) {
-    super()
+    super(true)
 
     this.teamManager = manager
 

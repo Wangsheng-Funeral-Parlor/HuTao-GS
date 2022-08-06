@@ -1,6 +1,6 @@
 import StoreItemChange from '#/packets/StoreItemChange'
 import StoreItemDel from '#/packets/StoreItemDel'
-import { ItemTypeEnum, ItemUseOpEnum } from '@/types/enum'
+import { ItemTypeEnum } from '@/types/enum'
 import { ItemInfo } from '@/types/proto'
 import InventoryUserData from '@/types/user/InventoryUserData'
 import Player from '..'
@@ -163,24 +163,14 @@ export default class Inventory {
     this.itemList = itemList.filter(item => !deletedItemList.includes(item))
   }
 
-  async useItem(item: Item) {
+  async useItem(item: Item, count?: number) {
     const { material } = item
     if (material == null) return
 
-    const { player } = this
-    const { energyManager } = player
-    const { useList } = material
-    for (const use of useList) {
-      const { op, param } = use
-      switch (op) {
-        case ItemUseOpEnum.ITEM_USE_ADD_ALL_ENERGY:
-          await energyManager.addAllEnergy(...param)
-          break
-        case ItemUseOpEnum.ITEM_USE_ADD_ELEM_ENERGY:
-          await energyManager.addElemEnergy(...param)
-          break
-      }
-    }
+    await material.use(count)
+    if (material.count > 0) return
+
+    await this.removeItem(item)
   }
 
   getItem(guid: bigint) {

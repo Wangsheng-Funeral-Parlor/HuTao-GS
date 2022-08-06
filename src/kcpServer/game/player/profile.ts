@@ -77,6 +77,21 @@ export default class Profile extends BaseClass {
     await this.unlockAllNamecards()
   }
 
+  destroy() {
+    delete this.player
+    delete this.nickname
+    delete this.signature
+    delete this.birthday
+    delete this.nameCardId
+    delete this.showAvatarList
+    delete this.showNameCardIdList
+    delete this.unlockedNameCardIdList
+    delete this.profilePicture
+    delete this.isShowAvatar
+
+    this.unregisterHandlers()
+  }
+
   async unlockAllNamecards() {
     const { unlockedNameCardIdList } = this
     const newNamecards = (await MaterialData.getMaterialList())

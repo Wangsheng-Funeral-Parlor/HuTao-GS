@@ -49,17 +49,18 @@ export default class Entity extends BaseClass {
   isOnScene: boolean
   gridHash: number
 
-  constructor() {
+  constructor(offScene: boolean = false) {
     super()
 
-    this.abilityManager = new AbilityManager(this)
     this.props = new EntityProps(this)
     this.fightProps = new FightProp(this)
-    this.motion = new Motion()
+    if (!offScene) {
+      this.abilityManager = new AbilityManager(this)
+      this.motion = new Motion()
+      this.bornPos = new Vector()
+    }
 
     this.authorityPeerId = null
-
-    this.bornPos = new Vector()
 
     this.groupId = 0
     this.configId = 0

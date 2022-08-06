@@ -5,6 +5,7 @@ import PlayerEnterScene, { PlayerEnterSceneNotify } from '#/packets/PlayerEnterS
 import ScenePlayerLocation from '#/packets/ScenePlayerLocation'
 import SceneTime from '#/packets/SceneTime'
 import uidPrefix from '#/utils/uidPrefix'
+import Entity from '$/entity'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
 import CombatManager from '$/manager/combatManager'
@@ -15,7 +16,7 @@ import World from '$/world'
 import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
 import { AbilityInvokeEntry, CombatInvokeEntry, PlayerWorldSceneInfo, ScenePlayerInfo, SceneTeamAvatar } from '@/types/proto'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
+import { ProtEntityTypeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import SceneUserData from '@/types/user/SceneUserData'
 import { getTimeSeconds } from '@/utils/time'
 import SceneBlock from './sceneBlock'
@@ -164,31 +165,21 @@ export default class Scene extends BaseClass {
     sceneDataMap[id] = this.exportUserData()
     await entityManager.destroy()
 
+    delete this.sceneTagList
     for (const sceneBlock of sceneBlockList) await sceneBlock.unload()
+
+    this.unregisterHandlers()
 
     if (sceneList.includes(this)) sceneList.splice(sceneList.indexOf(this), 1)
   }
 
   async initSceneBlocks() {
-    const { id, host, sceneBlockList, sceneBlockInit } = this
+    const { sceneBlockList, sceneBlockInit } = this
 
     if (sceneBlockInit) return
     this.sceneBlockInit = true
 
-    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loading non dynamic groups...')
-    Logger.mark('SceneLoadBlock')
-
-    for (const block of sceneBlockList) {
-      if (this.destroyed) {
-        logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Abort load non dynamic groups.')
-        Logger.clearMarks('SceneLoadBlock')
-        return
-      }
-      await block.initNew()
-    }
-
-    logger.debug(uidPrefix('LOAD', host), 'ID:', id, 'Loaded non dynamic groups.')
-    Logger.measure('Block load', 'SceneLoadBlock')
+    for (const block of sceneBlockList) await block.initNew()
   }
 
   unlockPoint(pointId: number): boolean {
@@ -415,5 +406,19 @@ export default class Scene extends BaseClass {
       this.lastTimeUpdate = Date.now()
       await SceneTime.broadcastNotify(broadcastContextList)
     }
+  }
+
+  // PlayerJoin
+  async handlePlayerJoin() {
+    const { sceneBlockList } = this
+    for (const sceneBlock of sceneBlockList) await sceneBlock.updateNonDynamic()
+  }
+
+  // EntityUpdate
+  async handleEntityUpdate(entity: Entity) {
+    if (entity.protEntityType !== ProtEntityTypeEnum.PROT_ENTITY_AVATAR) return
+
+    const { sceneBlockList } = this
+    for (const sceneBlock of sceneBlockList) await sceneBlock.updateNonDynamic()
   }
 }

@@ -94,6 +94,31 @@ export default class Material {
     return leftover
   }
 
+  async use(count?: number) {
+    if (count == null) count = this.count
+    for (let i = 0; i < count; i++) await this.useOnce()
+  }
+
+  async useOnce() {
+    const { player, useList, count } = this
+    const { energyManager } = player
+
+    if (count <= 0) return
+    this.count--
+
+    for (const use of useList) {
+      const { op, param } = use
+      switch (op) {
+        case ItemUseOpEnum.ITEM_USE_ADD_ALL_ENERGY:
+          await energyManager.addAllEnergy(...param)
+          break
+        case ItemUseOpEnum.ITEM_USE_ADD_ELEM_ENERGY:
+          await energyManager.addElemEnergy(...param)
+          break
+      }
+    }
+  }
+
   export(): MaterialInfo {
     return {
       count: this.count

@@ -22,7 +22,7 @@ export default class SceneGroup {
   npcList: Npc[]
   gadgetList: Gadget[]
 
-  private loaded: boolean
+  loaded: boolean
 
   constructor(block: SceneBlock, id: number, pos: Vector, dynamicLoad: boolean) {
     this.block = block
@@ -151,11 +151,15 @@ export default class SceneGroup {
   }
 
   private async unloadList(entityList: Entity[]) {
-    const { block } = this
+    const { block, dynamicLoad } = this
     const { scene } = block
     const { entityManager } = scene
 
-    for (const entity of entityList) await entityManager.remove(entity, undefined, undefined, true)
+    if (dynamicLoad) {
+      for (const entity of entityList) await entityManager.remove(entity, undefined, undefined, true)
+    } else {
+      while (entityList.length > 0) await entityManager.unregister(entityList.shift(), true)
+    }
   }
 
   async load(wob: WaitOnBlock) {

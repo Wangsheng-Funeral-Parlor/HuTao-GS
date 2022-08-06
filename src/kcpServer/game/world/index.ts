@@ -104,6 +104,8 @@ export default class World extends BaseClass {
     }
 
     while (sceneList.length > 0) await sceneList.shift().destroy()
+
+    this.unregisterHandlers()
   }
 
   getNextPeerId() {

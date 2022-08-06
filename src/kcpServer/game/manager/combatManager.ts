@@ -183,6 +183,7 @@ export default class CombatManager extends BaseClass {
         if (speedInfo == null || Date.now() - speedInfo[2] > 500) break
 
         await this.takeFallDamage(entity, speedInfo, motionState === MotionStateEnum.MOTION_FIGHT, seqId)
+        delete landSpeedInfoMap[entityId]
         break
       }
     }
