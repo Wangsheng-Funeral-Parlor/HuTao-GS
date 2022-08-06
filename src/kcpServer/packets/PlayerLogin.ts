@@ -1,9 +1,9 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { dataToProtobuffer } from '#/utils/dataUtils'
 import config from '@/config'
 import { AdjustTrackingInfo, BlockInfo, FeatureBlockInfo, QueryCurrRegionHttpRsp, ResVersionConfig, ShortAbilityHashPair, TrackingIOInfo } from '@/types/proto'
 import { ENetReasonEnum, RetcodeEnum } from '@/types/proto/enum'
 import { fileExists, readFile } from '@/utils/fileSystem'
+import { dataToProtobuffer } from '@/utils/proto'
 import { join } from 'path'
 import { cwd } from 'process'
 

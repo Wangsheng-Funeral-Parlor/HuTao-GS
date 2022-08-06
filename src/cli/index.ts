@@ -20,6 +20,8 @@ const commandsAnnouncement: Announcement = {
 const errLogger = new Logger('CLIERR', 0xff8080)
 const logger = new Logger('CLIOUT', 0xffffff)
 
+type ParseArgError = { error: string }
+type ParseArgResult = string | number | Buffer | ParseArgError
 const ARGS_CTYPES = [
   { type: 'GRP', list: ['"', '`', "'"] },
   { type: 'SEP', list: [' '] }
@@ -61,7 +63,7 @@ function splitArgs(str: string): string[] {
   return args
 }
 
-function parseArg(arg: string, def: ArgumentDefinition): any {
+function parseArg(arg: string, def: ArgumentDefinition): ParseArgResult {
   // optional argument check
   if (def.optional && arg == null) return
 
@@ -107,7 +109,7 @@ function parseArgs(args: string[], cmdDef: CommandDefinition): any {
   if (argDef == null) return []
 
   let parsingDynamic = false
-  let result: any
+  let result: ParseArgResult
 
   for (let i = 0; i < argDef.length; i++) {
     const def = argDef[i]
@@ -130,7 +132,7 @@ function parseArgs(args: string[], cmdDef: CommandDefinition): any {
     result = parseArg(arg, def)
 
     if (result == null) continue
-    if (result.error) return { error: result.error }
+    if ((<ParseArgError>result).error) return { error: (<ParseArgError>result).error }
 
     parsedArgs.push(result)
   }

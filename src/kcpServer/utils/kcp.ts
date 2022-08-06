@@ -356,7 +356,7 @@ export class Kcp {
       }
     }
 
-    let count = buf.length <= this.mss ? 1 : (((buf.length + this.mss - 1) / this.mss) >>> 0)
+    const count = buf.length <= this.mss ? 1 : (((buf.length + this.mss - 1) / this.mss) >>> 0)
 
     if (count >= KCP_WND_RCV) return -2
 
@@ -365,7 +365,7 @@ export class Kcp {
       const lf = buf.subarray(0, size)
       const rt = buf.subarray(size)
 
-      let newSegment = createSegment(lf)
+      const newSegment = createSegment(lf)
       buf = rt
 
       newSegment.frg = this.stream ? 0 : (((count - i - 1) << 24) >>> 24)
@@ -908,7 +908,7 @@ export class Kcp {
       return 0
     }
 
-    let tmFlush = (tsFlush - current) >>> 0
+    const tmFlush = (tsFlush - current) >>> 0
     for (let i = 0; i < this.sndBuf.length; i++) {
       const seg = this.sndBuf.peekAt(i)!
       const diff = seg.resendTs - current

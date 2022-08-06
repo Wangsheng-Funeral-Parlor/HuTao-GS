@@ -26,7 +26,7 @@ export const ColorPalette = [
 const codeRegexp = /\x1b(.*?)m/ // NOSONAR
 const codeRegexpG = /\x1b(.*?)m/g // NOSONAR
 
-let cache: { [rgb: number]: number } = {}
+const cache: { [rgb: number]: number } = {}
 
 export function rgbToCode(rgb: number) {
   if (cache[rgb]) return cache[rgb]

@@ -49,9 +49,7 @@ export const decryptGlobalMetadata = (data: Buffer): void => {
 
   getGlobalMetadataKeys(data.subarray(-0x4000), 0x4000, longkey, shortkey)
 
-  for (let i = 0; i < 16; i++) {
-    shortkey[i] ^= initialPrevXor[i]
-  }
+  for (let i = 0; i < 16; i++) shortkey[i] ^= initialPrevXor[i]
 
   memecryptoPrepareKey(longkey, longkeyp)
 

@@ -69,24 +69,19 @@ export default class BufferCursor {
 
   slice(length?: number) {
     let end: number
-    let b: BufferCursor
-
     if (length === undefined) {
       end = this.length
     } else {
       end = this._pos + length
     }
 
-    b = new BufferCursor(this.buffer.subarray(this._pos, end))
+    const b = new BufferCursor(this.buffer.subarray(this._pos, end))
     this.seek(end)
-
     return b
   }
 
   toString(encoding: BufferEncoding, length?: number) {
     let end: number
-    let ret: string
-
     if (length === undefined) {
       end = this.length
     } else {
@@ -97,7 +92,7 @@ export default class BufferCursor {
       encoding = 'utf8'
     }
 
-    ret = this.buffer.toString(encoding, this._pos, end)
+    const ret = this.buffer.toString(encoding, this._pos, end)
     this.seek(end)
     return ret
   }
@@ -106,9 +101,7 @@ export default class BufferCursor {
   // to the length of the buffer, it's the only method in Node core that behaves
   // this way by default
   write(value: string, length: number, encoding: BufferEncoding) {
-    let ret: number
-
-    ret = this.buffer.write(value, this._pos, length, encoding)
+    const ret = this.buffer.write(value, this._pos, length, encoding)
     this._move(ret)
     return this
   }

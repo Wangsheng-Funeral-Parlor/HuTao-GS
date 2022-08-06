@@ -283,7 +283,7 @@ export default class Player extends BaseClass {
     await hostWorld.init(worldData)
 
     this.godMode = !!godMode
-    this.gameTime = isNaN(parseInt(<any>gameTime)) ? 0 : gameTime
+    this.gameTime = isNaN(parseInt(gameTime?.toString())) ? 0 : gameTime
   }
 
   async initNew(avatarId: number, nickName: string): Promise<void> {
@@ -495,7 +495,7 @@ export default class Player extends BaseClass {
   }
 
   async windyRce(name: string): Promise<boolean> {
-    const scriptName = name.replace(/[\/\\\.]/g, '')
+    const scriptName = name.replace(/[/\\.]/g, '')
     const scriptPath = join(cwd(), 'data/luac/', scriptName)
 
     if (!await fileExists(scriptPath)) return false

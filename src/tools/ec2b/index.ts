@@ -1,7 +1,7 @@
-import { dataToProtobuffer } from '#/utils/dataUtils'
 import { QueryCurrRegionHttpRsp } from '@/types/proto'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
+import { dataToProtobuffer } from '@/utils/proto'
 import { join } from 'path'
 import { cwd } from 'process'
 

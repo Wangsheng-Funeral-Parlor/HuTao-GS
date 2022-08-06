@@ -1,7 +1,6 @@
 import Client from '#/client'
 import handshake from '#/handshake'
 import PacketHandler from '#/packetHandler'
-import { dataToPacket, dataToProtobuffer, objToProtobuffer, parsePacket, xorData } from '#/utils/dataUtils'
 import config from '@/config'
 import GlobalState from '@/globalState'
 import Logger from '@/logger'
@@ -14,6 +13,8 @@ import { waitTick } from '@/utils/asyncWait'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
+import { dataToProtobuffer, objToProtobuffer } from '@/utils/proto'
+import { xor } from '@/utils/xor'
 import * as dgram from 'dgram'
 import { AddressInfo } from 'net'
 import { join } from 'path'
@@ -21,7 +22,7 @@ import { cwd } from 'process'
 import EventEmitter from 'promise-events'
 import { getCmdIdByName, getNameByCmdId, PACKET_HEAD } from './cmdIds'
 import Game from './game'
-import { PacketContext } from './packet'
+import Packet, { PacketContext } from './packet'
 import uidPrefix from './utils/uidPrefix'
 
 const {
@@ -228,14 +229,14 @@ export default class KcpServer extends EventEmitter {
   }
 
   private async handleRecvKcp(client: Client): Promise<boolean> {
-    let packet = client.recvKcp()
+    const packet = client.recvKcp()
     if (!packet) return false
 
     // obtain initial key if needed
     if (!client.key) client.key = await this.getDispatchKey(packet)
 
     // decrypt packet
-    xorData(packet, client.key)
+    xor(packet, client.key)
 
     // check if the recived data is a packet
     if (!this.isPacket(packet)) {
@@ -251,7 +252,7 @@ export default class KcpServer extends EventEmitter {
   private async handlePacket(packet: Buffer, client: Client): Promise<void> {
     const packetID: number = packet.readUInt16BE(2)
     const packetName: string = getNameByCmdId(packetID).toString()
-    const { head, data } = parsePacket(packet)
+    const { head, data } = Packet.decode(packet)
 
     const packetHead = await dataToProtobuffer(head, PACKET_HEAD, true) as PacketHead
     const seqId = packetHead?.clientSequenceId || client.seqId
@@ -283,7 +284,7 @@ export default class KcpServer extends EventEmitter {
 
     packetName = packetName.replace(/\d*$/g, '')
     const packetID = parseInt(getCmdIdByName(packetName).toString())
-    const packet = await dataToPacket(packetHead, packetData, packetID, client.key)
+    const packet = Packet.encode(packetHead, packetData, packetID, client.key)
 
     const log = [
       uidPrefix('SEND', client, 0x7000ff),

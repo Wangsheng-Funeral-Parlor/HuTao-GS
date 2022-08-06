@@ -3,7 +3,7 @@ import GlobalState from '@/globalState'
 
 class AbtestApiHandler extends Handler {
   constructor() {
-    super(/^abtest\-api.*?\./, [
+    super(/^abtest-api.*?\./, [
       '/data_abtest_api/config/experiment/list'
     ])
   }

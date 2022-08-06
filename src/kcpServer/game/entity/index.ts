@@ -38,8 +38,6 @@ export default class Entity extends BaseClass {
 
   bornPos: Vector
 
-  animatorParaList: any[]
-
   lifeState: LifeStateEnum
   godMode: boolean
 

@@ -60,7 +60,8 @@ export class HttpResponse {
   }
 
   sendResponse(rsp: ServerResponse) {
-    let { code, type, data, headers } = this
+    const { code, headers } = this
+    let { type, data } = this
 
     const isBuffer = Buffer.isBuffer(data)
 

@@ -3,7 +3,7 @@ import GlobalState from '@/globalState'
 
 class ApiAccountHandler extends Handler {
   constructor() {
-    super(/.*?api\-account.*?\./, [
+    super(/.*?api-account.*?\./, [
       '/account/risky/api/check'
     ])
   }

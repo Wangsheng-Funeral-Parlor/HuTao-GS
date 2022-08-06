@@ -1,5 +1,4 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import { dataToProtobuffer, objToProtobuffer, xorData } from '#/utils/dataUtils'
 import config from '@/config'
 import GlobalState from '@/globalState'
 import Logger from '@/logger'
@@ -9,7 +8,9 @@ import { QueryCurrRegionHttpRsp, QueryRegionListHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile } from '@/utils/fileSystem'
+import { dataToProtobuffer, objToProtobuffer } from '@/utils/proto'
 import { rsaEncrypt, rsaSign } from '@/utils/rsa'
+import { xor } from '@/utils/xor'
 import { join } from 'path'
 import { cwd } from 'process'
 
@@ -79,12 +80,12 @@ class DispatchHandler extends Handler {
 
   private async queryCurRegion(req: HttpRequest): Promise<HttpResponse> {
     const { searchParams } = req
-    const clientVersion = (searchParams.get('version')?.match(/[\d\.]+/)?.[0] || '0')
+    const clientVersion = (searchParams.get('version')?.match(/[\d.]+/)?.[0] || '0')
       .split('.')
       .map((n, i, arr) => (parseInt(n) & 0xFF) << (8 * ((arr.length - 1) - i)))
       .reduce((sum, v) => sum + v, 0)
 
-    let response: any
+    let response: string | { content: string, sign: string }
     switch (true) {
       case clientVersion >= 0x020732: { // >= 2.7.50
         const keyId = parseInt(searchParams.get('key_id')) || 0
@@ -121,7 +122,7 @@ class DispatchHandler extends Handler {
       regionListData = await dataToProtobuffer(await readFile(binPath), 'QueryRegionListHttpRsp', true)
     } else {
       const customConfig = Buffer.from(JSON.stringify(clientCustomConfig))
-      xorData(customConfig, await DispatchKey.getXorKey())
+      xor(customConfig, await DispatchKey.getXorKey())
 
       regionListData = {
         retcode: RetcodeEnum.RET_SUCC,
@@ -169,7 +170,7 @@ class DispatchHandler extends Handler {
       curRegionData = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
     } else {
       const customConfig = Buffer.from(JSON.stringify(clientCustomConfig))
-      xorData(customConfig, await DispatchKey.getXorKey())
+      xor(customConfig, await DispatchKey.getXorKey())
 
       const secretKey = (await DispatchKey.getEc2b()).toString('base64')
 

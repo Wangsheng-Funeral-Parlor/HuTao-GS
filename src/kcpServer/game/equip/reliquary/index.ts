@@ -143,7 +143,7 @@ export default class Reliquary extends Equip {
     for (const appendPropId of appendPropIdList) {
       const affixData = await ReliquaryData.getAffix(appendPropId)
       const type = FightPropEnum[affixData?.PropType] || FightPropEnum.FIGHT_PROP_NONE
-      const value = parseFloat(<any>affixData?.PropValue) || 0
+      const value = parseFloat(affixData?.PropValue?.toString()) || 0
       const origValue = subStatMap[type] || 0
 
       if (isNaN(value)) continue
@@ -167,7 +167,7 @@ export default class Reliquary extends Equip {
 
     appendPropIdList.splice(0)
 
-    const filteredAppendPropList = appendPropList.map(id => parseInt(<any>id)).filter(id => !isNaN(id))
+    const filteredAppendPropList = appendPropList.map(id => parseInt(id?.toString())).filter(id => !isNaN(id))
     if (filteredAppendPropList.length === 0) {
       for (let i = 0; i < appendNum; i++) await this.addAppendProp()
     } else {

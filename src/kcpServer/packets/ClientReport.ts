@@ -1,22 +1,10 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import uidPrefix from '#/utils/uidPrefix'
 import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
+import { stringXorDecode } from '@/utils/xor'
 
 const logger = new Logger('REPORT', 0xfff838)
-
-function reportXor(hex: string): string {
-  const input = Buffer.from(hex, 'hex')
-  const output = Buffer.alloc(input.length)
-
-  let char = input[input.length - 1] ^ 0x7D
-  for (let i = input.length - 1; i >= 0; i--) {
-    char = input[i] ^ char
-    output[i] = char
-  }
-
-  return output.toString()
-}
 
 export interface ClientReportNotify {
   reportType: string
@@ -35,7 +23,7 @@ class ClientReportPacket extends Packet implements PacketInterface {
     const { player } = context
     const { reportType, reportValue } = data
 
-    logger.debug(uidPrefix(reportType.slice(0, 4).padEnd(4, ' '), player), reportXor(reportValue))
+    logger.debug(uidPrefix(reportType.slice(0, 4).padEnd(4, ' '), player), stringXorDecode(Buffer.from(reportValue, 'hex'), 0x7D))
   }
 }
 

@@ -121,7 +121,7 @@ class Hk4eSdkHandler extends Handler {
         combo_id: uid.slice(-8).padStart(8, '0'),
         open_id: uid,
         combo_token: hash1.slice(0, 20) + hash2.slice(0, 20),
-        data: '{\"guest\":false}',
+        data: '{"guest":false}',
         heartbeat: false,
         account_type: 1
       }

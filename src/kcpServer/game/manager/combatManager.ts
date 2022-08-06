@@ -1,13 +1,13 @@
 import BaseClass from '#/baseClass'
 import { PacketContext } from '#/packet'
 import CombatInvocations from '#/packets/CombatInvocations'
-import { dataToProtobuffer } from '#/utils/dataUtils'
 import Entity from '$/entity'
 import Scene from '$/scene'
 import Logger from '@/logger'
 import { ClientStateEnum, FightPropEnum } from '@/types/enum'
 import { CombatInvokeEntry, EntityMoveInfo, EvtBeingHitInfo } from '@/types/proto'
 import { ChangeHpReasonEnum, CombatTypeArgumentEnum, MotionStateEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
+import { dataToProtobuffer } from '@/utils/proto'
 
 const fallDamageConfig = {
   fall: {

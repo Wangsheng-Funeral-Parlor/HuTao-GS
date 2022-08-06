@@ -184,7 +184,8 @@ export default class Scene extends BaseClass {
 
   unlockPoint(pointId: number): boolean {
     const { unlockedPointList } = this
-    if (isNaN(parseInt(<any>pointId)) || unlockedPointList.includes(pointId)) return false
+    pointId = parseInt(pointId?.toString())
+    if (isNaN(pointId) || unlockedPointList.includes(pointId)) return false
 
     unlockedPointList.push(pointId)
     return true

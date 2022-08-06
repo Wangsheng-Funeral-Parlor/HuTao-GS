@@ -3,7 +3,6 @@ import { PacketContext } from '#/packet'
 import AbilityInvocations from '#/packets/AbilityInvocations'
 import ClientAbilityChange from '#/packets/ClientAbilityChange'
 import ClientAbilityInitFinish from '#/packets/ClientAbilityInitFinish'
-import { dataToProtobuffer } from '#/utils/dataUtils'
 import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
 import AppliedAbility from '$/ability/appliedAbility'
 import AppliedModifier from '$/ability/appliedModifier'
@@ -13,6 +12,7 @@ import AbilityStringManager from '$/manager/abilityStringManager'
 import Logger from '@/logger'
 import { AbilityActionGenerateElemBall, AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaReInitOverrideMap, AbilityScalarValueEntry, AbilitySyncStateInfo } from '@/types/proto'
 import { AbilityInvokeArgumentEnum, ModifierActionEnum } from '@/types/proto/enum'
+import { dataToProtobuffer } from '@/utils/proto'
 
 const protoLookupTable = {
   ABILITY_NONE: null,

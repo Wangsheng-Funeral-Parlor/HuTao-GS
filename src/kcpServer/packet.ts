@@ -2,6 +2,7 @@ import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
 import { PacketHead } from '@/types/kcp'
 import { WaitOnBlock } from '@/utils/asyncWait'
+import { xor } from '@/utils/xor'
 import { verbosePackets } from '.'
 import Client from './client'
 const logger = new Logger('PACKET', 0x8810cd)
@@ -125,6 +126,32 @@ export default class Packet implements PacketInterface {
     if (seqId != null) head.clientSequenceId = seqId
 
     return head
+  }
+
+  static decode(buf: Buffer): { head: Buffer, data: Buffer } {
+    const headLen = buf.readUInt16BE(4)
+    const dataLen = buf.readUInt32BE(6)
+
+    let offset = 10
+
+    const head = buf.subarray(offset, (() => offset += headLen)())
+    const data = buf.subarray(offset, (() => offset += dataLen)())
+
+    return { head, data }
+  }
+
+  static encode(head: Buffer, data: Buffer, packetID: number, keyBuffer: Buffer): Buffer {
+    const magic2 = Buffer.from(0x89AB.toString(16), 'hex')
+    const part1 = Buffer.alloc(10)
+
+    part1.writeUInt16BE(0x4567, 0)
+    part1.writeUInt16BE(packetID, 2)
+    part1.writeUInt16BE(head.length, 4)
+    part1.writeUInt32BE(data.length, 6)
+
+    const ret = Buffer.concat([part1, head, data, magic2], part1.length + head.length + data.length + magic2.length)
+    xor(ret, keyBuffer)
+    return ret
   }
 
   async response(context: PacketContext, data: any): Promise<void> {

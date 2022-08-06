@@ -3,7 +3,6 @@ import { EDNS_TO_NAME, NAME_TO_EDNS, NAME_TO_QCLASS, NAME_TO_QTYPE, QTYPE_TO_NAM
 
 export interface LableIndex { [str: string]: number }
 export type ResData = string | Buffer | (string | Buffer)[]
-export type ResDecoder = (buf: BufferCursor, len: number) => PacketResource
 
 export class EDNSData {
   ednsCode: number
@@ -50,7 +49,7 @@ export class OptECS extends EDNSData {
     return new OptECS(family, sourcePrefixLength, scopePrefixLength, ip)
   }
 
-  encode(buf?: BufferCursor, _index?: LableIndex): BufferCursor {
+  encode(buf?: BufferCursor): BufferCursor {
     const { family, sourcePrefixLength, scopePrefixLength, ip } = this
 
     buf.writeUInt16BE(family)
@@ -79,7 +78,7 @@ export class PacketHeader {
   nscount: number
   arcount: number
 
-  constructor(header?: any) {
+  constructor(header?: { [k: number]: number }) {
     this.id = 0
     this.qr = 0
     this.opcode = 0
@@ -180,7 +179,7 @@ export class PacketQuestion {
 }
 
 export class PacketResource {
-  static encoders: { [name: string]: any }
+  static encoders: { [name: string]: typeof PacketResource }
 
   name: string
   ttl: number
@@ -188,6 +187,7 @@ export class PacketResource {
   class: number
   data?: ResData
 
+  constructor(...args: any[])
   constructor(name: string = '', type: number = NAME_TO_QTYPE.ANY, cls: number = NAME_TO_QCLASS.ANY, ttl = 300) {
     this.name = name
     this.type = type
@@ -210,7 +210,7 @@ export class PacketResource {
     const len = buf.readUInt16BE()
 
     if (encoderName in encoders) {
-      res = (encoders[encoderName].decode as ResDecoder)(buf, len)
+      res = encoders[encoderName].decode(buf, len)
 
       res.name = name
       res.type = type
@@ -265,7 +265,7 @@ export class ResA extends PacketResource {
     return new ResA(parts.join('.'))
   }
 
-  encode(buf: BufferCursor, _index?: LableIndex): BufferCursor {
+  encode(buf: BufferCursor): BufferCursor {
     const parts = this.address.split('.')
     buf.writeUInt16BE(parts.length)
     for (const part of parts) buf.writeUInt8(parseInt(part))
@@ -284,7 +284,7 @@ export class ResMX extends PacketResource {
     this.priority = priority
   }
 
-  static decode(buf: BufferCursor, _len: number): ResMX {
+  static decode(buf: BufferCursor): ResMX {
     const priority = buf.readUInt16BE()
     const exchange = nameUnpack(buf)
     return new ResMX(exchange, priority)
@@ -313,7 +313,7 @@ export class ResAAAA extends PacketResource {
     return new ResAAAA(parts.map(p => p > 0 ? p.toString(16) : '').join(':'))
   }
 
-  encode(buf: BufferCursor, _index?: LableIndex): BufferCursor {
+  encode(buf: BufferCursor): BufferCursor {
     const parts = this.address.split(':')
     buf.writeUInt16BE(parts.length * 2)
     for (const part of parts) buf.writeUInt16BE(parseInt(part, 16))
@@ -329,7 +329,7 @@ export class ResNS extends PacketResource {
     this.ns = ns
   }
 
-  static decode(buf: BufferCursor, _len: number): ResNS {
+  static decode(buf: BufferCursor): ResNS {
     return new ResNS(nameUnpack(buf))
   }
 
@@ -391,7 +391,7 @@ export class ResTXT extends PacketResource {
     return new ResTXT(chunks)
   }
 
-  encode(buf: BufferCursor, _index?: LableIndex): BufferCursor {
+  encode(buf: BufferCursor): BufferCursor {
     const { data } = this
 
     const characterStrings = Array.isArray(data) ? data : [data]
@@ -454,7 +454,7 @@ export class ResSOA extends PacketResource {
     this.minimum = minimum
   }
 
-  static decode(buf: BufferCursor, _len: number): ResSOA {
+  static decode(buf: BufferCursor): ResSOA {
     return new ResSOA(
       nameUnpack(buf),
       nameUnpack(buf),
@@ -497,7 +497,7 @@ export class ResSRV extends PacketResource {
     this.target = target
   }
 
-  static decode(buf: BufferCursor, _len: number): ResSRV {
+  static decode(buf: BufferCursor): ResSRV {
     return new ResSRV(buf.readUInt16BE(), buf.readUInt16BE(), buf.readUInt16BE(), nameUnpack(buf))
   }
 
@@ -533,7 +533,7 @@ export class ResEDNS extends PacketResource {
 
       const optName = EDNS_TO_NAME[optCode]
       if (optName in ResEDNS) {
-        rdata.push((ResEDNS[optName].decode as ResDecoder)(buf, optLen))
+        rdata.push(ResEDNS[optName].decode(buf, optLen))
       } else {
         buf.seek(buf.tell() + optLen)
       }
@@ -585,7 +585,7 @@ export class ResNAPTR extends PacketResource {
     this.replacement = replacement
   }
 
-  static decode(buf: BufferCursor, _len: number): ResNAPTR {
+  static decode(buf: BufferCursor): ResNAPTR {
     return new ResNAPTR(
       buf.readUInt16BE(),
       buf.readUInt16BE(),
@@ -639,7 +639,7 @@ export class ResTLSA extends PacketResource {
     )
   }
 
-  encode(buf: BufferCursor, _index?: LableIndex): BufferCursor {
+  encode(buf: BufferCursor): BufferCursor {
     const { usage, selector, matchingtype } = this
 
     buf.writeUInt16BE(3 + this.buf.length)
@@ -827,7 +827,7 @@ export default class DnsPacket {
   }
 }
 
-let LABEL_POINTER = 0xC0
+const LABEL_POINTER = 0xC0
 
 function isPointer(len: number): boolean {
   return (len & LABEL_POINTER) === LABEL_POINTER

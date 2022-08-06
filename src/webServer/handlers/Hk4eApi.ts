@@ -14,7 +14,7 @@ class Hk4eApiHandler extends Handler {
   lastExchange: { [key: string]: number }
 
   constructor() {
-    super(/.*?hk4e\-api.*?\./, [
+    super(/.*?hk4e-api.*?\./, [
       '/common/apicdkey/api/exchangeCdkey',
       /\/common\/hk4e_.*?\/announcement\/api\/getAlertAnn/,
       /\/common\/hk4e_.*?\/announcement\/api\/getAlertPic/,
