@@ -34,9 +34,9 @@ const entityCommands: CommandDefinition[] = [
       entity.motion.pos.copy(pos)
       entity.bornPos.copy(pos)
 
-      entity.initNew(args[1])
+      await entity.initNew(args[1])
 
-      currentScene.entityManager.add(entity)
+      await currentScene.entityManager.add(entity)
     }
   }
 ]
