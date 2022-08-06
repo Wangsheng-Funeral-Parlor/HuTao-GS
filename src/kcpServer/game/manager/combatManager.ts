@@ -143,7 +143,7 @@ export default class CombatManager extends BaseClass {
     }
 
     // Take attack damage
-    await target.fightProps.takeDamage(attackerId, damage, true, reason, seqId)
+    await target.takeDamage(attackerId, damage, true, reason, seqId)
   }
 
   // CombatForceSetPosInfo

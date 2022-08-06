@@ -65,7 +65,9 @@ export default class Monster extends Entity {
 
     for (const weapon of this.weaponList) await weapon.initNew()
 
-    this.hpDropList = (monsterData.HpDrops || []).map(d => ({ id: d.DropId || 0, hp: (d.HpPercent || 0) / 100 }))
+    this.hpDropList = (monsterData.HpDrops || [])
+      .filter(d => d.DropId != null && d.HpPercent != null)
+      .map(d => ({ id: d.DropId || 0, hp: (d.HpPercent || 0) / 100 }))
     this.killDropId = monsterData.KillDropId || 0
 
     const describeData = await MonsterData.getDescribe(monsterData.DescribeId)

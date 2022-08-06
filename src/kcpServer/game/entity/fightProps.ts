@@ -324,8 +324,8 @@ export default class FightProp {
     const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     const gainAmount = Math.min(
       this.getCostElemVal() - this.get(type),
-      Math.max(0, val)
-    ) * (flat ? 1 : this.get(FightPropEnum.FIGHT_PROP_CHARGE_EFFICIENCY))
+      Math.max(0, val * (flat ? 1 : this.get(FightPropEnum.FIGHT_PROP_CHARGE_EFFICIENCY)))
+    )
     await this.add(type, gainAmount, notify, { changeEnergyReason }, seqId)
   }
 
