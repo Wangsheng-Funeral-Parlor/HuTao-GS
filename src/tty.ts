@@ -92,6 +92,7 @@ export class TTY extends EventEmitter {
     rowSpan: number
     buffer: string[]
     history: string[]
+    historyCursor: number
     historyIndex: number
   }
 
@@ -107,6 +108,7 @@ export class TTY extends EventEmitter {
       rowSpan: 0,
       buffer: [],
       history: [],
+      historyCursor: null,
       historyIndex: null
     }
 
@@ -162,7 +164,7 @@ export class TTY extends EventEmitter {
 
   prevCmd() {
     const { input } = this
-    const { buffer, history, historyIndex } = input
+    const { buffer, history, historyCursor, historyIndex } = input
 
     if (history.length <= 0) return
 
@@ -171,16 +173,18 @@ export class TTY extends EventEmitter {
 
     const index = Math.max(0, historyIndex == null ? history.length - 1 : historyIndex - 1)
     input.historyIndex = index
-    input.cursor = 0
 
-    buffer.push(...history[index].split(''))
+    const entry = history[index]
+    buffer.push(...entry.split(''))
+
+    input.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
 
     this.updateInput()
   }
 
   nextCmd() {
     const { input } = this
-    const { buffer, history, historyIndex } = input
+    const { buffer, history, historyCursor, historyIndex } = input
 
     if (history.length <= 0 || historyIndex == null) return
 
@@ -189,9 +193,11 @@ export class TTY extends EventEmitter {
 
     const index = historyIndex + 1
     input.historyIndex = index >= history.length ? null : index
-    input.cursor = 0
 
-    if (index < history.length) buffer.push(...history[index].split(''))
+    const entry = index < history.length ? history[index] : ''
+    buffer.push(...entry.split(''))
+
+    input.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
 
     this.updateInput()
   }
@@ -209,7 +215,7 @@ export class TTY extends EventEmitter {
     const { input } = this
     const { cursor, buffer } = input
 
-    let resetHI = true
+    let resetHistory = true
 
     switch (data) {
       case '\x03': { // ctrl-c
@@ -238,32 +244,36 @@ export class TTY extends EventEmitter {
         break
       }
       case '\x09': { // tab
-        resetHI = false
+        resetHistory = false
         break
       }
       case '\x1b[A': { // cursor up
-        resetHI = false
+        resetHistory = false
         this.prevCmd()
         break
       }
       case '\x1b[B': { // cursor down
-        resetHI = false
+        resetHistory = false
         this.nextCmd()
         break
       }
       case '\x1b[C': { // cursor forward
-        resetHI = false
+        resetHistory = false
         if (cursor >= buffer.length) break
 
         input.cursor++
+        input.historyCursor = input.cursor
+
         this.write('\x1b[C')
         break
       }
       case '\x1b[D': { // cursor back
-        resetHI = false
+        resetHistory = false
         if (cursor <= 0) break
 
         input.cursor--
+        input.historyCursor = input.cursor
+
         this.write('\x1b[D')
         break
       }
@@ -277,7 +287,10 @@ export class TTY extends EventEmitter {
       }
     }
 
-    if (resetHI) input.historyIndex = null
+    if (resetHistory) {
+      input.historyCursor = null
+      input.historyIndex = null
+    }
   }
 
   handleResize() {
