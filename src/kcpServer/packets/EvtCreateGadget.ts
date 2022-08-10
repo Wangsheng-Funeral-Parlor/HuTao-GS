@@ -1,9 +1,10 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
+import ClientGadget from '$/entity/gadget/clientGadget'
 import { ClientStateEnum } from '@/types/enum'
 import { VectorInfo } from '@/types/proto'
 import { ForwardTypeEnum } from '@/types/proto/enum'
 
-interface EvtCreateGadgetNotify {
+export interface EvtCreateGadgetNotify {
   forwardType: ForwardTypeEnum
   entityId: number
   configId: number
@@ -11,7 +12,7 @@ interface EvtCreateGadgetNotify {
   campType: number
   initPos: VectorInfo
   initEulerAngles: VectorInfo
-  guid: number
+  guid: string
   ownerEntityId: number
   targetEntityId: number
   isAsyncLoad: boolean
@@ -31,18 +32,24 @@ class EvtCreateGadgetPacket extends Packet implements PacketInterface {
 
   async recvNotify(context: PacketContext, data: EvtCreateGadgetNotify): Promise<void> {
     const { player, seqId } = context
-    const { forwardBuffer/*, loadedEntityIdList, currentScene*/ } = player
+    const { forwardBuffer, loadedEntityIdList, currentScene } = player
+    const { entityManager } = currentScene
+    const { entityId } = data
 
     forwardBuffer.addEntry(this, data, seqId)
     await forwardBuffer.sendAll()
 
-    if (!player.isInMp()) return
+    // prevent duplicate
+    if (entityManager.getEntity(entityId)) return
 
-    // add to player entity list
-    //loadedEntityIdList.push(data.entityId)
+    const entity = new ClientGadget(player, data)
+    await entity.initNew()
 
-    // add entity to scene entity list
-    //currentScene.entityManager.add()
+    // add entity to loaded entity list
+    loadedEntityIdList.push(entityId)
+
+    // add entity to scene
+    await entityManager.add(entity)
   }
 
   async sendNotify(context: PacketContext, data: EvtCreateGadgetNotify): Promise<void> {

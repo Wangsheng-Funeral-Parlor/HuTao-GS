@@ -2,7 +2,7 @@ import Packet, { PacketContext, PacketInterface } from '#/packet'
 import { ClientStateEnum } from '@/types/enum'
 import { ForwardTypeEnum } from '@/types/proto/enum'
 
-interface EvtDestroyGadgetNotify {
+export interface EvtDestroyGadgetNotify {
   forwardType: ForwardTypeEnum
   entityId: number
 }
@@ -17,15 +17,21 @@ class EvtDestroyGadgetPacket extends Packet implements PacketInterface {
 
   async recvNotify(context: PacketContext, data: EvtDestroyGadgetNotify): Promise<void> {
     const { player, seqId } = context
-    const { forwardBuffer } = player
+    const { forwardBuffer, loadedEntityIdList, currentScene } = player
+    const { entityManager } = currentScene
+    const { entityId } = data
 
     forwardBuffer.addEntry(this, data, seqId)
     await forwardBuffer.sendAll()
 
-    if (!player.isInMp()) return
+    const entity = entityManager.getEntity(entityId)
+    if (entity == null) return
 
-    // remove entity from scene entity list
-    //currentScene.entityManager.remove(data.entityId)
+    // remove entity from loaded entity list
+    loadedEntityIdList.splice(loadedEntityIdList.indexOf(entityId), 1)
+
+    // remove entity from scene
+    await currentScene.entityManager.unregister(entity)
   }
 
   async sendNotify(context: PacketContext, data: EvtDestroyGadgetNotify): Promise<void> {

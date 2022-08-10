@@ -71,15 +71,20 @@ export default class EntityManager extends BaseClass {
     super.initHandlers(scene)
   }
 
-  private getNextEntityId(entityType: ProtEntityTypeEnum): number {
+  private getNextEntityId(protEntityType: ProtEntityTypeEnum, forceSetId?: number): number {
     const { entityIdCounter } = this
 
-    if (entityIdCounter[entityType] == null) entityIdCounter[entityType] = Math.floor(Math.random() * 0x10000)
+    if (entityIdCounter[protEntityType] == null) entityIdCounter[protEntityType] = Math.floor(Math.random() * 0x10000)
 
-    entityIdCounter[entityType]++
-    entityIdCounter[entityType] %= 0x10000
+    if (forceSetId != null) {
+      entityIdCounter[protEntityType] = forceSetId & 0xFFFFFF
+      return forceSetId
+    }
 
-    return (entityType << 24) | entityIdCounter[entityType]
+    entityIdCounter[protEntityType]++
+    entityIdCounter[protEntityType] %= 0x10000
+
+    return (protEntityType << 24) | entityIdCounter[protEntityType]
   }
 
   private isGridAvailable(player: Player, entity: Entity): boolean {
@@ -258,7 +263,7 @@ export default class EntityManager extends BaseClass {
     if (manager) await manager.unregister(entity)
 
     entity.manager = this
-    entity.entityId = this.getNextEntityId(entity.protEntityType)
+    entity.entityId = this.getNextEntityId(entity.protEntityType, entity.entityId)
 
     const { entityId } = entity
 
