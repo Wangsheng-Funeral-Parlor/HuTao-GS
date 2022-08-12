@@ -10,6 +10,7 @@ import Equip from '$/equip'
 import AvatarData from '$/gameData/data/AvatarData'
 import EnergyManager from '$/manager/energyManager'
 import GuidManager from '$/manager/guidManager'
+import RuntimeIDManager from '$/manager/runtimeIDManager'
 import TeamManager from '$/manager/teamManager'
 import Material from '$/material'
 import Scene from '$/scene'
@@ -48,6 +49,7 @@ export default class Player extends BaseClass {
   widget: Widget
 
   guidManager: GuidManager
+  ridManager: RuntimeIDManager
   teamManager: TeamManager
   energyManager: EnergyManager
 
@@ -102,6 +104,7 @@ export default class Player extends BaseClass {
     this.widget = new Widget(this)
 
     this.guidManager = new GuidManager(this)
+    this.ridManager = new RuntimeIDManager(this)
     this.teamManager = new TeamManager(this)
     this.energyManager = new EnergyManager(this)
 
