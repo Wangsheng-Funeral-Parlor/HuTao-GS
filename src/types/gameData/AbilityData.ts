@@ -2,15 +2,15 @@ import AbilityConfig from './BinOutput/ConfigAbility'
 
 export default interface AbilityDataGroup {
   Animal: {
-    [name: string]: AbilityConfig[]
+    [name: string]: { [override: string]: AbilityConfig }[]
   }
   Avatar: {
-    [name: string]: AbilityConfig[]
+    [name: string]: { [override: string]: AbilityConfig }[]
   }
   Equip: {
-    [name: string]: AbilityConfig[]
+    [name: string]: { [override: string]: AbilityConfig }[]
   }
   Monster: {
-    [name: string]: AbilityConfig[]
+    [name: string]: { [override: string]: AbilityConfig }[]
   }
 }

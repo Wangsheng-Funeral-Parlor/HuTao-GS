@@ -40,7 +40,7 @@ export default class Gadget extends Entity {
   }
 
   private async loadGadgetData() {
-    const { gadgetId } = this
+    const { gadgetId, abilityManager } = this
 
     this.config = await GadgetData.getFightPropConfig(gadgetId)
     this.growCurve = await GrowCurveData.getGrowCurve('Gadget')
@@ -53,6 +53,13 @@ export default class Gadget extends Entity {
 
     this.destructible = this.config.HpBase > 0 || !!destructibleGadgetNameList.find(n => this.name.includes(n))
     this.flammable = !!flammableGadgetNameList.find(n => this.name.includes(n))
+
+    if (!Array.isArray(gadgetData?.Config?.Abilities)) return
+    for (const ability of gadgetData.Config.Abilities) {
+      abilityManager.addEmbryo(ability.AbilityName || undefined, ability.AbilityOverride || undefined)
+    }
+
+    abilityManager.initFromEmbryos()
   }
 
   async init(userData: EntityUserData): Promise<void> {

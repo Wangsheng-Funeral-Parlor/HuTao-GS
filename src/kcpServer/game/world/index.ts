@@ -109,6 +109,7 @@ export default class World extends BaseClass {
   }
 
   getNextPeerId() {
+    if (this.peerIdCounter >= 7) this.peerIdCounter = 0
     return ++this.peerIdCounter
   }
 

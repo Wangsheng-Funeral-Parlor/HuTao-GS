@@ -1,7 +1,6 @@
 import { State } from '.'
 
 export default interface ConfigAvatarStateIDInfo extends State {
-  AnimatorStates: { [stateName: string]: string[] }
   MoveType?: string
   CanDoSkill?: boolean
   AddEndure?: number

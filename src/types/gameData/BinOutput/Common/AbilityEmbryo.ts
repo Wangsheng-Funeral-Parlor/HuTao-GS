@@ -1,4 +1,4 @@
-export default interface AbilityConfig {
+export default interface AbilityEmbryoConfig {
   AbilityID: string
   AbilityName: string
   AbilityOverride: string

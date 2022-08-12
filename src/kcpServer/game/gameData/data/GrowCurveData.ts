@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
+import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
 import GrowCurveDataGroup from '@/types/gameData/GrowCurveData'
 
 class GrowCurveDataLoader extends Loader {

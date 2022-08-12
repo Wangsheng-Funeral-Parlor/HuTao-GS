@@ -55,7 +55,7 @@ export default class AbilityScalarValueContainer {
   }
 
   getValue(key: AbilityString) {
-    return this.valList.find(v => v.key.hash === key?.hash || v.key.str === key?.str) || null
+    return this.valList.find(v => v.key.hash === key?.hash || (key?.str && v.key.str === key?.str)) || null
   }
 
   setValue(sval: AbilityScalarValueEntry) {

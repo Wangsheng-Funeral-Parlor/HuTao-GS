@@ -5,7 +5,7 @@ import Reliquary from '$/equip/reliquary'
 import Weapon from '$/equip/weapon'
 import { CurveArithEnum, ElemTypeEnum, FightPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
-import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/CurveExcelConfig'
+import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
 import { FightPropPair } from '@/types/proto'
 import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import PropsUserData from '@/types/user/PropsUserData'
@@ -381,14 +381,16 @@ export default class FightProp {
   }
 
   async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    if (!this.entity.isAlive()) return
     const healAmount = Math.min(
       this.get(FightPropEnum.FIGHT_PROP_MAX_HP) - this.get(FightPropEnum.FIGHT_PROP_CUR_HP)
       , Math.max(0, val)
     )
-    this.add(FightPropEnum.FIGHT_PROP_CUR_HP, healAmount, notify, { changeHpReason }, seqId)
+    if (isFinite(healAmount) && healAmount > 0) this.add(FightPropEnum.FIGHT_PROP_CUR_HP, healAmount, notify, { changeHpReason }, seqId)
   }
 
   async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    if (!this.entity.isAlive()) return
     this.set(FightPropEnum.FIGHT_PROP_CUR_HP, this.get(FightPropEnum.FIGHT_PROP_MAX_HP), notify, { changeHpReason }, seqId)
   }
 

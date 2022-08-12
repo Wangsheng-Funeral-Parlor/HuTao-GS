@@ -1,0 +1,1 @@
+export type ActionParam = number | string | string[]

@@ -1,11 +1,11 @@
-import StateLayerConfig from './StateLayer'
-import HeadControlConfig from './HeadControl'
-import CommonConfig from './Common'
-import CombatConfig from './Combat'
-import AbilityConfig from './Ability'
+import CombatConfig from '../Common/Combat'
+import CommonConfig from '../Common/Common'
+import StateLayerConfig from '../Common/StateLayer'
+import AbilityEmbryoConfig from '../Common/AbilityEmbryo'
 import AudioConfig from './Audio'
-import MoveStateEffectConfig from './MoveStateEffect'
 import EquipControllerConfig from './EquipController'
+import HeadControlConfig from './HeadControl'
+import MoveStateEffectConfig from './MoveStateEffect'
 import SpecialPointConfig from './SpecialPoint'
 
 export default interface AvatarConfig {
@@ -14,7 +14,7 @@ export default interface AvatarConfig {
   SpecialPoint: SpecialPointConfig
   Combat: CombatConfig
   EquipController: EquipControllerConfig
-  Abilities: AbilityConfig[]
+  Abilities: AbilityEmbryoConfig[]
   StateLayers: { [layer: string]: StateLayerConfig }
   Audio: AudioConfig
   MoveStateEffect: MoveStateEffectConfig

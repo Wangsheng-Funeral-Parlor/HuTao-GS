@@ -22,30 +22,22 @@ export default class AppliedAbility {
     this.overrideMapContainer = new AbilityScalarValueContainer()
   }
 
-  private async loadAbilityData() {
-    return
+  setAbilityName(abilityName: AbilityString) {
+    if (abilityName == null) return
+    this.abilityName = abilityName
   }
 
-  async setAbilityName(abilityName: AbilityString = null) {
-    const { manager } = this
-    const { stringManager } = manager
-    if (stringManager.compare(abilityName, this.abilityName)) return
-
-    this.abilityName = stringManager.getByAbilityString(abilityName)
-    await this.loadAbilityData()
-  }
-
-  async setAbilityOverride(abilityOverride: AbilityString = null) {
-    const { manager } = this
-    const { stringManager } = manager
-    if (stringManager.compare(abilityOverride, this.abilityOverride)) return
-
-    this.abilityOverride = stringManager.getByAbilityString(abilityOverride)
-    await this.loadAbilityData()
+  setAbilityOverride(abilityOverride: AbilityString) {
+    if (abilityOverride == null) return
+    this.abilityOverride = abilityOverride
   }
 
   setOverrideMap(overrideMap: AbilityScalarValueEntry[] = []) {
     this.overrideMapContainer.setValues(overrideMap)
+  }
+
+  setOverrideParam(sval: AbilityScalarValueEntry) {
+    this.overrideMapContainer.setValue(sval)
   }
 
   getEntityInfo(): { type: string, name: string } {

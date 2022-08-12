@@ -1,3 +1,5 @@
+import GadgetConfig from "./BinOutput/ConfigGadget"
+
 export interface GadgetData {
   JsonName: string
   Tags: string[]
@@ -27,6 +29,8 @@ export interface GadgetData {
   PrefabPathRemoteHashPre?: number
   ControllerPathHashSuffix?: number
   ControllerPathHashPre?: number
+
+  Config: GadgetConfig
 }
 
 export interface GadgetPropData {

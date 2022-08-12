@@ -11,8 +11,10 @@ import EnableBulletCollisionPluginTrigger from './EnableBulletCollisionPluginTri
 import EnableHitBoxByName from './EnableHitBoxByName'
 import FireEffect from './FireEffect'
 import FixedMonsterRushMove from './FixedMonsterRushMove'
+import HealHP from './HealHP'
 import KillGadget from './KillGadget'
 import KillSelf from './KillSelf'
+import LoseHP from './LoseHP'
 import Predicated from './Predicated'
 import RemoveModifier from './RemoveModifier'
 import ReTriggerAISkillInitialCD from './ReTriggerAISkillInitialCD'
@@ -48,8 +50,10 @@ type ActionConfig =
   EnableHitBoxByName |
   FireEffect |
   FixedMonsterRushMove |
+  HealHP |
   KillGadget |
   KillSelf |
+  LoseHP |
   Predicated |
   RemoveModifier |
   ReTriggerAISkillInitialCD |

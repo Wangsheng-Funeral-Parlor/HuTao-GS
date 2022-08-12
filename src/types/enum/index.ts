@@ -1,3 +1,5 @@
+export * from './AbilityConfigIdx'
+export * from './AbilityModifierConfigIdx'
 export * from './ActivityId'
 export * from './ClientState'
 export * from './CurveArith'

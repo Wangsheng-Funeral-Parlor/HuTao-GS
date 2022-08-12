@@ -212,7 +212,11 @@ export default class Scene extends BaseClass {
 
     const { entityManager } = this
     for (const entry of invokes) {
-      const entity = entityManager.getEntity(entry?.entityId, true)
+      const entity = entityManager.getEntity(entry?.entityId)
+      if (entity == null) {
+        logger.debug('Ability invoke to null entity:', entry)
+        continue
+      }
       await entity?.abilityManager?.emit('AbilityInvoke', context, entry)
     }
   }
