@@ -110,7 +110,13 @@ class DispatchHandler extends Handler {
     return new HttpResponse(response)
   }
 
-  private async queryRegionList(_req: HttpRequest): Promise<HttpResponse> {
+  private async queryRegionList(req: HttpRequest): Promise<HttpResponse> {
+    const { searchParams } = req
+    const clientVersion = (searchParams.get('version')?.match(/[\d.]+/)?.[0] || '0')
+      .split('.')
+      .map((n, i, arr) => (parseInt(n) & 0xFF) << (8 * ((arr.length - 1) - i)))
+      .reduce((sum, v) => sum + v, 0)
+
     let regionListData: QueryRegionListHttpRsp
 
     if (autoPatch) {
@@ -142,7 +148,7 @@ class DispatchHandler extends Handler {
 
     for (const region of regionListData.regionList) {
       region.title = serverName
-      region.dispatchUrl = `https://${host}/query_cur_region`
+      region.dispatchUrl = `${clientVersion < 0x020000 ? 'http' : 'https'}://${host}/query_cur_region`
     }
 
     return new HttpResponse((await objToProtobuffer(regionListData, 'QueryRegionListHttpRsp', true)).toString('base64'))
