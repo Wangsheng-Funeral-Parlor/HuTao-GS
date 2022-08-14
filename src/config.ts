@@ -70,6 +70,7 @@ export const SUPPORT_REGIONS = [
 ]
 
 export const SUPPORT_VERSIONS = [
+  '1.6.51',
   '2.6.0',
   '2.7.0',
   '2.8.0',

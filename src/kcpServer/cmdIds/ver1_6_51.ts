@@ -1,6 +1,6 @@
 import { CmdIds } from '@/types/kcp'
 
-const ver1_5: CmdIds = {
+const ver1_6_51: CmdIds = {
   PingRsp: 1,
   EchoNotify: 6,
   ServerLogNotify: 12,
@@ -1242,4 +1242,4 @@ const ver1_5: CmdIds = {
   FindHilichurlAcceptQuestNotify: 8972
 }
 
-export default ver1_5
+export default ver1_6_51
