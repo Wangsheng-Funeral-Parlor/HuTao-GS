@@ -24,6 +24,12 @@ export default class Vehicle extends Gadget {
     this.memberList = []
   }
 
+  async destroy() {
+    const { vehicleManager, memberList } = this
+    while (memberList.length > 0) await this.getOut(memberList[0].player)
+    await vehicleManager.destroyVehicle(this)
+  }
+
   async getIn(player: Player, pos: number, context?: PacketContext) {
     const { entityId, memberList } = this
     const member = memberList.find(m => m.pos === pos)
@@ -73,10 +79,16 @@ export default class Vehicle extends Gadget {
     })
   }
 
-  async destroy() {
-    const { vehicleManager, memberList } = this
-    while (memberList.length > 0) await this.getOut(memberList[0].player)
-    await vehicleManager.destroyVehicle(this)
+  syncMemberPos() {
+    const { memberList, motion } = this
+    const { pos, rot } = motion
+
+    for (const member of memberList) {
+      const { pos: playerPos, rot: playerRot } = member.player
+
+      playerPos?.copy(pos)
+      playerRot?.copy(rot)
+    }
   }
 
   exportSceneGadgetInfo(): SceneGadgetInfo {

@@ -6,6 +6,7 @@ import ScenePlayerLocation from '#/packets/ScenePlayerLocation'
 import SceneTime from '#/packets/SceneTime'
 import uidPrefix from '#/utils/uidPrefix'
 import Entity from '$/entity'
+import Vehicle from '$/entity/gadget/vehicle'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
 import CombatManager from '$/manager/combatManager'
@@ -426,9 +427,10 @@ export default class Scene extends BaseClass {
 
   // EntityUpdate
   async handleEntityUpdate(entity: Entity) {
-    if (entity.protEntityType !== ProtEntityTypeEnum.PROT_ENTITY_AVATAR) return
-
-    const { sceneBlockList } = this
-    for (const sceneBlock of sceneBlockList) await sceneBlock.updateNonDynamic()
+    if (entity instanceof Vehicle) entity.syncMemberPos()
+    if (entity.protEntityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) {
+      const { sceneBlockList } = this
+      for (const sceneBlock of sceneBlockList) await sceneBlock.updateNonDynamic()
+    }
   }
 }

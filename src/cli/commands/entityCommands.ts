@@ -1,4 +1,3 @@
-import Vehicle from '$/entity/gadget/vehicle'
 import Monster from '$/entity/monster'
 import Vector from '$/utils/vector'
 import { CommandDefinition } from '.'
