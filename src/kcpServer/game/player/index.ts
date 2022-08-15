@@ -6,6 +6,7 @@ import { PlayerEnterSceneInfoNotify } from '#/packets/PlayerEnterSceneInfo'
 import PlayerGameTime from '#/packets/PlayerGameTime'
 import WindSeedClient from '#/packets/WindSeedClient'
 import Avatar from '$/entity/avatar'
+import Vehicle from '$/entity/gadget/vehicle'
 import Equip from '$/equip'
 import AvatarData from '$/gameData/data/AvatarData'
 import EnergyManager from '$/manager/energyManager'
@@ -72,6 +73,7 @@ export default class Player extends BaseClass {
   noAuthority: boolean
 
   currentAvatar: Avatar
+  currentVehicle: Vehicle
 
   changingTeam: boolean
   peerId: number

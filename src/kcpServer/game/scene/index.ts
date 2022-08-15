@@ -10,6 +10,7 @@ import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
 import CombatManager from '$/manager/combatManager'
 import EntityManager from '$/manager/entityManager'
+import VehicleManager from '$/manager/vehicleManager'
 import Player from '$/player'
 import Vector from '$/utils/vector'
 import World from '$/world'
@@ -38,6 +39,7 @@ export default class Scene extends BaseClass {
 
   entityManager: EntityManager
   combatManager: CombatManager
+  vehicleManager: VehicleManager
 
   playerList: Player[]
 
@@ -71,6 +73,7 @@ export default class Scene extends BaseClass {
 
     this.entityManager = new EntityManager(this)
     this.combatManager = new CombatManager(this)
+    this.vehicleManager = new VehicleManager(this)
 
     this.playerList = []
 
@@ -157,13 +160,15 @@ export default class Scene extends BaseClass {
   }
 
   async destroy() {
-    const { world, id, entityManager, sceneBlockList } = this
+    const { world, id, entityManager, vehicleManager, sceneBlockList } = this
     const { sceneDataMap, sceneList } = world
 
     this.destroyed = true
 
     sceneDataMap[id] = this.exportUserData()
+
     await entityManager.destroy()
+    await vehicleManager.destroy()
 
     delete this.sceneTagList
     for (const sceneBlock of sceneBlockList) await sceneBlock.unload()
@@ -394,7 +399,7 @@ export default class Scene extends BaseClass {
 
   // SceneUpdate
   async handleSceneUpdate() {
-    const { id, sceneBlockList, playerList, broadcastContextList, lastLocUpdate, lastTimeUpdate } = this
+    const { id, vehicleManager, sceneBlockList, playerList, broadcastContextList, lastLocUpdate, lastTimeUpdate } = this
 
     for (const sceneBlock of sceneBlockList) await sceneBlock.emit('Update')
 
@@ -403,7 +408,7 @@ export default class Scene extends BaseClass {
       await ScenePlayerLocation.broadcastNotify(broadcastContextList, {
         sceneId: id,
         playerLocList: playerList.map(player => player.exportLocationInfo()),
-        vehicleLocList: []
+        vehicleLocList: vehicleManager.exportVehicleLocationInfoList()
       })
     }
 
