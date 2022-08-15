@@ -28,9 +28,6 @@ const {
 } = config
 
 const requiredDirs = [
-  //dispatch
-  'data/key/' + dispatchKeyId,
-
   // game resource
   'data/bin/' + version,
   'data/proto/' + version,
@@ -47,6 +44,9 @@ const requiredDirs = [
   // windy
   'data/luac'
 ]
+
+//dispatch
+if (dispatchKeyId) requiredDirs.push('data/key/' + dispatchKeyId)
 
 const welcomeAnnouncement: Announcement = {
   type: 2, // Game
