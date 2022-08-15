@@ -86,7 +86,7 @@ export default class Server {
     logger.info(`Game version: ${cRGB(0xffffff, version)}`)
     logger.info(`Dispatch region: ${cRGB(0xffffff, dispatchRegion)}`)
     logger.info(`Dispatch seed: ${cRGB(0xffffff, dispatchSeed)}`)
-    logger.info(`Dispatch key: ${cRGB(0xffffff, dispatchKeyId.toString())}`)
+    logger.info(`Dispatch key: ${cRGB(0xffffff, dispatchKeyId?.toString())}`)
     logger.info(`Auto patch: ${cRGB(0xffffff, autoPatch.toString())}`)
     logger.info(`Log level: ${cRGB(0xffffff, logger.getLogLevel().toString())}`)
 
