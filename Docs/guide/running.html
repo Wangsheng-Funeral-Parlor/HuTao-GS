@@ -34,9 +34,23 @@
     <br>
     <h2>Connecting</h2>
     <p class="tip important">If you haven't already, do the steps listed on <a href="#a-install-ssl-certificate">Install SSL Certificate</a></p>
-    <h3>Method 1</h3>
-    <p class="tip">You can try to use cultivation, I haven't tested it yet.</p>
-    <h3>Method 2 (Recommended)</h3>
+    <h3>Method 1: Fiddler</h3>
+    <code>/* Original script by NicknameGG, modified for Grasscutter by contributors, modified for HuTao GS by NotArandomGUY */
+import System;
+import System.Windows.Forms;
+import Fiddler;
+import System.Text.RegularExpressions;
+
+class Handlers
+{
+    static function OnBeforeRequest(oS: Session) {
+        if(oS.host.EndsWith(".yuanshen.com") || oS.host.EndsWith(".hoyoverse.com") || oS.host.EndsWith(".mihoyo.com") || oS.uriContains("http://overseauspider.yuanshen.com:8888/log")){
+            oS.bypassGateway = true;
+            oS["x-overrideHost"] = '127.0.0.1';
+        }
+    }
+}</code>
+    <h3>Method 2: DNS (Recommended)</h3>
     <ol>
       <li><p>Press <strong>Win+R</strong></p></li>
       <li><p>Type <code>ncpa.cpl</code></p></li>

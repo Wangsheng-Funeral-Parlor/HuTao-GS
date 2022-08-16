@@ -312,13 +312,21 @@ code {
   font-size: inherit;
 }
 
+/* Code */
+code {
+  display: block;
+  background: #ffeff0;
+  word-wrap: break-word;
+  white-space: pre;
+}
+
 /* Code in text */
 p>code,
 li>code,
 dd>code,
 td>code {
-  background: #ffeff0;
-  word-wrap: break-word;
+  display: inline;
+  white-space: inherit;
   box-decoration-break: clone;
   padding: .1rem .3rem .2rem;
   border-radius: .2rem;
