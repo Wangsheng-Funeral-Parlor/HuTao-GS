@@ -129,7 +129,7 @@ body {
   position: fixed;
   top: 0;
   left: 300px;
-  padding: 8px 8px 45px 8px;
+  padding: 8px 8px 45px;
   width: calc(100% - 300px);
   height: 100%;
   overflow: auto scroll;
@@ -308,16 +308,12 @@ body {
 
 /* For all <code> */
 code {
-  font-family: MyFancyCustomFont, monospace;
-  font-size: inherit;
-}
-
-/* Code */
-code {
   display: block;
   background: #ffeff0;
   word-wrap: break-word;
   white-space: pre;
+  font-family: MyFancyCustomFont, monospace;
+  font-size: inherit;
 }
 
 /* Code in text */
