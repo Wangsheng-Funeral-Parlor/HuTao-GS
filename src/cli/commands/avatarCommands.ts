@@ -107,6 +107,40 @@ const avatarCommands: CommandDefinition[] = [
       currentAvatar.fightProps.set(prop, args[1], true)
       print(`Set ${FightPropEnum[prop]}(${prop}) to ${args[1]}.`)
     }
+  },
+  {
+    name: 'equip',
+    desc: 'Equip weapon or artifact',
+    args: [
+      { name: 'guid', type: 'str' },
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: async (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+
+      const { currentAvatar } = player
+      if (!currentAvatar) {
+        printError('Current avatar is null.')
+        return
+      }
+
+      const equip = player.getEquip(BigInt(args[0] || 0))
+      if (!equip) {
+        printError('Equip not found.')
+        return
+      }
+
+      await currentAvatar.equip(equip)
+      print(`Equipped ${args[0]} to current avatar.`)
+    }
   }
 ]
 
