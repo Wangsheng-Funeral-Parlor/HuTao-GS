@@ -1,5 +1,6 @@
 import Monster from '$/entity/monster'
 import Vector from '$/utils/vector'
+import { PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { CommandDefinition } from '.'
 
 const entityCommands: CommandDefinition[] = [
@@ -28,7 +29,7 @@ const entityCommands: CommandDefinition[] = [
         return
       }
 
-      print('Attempt to spawn monster:', args[0])
+      print('Spawning monster:', args[0])
 
       const entity = new Monster(args[0], player)
 
@@ -49,7 +50,7 @@ const entityCommands: CommandDefinition[] = [
     exec: async (cmdInfo) => {
       const { args, cli, sender, kcpServer } = cmdInfo
       const { print, printError } = cli
-      const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
+      const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
       if (!player) {
         printError('Player not found.')
@@ -62,9 +63,53 @@ const entityCommands: CommandDefinition[] = [
         return
       }
 
-      print('Attempt to spawn vehicle')
+      print('Spawning vehicle')
 
       await currentScene.vehicleManager.createVehicle(player, 45001001, 0, pos, new Vector())
+    }
+  },
+  {
+    name: 'killall',
+    desc: 'Kill all nearby monsters (10 Max)',
+    args: [
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: async (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+
+      const { currentScene, currentAvatar, loadedEntityIdList } = player
+      if (!currentAvatar) {
+        printError('Current avatar is null.')
+        return
+      }
+      if (!currentScene) {
+        printError('Not in scene.')
+        return
+      }
+
+      print('Killing monsters')
+
+      const { entityManager } = currentScene
+      const entityList = loadedEntityIdList
+        .map(id => entityManager.getEntity(id, true))
+        .filter(e => e != null && e.protEntityType === ProtEntityTypeEnum.PROT_ENTITY_MONSTER && e.isAlive())
+        .sort((a, b) => Math.sign(a.distanceTo2D(currentAvatar) - b.distanceTo2D(currentAvatar)))
+
+      let i = 0
+      for (const entity of entityList) {
+        if (i++ > 10) break
+        await entity.kill(0, PlayerDieTypeEnum.PLAYER_DIE_NONE, undefined, true)
+      }
+
+      await entityManager.flushAll()
     }
   }
 ]

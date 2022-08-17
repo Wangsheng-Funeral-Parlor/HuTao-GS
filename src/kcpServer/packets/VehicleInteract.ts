@@ -38,10 +38,10 @@ class VehicleInteractPacket extends Packet implements PacketInterface {
 
     switch (interactType) {
       case VehicleInteractTypeEnum.VEHICLE_INTERACT_IN:
-        await vehicle.getIn(player, pos, context)
+        await vehicle.addPassenger(player, pos, context)
         break
       case VehicleInteractTypeEnum.VEHICLE_INTERACT_OUT:
-        await vehicle.getOut(player, context)
+        await vehicle.removePassenger(player, context)
         break
       default:
         await this.response(context, { retcode: RetcodeEnum.RET_UNKNOWN_ERROR })

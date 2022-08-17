@@ -151,7 +151,7 @@ export default class Entity extends BaseClass {
     await this.fightProps.takeDamage(attackerId, val, notify, changeHpReason, seqId)
   }
 
-  async kill(attackerId: number, dieType: PlayerDieTypeEnum, seqId?: number): Promise<void> {
+  async kill(attackerId: number, dieType: PlayerDieTypeEnum, seqId?: number, batch: boolean = false): Promise<void> {
     // Can't die again if you are dead
     if (this.isDead()) return
 
@@ -163,7 +163,7 @@ export default class Entity extends BaseClass {
     this.attackerId = attackerId
 
     // Emit death event
-    await this.emit('Death', seqId)
+    await this.emit('Death', seqId, batch)
   }
 
   async revive(val?: number): Promise<void> {
@@ -263,13 +263,13 @@ export default class Entity extends BaseClass {
   /**Events**/
 
   // Death
-  async handleDeath() {
+  async handleDeath(seqId?: number, batch: boolean = false) {
     const { manager } = this
 
     // Broadcast life state change if on scene
     if (!manager) return
 
     await LifeStateChange.broadcastNotify(manager.scene.broadcastContextList, this)
-    await manager.remove(this, VisionTypeEnum.VISION_DIE)
+    await manager.remove(this, VisionTypeEnum.VISION_DIE, seqId, batch)
   }
 }

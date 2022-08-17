@@ -26,11 +26,11 @@ export default class Vehicle extends Gadget {
 
   async destroy() {
     const { vehicleManager, memberList } = this
-    while (memberList.length > 0) await this.getOut(memberList[0].player)
+    while (memberList.length > 0) await this.removePassenger(memberList[0].player)
     await vehicleManager.destroyVehicle(this)
   }
 
-  async getIn(player: Player, pos: number, context?: PacketContext) {
+  async addPassenger(player: Player, pos: number, context?: PacketContext) {
     const { entityId, memberList } = this
     const member = memberList.find(m => m.pos === pos)
 
@@ -59,7 +59,7 @@ export default class Vehicle extends Gadget {
     })
   }
 
-  async getOut(player: Player, context?: PacketContext) {
+  async removePassenger(player: Player, context?: PacketContext) {
     const { entityId, memberList } = this
     const member = memberList.find(m => m.player === player)
 
@@ -77,6 +77,11 @@ export default class Vehicle extends Gadget {
       interactType: VehicleInteractTypeEnum.VEHICLE_INTERACT_OUT,
       member: memberInfo
     })
+  }
+
+  async clearPassengers(context?: PacketContext) {
+    const { memberList } = this
+    for (const member of memberList) await this.removePassenger(member.player, context)
   }
 
   syncMemberPos() {
@@ -129,5 +134,13 @@ export default class Vehicle extends Gadget {
       avatarGuid: member.player.currentAvatar?.guid?.toString(),
       pos
     }
+  }
+
+  /**Events**/
+
+  // Death
+  async handleDeath(seqId?: number, batch: boolean = false) {
+    await this.clearPassengers()
+    await super.handleDeath(seqId, batch)
   }
 }

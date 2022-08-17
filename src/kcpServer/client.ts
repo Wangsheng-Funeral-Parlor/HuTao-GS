@@ -142,16 +142,15 @@ export default class Client extends BaseClass {
   setKeyFromSeed(seed: bigint): void {
     logger.debug('Seed:', seed)
 
-    const gen1 = new MT19937()
-    const gen2 = new MT19937()
-    gen1.seed(seed)
-    gen2.seed(gen1.int64())
-    gen2.int64()
+    const mt = new MT19937()
+    mt.seed(seed)
+    mt.seed(mt.int64())
+    mt.int64()
 
     this.key = Buffer.alloc(4096)
 
     for (let i = 0; i < 4096; i += 8) {
-      this.key.writeBigUInt64BE(gen2.int64(), i)
+      this.key.writeBigUInt64BE(mt.int64(), i)
     }
   }
 

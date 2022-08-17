@@ -141,10 +141,10 @@ export default class Monster extends Entity {
   }
 
   // Death
-  async handleDeath(seqId?: number) {
+  async handleDeath(seqId?: number, batch: boolean = false) {
     const { manager, motion, killDropId } = this
 
     await manager?.scene?.spawnDropsById(motion.pos, killDropId, seqId)
-    await super.handleDeath()
+    await super.handleDeath(seqId, batch)
   }
 }
