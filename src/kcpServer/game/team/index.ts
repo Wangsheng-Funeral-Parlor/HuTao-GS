@@ -56,7 +56,11 @@ export default class Team {
   }
 
   getAvatar(guid: bigint) {
-    guid = this.teamManager.player.guidManager.getGuid(guid)
+    const { guidManager } = this.teamManager.player
+
+    if (!guidManager.isValidGuid(guid)) return null
+    guid = guidManager.getGuid(guid)
+
     return this.getAvatarList().find(avatar => avatar.guid === guid)
   }
 

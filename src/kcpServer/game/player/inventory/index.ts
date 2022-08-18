@@ -148,9 +148,11 @@ export default class Inventory {
 
   async removeGuid(guid: bigint, notify: boolean = true) {
     const { player, itemList } = this
+    const { guidManager } = player
     const deletedItemList = []
 
-    guid = player.guidManager.getGuid(guid)
+    if (!guidManager.isValidGuid(guid)) return null
+    guid = guidManager.getGuid(guid)
 
     for (const item of itemList) {
       if (item.guid !== guid) continue
@@ -175,7 +177,11 @@ export default class Inventory {
 
   getItem(guid: bigint) {
     const { player, itemList } = this
-    guid = player.guidManager.getGuid(guid)
+    const { guidManager } = player
+
+    if (!guidManager.isValidGuid(guid)) return null
+    guid = guidManager.getGuid(guid)
+
     return itemList.find(item => item.guid === guid)
   }
 

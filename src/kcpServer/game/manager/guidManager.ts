@@ -54,7 +54,7 @@ export default class GuidManager {
     return (BigInt(player?.uid || 0) << 32n) | BigInt(id)
   }
 
-  private isValidGuid(guid: bigint): boolean {
+  isValidGuid(guid: bigint): boolean {
     if (guid == null) return false
 
     const { player, usedId } = this

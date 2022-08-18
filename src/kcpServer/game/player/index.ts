@@ -406,7 +406,10 @@ export default class Player extends BaseClass {
 
   getAvatar(guid: bigint): Avatar {
     const { guidManager, avatarList } = this
+
+    if (!guidManager.isValidGuid(guid)) return null
     guid = guidManager.getGuid(guid)
+
     return avatarList.find(avatar => avatar.guid === guid)
   }
 
