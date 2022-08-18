@@ -1,4 +1,4 @@
-import { FightPropEnum } from '@/types/enum'
+import { EquipTypeEnum, FightPropEnum } from '@/types/enum'
 import { CommandDefinition } from '.'
 
 const avatarCommands: CommandDefinition[] = [
@@ -106,6 +106,34 @@ const avatarCommands: CommandDefinition[] = [
 
       currentAvatar.fightProps.set(prop, args[1], true)
       print(`Set ${FightPropEnum[prop]}(${prop}) to ${args[1]}.`)
+    }
+  },
+  {
+    name: 'guid',
+    desc: 'Show current avatar guid & equips guid',
+    args: [
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: async (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+
+      const { currentAvatar } = player
+      if (!currentAvatar) {
+        printError('Current avatar is null.')
+        return
+      }
+
+      const { guid, equipMap } = currentAvatar
+      const equips = Object.entries(equipMap).map(e => `${EquipTypeEnum[parseInt(e[0])]}: ${e[1]?.guid?.toString()}`).join('\n')
+      print(`Avatar: ${guid?.toString()}\n${equips}`)
     }
   },
   {
