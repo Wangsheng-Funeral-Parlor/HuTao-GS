@@ -89,8 +89,39 @@ export default class GuidManager {
     usedId.splice(usedId.indexOf(id), 1)
   }
 
+  cleanupUnused() {
+    const { player, usedId } = this
+    const { avatarList, inventory } = player
+    const { itemList } = inventory
+
+    const usedIdList = []
+
+    // get used id from avatars
+    for (const avatar of avatarList) {
+      if (!this.isValidGuid(avatar?.guid)) continue
+      usedIdList.push(GuidManager.parseGuid(avatar.guid).id)
+    }
+
+    // get used id from items
+    for (const item of itemList) {
+      if (!this.isValidGuid(item?.guid)) continue
+      usedIdList.push(GuidManager.parseGuid(item.guid).id)
+    }
+
+    // find unused id
+    const unusedIdList = []
+    for (const id of usedId) {
+      if (usedIdList.includes(id)) continue
+      unusedIdList.push(id)
+    }
+
+    // cleanup
+    for (const id of unusedIdList) usedId.splice(usedId.indexOf(id), 1)
+  }
+
   exportUserData(): GuidUserData {
     const { usedId } = this
+    this.cleanupUnused()
 
     return {
       usedIdList: usedId
