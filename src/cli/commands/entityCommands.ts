@@ -1,5 +1,5 @@
-import Monster from '$/entity/monster'
 import Gadget from '$/entity/gadget'
+import Monster from '$/entity/monster'
 import Vector from '$/utils/vector'
 import { PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { CommandDefinition } from '.'
@@ -69,7 +69,6 @@ const entityCommands: CommandDefinition[] = [
       print('Spawning gadget:', args[0])
 
       const entity = new Gadget(args[0])
-      //const entity = new Gadget(args[0], player)
 
       entity.motion.pos.copy(pos)
       entity.bornPos.copy(pos)
