@@ -1,4 +1,5 @@
 import Monster from '$/entity/monster'
+import Gadget from '$/entity/gadget'
 import Vector from '$/utils/vector'
 import { PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { CommandDefinition } from '.'
@@ -32,6 +33,43 @@ const entityCommands: CommandDefinition[] = [
       print('Spawning monster:', args[0])
 
       const entity = new Monster(args[0], player)
+
+      entity.motion.pos.copy(pos)
+      entity.bornPos.copy(pos)
+
+      await entity.initNew(args[1])
+      await currentScene.entityManager.add(entity)
+    }
+  },
+  {
+    name: 'gadget',
+    desc: 'Spawn gadget',
+    args: [
+      { name: 'id', type: 'int' },
+      { name: 'lv', type: 'int' },
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: async (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+
+      const { currentScene, pos } = player
+      if (!currentScene || !pos) {
+        printError('Unable to get player position.')
+        return
+      }
+
+      print('Spawning gadget:', args[0])
+
+      const entity = new Gadget(args[0])
+      //const entity = new Gadget(args[0], player)
 
       entity.motion.pos.copy(pos)
       entity.bornPos.copy(pos)
