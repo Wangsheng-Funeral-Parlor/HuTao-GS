@@ -1,4 +1,4 @@
-import { constants as CryptoConsts, createSign, privateDecrypt, publicEncrypt } from 'crypto'
+import { constants as CryptoConsts, createSign, createVerify, privateDecrypt, publicEncrypt } from 'crypto'
 
 export const rsaEncrypt = (publicKey: Buffer | string, plaintext: Buffer): Buffer => {
   const chunkSize = 256 - 11
@@ -30,4 +30,15 @@ export const rsaSign = (privateKey: Buffer | string, data: Buffer): Buffer => {
   const signer = createSign('RSA-SHA256')
   signer.update(data)
   return signer.sign({ key: privateKey, padding: CryptoConsts.RSA_PKCS1_PADDING })
+}
+
+export const rsaVerify = (publicKey: Buffer | string, data: Buffer, signature: Buffer): boolean => {
+  if (
+    publicKey == null || data == null || signature == null ||
+    publicKey.length <= 0 || data.length <= 0 || signature.length <= 0
+  ) return false
+
+  const verifier = createVerify('RSA-SHA256')
+  verifier.update(data)
+  return verifier.verify({ key: publicKey, padding: CryptoConsts.RSA_PKCS1_PADDING }, signature)
 }
