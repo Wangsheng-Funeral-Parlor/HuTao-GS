@@ -4,6 +4,7 @@ import { join } from 'path'
 import { cwd } from 'process'
 import { PerformanceObserverEntryList, performance } from 'perf_hooks'
 import getTTY, { TTY, cRGB, noColor } from './tty'
+import parseArgs from './utils/parseArgs'
 
 export enum LogLevel {
   NONE = 0,
@@ -17,7 +18,8 @@ export enum LogLevel {
   VERBH = 8
 }
 
-let logLevel = parseInt((process.argv.find(arg => arg.indexOf('-ll:') === 0) || `-ll:${LogLevel.INFO}`).split(':')[1])
+let logLevel = parseArgs(process.argv).ll
+if (typeof logLevel !== 'number') logLevel = LogLevel.INFO
 
 let logFileName = null
 let logHistory: string[] = null
