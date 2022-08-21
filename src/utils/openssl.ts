@@ -1,5 +1,7 @@
 import Logger from '@/logger'
 import { exec } from 'child_process'
+import { join } from 'path'
+import { fileExists, readFile } from './fileSystem'
 
 const logger = new Logger('OPNSSL', 0x730c0a)
 
@@ -18,6 +20,16 @@ function trimBuffer(buf: Buffer): Buffer {
   let i = 0
   while (buf[i] === 0) i++
   return buf.subarray(i)
+}
+
+export interface Key {
+  pem: string
+  xml: string
+}
+
+export interface KeyPair {
+  private: Key
+  public: Key
 }
 
 export default class OpenSSL {
@@ -159,5 +171,33 @@ export default class OpenSSL {
     const E = e.toString('base64')
 
     return `<RSAKeyValue><Modulus>${M}</Modulus><Exponent>${E}</Exponent></RSAKeyValue>`
+  }
+
+  static async getKeyPair(dir: string, name: string, generateKeySize: number = null): Promise<KeyPair> {
+    const privatePath = join(dir, `${name}Private.pem`)
+    const publicPath = join(dir, `${name}Public.pem`)
+
+    if (!await fileExists(privatePath)) {
+      if (generateKeySize == null) throw new Error(`${name}Private.pem is missing.`)
+      await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(generateKeySize, 1024))
+    }
+    if (!await fileExists(publicPath)) await OpenSSL.extractRsaPublicKey(privatePath, publicPath)
+
+    const priPem = (await readFile(privatePath)).toString()
+    const pubPem = (await readFile(publicPath)).toString()
+
+    const priXml = await OpenSSL.pemToXmlRsaPrivate(privatePath)
+    const pubXml = await OpenSSL.pemToXmlRsaPublic(publicPath)
+
+    return {
+      private: {
+        pem: priPem,
+        xml: priXml
+      },
+      public: {
+        pem: pubPem,
+        xml: pubXml
+      }
+    }
   }
 }
