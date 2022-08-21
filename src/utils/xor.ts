@@ -4,14 +4,27 @@ export const xor = (data: Buffer, key: Buffer): void => {
   }
 }
 
-export const stringXorDecode = (encoded: Buffer, key: number): string => {
-  const decoded = Buffer.alloc(encoded.length)
+export const stringXorEncode = (str: string | Buffer, rand: number): Buffer => {
+  const input = Buffer.from(str)
+  const len = input.length
 
-  let char = encoded[encoded.length - 1] ^ key
-  for (let i = encoded.length - 1; i >= 0; i--) {
-    char = encoded[i] ^ char
-    decoded[i] = char
+  const encoded = Buffer.alloc(len)
+  for (let i = 0; i < len; i++) {
+    encoded[i] = input[i] ^ (i < (len - 1) ? input[i + 1] : rand)
   }
 
-  return decoded.toString()
+  return encoded
+}
+
+export const stringXorDecode = (encoded: Buffer, key: number, buf: boolean = false): string | Buffer => {
+  const len = encoded.length
+  const decoded = Buffer.alloc(len)
+
+  let byte = encoded[len - 1] ^ key
+  for (let i = len - 1; i >= 0; i--) {
+    byte = encoded[i] ^ byte
+    decoded[i] = byte
+  }
+
+  return buf ? decoded : decoded.toString()
 }

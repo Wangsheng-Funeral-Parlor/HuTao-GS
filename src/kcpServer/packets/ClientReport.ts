@@ -23,7 +23,7 @@ class ClientReportPacket extends Packet implements PacketInterface {
     const { player } = context
     const { reportType, reportValue } = data
 
-    logger.debug(uidPrefix(reportType.slice(0, 4).padEnd(4, ' '), player), stringXorDecode(Buffer.from(reportValue, 'hex'), 0x7D))
+    logger.debug(uidPrefix(reportType.slice(0, 4).padEnd(4, ' '), player), <string>stringXorDecode(Buffer.from(reportValue, 'hex'), 0x7D))
   }
 }
 
