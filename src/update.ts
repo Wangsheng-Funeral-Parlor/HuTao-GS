@@ -7,6 +7,7 @@ import Logger from './logger'
 import Server from './server'
 import { UpdateApiRetcodeEnum } from './types/enum'
 import { UpdateApiResponse, UpdateContent } from './types/update'
+import { waitMs } from './utils/asyncWait'
 import { deleteFile, readFile, writeFile } from './utils/fileSystem'
 import OpenSSL, { Key, KeyPair } from './utils/openssl'
 import parseArgs from './utils/parseArgs'
@@ -37,8 +38,54 @@ export default class Update {
     this.server = server
   }
 
-  private async stopServer() {
+  private async restart(path: string, args: string[]) {
+    logger.info('Stopping...')
     await this.server.runShutdownTasks(true)
+
+    const launchArgs = [`"${proc.argv[1]}"`, ...args]
+
+    logger.info('Restarting...')
+    logger.info('Path:', path)
+    logger.info('Args:', launchArgs)
+
+    spawn(
+      `"${path}"`,
+      launchArgs,
+      { detached: true, shell: true, stdio: 'ignore' }
+    ).on('spawn', () => {
+      logger.info('Exiting...')
+      proc.exit()
+    }).unref()
+  }
+
+  private async tryWrite(path: string, data: Buffer) {
+    let lastErr: Error
+    for (let i = 0; i < 10; i++) {
+      try {
+        await writeFile(path, data)
+        return
+      } catch (err) {
+        lastErr = err
+        await waitMs(1e3)
+      }
+    }
+
+    throw lastErr
+  }
+
+  private async tryDelete(path: string) {
+    let lastErr: Error
+    for (let i = 0; i < 10; i++) {
+      try {
+        await deleteFile(path)
+        return
+      } catch (err) {
+        lastErr = err
+        await waitMs(1e3)
+      }
+    }
+
+    throw lastErr
   }
 
   private async getKeyPair(): Promise<KeyPair> {
@@ -170,24 +217,9 @@ export default class Update {
           logger.info('Mismatch version, downloading update...')
           const newExePath = join(cwd(), 'Update.exe')
           const newExeFile = await this.apiGetContent(updateURL)
-          await writeFile(newExePath, newExeFile)
+          await this.tryWrite(newExePath, newExeFile)
 
-          logger.info('Stopping...')
-          await this.stopServer()
-
-          logger.info('Starting update exe...')
-          spawn(
-            `"${newExePath}"`,
-            [
-              proc.argv[1],
-              `-updateState=${UpdateStateEnum.CLONE}`,
-              `-oldPath="${proc.execPath}"`
-            ],
-            { detached: true, shell: true, stdio: 'ignore' }
-          ).on('spawn', () => {
-            logger.info('Exiting...')
-            proc.exit()
-          }).unref()
+          await this.restart(newExePath, [`-updateState=${UpdateStateEnum.CLONE}`, `-oldPath="${proc.execPath}"`])
           break
         }
         case UpdateStateEnum.CLONE: {
@@ -197,24 +229,9 @@ export default class Update {
           logger.info('Copying exe...')
           const newExePath = proc.execPath
           const newExeFile = await readFile(newExePath)
-          await writeFile(oldExePath, newExeFile)
+          await this.tryWrite(oldExePath, newExeFile)
 
-          logger.info('Stopping...')
-          await this.stopServer()
-
-          logger.info('Starting exe...')
-          spawn(
-            `"${oldExePath}"`,
-            [
-              proc.argv[1],
-              `-updateState=${UpdateStateEnum.CLEAN}`,
-              `-updatePath="${newExePath}"`
-            ],
-            { detached: true, shell: true, stdio: 'ignore' }
-          ).on('spawn', () => {
-            logger.info('Exiting...')
-            proc.exit()
-          }).unref()
+          await this.restart(oldExePath, [`-updateState=${UpdateStateEnum.CLEAN}`, `-updatePath="${newExePath}"`])
           break
         }
         case UpdateStateEnum.CLEAN: {
@@ -222,9 +239,10 @@ export default class Update {
           const updateExePath = args.updatePath?.toString()
           if (updateExePath == null) return logger.error('Missing argument')
 
-          await deleteFile(updateExePath)
+          await this.tryDelete(updateExePath)
+          logger.info('Cleanup complete.')
 
-          logger.info('Update complete.')
+          await this.restart(proc.argv0, [])
           break
         }
         default: {
