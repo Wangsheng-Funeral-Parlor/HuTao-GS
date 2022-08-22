@@ -8,6 +8,14 @@ import Equip from '../../equip'
 import Material from '../../material'
 import Item from './item'
 
+export const STORE_LIMIT = {
+  ALL: 30000,
+  MATERIAL: 2000,
+  WEAPON: 2000,
+  RELIQUARY: 1500,
+  FURNITURE: 2000
+}
+
 export default class Inventory {
   player: Player
 
@@ -110,16 +118,18 @@ export default class Inventory {
     }
   }
 
-  async add(obj: Material | Equip, notify: boolean = true): Promise<void> {
-    await this.addItem(new Item(obj), notify)
+  async add(obj: Material | Equip, notify: boolean = true, forceAdd: boolean = false): Promise<boolean> {
+    return this.addItem(new Item(obj), notify, forceAdd)
   }
 
-  async addItem(item: Item, notify: boolean = true) {
+  async addItem(item: Item, notify: boolean = true, forceAdd: boolean = false): Promise<boolean> {
     const { player, itemList } = this
     const { itemType, material } = item
 
     if (material?.useOnGain) return this.useItem(item)
-    if (itemType === ItemTypeEnum.ITEM_VIRTUAL && await this.addVirtualItem(item)) return
+    if (itemType === ItemTypeEnum.ITEM_VIRTUAL && await this.addVirtualItem(item)) return true
+
+    if (!forceAdd && this.isFull(item)) return false
 
     const changedItemList = []
 
@@ -134,6 +144,8 @@ export default class Inventory {
     }
 
     if (notify) await StoreItemChange.sendNotify(player.context, changedItemList)
+
+    return true
   }
 
   async remove(item: Item | number, amount: number = 1, commit: boolean = true, notify: boolean = true): Promise<number> {
@@ -165,17 +177,17 @@ export default class Inventory {
     this.itemList = itemList.filter(item => !deletedItemList.includes(item))
   }
 
-  async useItem(item: Item, count?: number) {
+  async useItem(item: Item, count?: number): Promise<boolean> {
     const { material } = item
-    if (material == null) return
+    if (material == null) return false
 
     await material.use(count)
-    if (material.count > 0) return
+    if (material.count <= 0) await this.removeItem(item)
 
-    await this.removeItem(item)
+    return true
   }
 
-  getItem(guid: bigint) {
+  getItem(guid: bigint): Item {
     const { player, itemList } = this
     const { guidManager } = player
 
@@ -183,6 +195,37 @@ export default class Inventory {
     guid = guidManager.getGuid(guid)
 
     return itemList.find(item => item.guid === guid)
+  }
+
+  countItems(itemType?: ItemTypeEnum): number {
+    const { itemList } = this
+
+    let count = 0
+    for (const item of itemList) {
+      if (itemType != null && itemType !== item.itemType) continue
+      count += item.count
+    }
+
+    return count
+  }
+
+  isFull(item: Item): boolean {
+    const { itemType, count } = item
+
+    if (this.countItems() + count > STORE_LIMIT.ALL) return true
+
+    switch (itemType) {
+      case ItemTypeEnum.ITEM_MATERIAL:
+        return this.countItems(itemType) + count > STORE_LIMIT.MATERIAL
+      case ItemTypeEnum.ITEM_WEAPON:
+        return this.countItems(itemType) + count > STORE_LIMIT.WEAPON
+      case ItemTypeEnum.ITEM_RELIQUARY:
+        return this.countItems(itemType) + count > STORE_LIMIT.RELIQUARY
+      case ItemTypeEnum.ITEM_FURNITURE:
+        return this.countItems(itemType) + count > STORE_LIMIT.FURNITURE
+    }
+
+    return false
   }
 
   exportItemList(): ItemInfo[] {

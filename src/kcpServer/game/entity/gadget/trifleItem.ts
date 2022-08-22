@@ -24,7 +24,7 @@ export default class TrifleItem extends Gadget {
     if (GuidManager.parseGuid(guid).uid !== uid) return { retcode: RetcodeEnum.RET_GADGET_INTERACT_COND_NOT_MEET }
 
     await manager.unregister(this)
-    await inventory.addItem(item)
+    if (!await inventory.addItem(item)) return { retcode: RetcodeEnum.RET_ITEM_EXCEED_LIMIT }
 
     return {
       retcode: RetcodeEnum.RET_SUCC,

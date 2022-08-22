@@ -32,7 +32,10 @@ const inventoryCommands: CommandDefinition[] = [
       for (let i = 0; i < count; i++) {
         const weapon = new Weapon(id, player)
         await weapon.initNew()
-        player.inventory.add(weapon)
+        if (!await player.inventory.add(weapon)) {
+          printError('Inventory full')
+          return
+        }
       }
     }
   },
@@ -63,7 +66,10 @@ const inventoryCommands: CommandDefinition[] = [
       for (let i = 0; i < count; i++) {
         const reliquary = new Reliquary(id, player)
         await reliquary.initNew()
-        player.inventory.add(reliquary)
+        if (!await player.inventory.add(reliquary)) {
+          printError('Inventory full')
+          return
+        }
       }
     }
   },
@@ -101,7 +107,10 @@ const inventoryCommands: CommandDefinition[] = [
         for (const id of artIdList) {
           const reliquary = new Reliquary(id, player)
           await reliquary.initNew()
-          player.inventory.add(reliquary)
+          if (!await player.inventory.add(reliquary)) {
+            printError('Inventory full')
+            return
+          }
         }
       }
     }
@@ -129,9 +138,9 @@ const inventoryCommands: CommandDefinition[] = [
       const count = args[1] || 1
 
       const material = await Material.create(player, id, count)
-      player.inventory.add(material)
-
       print('Give material:', `(${id})x${material.count}`)
+
+      if (!await player.inventory.add(material)) printError('Inventory full')
     }
   }
 ]
