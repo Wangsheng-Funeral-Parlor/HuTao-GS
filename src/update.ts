@@ -232,7 +232,7 @@ export default class Update {
         }
       }
     } catch (err) {
-      logger.error((<Error>err).message)
+      logger.error(err)
     }
   }
 }

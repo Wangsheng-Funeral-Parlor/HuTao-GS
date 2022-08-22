@@ -56,11 +56,13 @@ const srvFiles = {
 
 export default class SSL {
   workDir: string
+  caPath: string
   certPath: string
   keyPath: string
 
   constructor() {
     this.workDir = resolve(config.sslDir)
+    this.caPath = join(this.workDir, caFiles.caCrt)
     this.certPath = join(this.workDir, srvFiles.srvCrt)
     this.keyPath = join(this.workDir, srvFiles.srvKey)
   }
@@ -186,7 +188,7 @@ export default class SSL {
   }
 
   async exportHttpsConfig() {
-    const { certPath, keyPath } = this
+    const { caPath, certPath, keyPath } = this
 
     if (!await this.validateCaFiles()) {
       // missing ca files, regenerate ca & server files
@@ -197,6 +199,7 @@ export default class SSL {
     }
 
     return {
+      ca: await readFile(caPath),
       cert: await readFile(certPath),
       key: await readFile(keyPath)
     }
