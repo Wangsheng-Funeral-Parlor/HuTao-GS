@@ -1,6 +1,5 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 import config from '@/config'
-import GlobalState from '@/globalState'
 import UserData from '@/types/user'
 import hash from '@/utils/hash'
 import { getJson } from '@/utils/json'
@@ -20,7 +19,7 @@ class Hk4eSdkHandler extends Handler {
     ])
   }
 
-  async request(req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
+  async request(req: HttpRequest): Promise<HttpResponse> {
     const path = req.url.pathname.split('/').slice(-1)[0]
     switch (path) {
       case 'compareProtocolVersion':

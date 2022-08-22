@@ -41,7 +41,7 @@ function execCommand(cmd, slient = false) {
   await require('./prepNodeBin')()
 
   console.log('Packing executable...')
-  await execCommand('pkg . -o "dist/HuTao-GS.exe" --build', true)
+  await execCommand('pkg . --compress Brotli -o "dist/HuTao-GS.exe" --build', true)
 
   console.log('Build complete.')
 })()

@@ -1,5 +1,4 @@
-import GlobalState from '@/globalState'
-import { IncomingMessage, ServerResponse, IncomingHttpHeaders } from 'http'
+import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'http'
 import WebServer from '.'
 
 export type MatchRule = string | RegExp | (string | RegExp)[]
@@ -27,6 +26,10 @@ export class HttpRequest {
 
   get searchParams() {
     return this.url.searchParams
+  }
+
+  getGState(key: string) {
+    return this.webServer.server.getGState(key)
   }
 
   waitBody(): Promise<void> {
@@ -111,7 +114,7 @@ export default class Handler {
     return true
   }
 
-  async request(_req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
+  async request(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse()
   }
 }

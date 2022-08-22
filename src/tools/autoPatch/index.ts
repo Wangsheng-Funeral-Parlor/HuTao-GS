@@ -2,7 +2,7 @@ import Logger from '@/logger'
 import * as QueryCurRegion from './curRegion'
 import * as QueryRegionList from './regionList'
 
-const logger = new Logger('UPDATE')
+const logger = new Logger('APATCH')
 
 export const checkForUpdate = async (): Promise<void> => {
   logger.info('Checking for updates...')

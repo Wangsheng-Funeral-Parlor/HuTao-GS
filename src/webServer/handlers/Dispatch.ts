@@ -1,9 +1,8 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 import config from '@/config'
-import GlobalState from '@/globalState'
 import Logger from '@/logger'
-import curRegion from '@/tools/update/curRegion'
-import regionList from '@/tools/update/regionList'
+import curRegion from '@/tools/autoPatch/curRegion'
+import regionList from '@/tools/autoPatch/regionList'
 import { QueryCurrRegionHttpRsp, QueryRegionListHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
@@ -63,7 +62,7 @@ class DispatchHandler extends Handler {
     this.keyMap = {}
   }
 
-  async request(req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
+  async request(req: HttpRequest): Promise<HttpResponse> {
     const path = req.url.pathname.split('/').slice(-1)[0]
     logger.debug('Search:', req.searchParams.toString())
     switch (path) {

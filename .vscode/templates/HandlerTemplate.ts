@@ -1,4 +1,3 @@
-import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
 class HandlerTemplateHandler extends Handler {
@@ -6,7 +5,7 @@ class HandlerTemplateHandler extends Handler {
     super('HandlerTemplate.com', '/HandlerTemplate')
   }
 
-  async request(req: HttpRequest, globalState: GlobalState): Promise<HttpResponse> {
+  async request(req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse()
   }
 }

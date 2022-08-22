@@ -2,8 +2,8 @@ import Client from '#/client'
 import handshake from '#/handshake'
 import PacketHandler from '#/packetHandler'
 import config from '@/config'
-import GlobalState from '@/globalState'
 import Logger from '@/logger'
+import Server from '@/server'
 import { cRGB } from '@/tty'
 import { ClientStateEnum } from '@/types/enum'
 import { PacketHead, SocketContext } from '@/types/kcp'
@@ -69,17 +69,18 @@ export default class KcpServer extends EventEmitter {
   private loop: NodeJS.Timer
   private frame: number
 
-  globalState: GlobalState
+  server: Server
+
   socket: dgram.Socket
   game: Game
   packetHandler: PacketHandler
   clients: { [clientID: string]: Client }
   tokens: number[]
 
-  constructor(globalState: GlobalState) {
+  constructor(server: Server) {
     super()
 
-    this.globalState = globalState
+    this.server = server
 
     this.socket = dgram.createSocket('udp4')
 
@@ -96,6 +97,10 @@ export default class KcpServer extends EventEmitter {
 
     this.socket.on('message', this.handleMessage)
     this.socket.on('error', err => logger.error('Socket error:', err))
+  }
+
+  getGState(key: string) {
+    return this.server.getGState(key)
   }
 
   start(): void {
@@ -162,7 +167,7 @@ export default class KcpServer extends EventEmitter {
   }
 
   private async dump(name: string, data: Buffer) {
-    if (!this.globalState.get('PacketDump')) return
+    if (!this.getGState('PacketDump')) return
 
     try {
       const dumpPath = join(cwd(), 'data/log/dump', `${name}.bin`)
@@ -263,7 +268,7 @@ export default class KcpServer extends EventEmitter {
 
     const log = [
       uidPrefix('RECV', client, 0x00d5ff),
-      this.globalState.state.ShowPacketId ? packetID : '-',
+      this.getGState('ShowPacketId') ? packetID : '-',
       cRGB(0xc5ff00, seqId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
       packetName
     ]
@@ -288,7 +293,7 @@ export default class KcpServer extends EventEmitter {
 
     const log = [
       uidPrefix('SEND', client, 0x7000ff),
-      this.globalState.state.ShowPacketId ? packetID : '-',
+      this.getGState('ShowPacketId') ? packetID : '-',
       cRGB(0x00e5ff, seqId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
       packetName
     ]

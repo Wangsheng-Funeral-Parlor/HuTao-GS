@@ -1,18 +1,19 @@
-import { spawn, exec } from 'child_process'
-import { statSync, mkdirSync } from 'fs'
-import { join } from 'path'
-import { cwd } from 'process'
-import { PerformanceObserver } from 'perf_hooks'
-import * as hostile from 'hostile'
-import WebServer from '@/webServer'
-import KcpServer from '@/kcpServer'
 import GlobalState from '@/globalState'
+import KcpServer from '@/kcpServer'
+import { waitMs } from '@/utils/asyncWait'
+import WebServer from '@/webServer'
+import { exec, spawn } from 'child_process'
+import { mkdirSync, statSync } from 'fs'
+import * as hostile from 'hostile'
+import { join } from 'path'
+import { PerformanceObserver } from 'perf_hooks'
+import { cwd } from 'process'
+import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
+import DnsServer from './dnsServer'
 import Logger from './logger'
 import { cRGB } from './tty'
-import DnsServer from './dnsServer'
-import { waitMs } from '@/utils/asyncWait'
 import { Announcement } from './types/announcement'
-import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
+import Update from './update'
 
 const {
   version,
@@ -33,6 +34,9 @@ const requiredDirs = [
   'data/proto/' + version,
   'data/game/' + version,
 
+  // RSA key
+  'data/key',
+
   // log
   'data/log/server',
   'data/log/client',
@@ -45,7 +49,7 @@ const requiredDirs = [
   'data/luac'
 ]
 
-//dispatch
+// dispatch RSA key
 if (dispatchKeyId) requiredDirs.push('data/key/' + dispatchKeyId)
 
 const welcomeAnnouncement: Announcement = {
@@ -66,6 +70,8 @@ export default class Server {
   globalState: GlobalState
 
   observer: PerformanceObserver
+
+  update: Update
 
   dnsServer: DnsServer
   webServer: WebServer
@@ -107,9 +113,11 @@ export default class Server {
 
     this.observer = new PerformanceObserver(list => logger.performance(list))
 
-    this.dnsServer = new DnsServer(this.globalState)
-    this.webServer = new WebServer(this.globalState)
-    this.kcpServer = new KcpServer(this.globalState)
+    this.update = new Update(this)
+
+    this.dnsServer = new DnsServer(this)
+    this.webServer = new WebServer(this)
+    this.kcpServer = new KcpServer(this)
 
     this.webServer.announcements.push(welcomeAnnouncement)
 
@@ -118,6 +126,10 @@ export default class Server {
 
   get announcements() {
     return this.webServer.announcements
+  }
+
+  getGState(key: string) {
+    return this.globalState.get(key)
   }
 
   flushDNS(): Promise<void> {

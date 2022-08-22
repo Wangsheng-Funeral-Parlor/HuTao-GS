@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-const { mkdir: makeDirectory, stat, readFile: read, writeFile: write } = fs.promises
+const { mkdir: makeDirectory, stat, readFile: read, writeFile: write, unlink } = fs.promises
 
 export async function dirExists(path: string): Promise<boolean> {
   try { return (await stat(path)).isDirectory() } catch (err) { return false }
@@ -19,4 +19,8 @@ export async function readFile(path: string): Promise<Buffer> {
 
 export async function writeFile(path: string, data: string | Buffer): Promise<void> {
   return write(path, data)
+}
+
+export async function deleteFile(path: string): Promise<void> {
+  return unlink(path)
 }

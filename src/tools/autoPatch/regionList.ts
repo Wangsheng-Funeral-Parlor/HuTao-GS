@@ -15,7 +15,7 @@ const host = `dispatch${config.dispatchRegion.slice(0, 2).toLowerCase()}global.y
 const protoPath = join(cwd(), `data/proto/QueryRegionListHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${config.version}/QueryRegionListHttpRsp.bin`)
 
-const logger = new Logger('UPDATE')
+const logger = new Logger('APATCH')
 
 function query(ip: string) {
   return new Promise<void>((resolve, reject) => {

@@ -1,5 +1,4 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import { RecorderLog, RecorderLogData } from '@/types/log/recorder'
 import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
@@ -13,7 +12,7 @@ class LogRecorderHandler extends Handler {
     super(/^.*?uspider\..*$/, '/log')
   }
 
-  async request(req: HttpRequest, globalState: GlobalState): Promise<HttpResponse> {
+  async request(req: HttpRequest): Promise<HttpResponse> {
     const {
       userName,
       auid,
@@ -43,7 +42,7 @@ class LogRecorderHandler extends Handler {
 
     logger.debug(`[UID:${uid.toString() || '-'.repeat(6)}]`, logStr)
 
-    if (globalState.get('SaveRecorder')) {
+    if (req.getGState('SaveRecorder')) {
       const path = join(cwd(), 'data/log/client/recorder.json')
       const exists = await fileExists(path)
 

@@ -1,6 +1,6 @@
 import config from '@/config'
-import GlobalState from '@/globalState'
 import Logger from '@/logger'
+import Server from '@/server'
 import { cRGB } from '@/tty'
 import { writeFile } from '@/utils/fileSystem'
 import * as dgram from 'dgram'
@@ -16,17 +16,17 @@ import { listAnswer, readStream } from './utils'
 const logger = new Logger('DNSSRV', 0xfc9c14)
 
 export default class DnsServer extends EventEmitter {
-  globalState: GlobalState
+  server: Server
 
   private tcp: Tcp.Server
   private udp: dgram.Socket
 
   private nsMap: { [address: string]: NameServer }
 
-  constructor(globalState: GlobalState) {
+  constructor(server: Server) {
     super()
 
-    this.globalState = globalState
+    this.server = server
 
     this.tcp = new Tcp.Server()
     this.udp = dgram.createSocket('udp4')

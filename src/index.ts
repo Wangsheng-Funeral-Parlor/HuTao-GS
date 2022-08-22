@@ -1,11 +1,12 @@
-import Server from '@/server'
 import Logger from '@/logger'
-import printIcon from './printIcon'
-import getTTY from './tty'
-import CLI from './cli'
+import Server from '@/server'
 import { appendFileSync } from 'fs'
 import { join } from 'path'
 import { cwd } from 'process'
+import CLI from './cli'
+import printIcon from './printIcon'
+import getTTY from './tty'
+import parseArgs from './utils/parseArgs'
 
 // initialize tty
 getTTY()
@@ -34,8 +35,11 @@ process.on('uncaughtException', (err) => {
 
 logger.debug('Launch arguments:', process.argv)
 
-// start server
-server.start()
-
-// start cli
-cli.start()
+if (parseArgs(process.argv).updateState != null) {
+  // start update
+  server.update.start()
+} else {
+  // start server
+  server.start()
+  cli.start()
+}

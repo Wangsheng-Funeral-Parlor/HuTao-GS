@@ -11,6 +11,10 @@ interface Config {
   version: string
   packetsToDump: string[]
 
+  // auto update
+  hostUpdate: boolean
+  updateURL: string | null
+
   // dispatch
   dispatchHost: string | null
   dispatchSeed: string
@@ -40,6 +44,9 @@ export const DEFAULT_CONFIG: Config = {
   sslDir: './ssl',
   version: '2.7.0',
   packetsToDump: [],
+
+  hostUpdate: false,
+  updateURL: null,
 
   dispatchHost: null,
   dispatchSeed: null,

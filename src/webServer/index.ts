@@ -1,23 +1,24 @@
+import Logger from '@/logger'
+import Server from '@/server'
+import { cRGB } from '@/tty'
+import { Announcement, AnnouncementType } from '@/types/announcement'
 import * as http from 'http'
 import * as https from 'https'
 import { AddressInfo } from 'net'
-import Logger from '@/logger'
 import EventEmitter from 'promise-events'
-import { cRGB } from '@/tty'
-import SSL from './ssl'
 import Handler, { HttpRequest, HttpResponse } from './handler'
-import LogRecorder from './handlers/LogRecorder'
-import Report from './handlers/Report'
-import GlobalState from '@/globalState'
-import Dispatch from './handlers/Dispatch'
-import WebstaticSea from './handlers/WebstaticSea'
-import SdkStatic from './handlers/SdkStatic'
-import Hk4eSdk from './handlers/Hk4eSdk'
-import Hk4eApi from './handlers/Hk4eApi'
-import ApiAccount from './handlers/ApiAccount'
 import AbtestApi from './handlers/AbtestApi'
-import { Announcement, AnnouncementType } from '@/types/announcement'
+import ApiAccount from './handlers/ApiAccount'
+import Dispatch from './handlers/Dispatch'
+import Hk4eApi from './handlers/Hk4eApi'
+import Hk4eSdk from './handlers/Hk4eSdk'
+import LogRecorder from './handlers/LogRecorder'
 import MinorApi from './handlers/MinorApi'
+import Report from './handlers/Report'
+import SdkStatic from './handlers/SdkStatic'
+import Update from './handlers/Update'
+import WebstaticSea from './handlers/WebstaticSea'
+import SSL from './ssl'
 
 const logger = new Logger('WEBSRV', 0x00ff00)
 
@@ -27,7 +28,8 @@ export interface ServerConfig {
 }
 
 export default class WebServer extends EventEmitter {
-  globalState: GlobalState
+  server: Server
+
   servers: (http.Server | https.Server)[]
   handlers: Handler[]
   ssl: SSL
@@ -35,10 +37,11 @@ export default class WebServer extends EventEmitter {
   announcementTypes: AnnouncementType[]
   announcements: Announcement[]
 
-  constructor(globalState: GlobalState) {
+  constructor(server: Server) {
     super()
 
-    this.globalState = globalState
+    this.server = server
+
     this.servers = []
     this.handlers = [
       LogRecorder,
@@ -50,6 +53,7 @@ export default class WebServer extends EventEmitter {
       ApiAccount,
       AbtestApi,
       SdkStatic,
+      Update,
       WebstaticSea
     ]
 
@@ -111,7 +115,7 @@ export default class WebServer extends EventEmitter {
   }
 
   async requestListener(req: http.IncomingMessage, rsp: http.ServerResponse): Promise<void> {
-    const { globalState, handlers } = this
+    const { handlers } = this
 
     try {
       const request = new HttpRequest(this, req)
@@ -126,7 +130,7 @@ export default class WebServer extends EventEmitter {
       for (const handler of handlers) {
         if (!handler.matchUrl(url)) continue
 
-        response = await handler.request(request, globalState)
+        response = await handler.request(request)
         isVerbose = handler.verbose
         break
       }

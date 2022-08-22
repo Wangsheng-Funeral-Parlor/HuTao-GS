@@ -34,7 +34,8 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       'process.env': {
-        BUILD_INFO: `"production v${version} [${commitHash}]"`
+        BUILD_INFO: `"production v${version} [${commitHash}]"`,
+        COMMIT_HASH: `"${commitHash}"`
       }
     }),
     new WebpackObfuscator({

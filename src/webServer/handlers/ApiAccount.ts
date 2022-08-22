@@ -1,5 +1,4 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import GlobalState from '@/globalState'
 
 class ApiAccountHandler extends Handler {
   constructor() {
@@ -8,7 +7,7 @@ class ApiAccountHandler extends Handler {
     ])
   }
 
-  async request(_req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
+  async request(_req: HttpRequest): Promise<HttpResponse> {
     return new HttpResponse({
       retcode: 0,
       message: 'OK',

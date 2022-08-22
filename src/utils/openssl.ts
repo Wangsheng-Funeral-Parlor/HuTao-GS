@@ -200,4 +200,17 @@ export default class OpenSSL {
       }
     }
   }
+
+  static async getPublicKey(dir: string, name: string): Promise<Key> {
+    const publicPath = join(dir, `${name}Public.pem`)
+    if (!await fileExists(publicPath)) throw new Error(`${name}Public.pem is missing.`)
+
+    const pubPem = (await readFile(publicPath)).toString()
+    const pubXml = await OpenSSL.pemToXmlRsaPublic(publicPath)
+
+    return {
+      pem: pubPem,
+      xml: pubXml
+    }
+  }
 }

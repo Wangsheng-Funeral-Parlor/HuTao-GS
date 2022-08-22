@@ -1,4 +1,3 @@
-import GlobalState from '@/globalState'
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
 class SdkStaticHandler extends Handler {
@@ -11,7 +10,7 @@ class SdkStaticHandler extends Handler {
     ])
   }
 
-  async request(req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
+  async request(req: HttpRequest): Promise<HttpResponse> {
     const path = req.url.pathname.split('/').slice(-1)[0]
     switch (path) {
       case 'combo':

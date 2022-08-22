@@ -36,13 +36,12 @@ export default class PacketHandler {
   }
 
   private unknownPacket(packetData: Buffer, packetID: number): void {
+    const { server, ptm } = this
+
     logger.warn('Unknown packet:', packetID)
+    if (!server.getGState('UseProtoMatch')) return
 
-    const { UseProtoMatch } = this.server.globalState.state
-
-    if (!UseProtoMatch) return
-
-    logger.debug('ProtoMatch:', packetID, JSON.stringify(this.ptm.parseBuffer(packetData), null, 2), JSON.stringify(this.ptm.findProto(packetData), null, 2))
+    logger.debug('ProtoMatch:', packetID, JSON.stringify(ptm.parseBuffer(packetData), null, 2), JSON.stringify(ptm.findProto(packetData), null, 2))
   }
 
   async handle(packetID: number, packetName: string, packetData: Buffer, context: PacketContext, ...any: any[]): Promise<void> {
@@ -84,7 +83,7 @@ export default class PacketHandler {
           break
       }
     } catch (err) {
-      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('No handler for packet:', this.server.globalState.state.ShowPacketId ? packetID : '-', packetName)
+      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('No handler for packet:', this.server.getGState('ShowPacketId') ? packetID : '-', packetName)
       else logger.error('Error handling packet:', err)
     }
   }

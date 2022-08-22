@@ -1,5 +1,4 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
-import GlobalState from '@/globalState'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { join } from 'path'
 
@@ -8,7 +7,7 @@ class WebstaticSeaHandler extends Handler {
     super(/^webstatic.*?\./, /^\/.*$/)
   }
 
-  async request(req: HttpRequest, _globalState: GlobalState): Promise<HttpResponse> {
+  async request(req: HttpRequest): Promise<HttpResponse> {
     const { host, pathname } = req.url
 
     const isPkg = __filename.indexOf('index.js') !== -1

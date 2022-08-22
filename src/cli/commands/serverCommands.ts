@@ -58,6 +58,13 @@ const serverCommands: CommandDefinition[] = [
     }
   },
   {
+    name: 'update',
+    desc: 'Update server',
+    exec: async (cmdInfo) => {
+      await cmdInfo.server.update.start()
+    }
+  },
+  {
     name: 'list',
     desc: 'List connected clients',
     allowPlayer: true,

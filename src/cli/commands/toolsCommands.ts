@@ -1,12 +1,12 @@
+import { update } from '@/tools/autoPatch'
 import { dumpEc2bKey } from '@/tools/ec2b'
 import keyGen from '@/tools/keyGen'
 import { decryptMetadata, encryptMetadata, patchMetadata } from '@/tools/metadata'
-import { update } from '@/tools/update'
 import { CommandDefinition } from '.'
 
 const toolsCommands: CommandDefinition[] = [
   {
-    name: 'update',
+    name: 'updateDispatch',
     desc: 'Fetch new dispatch data',
     exec: async () => update()
   },

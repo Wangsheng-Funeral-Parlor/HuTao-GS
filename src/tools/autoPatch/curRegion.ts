@@ -23,7 +23,7 @@ const host = `${hostMap[dispatchRegion]}.yuanshen.com`
 const protoPath = join(cwd(), `data/proto/QueryCurrRegionHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
 
-const logger = new Logger('UPDATE')
+const logger = new Logger('APATCH')
 
 async function decryptResponse(keyId: number, data: string): Promise<string> {
   if (keyId == null || data?.[0] !== '{') return data
