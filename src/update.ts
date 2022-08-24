@@ -186,6 +186,10 @@ export default class Update {
     return parseInt(process.env.COMMIT_HASH, 16) || null
   }
 
+  async isSameVersion(): Promise<boolean> {
+    return updateURL == null || await this.apiVersion(updateURL) === this.getBuildVersion()
+  }
+
   async getBuildContent(): Promise<UpdateContent> {
     if (proc.pkg == null) return null
 
@@ -212,7 +216,7 @@ export default class Update {
           if (updateURL == null) return logger.error('No update url.')
 
           logger.info('Comparing version...')
-          if ((await this.apiVersion(updateURL)) === this.getBuildVersion()) return logger.info('Same version, stop update.')
+          if (await this.isSameVersion()) return logger.info('Same version, stop update.')
 
           logger.info('Mismatch version, downloading update...')
           const newExePath = join(cwd(), 'Update.exe')
@@ -249,6 +253,15 @@ export default class Update {
           logger.error('Invalid update state: ' + updateState)
         }
       }
+    } catch (err) {
+      logger.error(err)
+    }
+  }
+
+  async checkForUpdate() {
+    try {
+      if (await this.isSameVersion()) return
+      logger.info('New update available, use /update to update.')
     } catch (err) {
       logger.error(err)
     }

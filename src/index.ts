@@ -42,4 +42,7 @@ if (parseArgs(process.argv).updateState != null) {
   // start server
   server.start()
   cli.start()
+
+  // check for update
+  server.update.checkForUpdate()
 }
