@@ -197,13 +197,18 @@ export default class Inventory {
     return itemList.find(item => item.guid === guid)
   }
 
+  getItemByItemId(itemId: number): Item {
+    const { itemList } = this
+    return itemList.find(item => item.itemId === itemId)
+  }
+
   countItems(itemType?: ItemTypeEnum): number {
     const { itemList } = this
 
     let count = 0
     for (const item of itemList) {
       if (itemType != null && itemType !== item.itemType) continue
-      count += item.count
+      count++
     }
 
     return count

@@ -9,6 +9,7 @@ import Avatar from '$/entity/avatar'
 import Vehicle from '$/entity/gadget/vehicle'
 import Equip from '$/equip'
 import AvatarData from '$/gameData/data/AvatarData'
+import MaterialData from '$/gameData/data/MaterialData'
 import EnergyManager from '$/manager/energyManager'
 import GuidManager from '$/manager/guidManager'
 import RuntimeIDManager from '$/manager/runtimeIDManager'
@@ -265,6 +266,9 @@ export default class Player extends BaseClass {
       avatarList.push(avatar)
     }
 
+    // Unlock all widgets
+    await this.unlockAllWidgets()
+
     // Unlock all new avatars
     await this.unlockAllAvatars()
 
@@ -304,10 +308,8 @@ export default class Player extends BaseClass {
     inventory.add(await Material.create(this, 221, 1000000), false)
     inventory.add(await Material.create(this, 222, 1000000), false)
 
-    // Give all music instrument
-    inventory.add(await Material.create(this, 220025), false) // lyre
-    inventory.add(await Material.create(this, 220044), false) // zither
-    inventory.add(await Material.create(this, 220051), false) // drum
+    // Unlock all widgets
+    await this.unlockAllWidgets()
 
     // Add main avatar
     const mainAvatar = new Avatar(this, avatarId)
@@ -344,6 +346,18 @@ export default class Player extends BaseClass {
     teamManager.destroy()
 
     this.unregisterHandlers()
+  }
+
+  async unlockAllWidgets() {
+    const { inventory } = this
+    const materialDataList = await MaterialData.getMaterialList()
+    const widgetList = materialDataList.filter(data => data.MaterialType === 'MATERIAL_WIDGET')
+
+    for (const materialData of widgetList) {
+      const { Id } = materialData
+      if (inventory.getItemByItemId(Id) != null) continue
+      await inventory.add(await Material.create(this, Id), false)
+    }
   }
 
   async unlockAllAvatars() {
