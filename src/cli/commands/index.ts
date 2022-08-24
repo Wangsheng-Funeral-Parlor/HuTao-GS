@@ -3,6 +3,7 @@ import Player from '$/player'
 import Server from '@/server'
 import { cRGB } from '@/tty'
 import avatarCommands from './avatarCommands'
+import configCommands from './configCommands'
 import debugCommands from './debugCommands'
 import entityCommands from './entityCommands'
 import inventoryCommands from './inventoryCommands'
@@ -13,7 +14,7 @@ import worldCommands from './worldCommands'
 
 export interface ArgumentDefinition {
   name: string
-  type?: string
+  type?: 'str' | 'flt' | 'int' | 'num' | 'b64' | 'hex'
   optional?: boolean
   dynamic?: boolean
 }
@@ -59,6 +60,7 @@ const commands: CommandDefinition[] = [
   ...serverCommands,
   ...debugCommands,
   ...toolsCommands,
+  ...configCommands,
 
   ...worldCommands,
   ...entityCommands,

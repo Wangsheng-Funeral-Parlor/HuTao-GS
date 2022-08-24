@@ -200,7 +200,7 @@ export default class CLI {
   }
 
   stop() {
-    this.tty.on('line', this.handleLine)
+    this.tty.off('line', this.handleLine)
   }
 
   print(...args: any[]) {

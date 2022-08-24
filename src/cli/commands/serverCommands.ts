@@ -1,3 +1,4 @@
+import Server from '@/server'
 import { noColor } from '@/tty'
 import commands, { CommandDefinition, helpFormatCommand } from '.'
 import CLI from '..'
@@ -45,16 +46,18 @@ const serverCommands: CommandDefinition[] = [
     name: 'stop',
     desc: 'Stop server',
     exec: async (cmdInfo) => {
-      (<CLI>cmdInfo.cli).stop()
-      cmdInfo.server.stop()
+      const { cli, server } = cmdInfo as { cli: CLI, server: Server }
+      cli.stop()
+      await server.stop()
     }
   },
   {
     name: 'restart',
     desc: 'Restart server',
     exec: async (cmdInfo) => {
-      (<CLI>cmdInfo.cli).stop()
-      cmdInfo.server.restart()
+      const { cli, server } = cmdInfo as { cli: CLI, server: Server }
+      cli.stop()
+      await server.restart()
     }
   },
   {
