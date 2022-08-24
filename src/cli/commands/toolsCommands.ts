@@ -1,7 +1,7 @@
 import { update } from '@/tools/autoPatch'
 import { dumpEc2bKey } from '@/tools/ec2b'
 import keyGen from '@/tools/keyGen'
-import { decryptMetadata, encryptMetadata, patchMetadata } from '@/tools/metadata'
+import { decryptMetadata, dumpStringLiterals, encryptMetadata, patchMetadata } from '@/tools/metadata'
 import { CommandDefinition } from '.'
 
 const toolsCommands: CommandDefinition[] = [
@@ -81,6 +81,25 @@ const toolsCommands: CommandDefinition[] = [
 
       try {
         await patchMetadata(args[0], args[1])
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
+    }
+  },
+  {
+    name: 'metadmpstr',
+    desc: 'Dump metadata strings',
+    args: [
+      { name: 'src', type: 'str' },
+      { name: 'dst', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await dumpStringLiterals(args[0], args[1])
         print('Success.')
       } catch (err) {
         printError(err)
