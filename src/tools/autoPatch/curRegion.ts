@@ -98,6 +98,7 @@ export const checkForUpdate = async (overrideSeed?: string): Promise<boolean> =>
 
 export const update = async (overrideSeed?: string): Promise<boolean> => {
   try {
+    if (hostMap[dispatchRegion] == null) throw new Error('Auto patch not supported for this version.')
     if (!await fileExists(protoPath)) throw new Error('Missing proto file.')
     if (dispatchSeed == null && overrideSeed == null) throw new Error('Missing dispatch seed.')
 

@@ -37,12 +37,12 @@ logger.debug('Launch arguments:', process.argv)
 
 if (parseArgs(process.argv).updateState != null) {
   // start update
-  server.update.start()
+  server.update?.start()
 } else {
   // start server
   server.start()
   cli.start()
 
   // check for update
-  server.update.checkForUpdate()
+  server.update?.checkForUpdate()
 }

@@ -2,6 +2,7 @@ import { update } from '@/tools/autoPatch'
 import { dumpEc2bKey } from '@/tools/ec2b'
 import keyGen from '@/tools/keyGen'
 import { decryptMetadata, dumpStringLiterals, encryptMetadata, patchMetadata } from '@/tools/metadata'
+import { UAList, UAPatch } from '@/tools/UAPatch'
 import { CommandDefinition } from '.'
 
 const toolsCommands: CommandDefinition[] = [
@@ -100,6 +101,42 @@ const toolsCommands: CommandDefinition[] = [
 
       try {
         await dumpStringLiterals(args[0], args[1])
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
+    }
+  },
+  {
+    name: 'ualist',
+    desc: 'List RSA keys in UA',
+    args: [
+      { name: 'path', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        (await UAList(args[0])).forEach((k, i) => print(`Key ${i}: ${k}`))
+      } catch (err) {
+        printError(err)
+      }
+    }
+  },
+  {
+    name: 'uapatch',
+    desc: 'Patch RSA key in UA',
+    args: [
+      { name: 'src', type: 'str' },
+      { name: 'dst', type: 'str' }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await UAPatch(args[0], args[1])
         print('Success.')
       } catch (err) {
         printError(err)

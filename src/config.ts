@@ -73,20 +73,15 @@ export const DEFAULT_CONFIG: Config = {
 
 export const SUPPORT_REGIONS = [
   'OSREL',
+  'OSCB',
   'CNCB'
 ]
 
 export const SUPPORT_VERSIONS = [
-  '1.6.51',
-  '2.6.0',
-  '2.7.0',
-  '2.8.0',
-  '2.8.50',
-  '2.8.51',
-  '2.8.52',
-  '2.8.53',
-  '2.8.54',
-  '3.0.0'
+  '1.6.51', '2.6.0', '2.7.0',
+  '2.8.0', '2.8.50', '2.8.51',
+  '2.8.52', '2.8.53', '2.8.54',
+  '3.0.0', '3.0.50'
 ]
 
 logger.info('Loading config...')

@@ -13,7 +13,7 @@ export default class DispatchKey {
   }
 
   static async getSigningKeyPair(keyId: number = dispatchKeyId): Promise<KeyPair> {
-    return OpenSSL.getKeyPair(join(cwd(), `data/key/${keyId}`), 'signing', signingKeySize)
+    return OpenSSL.getKeyPair(join(cwd(), `data/key/${keyId}`), 'signing', Math.min(signingKeySize, 2048)) // 3.0.5+ ua patch limit
   }
 
   static async getKeyPairs(keyId: number = dispatchKeyId): Promise<{ encrypt: KeyPair, signing: KeyPair }> {

@@ -179,7 +179,7 @@ export default class OpenSSL {
 
     if (!await fileExists(privatePath)) {
       if (generateKeySize == null) throw new Error(`${name}Private.pem is missing.`)
-      await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(generateKeySize, 1024))
+      await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(generateKeySize, 512))
     }
     if (!await fileExists(publicPath)) await OpenSSL.extractRsaPublicKey(privatePath, publicPath)
 

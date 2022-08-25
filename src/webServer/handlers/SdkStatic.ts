@@ -2,7 +2,7 @@ import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
 class SdkStaticHandler extends Handler {
   constructor() {
-    super(/(sdk-.*?static|api-beta-sdk)\./, [
+    super(/(sdk-.*?static|api-beta-sdk.*?)\./, [
       '/combo/box/api/config/sdk/combo',
       '/combo/box/api/config/sw/precache',
       /\/hk4e_.*?\/mdk\/shield\/api\/loadConfig/,

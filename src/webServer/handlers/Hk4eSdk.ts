@@ -8,7 +8,7 @@ import priceTier from '../priceTier.json'
 
 class Hk4eSdkHandler extends Handler {
   constructor() {
-    super(/^(hk4e-sdk|api-beta-sdk).*?\./, [
+    super(/^(hk4e-sdk|hk4e-beta-sdk|api-beta-sdk).*?\./, [
       /\/hk4e_.*?\/combo\/granter\/api\/compareProtocolVersion/,
       /\/hk4e_.*?\/combo\/granter\/login\/beforeVerify/,
       /\/hk4e_.*?\/combo\/granter\/login\/v2\/login/,
