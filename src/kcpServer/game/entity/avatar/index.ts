@@ -275,7 +275,7 @@ export default class Avatar extends Entity {
 
   exportAvatarInfo(): AvatarInfo {
     const { avatarId, guid, props, fightProps, skillManager, fetterList, /*excelInfo,*/ avatarType, lifeState, wearingFlycloakId, costumeId, bornTime } = this
-    const { skillDepotId, inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap, talentIdList } = skillManager.export()
+    const { skillDepotId, inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap, talentIdList } = skillManager.export() || {}
 
     return {
       avatarId,
@@ -319,7 +319,7 @@ export default class Avatar extends Entity {
   exportSceneAvatarInfo(): SceneAvatarInfo {
     const { player, avatarId, guid, weapon, skillManager, /*excelInfo,*/ wearingFlycloakId, costumeId, bornTime } = this
     const { uid, peerId } = player
-    const { skillDepotId, inherentProudSkillList, skillLevelMap, talentIdList } = skillManager.export()
+    const { skillDepotId, inherentProudSkillList, skillLevelMap, talentIdList } = skillManager.export() || {}
 
     return {
       uid,

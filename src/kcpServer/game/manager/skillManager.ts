@@ -102,7 +102,7 @@ export default class SkillManager {
   }
 
   export() {
-    return this.currentDepot?.export()
+    return this.currentDepot?.export() || null
   }
 
   exportUserData(): SkillManagerUserData {
