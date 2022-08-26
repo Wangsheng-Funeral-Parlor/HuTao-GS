@@ -1,5 +1,5 @@
 (() => { // NOSONAR
-  const APP_NAME = 'HuTao GS'
+  const APP_NAME = 'HuTao GS/EN'
   const CURRENT_PATH = location.href.replace(/#.*$/m, '')
   const BASE_PATH = CURRENT_PATH.match(/.*\/en-us/)[0]
   const SIDEBAR_TEMPLATE = [
@@ -9,7 +9,8 @@
       child: [
         'Building',
         'Resources',
-        'Running'
+        'Running',
+        'Troubleshooting'
       ]
     }
   ]
