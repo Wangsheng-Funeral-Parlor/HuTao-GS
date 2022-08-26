@@ -8,6 +8,7 @@ import Reliquary from '$/equip/reliquary'
 import Weapon from '$/equip/weapon'
 import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
+import SkillManager from '$/manager/skillManager'
 import Player from '$/player'
 import { EntityTypeEnum, EquipTypeEnum, PlayerPropEnum } from '@/types/enum'
 import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo, SceneTeamAvatar } from '@/types/proto'
@@ -16,7 +17,6 @@ import AvatarUserData from '@/types/user/AvatarUserData'
 import { getTimeSeconds } from '@/utils/time'
 import ExcelInfo from './excelInfo'
 import FetterList from './fetter/fetterList'
-import SkillDepot from './skill/skillDepot'
 
 const AvatarDefaultAbilities = [
   'Avatar_DefaultAbility_VisionReplaceDieInvincible',
@@ -36,7 +36,7 @@ export default class Avatar extends Entity {
 
   equipMap: { [type: number]: Equip }
 
-  skillDepot: SkillDepot
+  skillManager: SkillManager
   fetterList: FetterList
   excelInfo: ExcelInfo
 
@@ -54,7 +54,7 @@ export default class Avatar extends Entity {
 
     this.equipMap = {}
 
-    this.skillDepot = new SkillDepot(this)
+    this.skillManager = new SkillManager(this)
     this.fetterList = new FetterList(this)
     this.excelInfo = new ExcelInfo(this)
 
@@ -85,12 +85,12 @@ export default class Avatar extends Entity {
   }
 
   async init(userData: AvatarUserData) {
-    const { player, avatarId, skillDepot, fetterList, excelInfo, motion } = this
+    const { player, avatarId, skillManager, fetterList, excelInfo, motion } = this
     const { inventory } = player
     const {
       id,
       type,
-      skillDepotData,
+      skillsData,
       fettersData,
       weaponGuid,
       equipGuidList,
@@ -102,7 +102,7 @@ export default class Avatar extends Entity {
 
     await this.loadAvatarData()
 
-    await skillDepot.init(skillDepotData)
+    await skillManager.init(skillsData)
     await fetterList.init(fettersData)
     await excelInfo.init()
 
@@ -127,11 +127,11 @@ export default class Avatar extends Entity {
   }
 
   async initNew(avatarType: AvatarTypeEnum = AvatarTypeEnum.FORMAL, notify: boolean = true): Promise<void> {
-    const { player, avatarId, skillDepot, fetterList, excelInfo, motion } = this
+    const { player, avatarId, skillManager, fetterList, excelInfo, motion } = this
 
     await this.loadAvatarData()
 
-    await skillDepot.initNew()
+    await skillManager.initNew()
     await fetterList.initNew()
     await excelInfo.init()
 
@@ -274,8 +274,8 @@ export default class Avatar extends Entity {
   }
 
   exportAvatarInfo(): AvatarInfo {
-    const { avatarId, guid, props, fightProps, skillDepot, fetterList, /*excelInfo,*/ avatarType, lifeState, wearingFlycloakId, costumeId, bornTime } = this
-    const { skillDepotId, inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap, talentIdList } = skillDepot.export()
+    const { avatarId, guid, props, fightProps, skillManager, fetterList, /*excelInfo,*/ avatarType, lifeState, wearingFlycloakId, costumeId, bornTime } = this
+    const { skillDepotId, inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap, talentIdList } = skillManager.export()
 
     return {
       avatarId,
@@ -317,9 +317,9 @@ export default class Avatar extends Entity {
   }
 
   exportSceneAvatarInfo(): SceneAvatarInfo {
-    const { player, avatarId, guid, weapon, skillDepot, /*excelInfo,*/ wearingFlycloakId, costumeId, bornTime } = this
+    const { player, avatarId, guid, weapon, skillManager, /*excelInfo,*/ wearingFlycloakId, costumeId, bornTime } = this
     const { uid, peerId } = player
-    const { skillDepotId, inherentProudSkillList, skillLevelMap, talentIdList } = skillDepot.export()
+    const { skillDepotId, inherentProudSkillList, skillLevelMap, talentIdList } = skillManager.export()
 
     return {
       uid,
@@ -376,7 +376,7 @@ export default class Avatar extends Entity {
       guid,
       avatarId,
       avatarType,
-      skillDepot,
+      skillManager,
       fetterList,
       wearingFlycloakId,
       costumeId,
@@ -387,7 +387,7 @@ export default class Avatar extends Entity {
       guid: guid.toString(),
       id: avatarId,
       type: avatarType,
-      skillDepotData: skillDepot.exportUserData(),
+      skillsData: skillManager.exportUserData(),
       fettersData: fetterList.exportUserData(),
       equipGuidList: this.exportEquipList().map(equip => equip.guid.toString()),
       flycloak: wearingFlycloakId,

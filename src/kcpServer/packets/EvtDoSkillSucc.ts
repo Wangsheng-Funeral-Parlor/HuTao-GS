@@ -22,7 +22,7 @@ class EvtDoSkillSuccPacket extends Packet implements PacketInterface {
     const { avatarList } = context.player
     const { casterId, skillId } = data
 
-    const avatar = avatarList.find(a => a.entityId === casterId && a.skillDepot.energySkill?.id === skillId)
+    const avatar = avatarList.find(a => a.entityId === casterId && a.skillManager.energySkill?.id === skillId)
     if (!avatar) return
 
     await avatar.fightProps.drainEnergy(true, ChangeEnergyReasonEnum.CHANGE_ENERGY_SKILL_START)

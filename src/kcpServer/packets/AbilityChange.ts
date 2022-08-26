@@ -24,6 +24,10 @@ class AbilityChangePacket extends Packet implements PacketInterface {
 
     await super.sendNotify(context, notifyData)
   }
+
+  async broadcastNotify(contextList: PacketContext[], entity: Entity): Promise<void> {
+    await super.broadcastNotify(contextList, entity)
+  }
 }
 
 let packet: AbilityChangePacket

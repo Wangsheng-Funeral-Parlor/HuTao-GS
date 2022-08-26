@@ -1,3 +1,4 @@
+import Embryo from '$/ability/embryo'
 import SkillData from '$/gameData/data/SkillData'
 import { ElemTypeEnum } from '@/types/enum'
 import SkillUserData from '@/types/user/SkillUserData'
@@ -14,6 +15,9 @@ export default class Skill {
   costElemType?: ElemTypeEnum
   costElemVal: number
 
+  abilityName: string | null
+  abilityEmbryo: Embryo
+
   constructor(depot: SkillDepot, skillId: number) {
     this.depot = depot
     this.id = skillId
@@ -21,6 +25,8 @@ export default class Skill {
     this.costStamina = 0
     this.costElemType = 0
     this.costElemVal = 0
+
+    this.abilityName = null
   }
 
   async init(userData: SkillUserData) {
@@ -29,11 +35,13 @@ export default class Skill {
 
     this.level = level || 1
 
-    const { ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
+    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
 
     this.costStamina = CostStamina || 0
     this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
     this.costElemVal = CostElemVal || 0
+
+    this.abilityName = AbilityName || null
 
     if (ProudSkillGroupId == null) return
 
@@ -48,11 +56,13 @@ export default class Skill {
 
     this.level = 1
 
-    const { ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
+    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
 
     this.costStamina = CostStamina || 0
     this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
     this.costElemVal = CostElemVal || 0
+
+    this.abilityName = AbilityName || null
 
     if (ProudSkillGroupId == null) return
 

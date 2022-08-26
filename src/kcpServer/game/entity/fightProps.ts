@@ -298,11 +298,11 @@ export default class FightProp {
   }
 
   private getCostElemVal(): number {
-    return (this.entity as Avatar).skillDepot?.getCostElemVal() || 0
+    return (this.entity as Avatar).skillManager.costElemVal
   }
 
   private getCostElemType(): ElemTypeEnum {
-    return (this.entity as Avatar).skillDepot?.getCostElemType() || ElemTypeEnum.NONE
+    return (this.entity as Avatar).skillManager.costElemType
   }
 
   private getMaxEnergy(): number {

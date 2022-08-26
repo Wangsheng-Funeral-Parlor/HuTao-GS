@@ -130,12 +130,14 @@ export default class AbilityManager extends BaseClass {
     }
   }
 
-  addEmbryo(name: string = 'Default', overrideName: string = 'Default') {
+  addEmbryo(name: string = 'Default', overrideName: string = 'Default'): Embryo {
     const id = this.getNewId()
+    const embryo = new Embryo(this, id, name, overrideName)
 
-    this.embryoList.push(new Embryo(this, id, name, overrideName))
-
+    this.embryoList.push(embryo)
     logger.verbose('Register:', id, '->', `${name}[${overrideName}]`)
+
+    return embryo
   }
 
   removeEmbryo(embryo: Embryo) {

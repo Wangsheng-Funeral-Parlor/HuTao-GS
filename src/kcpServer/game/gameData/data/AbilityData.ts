@@ -2,6 +2,7 @@ import abilityHash from '$/ability/abilityHash'
 import Loader from '$/gameData/loader'
 import { AbilityConfigIdxEnum, AbilityModifierConfigIdxEnum } from '@/types/enum'
 import AbilityDataGroup from '@/types/gameData/AbilityData'
+import AbilityGroupConfig from '@/types/gameData/BinOutput/AbilityGroup'
 import AbilityConfig from '@/types/gameData/BinOutput/ConfigAbility'
 import ActionConfig from '@/types/gameData/BinOutput/ConfigAbility/Action'
 import { AbilityString } from '@/types/proto'
@@ -86,6 +87,8 @@ class AbilityDataLoader extends Loader {
 
     const { data } = this
     for (const groupName in data) {
+      if (groupName === 'Group') continue
+
       const group: { [name: string]: { [override: string]: AbilityConfig }[] } = data[groupName]
       if (group == null) continue
 
@@ -100,6 +103,11 @@ class AbilityDataLoader extends Loader {
 
   async getData(): Promise<AbilityDataGroup> {
     return super.getData()
+  }
+
+  async getAbilityGroup(name: string): Promise<AbilityGroupConfig> {
+    await this.getData()
+    return this.data?.Group?.[name] || null
   }
 
   async getAbility(name: string): Promise<AbilityConfig> {

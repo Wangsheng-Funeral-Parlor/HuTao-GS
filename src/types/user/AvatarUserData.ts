@@ -1,13 +1,13 @@
 import { AvatarTypeEnum } from '../proto/enum'
 import EntityUserData from './EntityUserData'
 import FettersUserData from './FettersUserData'
-import SkillDepotUserData from './SkillDepotUserData'
+import SkillManagerUserData from './SkillManagerUserData'
 
 export default interface AvatarUserData extends EntityUserData {
   guid: string
   id: number
   type: AvatarTypeEnum
-  skillDepotData: SkillDepotUserData
+  skillsData: SkillManagerUserData
   fettersData: FettersUserData
   weaponGuid?: string | false // compatibility
   equipGuidList: string[]

@@ -1,38 +1,116 @@
-import AvatarData from '$/gameData/data/AvatarData'
+import Embryo from '$/ability/embryo'
+import AbilityData from '$/gameData/data/AbilityData'
 import SkillData from '$/gameData/data/SkillData'
-import { ElemTypeEnum, PlayerPropEnum } from '@/types/enum'
+import SkillManager from '$/manager/skillManager'
+import { PlayerPropEnum } from '@/types/enum'
 import SkillDepotUserData from '@/types/user/SkillDepotUserData'
-import Avatar from '..'
 import InherentProudSkill from './inherentProudSkill'
 import Skill from './skill'
 import Talent from './talent'
 
-// TODO: Reimplement
-
 export default class SkillDepot {
-  avatar: Avatar
+  manager: SkillManager
+
   id: number
+
   inherentProudSkills: InherentProudSkill[]
   skills: Skill[]
   energySkill?: Skill
   talents: Talent[]
 
-  constructor(avatar: Avatar) {
-    this.avatar = avatar
+  extraAbilities: string[]
+  abilityEmbryos: Embryo[]
+
+  constructor(manager: SkillManager, id: number) {
+    this.manager = manager
+
+    this.id = id
 
     this.inherentProudSkills = []
     this.skills = []
     this.talents = []
+
+    this.extraAbilities = []
+    this.abilityEmbryos = []
+  }
+
+  private async loadSkillsData() {
+    const { id, inherentProudSkills, skills, talents, extraAbilities } = this
+
+    inherentProudSkills.splice(0)
+    skills.splice(0)
+    talents.splice(0)
+    extraAbilities.splice(0)
+
+    const depotData = await SkillData.getSkillDepot(id)
+    if (!depotData) return
+
+    // inherentProudSkills
+    for (const proudSkillOpen of depotData.InherentProudSkillOpens) {
+      const { ProudSkillGroupId, NeedAvatarPromoteLevel } = proudSkillOpen || {}
+      if (ProudSkillGroupId == null) continue
+
+      const proudSkillData = await SkillData.getProudSkillByGroup(ProudSkillGroupId)
+      if (proudSkillData == null) continue
+
+      inherentProudSkills.push(new InherentProudSkill(this, proudSkillData.Id, NeedAvatarPromoteLevel))
+    }
+
+    // skills
+    skills.push(...depotData.Skills.filter(skillId => skillId !== 0).map(skillId => new Skill(this, skillId)))
+    if (depotData.EnergySkill != null) this.energySkill = new Skill(this, depotData.EnergySkill)
+
+    // talents
+    talents.push(...depotData.Talents.map(talentId => new Talent(this, talentId)))
+
+    extraAbilities.push(
+      ...(depotData.ExtraAbilities || [])
+        .filter(ability => typeof ability === 'string' && ability.length > 0)
+    )
+
+    const abilityGroupData = await AbilityData.getAbilityGroup(depotData.SkillDepotAbilityGroup)
+    if (!abilityGroupData) return
+
+    extraAbilities.push(
+      ...(abilityGroupData.TargetAbilities || [])
+        .filter(ability => ability?.AbilityName)
+        .map(ability => ability.AbilityName)
+    )
+  }
+
+  private addSkillsEmbryos() {
+    const { manager, skills, energySkill } = this
+    const { avatar } = manager
+    const { abilityManager } = avatar
+    const skillList = [energySkill, ...skills].filter(skill => skill != null)
+
+    for (const skill of skillList) {
+      const { abilityName, abilityEmbryo } = skill
+      if (abilityEmbryo != null) abilityEmbryo.manager.removeEmbryo(abilityEmbryo)
+      skill.abilityEmbryo = abilityName ? abilityManager.addEmbryo(abilityName) : null
+    }
+  }
+
+  private removeSkillsEmbryos() {
+    const { skills, energySkill } = this
+    const skillList = [energySkill, ...skills].filter(skill => skill != null)
+
+    for (const skill of skillList) {
+      const { abilityEmbryo } = skill
+      if (abilityEmbryo == null) continue
+
+      abilityEmbryo.manager.removeEmbryo(abilityEmbryo)
+    }
   }
 
   async init(userData: SkillDepotUserData) {
-    await this.update()
+    await this.loadSkillsData()
 
     const { skills, talents, energySkill } = this
-    const { skillDataList, energySkillData } = userData
+    const { skillDataList, energySkillData } = userData || {}
 
     for (const skill of skills) {
-      const skillData = skillDataList.find(data => data.id === skill.id)
+      const skillData = skillDataList?.find(data => data.id === skill.id)
       if (!skillData) continue
 
       await skill.init(skillData)
@@ -47,7 +125,7 @@ export default class SkillDepot {
   }
 
   async initNew() {
-    await this.update()
+    await this.loadSkillsData()
 
     const { skills, talents, energySkill } = this
 
@@ -57,43 +135,30 @@ export default class SkillDepot {
     await energySkill?.initNew()
   }
 
-  async update() {
-    const { avatar, inherentProudSkills, skills, talents } = this
-    const promoteLevel = avatar.props.get(PlayerPropEnum.PROP_BREAK_LEVEL)
+  addEmbryos() {
+    const { manager, extraAbilities, abilityEmbryos } = this
+    const { avatar } = manager
+    const { abilityManager } = avatar
 
-    const avatarData = await AvatarData.getAvatar(avatar.avatarId)
-    if (!avatarData) return
+    this.addSkillsEmbryos()
 
-    const depotData = await SkillData.getSkillDepot(avatarData.SkillDepotId)
-    if (!depotData) return
+    for (const ability of extraAbilities) {
+      const embryo = abilityManager.addEmbryo(ability)
+      if (!embryo) continue
 
-    this.id = depotData.Id
-
-    // inherentProudSkills
-    for (const proudSkillOpen of depotData.InherentProudSkillOpens) {
-      if (proudSkillOpen.ProudSkillGroupId == null) continue
-      if (proudSkillOpen.NeedAvatarPromoteLevel != null && promoteLevel < proudSkillOpen.NeedAvatarPromoteLevel) continue
-
-      const proudSkillData = await SkillData.getProudSkillByGroup(proudSkillOpen.ProudSkillGroupId)
-      if (proudSkillData == null) continue
-
-      inherentProudSkills.push(new InherentProudSkill(this, proudSkillData.Id))
+      abilityEmbryos.push(embryo)
     }
-
-    // skills
-    skills.push(...depotData.Skills.filter(id => id !== 0).map(id => new Skill(this, id)))
-    if (depotData.EnergySkill != null) this.energySkill = new Skill(this, depotData.EnergySkill)
-
-    // talents
-    talents.push(...depotData.Talents.map(id => new Talent(this, id)))
   }
 
-  getCostElemVal(): number {
-    return this.energySkill?.costElemVal || 0
-  }
+  removeEmbryos() {
+    const { abilityEmbryos } = this
 
-  getCostElemType(): ElemTypeEnum {
-    return this.energySkill?.costElemType || ElemTypeEnum.NONE
+    this.removeSkillsEmbryos()
+
+    while (abilityEmbryos.length > 0) {
+      const embryo = abilityEmbryos.shift()
+      embryo.manager.removeEmbryo(embryo)
+    }
   }
 
   exportSkillLevelMap() {
@@ -113,11 +178,16 @@ export default class SkillDepot {
   }
 
   export() {
-    const { id, inherentProudSkills, talents } = this
+    const { manager, id, inherentProudSkills, talents } = this
+    const { avatar } = manager
+    const { props } = avatar
+    const promoteLevel = props.get(PlayerPropEnum.PROP_BREAK_LEVEL)
 
     return {
       skillDepotId: id,
-      inherentProudSkillList: inherentProudSkills.map(s => s.id),
+      inherentProudSkillList: inherentProudSkills
+        .filter(proudSkill => proudSkill.promoteLevel == null || promoteLevel >= proudSkill.promoteLevel)
+        .map(s => s.id),
       skillLevelMap: this.exportSkillLevelMap(),
       proudSkillExtraLevelMap: this.exportProudSkillExtraLevelMap(),
       talentIdList: talents.map(talent => talent.id)
@@ -125,9 +195,10 @@ export default class SkillDepot {
   }
 
   exportUserData(): SkillDepotUserData {
-    const { skills, energySkill } = this
+    const { id, skills, energySkill } = this
 
     return {
+      id,
       skillDataList: skills.map(skill => skill.exportUserData()),
       energySkillData: energySkill?.exportUserData() || false
     }

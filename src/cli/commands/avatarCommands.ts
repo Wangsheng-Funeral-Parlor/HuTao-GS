@@ -74,6 +74,37 @@ const avatarCommands: CommandDefinition[] = [
     }
   },
   {
+    name: 'setcs',
+    desc: 'Set cand skill',
+    args: [
+      { name: 'id', type: 'num' },
+      { name: 'uid', type: 'int', optional: true }
+    ],
+    allowPlayer: true,
+    exec: async (cmdInfo) => {
+      const { args, cli, sender, kcpServer } = cmdInfo
+      const { print, printError } = cli
+      const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
+
+      if (!player) {
+        printError('Player not found.')
+        return
+      }
+
+      const { currentAvatar } = player
+      if (!currentAvatar) {
+        printError('Current avatar is null.')
+        return
+      }
+
+      if (await currentAvatar.skillManager.setCandSkillId(args[0])) {
+        print(`Set cand skill to ${args[0]}.`)
+      } else {
+        printError('Skill not found.')
+      }
+    }
+  },
+  {
     name: 'setfp',
     desc: 'Set fight prop',
     args: [
