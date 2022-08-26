@@ -176,9 +176,25 @@ body {
   background-color: #fafafa;
 }
 
+.content .common {
+  margin: 2em;
+  padding: 12px 24px 12px 30px;
+  border-left: solid 5px var(--theme);
+  background-color: #fafafa;
+}
+
 .content .tip.important {
   border-color: #ff0000;
 }
+
+.content .common.error {
+  border-color: #ff0000;
+}
+
+.content .common.solved {
+  border-color: #0bdd63;
+}
+
 
 .content .color {
   padding: 0;
