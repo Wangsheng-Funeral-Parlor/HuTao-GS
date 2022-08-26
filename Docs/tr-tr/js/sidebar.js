@@ -1,7 +1,7 @@
 (() => { // NOSONAR
   const APP_NAME = 'HuTao GS'
   const CURRENT_PATH = location.href.replace(/#.*$/m, '')
-  const BASE_PATH = CURRENT_PATH.match(/.*\/Docs/)[0]
+  const BASE_PATH = CURRENT_PATH.match(/.*\/tr-tr/)[0]
   const SIDEBAR_TEMPLATE = [
     {
       title: 'Guide',
