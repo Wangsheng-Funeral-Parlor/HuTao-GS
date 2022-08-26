@@ -1,3 +1,4 @@
+import AbilityGroupConfig from './BinOutput/AbilityGroup'
 import AbilityConfig from './BinOutput/ConfigAbility'
 
 export default interface AbilityDataGroup {
@@ -12,5 +13,8 @@ export default interface AbilityDataGroup {
   }
   Monster: {
     [name: string]: { [override: string]: AbilityConfig }[]
+  },
+  Group: {
+    [name: string]: AbilityGroupConfig
   }
 }
