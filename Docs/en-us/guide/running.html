@@ -4,10 +4,10 @@
 <head>
   <title>HuTao GS documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../css/style.css">
-  <script src="../js/jquery.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="../../js/jquery.js"></script>
   <script src="../js/sidebar.js" defer></script>
-  <script src="../js/closestAnchor.js" defer></script>
+  <script src="../../js/closestAnchor.js" defer></script>
 </head>
 
 <body>
@@ -16,6 +16,8 @@
     <p class="tip important">Please complete the steps in <a href="./resources.html">Resources</a> before you continue.</p>
     <h2>Prerequisite</h2>
     <p><a href="https://github.com/openssl/openssl" target="_blank">openssl</a> (Or ask someone else to generate the certificates for you)</p>
+    <p>You need patch Metadata (Only for 3.0.0 and lower versions) You can patch it with in-console command </p>
+    <p class="tip"> You can join our discord server for more information about it! </p>
     <br>
     <br>
     <h2>Starting the server(Choose one)</h2>
@@ -35,7 +37,12 @@
     <h2>Connecting</h2>
     <p class="tip important">If you haven't already, do the steps listed on <a href="#a-install-ssl-certificate">Install SSL Certificate</a></p>
     <h3>Method 1: Fiddler</h3>
-    <code>/* Original script by NicknameGG, modified for Grasscutter by contributors, modified for HuTao GS by NotArandomGUY */
+    <ol>
+      <li><p>Download <a href="https://www.telerik.com/download/fiddler" target="_blank">Fiddler Classic</a> </p></li>
+      <li><p>Open Fiddler and go <strong>tools -> options -> https and Open Capture Https Connect then also open decrypt https traffic and Ignore server certificate errors then click <strong>Save Script</strong> </p></li>
+      <li><p>Then click <strong>ok</strong> </p></li>
+      <li><p>Go to <strong>Fiddler Script</strong> then paste the script below into Fiddler Script </p></li>
+      <code>/* Original script by NicknameGG, modified for Grasscutter by contributors, modified for HuTao GS by NotArandomGUY */
 import System;
 import System.Windows.Forms;
 import Fiddler;
@@ -50,6 +57,7 @@ class Handlers
         }
     }
 }</code>
+    </ol>
     <h3>Method 2: DNS (Recommended)</h3>
     <ol>
       <li><p>Press <strong>Win+R</strong></p></li>

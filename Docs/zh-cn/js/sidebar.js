@@ -1,17 +1,17 @@
 (() => { // NOSONAR
-  const APP_NAME = 'HuTao GS/TR'
+  const APP_NAME = 'HuTao GS/CN'
   const CURRENT_PATH = location.href.replace(/#.*$/m, '')
-  const BASE_PATH = CURRENT_PATH.match(/.*\/tr-tr/)[0]
+  const BASE_PATH = CURRENT_PATH.match(/.*\/zh-cn/)[0]
   const SIDEBAR_TEMPLATE = [
     {
       id: 'guide',
-      title: 'kılavuz',
+      title: '目录',
       heading: true,
       child: [
-        { id: 'building', title: 'Yapılandırma' },
-        { id: 'resources', title: 'Kaynaklar' },
-        { id: 'running', title: 'Server Başlatma' },
-        { id: 'troubleshooting', title: 'Sorun giderme' }
+        { id: 'building', title: '构建服务端' },
+        { id: 'resources', title: 'Resources' },
+        { id: 'running', title: '运行与连接' },
+        { id: 'troubleshooting', title: '问题解答' }
       ]
     }
   ]
