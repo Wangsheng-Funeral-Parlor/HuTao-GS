@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="cn">
 
-    <head>
-    <title>HuTao GS 使用说明</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/jquery.js"></script>
-    <script src="../js/sidebar.js" defer></script>
-    <script src="../js/closestAnchor.js" defer></script>
-  </head>
+<head>
+  <title>HuTao GS 使用说明</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../css/style.css">
+  <script src="../../js/jquery.js"></script>
+  <script src="../js/sidebar.js" defer></script>
+  <script src="../../js/closestAnchor.js" defer></script>
+</head>
 
-  <body>
-    <div class="content">
-      <h2>常见问题</h2>
-      <br>
-      <h3>端口被占用</h3>
-      <p class="common error"> 如果出现在CMD窗口中的最后一条消息不是<code>|INFO |[SERVER] Started</code>。那么服务端启动不正确，无法与游戏连接，这时可以向上滚动，可能会看到"port in use"的错误。因为服务器使用多个端口（如端口53）运行，存在部分端口被其他程序占用的情况。</p>
-      <h3>如何解决</h3>
-      <p class="common solved">  以管理员身份运行cmd并输入<code>stop sharedaccess</code>。可能会提示 "The Network Sharing Service could not be stopped"，如果是，则执行以下操作：Win+R，输入“services.msc”回车，点击“name”并输入“host”，找到Host Network service，右键停止。现在就可以禁用sharedaccess了。</p>
-    </body>
+<body>
+  <div class="content">
+    <h2>常见问题</h2>
+    <br>
+    <h3>端口被占用</h3>
+    <p class="common error"> 如果出现在CMD窗口中的最后一条消息不是<code>|INFO |[SERVER] Started</code>。那么服务端启动不正确，无法与游戏连接，这时可以向上滚动，可能会看到"port in use"的错误。因为服务器使用多个端口（如端口53）运行，存在部分端口被其他程序占用的情况。</p>
+    <h3>如何解决</h3>
+    <p class="common solved">  以管理员身份运行cmd并输入<code>stop sharedaccess</code>。可能会提示 "The Network Sharing Service could not be stopped"，如果是，则执行以下操作：Win+R，输入“services.msc”回车，点击“name”并输入“host”，找到Host Network service，右键停止。现在就可以禁用sharedaccess了。</p>
+  </div>
+</body>
+
+</html>

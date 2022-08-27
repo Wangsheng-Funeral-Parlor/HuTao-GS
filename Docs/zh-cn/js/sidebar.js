@@ -4,13 +4,14 @@
   const BASE_PATH = CURRENT_PATH.match(/.*\/zh-cn/)[0]
   const SIDEBAR_TEMPLATE = [
     {
-      title: 'Guide',
+      id: 'guide',
+      title: 'Guide<Need translation>',
       heading: true,
       child: [
-        'Building',
-        'Resources',
-        'Running',
-        'Troubleshooting'
+        { id: 'building', title: 'Building<Need translation>' },
+        { id: 'resources', title: 'Resources<Need translation>' },
+        { id: 'running', title: 'Running<Need translation>' },
+        { id: 'troubleshooting', title: 'Troubleshooting<Need translation>' }
       ]
     }
   ]
