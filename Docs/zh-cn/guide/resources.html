@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="cn">
+  
+<head>
+  <title>HuTao GS 使用说明</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/jquery.js"></script>
+  <script src="../js/sidebar.js" defer></script>
+  <script src="../js/closestAnchor.js" defer></script>
+</head>
+
+<body>
+  <div class="content">
+    <h1>Resources</h1>
+    <p class="tip important">请先完成 <a href="./building.html">构建</a> 的步骤再继续。</p>
+    <h2>生成 data</h2>
+    <ol>
+      <li><p>下载 HuTao-GD <a href="https://github.com/NotArandomGUY/HuTao-GD" target="_blank">Github</a></p></li>
+      <li><p>安装以下依赖项 </p>
+      <p> <code>npm install</code></p>
+      <p> <code>npm i typescript</code></p>
+      <p> <code>npm i tsc-alias</code></p></li>
+    <li><p>运行 <code>npm run build</code>进行构建</p></li>
+    <li><p>将resources里的文件夹放到 <strong>./InputData/{version}/</strong></p>
+      <p>例如：</p>
+      <p>HuTao-GD</p>
+      <p>├─InputData</p>
+      <p>│  └─X.X.X</p>
+      <p>│──├─BinOutput</p>
+      <p>│──├─ExcelBinOutput</p>
+      <p>│──└─Scripts</p></li>
+    <li><p>运行 <strong>RunConvert.bat</strong></p></li>
+    <li><p>从 <strong>./OutputData/{version}/*</strong> 复制到 <strong>(HuTaoGS)/data/game/{version}/</strong></p></li>
+    </ol>
+    <hr>
+    <p>是否阅读完毕? <a href="./running.html">下一页</a></p>
+  </div>
+</body>
+
+</html>
