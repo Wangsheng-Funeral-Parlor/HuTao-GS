@@ -16,6 +16,8 @@
     <p class="tip important">请先完成 <a href="./resources.html">Resources</a> 的步骤再继续。</p>
     <h2>运行条件</h2>
     <p>安装<a href="https://github.com/openssl/openssl" target="_blank">openssl</a>来生成证书 (或者让其他人给你生成)。</p>
+    <p>你需要patch Metadata (只适用于3.0以及更低的版本。) 你可以使用控制台命令对其进行修补。 </p>
+    <p class="tip"> 你可以加入我们的discord获取更多信息！ </p>
     <br>
     <br>
     <h2>开始(请选择你之前构建的版本)</h2>
@@ -52,6 +54,11 @@
     <h2>连接</h2>
     <p class="tip important">如果尚未安装SSL证书，则请先安装SSL证书。</a></p>
     <h3>方法1：Fiddler（本项目代理脚本与GC不相同）</h3>
+    <ol>
+    <li><p>下载 <a href="https://www.telerik.com/download/fiddler" target="_blank">Fiddler Classic</a> </p></li>
+    <li><p> 打开 Fiddler接着打开上方的 <strong>tools -> options -> https </strong>并且打开Capture Https Connect 打开解密 https 流量并忽略服务器证书错误，然后点击<strong>保存脚本 </strong> </p></li>
+    <li><p>点击<strong>确定</strong> </p></li>
+    <li><p>然后打开<strong>Fiddler Script</strong>然后将下面的脚本粘贴到Fiddler Script里并保存脚本 </p></li>
     <code>/* Original script by NicknameGG, modified for Grasscutter by contributors, modified for HuTao GS by NotArandomGUY */
 import System;
 import System.Windows.Forms;
