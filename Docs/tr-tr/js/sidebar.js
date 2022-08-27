@@ -5,7 +5,7 @@
   const SIDEBAR_TEMPLATE = [
     {
       id: 'guide',
-      title: 'Guide<Need translation>',
+      title: 'kılavuz',
       heading: true,
       child: [
         { id: 'building', title: 'Yapılandırma' },
