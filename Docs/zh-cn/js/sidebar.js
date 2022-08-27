@@ -5,13 +5,13 @@
   const SIDEBAR_TEMPLATE = [
     {
       id: 'guide',
-      title: 'Guide<Need translation>',
+      title: '目录',
       heading: true,
       child: [
-        { id: 'building', title: 'Building<Need translation>' },
-        { id: 'resources', title: 'Resources<Need translation>' },
-        { id: 'running', title: 'Running<Need translation>' },
-        { id: 'troubleshooting', title: 'Troubleshooting<Need translation>' }
+        { id: 'building', title: '构建服务端' },
+        { id: 'resources', title: 'Resources' },
+        { id: 'running', title: '运行与连接' },
+        { id: 'troubleshooting', title: '问题解答' }
       ]
     }
   ]
