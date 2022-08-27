@@ -42,7 +42,7 @@ export const DEFAULT_CONFIG: Config = {
   serverName: 'HuTao GS',
   hostIp: '127.0.0.1',
   sslDir: './ssl',
-  version: '2.7.0',
+  version: '3.0.0',
   packetsToDump: [],
 
   hostUpdate: false,
