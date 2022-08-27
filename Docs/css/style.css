@@ -169,13 +169,7 @@ body {
   padding: 4px 8px;
 }
 
-.content .tip {
-  margin: 2em;
-  padding: 12px 24px 12px 30px;
-  border-left: solid 5px var(--theme);
-  background-color: #fafafa;
-}
-
+.content .tip,
 .content .common {
   margin: 2em;
   padding: 12px 24px 12px 30px;
