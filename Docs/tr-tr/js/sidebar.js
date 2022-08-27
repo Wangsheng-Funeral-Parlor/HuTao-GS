@@ -8,10 +8,10 @@
       title: 'Guide<Need translation>',
       heading: true,
       child: [
-        { id: 'building', title: 'Building<Need translation>' },
-        { id: 'resources', title: 'Resources<Need translation>' },
-        { id: 'running', title: 'Running<Need translation>' },
-        { id: 'troubleshooting', title: 'Troubleshooting<Need translation>' }
+        { id: 'building', title: 'Yapılandırma' },
+        { id: 'resources', title: 'Kaynaklar' },
+        { id: 'running', title: 'Server Başlatma' },
+        { id: 'troubleshooting', title: 'Sorun giderme' }
       ]
     }
   ]
