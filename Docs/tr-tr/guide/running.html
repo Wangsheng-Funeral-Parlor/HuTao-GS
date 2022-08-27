@@ -16,6 +16,8 @@
     <p class="tip important">Lütfen öncelikle <a href="./resources.html">Kaynaklar'da</a> ki adımları tamamlayın.</p>
     <h2>Gerekenler</h2>
     <p><a href="https://github.com/openssl/openssl" target="_blank">openssl</a> (Veya birine sizin için sertifika almasını söyleyin)</p>
+    <p>Patchlanmış bir metadata dosyasına ihtiyacınız var (sadece 3.0.0 versiyonu veya alt versiyonlar için) MetaData dosyasını server komutlarındaki komutdan patchlayabilirsiniz. </p>
+    <p class="tip"> Daha fazla bilgi için discord sunucumuza gelebilirsin! </p>
     <br>
     <br>
     <h2>Sunucuyu başlatma(Birini seçin)</h2>
@@ -35,21 +37,28 @@
     <h2>Sunucuya Bağlanma</h2>
     <p class="tip important">Eğer ssl sertifikasını kurmadıysanız <a href="#a-install-ssl-certificate">SSL Sertifikasını indirin</a></p>
     <h3>1.Yöntem: Fiddler</h3>
-    <code>/* Original script by NicknameGG, modified for Grasscutter by contributors, modified for HuTao GS by NotArandomGUY */
-import System;
-import System.Windows.Forms;
-import Fiddler;
-import System.Text.RegularExpressions;
-
-class Handlers
-{
-    static function OnBeforeRequest(oS: Session) {
-        if(oS.host.EndsWith(".yuanshen.com") || oS.host.EndsWith(".hoyoverse.com") || oS.host.EndsWith(".mihoyo.com") || oS.uriContains("http://overseauspider.yuanshen.com:8888/log")){
-            oS.bypassGateway = true;
-            oS["x-overrideHost"] = '127.0.0.1';
-        }
-    }
-}</code>
+    <ol>
+      <h3>1. Yöntem: Fiddler</h3>
+      <li><p><a href="https://www.telerik.com/download/fiddler" target="_blank">Fiddler Classic'i</a> indirin </p></li>
+      <li><p> Fiddlerı açın ve <strong>tools -> options -> https'ye gidin ve Capture Https Connect'i açın ardından decrypt https traffic ve Ignore server certificate errors'u açın</strong> </p></li>
+      <li><p> Sonra <strong>Tamam'a</strong> basın </p></li>
+      <li><p><strong>Fiddler Script'e</strong> gidin sonra alttaki scripti fiddler scripte yapıştırın ve <strong>Save Script'e</strong> basın </p></li>
+      <code>/* Original script by NicknameGG, modified for Grasscutter by contributors, modified for HuTao GS by NotArandomGUY */
+  import System;
+  import System.Windows.Forms;
+  import Fiddler;
+  import System.Text.RegularExpressions;
+  
+  class Handlers
+  {
+      static function OnBeforeRequest(oS: Session) {
+          if(oS.host.EndsWith(".yuanshen.com") || oS.host.EndsWith(".hoyoverse.com") || oS.host.EndsWith(".mihoyo.com") || oS.uriContains("http://overseauspider.yuanshen.com:8888/log")){
+              oS.bypassGateway = true;
+              oS["x-overrideHost"] = '127.0.0.1';
+          }
+      }
+  }</code>
+  </ol>
     <h3>Method 2: DNS (Tercih Edilen)</h3>
     <ol>
       <li><p><strong>Win+R</strong> Tuşlarına basın</p></li>
