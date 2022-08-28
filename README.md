@@ -3,6 +3,8 @@
 ![pc-fork](./pc-fork.jpg)
 <!-- Source: https://www.kingarthurbaking.com/sites/default/files/styles/featured_image/public/blog-featured/lemon-zephyr-pancakes_0.jpg -->
 
+>For support please join our [Discord](https://discord.gg/4tZ96QMvHq).
+
 ## HuTao-GS's current features
 
 * Logging in
@@ -43,15 +45,10 @@ Run ```npm run build```
 * Put resources in ```./InputData/{version}/```
 ```bash
  Hutao-GD
-
 ├─InputData
-
 │ └─X.X.X
-
 │──├─BinOutput
-
 │──├─ExcelBinOutput
-
 │──└─Scripts
 ```
 * Execute RunConvert.bat
