@@ -60,27 +60,16 @@ Run ```npm run build```
 * Put protos in ./data/proto/*
 ```bash
  Hutao-GS
-
 ├─data
-
 │ └─Proto
-
 │──├─X.X.X
-
 │──├─ForceUpdateInfo.proto
-
 │──├─PacketHead.proto
-
 │──├─QueryCurrRegionHttpRsp.proto
-
 │──├─QueryRegionListHttpRsp.proto
-
 │──├─RegionInfo.proto
-
 │──├─RegionSimpleInfo.proto
-
 │──├─ResVersionConfig.proto
-
 │──└─StopServerInfo.proto
 ```
 ## Running ##
