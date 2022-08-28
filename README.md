@@ -25,11 +25,11 @@
 
 ## Building (Choose one) ##
 
-# Build development #
+## Build development ##
 Run ```npm run build-dev```
-# Build release(webpack) #
+## Build release(webpack) ##
 Run ```npm run build-rel```
-# Build release(executable) #
+## Build release(executable) ##
 Run ```npm run build```
 
 ## Resources ##
@@ -94,13 +94,13 @@ Run ```npm run build```
 
 ## Starting the server (Choose one) ##
 
-# Starting development server #
+## Starting development server ##
 Start server by running ```START-DEV.bat```
 
-# Starting release server(webpack) #
+## Starting release server(webpack) ##
 Start server by running ```START-REL.bat```
 
-# Starting release server(executable) #
+## Starting release server(executable) ##
 Start server by ```running HuTao-GS.exe``` ```(Located at ./dist directory)```
 
 ## Stopping ##
