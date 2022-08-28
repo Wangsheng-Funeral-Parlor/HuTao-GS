@@ -40,8 +40,8 @@ Run ```npm run build```
 
 * Download [HuTao-GD](https://github.com/NotArandomGUY/HuTao-GD)
 * Run ```npm run build```
-* Put resources in ./InputData/{version}/
-
+* Put resources in ```./InputData/{version}/```
+```bash
  Hutao-GD
 
 ├─InputData
@@ -52,8 +52,8 @@ Run ```npm run build```
 
 │──├─ExcelBinOutput
 
-│──└─Scripts Click Next
-
+│──└─Scripts
+```
 * Execute RunConvert.bat
 * Copy ./OutputData/{version}/* -> (HuTaoGS)/data/game/{version}/
 
@@ -61,7 +61,7 @@ Run ```npm run build```
 
 * Download HuTao-GD-Protos in [Discord/#resources](https://discord.com/invite/qGet4fdNAj)
 * Put protos in ./data/proto/*
-
+```bash
  Hutao-GS
 
 ├─data
@@ -85,7 +85,7 @@ Run ```npm run build```
 │──├─ResVersionConfig.proto
 
 │──└─StopServerInfo.proto
-
+```
 ## Running ##
 
 >Please complete the steps in Resources before you continue.
