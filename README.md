@@ -1,4 +1,4 @@
-# HuTao-GS
+# HuTao-GS / Nuclear Weapon Development
 
 ![pc-fork](./pc-forkk.jpg)
 <!-- Source: https://raw.githubusercontent.com/crowity/HuTao-GS/master/pc-forkk.jpg -->
