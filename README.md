@@ -3,6 +3,8 @@
 ![pc-fork](./pc-fork.jpg)
 <!-- Source: https://www.kingarthurbaking.com/sites/default/files/styles/featured_image/public/blog-featured/lemon-zephyr-pancakes_0.jpg -->
 
+>For support please join our [Discord](https://discord.gg/4tZ96QMvHq).
+
 ## HuTao-GS's current features
 
 * Logging in
@@ -25,11 +27,11 @@
 
 ## Building (Choose one) ##
 
-# Build development #
+## Build development ##
 Run ```npm run build-dev```
-# Build release(webpack) #
+## Build release(webpack) ##
 Run ```npm run build-rel```
-# Build release(executable) #
+## Build release(executable) ##
 Run ```npm run build```
 
 ## Resources ##
@@ -40,20 +42,15 @@ Run ```npm run build```
 
 * Download [HuTao-GD](https://github.com/NotArandomGUY/HuTao-GD)
 * Run ```npm run build```
-* Put resources in ./InputData/{version}/
-
+* Put resources in ```./InputData/{version}/```
+```bash
  Hutao-GD
-
 ├─InputData
-
 │ └─X.X.X
-
 │──├─BinOutput
-
 │──├─ExcelBinOutput
-
-│──└─Scripts Click Next
-
+│──└─Scripts
+```
 * Execute RunConvert.bat
 * Copy ./OutputData/{version}/* -> (HuTaoGS)/data/game/{version}/
 
@@ -61,31 +58,20 @@ Run ```npm run build```
 
 * Download HuTao-GD-Protos in [Discord/#resources](https://discord.com/invite/qGet4fdNAj)
 * Put protos in ./data/proto/*
-
+```bash
  Hutao-GS
-
 ├─data
-
 │ └─Proto
-
 │──├─X.X.X
-
 │──├─ForceUpdateInfo.proto
-
 │──├─PacketHead.proto
-
 │──├─QueryCurrRegionHttpRsp.proto
-
 │──├─QueryRegionListHttpRsp.proto
-
 │──├─RegionInfo.proto
-
 │──├─RegionSimpleInfo.proto
-
 │──├─ResVersionConfig.proto
-
 │──└─StopServerInfo.proto
-
+```
 ## Running ##
 
 >Please complete the steps in Resources before you continue.
@@ -94,13 +80,13 @@ Run ```npm run build```
 
 ## Starting the server (Choose one) ##
 
-# Starting development server #
+## Starting development server ##
 Start server by running ```START-DEV.bat```
 
-# Starting release server(webpack) #
+## Starting release server(webpack) ##
 Start server by running ```START-REL.bat```
 
-# Starting release server(executable) #
+## Starting release server(executable) ##
 Start server by ```running HuTao-GS.exe``` ```(Located at ./dist directory)```
 
 ## Stopping ##
