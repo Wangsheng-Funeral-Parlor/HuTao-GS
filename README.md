@@ -1,14 +1,14 @@
 # HuTao-GS
 
-![pc-fork](./pc-fork.jpg)
-<!-- Source: https://www.kingarthurbaking.com/sites/default/files/styles/featured_image/public/blog-featured/lemon-zephyr-pancakes_0.jpg -->
+![pc-fork](./pc-forkk.jpg)
+<!-- Source: https://raw.githubusercontent.com/crowity/HuTao-GS/master/pc-forkk.jpg -->
 
 >For support please join our [Discord](https://discord.gg/4tZ96QMvHq).
 
 ## HuTao-GS's current features
 
 * Logging in
-* Automaticly gives all characters
+* Automatically gives all characters
 * Combat (a bit laggy)
 * Spawning monsters
 
