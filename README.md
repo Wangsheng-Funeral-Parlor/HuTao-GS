@@ -1,7 +1,7 @@
 # HuTao-GS
 
-![pc-fork](./pc-fork.jpg)
-<!-- Source: https://www.kingarthurbaking.com/sites/default/files/styles/featured_image/public/blog-featured/lemon-zephyr-pancakes_0.jpg -->
+![pc-fork](./pc-forkk.jpg)
+<!-- Source: https://raw.githubusercontent.com/crowity/HuTao-GS/master/pc-forkk.jpg -->
 
 >For support please join our [Discord](https://discord.gg/4tZ96QMvHq).
 
