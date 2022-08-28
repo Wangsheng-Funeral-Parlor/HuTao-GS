@@ -8,7 +8,7 @@
 ## HuTao-GS's current features
 
 * Logging in
-* Automaticly gives all characters
+* Automatically gives all characters
 * Combat (a bit laggy)
 * Spawning monsters
 
