@@ -3,6 +3,8 @@
 ![pc-fork](./pc-forkk.jpg)
 <!-- Source: https://raw.githubusercontent.com/crowity/HuTao-GS/master/pc-forkk.jpg -->
 
+[EN](README.md) | [简中](README_zh-CN.md)
+
 >For support please join our [Discord](https://discord.gg/4tZ96QMvHq).
 
 ## HuTao-GS's current features
