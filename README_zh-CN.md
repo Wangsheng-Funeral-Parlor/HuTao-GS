@@ -5,9 +5,9 @@
 
 [EN](README.md) | [简中](README_zh-CN.md)
 
-## 快速设置指南
+## 使用指南
 
-**注意:** 如需帮助请加入 [Discord](https://discord.gg/4tZ96QMvHq).
+**注意:** 如需帮助请加入官方 [Discord](https://discord.gg/4tZ96QMvHq).
 
 ## HuTao-GS 当前功能
 
@@ -20,126 +20,28 @@
 
 * [Node-Js](https://nodejs.org/en/)
 * [Openssl](https://slproweb.com/products/Win32OpenSSL.html)
-* [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-* [Typescript](https://www.npmjs.com/package/typescript)
-* [Tsc-Alias](https://www.npmjs.com/package/tsc-alias)
+* [HuTao-GD](https://github.com/NotArandomGUY/HuTao-GD)
+* HuTao-GS-Protos [Discord/#resources](https://discord.gg/4tZ96QMvHq).
+* 准备相应版本的Resources文件
 
-## Setup ##
+## 步骤概述 ##
+* 1.安装所需软件
+* 2.下载所需文件至本地
+* 3.构建服务端
+* 4.使用Resources生成data
+* 5.将Proto放入HuTao-GS
+* 6.运行服务端
+* 7.安装自动生成的证书
+* 8.设置代理（GC代理不适用于HuTao-GS）
+* 9.开始游玩
 
-* Download repository
-* Install dependencies by running ```npm i```
+**详细步骤请下载 HuTao-GS 打开 HuTao-GS/Docs/zh-cn/index.html 进行阅读！ **
 
-## Building (Choose one) ##
+## 快速问题排除 ##
 
-## Build development ##
-Run ```npm run build-dev```
-## Build release(webpack) ##
-Run ```npm run build-rel```
-## Build release(executable) ##
-Run ```npm run build```
-
-## Resources ##
-
->Please complete the steps in Building before you continue.
-
-## Generate Data ##
-
-* Download [HuTao-GD](https://github.com/NotArandomGUY/HuTao-GD)
-* Run ```npm run build```
-* Put resources in ```./InputData/{version}/```
-```bash
- Hutao-GD
-├─InputData
-│ └─X.X.X
-│──├─BinOutput
-│──├─ExcelBinOutput
-│──└─Scripts
-```
-* Execute RunConvert.bat
-* Copy ./OutputData/{version}/* -> (HuTaoGS)/data/game/{version}/
-
-## Setup Protos ##
-
-* Download HuTao-GD-Protos in [Discord/#resources](https://discord.com/invite/qGet4fdNAj)
-* Put protos in ./data/proto/*
-```bash
- Hutao-GS
-├─data
-│ └─Proto
-│──├─X.X.X
-│──├─ForceUpdateInfo.proto
-│──├─PacketHead.proto
-│──├─QueryCurrRegionHttpRsp.proto
-│──├─QueryRegionListHttpRsp.proto
-│──├─RegionInfo.proto
-│──├─RegionSimpleInfo.proto
-│──├─ResVersionConfig.proto
-│──└─StopServerInfo.proto
-```
-## Running ##
-
->Please complete the steps in Resources before you continue.
-
-* You need patch Metadata (Only for 3.0.0 and lower versions) You can patch it with in-console command
-
-## Starting the server (Choose one) ##
-
-## Starting development server ##
-Start server by running ```START-DEV.bat```
-
-## Starting release server(webpack) ##
-Start server by running ```START-REL.bat```
-
-## Starting release server(executable) ##
-Start server by ```running HuTao-GS.exe``` ```(Located at ./dist directory)```
-
-## Stopping ##
-
-* Type ```stop``` in the server console then press enter to stop the server
-
->If you did not use the ```stop``` command to stop the server, any unsaved data will be lost.
-
-## Connecting ##
-
-## Method 1: Fiddler ##
-
-* Download [Fiddler Classic](https://www.telerik.com/download/fiddler)
-* Open Fiddler and go ```tools -> options -> https and Open Capture Https Connect then also open decrypt https traffic and Ignore server certificate errors then click Save Script```
-* Then click ok
-* Go to Fiddler Script then paste the script below into Fiddler Script
-
-[Fiddler Script](https://hastebin.com/uzexudoyeq.js)
-
-## Method 2: DNS (Recommended) ##
-
-* Press Win+R
-* Type ```ncpa.cpl```
-* Press enter
-* Right click on your network adapter
-* Select Properties
-* Inside This connection uses the following items select (TCP/IPv4) or (TCP/IPv6) depending on what you are using
-* Click Properties
-* Select Use the following dns server addresses
-* Type the ip address in hostIp of ```config.json``` or ```127.0.0.1``` if hosting locally
-* Press OK
-* (Optional but recommended) Run ```ipconfig /flushdns```
-* Have Fun!
-
->Remember to switch back to Obtain dns server address automatically after you are done playing.
-
-## Install SSL Certificate ##
-
-* Start the server
-* Wait until certificates are generated
-* Goto directory in ```sslDir``` of ```config.json``` or ```./ssl``` if you haven't changed it
-* Open ```ca.crt```
-* Click Install Certificate
-* Select Local Machine
-* Click Next
-* Click Yes if a prompt popped up
-* Select Place all certificates in the following store
-* Click Browse
-* Select Trusted Root Certification Authorities
-* Click OK
-* Click Next
-* Click Finish
+* 如果编译服务端失败
+      请检查 构建所需依赖 安装是否成功 可尝试重新安装
+* 运行服务端后证书没有自动生成
+      请确认 OpenSSL 的 bin 文件夹处于环境变量 `PATH` 中
+* 客户端无法登录、连接、错误 4206 等其他问题
+      可能是代理设置出现了*问题*
