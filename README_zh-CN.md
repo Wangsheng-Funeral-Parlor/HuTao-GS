@@ -5,16 +5,18 @@
 
 [EN](README.md) | [简中](README_zh-CN.md)
 
->For support please join our [Discord](https://discord.gg/4tZ96QMvHq).
+## 快速设置指南
 
-## HuTao-GS's current features
+**注意:** 如需帮助请加入 [Discord](https://discord.gg/4tZ96QMvHq).
 
-* Logging in
-* Automatically gives all characters
-* Combat (a bit laggy)
-* Spawning monsters
+## HuTao-GS 当前功能
 
-## Requirements ##
+* 登录
+* 自动给予所有角色及物品
+* 战斗
+* 生成怪物
+
+## 前期准备 ##
 
 * [Node-Js](https://nodejs.org/en/)
 * [Openssl](https://slproweb.com/products/Win32OpenSSL.html)
