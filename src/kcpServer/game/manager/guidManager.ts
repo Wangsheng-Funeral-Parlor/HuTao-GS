@@ -57,9 +57,10 @@ export default class GuidManager {
   isValidGuid(guid: bigint): boolean {
     if (guid == null) return false
 
-    const { player, usedId } = this
-    const { uid, id } = GuidManager.parseGuid(guid)
+    const { player, usedId, remapId } = this
+    if (remapId[guid.toString()]) return true
 
+    const { uid, id } = GuidManager.parseGuid(guid)
     return player.uid === uid && usedId.includes(id)
   }
 
