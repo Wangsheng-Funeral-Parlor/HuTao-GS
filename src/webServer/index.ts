@@ -102,7 +102,7 @@ export default class WebServer extends EventEmitter {
       server.on('error', err => logger.error(err))
 
       server.listen(port, () => {
-        logger.debug(`Listening on port ${cRGB(0xffffff, (server.address() as AddressInfo).port.toString())}`)
+        logger.info(`Listening on port ${cRGB(0xffffff, (server.address() as AddressInfo).port.toString())}`)
         if (++listening >= total) this.emit('listening')
       })
 

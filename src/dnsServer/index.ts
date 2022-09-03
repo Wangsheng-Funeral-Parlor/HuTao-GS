@@ -47,12 +47,12 @@ export default class DnsServer extends EventEmitter {
     let listening = 0
 
     this.tcp.listen(config.dnsPort, () => {
-      logger.debug('[TCP]', `Listening on port ${cRGB(0xffffff, this.tcpAddress().port.toString())}`)
+      logger.info('[TCP]', `Listening on port ${cRGB(0xffffff, this.tcpAddress().port.toString())}`)
       if (++listening >= 2) this.emit('listening')
     })
 
     this.udp.bind(config.dnsPort, () => {
-      logger.debug('[UDP]', `Listening on port ${cRGB(0xffffff, this.udpAddress().port.toString())}`)
+      logger.info('[UDP]', `Listening on port ${cRGB(0xffffff, this.udpAddress().port.toString())}`)
       if (++listening >= 2) this.emit('listening')
     })
   }
