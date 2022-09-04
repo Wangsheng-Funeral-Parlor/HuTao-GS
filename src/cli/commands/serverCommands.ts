@@ -74,12 +74,11 @@ const serverCommands: CommandDefinition[] = [
     exec: async (cmdInfo) => {
       const { cli, kcpServer } = cmdInfo
       const { print } = cli
-      const { clients } = kcpServer
+      const { clientList } = kcpServer
       const lines = []
 
-      for (const clientID in clients) {
-        const client = clients[clientID]
-        lines.push(`${client.uid?.toString()?.padStart(6, '0') || '------'}|${client.state.toString(16).padStart(4, '0').toUpperCase()}|${clientID}`)
+      for (const client of clientList) {
+        lines.push(`${client.uid?.toString()?.padStart(6, '0') || '------'}|${client.state?.toString(16)?.padStart(4, '0')?.toUpperCase()}|${client.conv?.toString(16)?.padStart(8, '0')?.toUpperCase()}`)
       }
 
       if (lines.length === 0) {
@@ -90,7 +89,7 @@ const serverCommands: CommandDefinition[] = [
       const maxLength = Math.max(...lines.map(line => line.length))
 
       print('='.repeat(maxLength))
-      print(' UID  | CS | clientID')
+      print(' UID  | CS | ID')
       print('='.repeat(maxLength))
       for (const line of lines) print(line)
       print('='.repeat(maxLength))
@@ -100,15 +99,14 @@ const serverCommands: CommandDefinition[] = [
     name: 'disconnect',
     desc: 'Disconnect client',
     args: [
-      { name: 'clientID|uid' },
+      { name: 'UID|ID' },
       { name: 'reason', type: 'int', optional: true }
     ],
     allowPlayer: true,
     exec: async (cmdInfo) => {
       const { args, cli, kcpServer } = cmdInfo
       cli.print('Attempt to disconnect:', args[0])
-      if (args[0].indexOf('_') === -1) kcpServer.disconnectUid(parseInt(args[0]), args[1])
-      else kcpServer.disconnect(args[0], args[1])
+      if (!await kcpServer.disconnect(parseInt(args[0], 16), args[1])) await kcpServer.disconnectUid(parseInt(args[0]), args[1])
     }
   },
   {

@@ -1,7 +1,3 @@
-import Logger from '@/logger'
-
-const logger = new Logger('HNDSHK', 0x59ff4a)
-
 export class Handshake {
   static MAGIC_CONNECT = [0xFF, 0xFFFFFFFF]
   static MAGIC_SEND_BACK_CONV = [0x145, 0x14514545]
@@ -53,8 +49,6 @@ export default (data: Buffer): Handshake => {
 
   switch (type) {
     case 255: { // 0xFF -- NEW CONNECTION
-      logger.debug('Connect')
-
       const handshakeReq = new Handshake()
       handshakeReq.decode(data)
 
@@ -68,8 +62,6 @@ export default (data: Buffer): Handshake => {
       return handshakeRes
     }
     case 404: { // 0x194 -- DISCONNECTION
-      logger.debug('Disconnect')
-
       const handshakeReq = new Handshake()
       handshakeReq.decode(data)
 
@@ -83,7 +75,6 @@ export default (data: Buffer): Handshake => {
       return handshakeRes
     }
     default:
-      logger.debug('Unhandled:', type)
       return null
   }
 }

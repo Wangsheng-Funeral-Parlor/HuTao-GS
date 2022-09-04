@@ -28,7 +28,7 @@ interface Config {
   httpPort: number
   httpsPort: number
   recorderPort: number
-  kcpPort: number
+  kcpPort: number[] | number
 
   // dns server
   domains: { [domain: string]: string | null } // domain to ip map

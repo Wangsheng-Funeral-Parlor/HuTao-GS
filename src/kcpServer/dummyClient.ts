@@ -13,13 +13,9 @@ export default class DummyClient extends Client {
   private loop: NodeJS.Timer
 
   constructor(server: KcpServer) {
-    super(server, 'SERVER_PLAYER', 0, 0, null)
+    super(server, 0xFFFFFFFF, null)
 
     this.loop = setInterval(this.update.bind(this), 1e3 / 30)
-  }
-
-  get rtt() {
-    return 0
   }
 
   // Destroy client
@@ -41,38 +37,8 @@ export default class DummyClient extends Client {
     if (player) player.emit('Update')
   }
 
-  // Decode received kcp packet
-  inputKcp(_buf: Buffer) {
-    return
-  }
-
-  // Send kcp output to socket
-  outputKcp(_data: Buffer) {
-    return
-  }
-
-  // Send packet using kcp
-  sendKcp(_packet: Buffer) {
-    return
-  }
-
-  // Read decoded kcp packet
-  recvKcp() {
-    return null
-  }
-
-  // Update kcp
-  updateKcp() {
-    return
-  }
-
-  // Send raw packet
-  async send(_packetName: string, _packetHead: Buffer, _packetData: Buffer, _seqId?: number) {
-    return
-  }
-
-  // Send protobuf packet
-  async sendProtobuf(packetName: string, _head: PacketHead, data: object) {
+  // Send packet
+  async sendPacket(packetName: string, _head: PacketHead, data: object) {
     const { player } = this
     if (!player) return
 

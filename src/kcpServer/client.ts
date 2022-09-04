@@ -1,13 +1,12 @@
 import BaseClass from '#/baseClass'
-import { Kcp } from '#/utils/kcp'
 import Player from '$/player'
 import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
-import { PacketHead, SocketContext } from '@/types/kcp'
+import { PacketHead } from '@/types/kcp'
 import { ENetReasonEnum } from '@/types/proto/enum'
 import MT19937 from '@/utils/mt19937'
 import KcpServer from './'
-import { Handshake } from './handshake'
+import KcpWorkerInterface from './socket/worker/kcpWorker/kcpWorkerInterface'
 import protoCleanup from './utils/protoCleanup'
 
 const logger = new Logger('CLIENT', 0xffdb4a)
@@ -19,61 +18,46 @@ const noCleanupPackets = [
 ]
 
 export default class Client extends BaseClass {
-  private conv: number
-  private token: number
-
-  private kcp: Kcp
-  private ctx: SocketContext
-
   server: KcpServer
 
-  id: string
+  conv: number
+  workerId: number
 
   state: ClientStateEnum
 
-  key: Buffer
-  seqId: number
   auid: string
   uid: number
   player: Player
 
+  deadLink: boolean
+  rtt: number
+
   readyToSave: boolean
   destroyed: boolean
 
-  constructor(server: KcpServer, id: string, conv: number, token: number, ctx: SocketContext) {
+  constructor(server: KcpServer, conv: number, workerId: number) {
     super()
 
     this.server = server
 
-    this.id = id
+    this.conv = conv
+    this.workerId = workerId
 
     this.state = ClientStateEnum.NONE
 
+    this.auid = null
+    this.uid = null
     this.player = null
-    this.key = null
-    this.seqId = 0
 
-    this.conv = conv
-    this.token = token
-
-    this.kcp = new Kcp(conv, token, this.outputKcp.bind(this))
-    this.kcp.setNodelay(true, 0, false)
-    this.kcp.setInterval(0)
-    this.kcp.setMaxResend(1024)
-
-    this.ctx = ctx
+    this.deadLink = false
+    this.rtt = 0
 
     this.readyToSave = false
   }
 
-  get rtt() {
-    return this.kcp.rtt
-  }
-
   // Destroy client
-  async destroy(enetReason: ENetReasonEnum = ENetReasonEnum.ENET_SERVER_KICK) {
-    const { server, player, conv, token, ctx } = this
-    const { address, port } = ctx
+  async destroy(_enetReason: ENetReasonEnum = ENetReasonEnum.ENET_SERVER_KICK) {
+    const { server, player } = this
 
     this.destroyed = true
 
@@ -81,65 +65,29 @@ export default class Client extends BaseClass {
     this.uid = null
 
     this.update()
-
-    const handshake = new Handshake(Handshake.MAGIC_DISCONNECT, conv, token, enetReason)
-    handshake.encode()
-
-    server.socket.send(handshake.buffer, 0, handshake.buffer.length, port, address)
   }
 
   // Update function
   update() {
-    const { server, kcp, player, state } = this
+    const { server, conv, player, state, deadLink } = this
 
-    if (state > ClientStateEnum.DEADLINK && kcp.isDeadLink()) {
+    if (state > ClientStateEnum.DEADLINK && deadLink) {
       this.state = ClientStateEnum.DEADLINK
-      server.disconnect(this.id)
+      server.disconnect(conv, ENetReasonEnum.ENET_TIMEOUT)
+      return
     }
-
-    this.updateKcp()
 
     this.emit('update')
     if (player) player.emit('Update')
   }
 
-  // Decode received kcp packet
-  inputKcp(buf: Buffer) {
-    this.kcp.input(buf)
-    this.updateKcp()
-  }
-
-  // Send kcp output to socket
-  outputKcp(data: Buffer) {
-    const { server, ctx } = this
-    const { address, port } = ctx
-
-    server.socket.send(data, 0, data.length, port, address)
-  }
-
-  // Send packet using kcp
-  sendKcp(packet: Buffer) {
-    this.kcp.send(packet)
-  }
-
-  // Read decoded kcp packet
-  recvKcp() {
-    const size = this.kcp.peekSize()
-    if (size <= 0) return null
-
-    const buf = Buffer.alloc(size)
-    if (this.kcp.recv(buf) <= 0) return null
-
-    return buf
-  }
-
-  // Update kcp
-  updateKcp() {
-    this.kcp.update(Date.now())
-  }
-
   // Generate xor key from seed
-  setKeyFromSeed(seed: bigint): void {
+  async setKeyFromSeed(seed: bigint): Promise<void> {
+    const { server, workerId } = this
+    const { socket } = server
+    const worker = socket.getWorker<KcpWorkerInterface>(workerId)
+    if (!worker) return
+
     logger.debug('Seed:', seed)
 
     const mt = new MT19937()
@@ -147,11 +95,10 @@ export default class Client extends BaseClass {
     mt.seed(mt.int64())
     mt.int64()
 
-    this.key = Buffer.alloc(4096)
+    const key = Buffer.alloc(4096)
+    for (let i = 0; i < 4096; i += 8) key.writeBigUInt64BE(mt.int64(), i)
 
-    for (let i = 0; i < 4096; i += 8) {
-      this.key.writeBigUInt64BE(mt.int64(), i)
-    }
+    await worker.setKey(key)
   }
 
   // Set client player uid
@@ -162,13 +109,8 @@ export default class Client extends BaseClass {
     this.uid = uid
   }
 
-  // Send raw packet
-  async send(packetName: string, packetHead: Buffer, packetData: Buffer, seqId?: number) {
-    await this.server.send(this, packetName, packetHead, packetData, seqId)
-  }
-
-  // Send protobuf packet
-  async sendProtobuf(packetName: string, packetHead: PacketHead, obj: object) {
-    await this.server.sendProtobuf(this, packetName, packetHead, noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj))
+  // Send packet
+  async sendPacket(packetName: string, packetHead: PacketHead, obj: object) {
+    await this.server.socket.sendPacket(this.conv, packetName, packetHead, noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj))
   }
 }

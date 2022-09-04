@@ -1,4 +1,3 @@
-import { spawn } from 'child_process'
 import { get } from 'https'
 import { join } from 'path'
 import { cwd } from 'process'
@@ -8,6 +7,7 @@ import Server from './server'
 import { UpdateApiRetcodeEnum } from './types/enum'
 import { UpdateApiResponse, UpdateContent } from './types/update'
 import { waitMs } from './utils/asyncWait'
+import { detachedSpawn } from './utils/childProcess'
 import { deleteFile, readFile, writeFile } from './utils/fileSystem'
 import OpenSSL, { Key, KeyPair } from './utils/openssl'
 import parseArgs from './utils/parseArgs'
@@ -42,20 +42,14 @@ export default class Update {
     logger.info('Stopping...')
     await this.server.runShutdownTasks(true)
 
-    const launchArgs = [`"${proc.argv[1]}"`, ...args]
-
     logger.info('Restarting...')
     logger.info('Path:', path)
-    logger.info('Args:', launchArgs)
+    logger.info('Args:', args)
 
-    spawn(
-      `"${path}"`,
-      launchArgs,
-      { detached: true, shell: true, stdio: 'ignore' }
-    ).on('spawn', () => {
-      logger.info('Exiting...')
-      proc.exit()
-    }).unref()
+    await detachedSpawn(path, [process.argv[1], ...args])
+
+    logger.info('Exiting...')
+    proc.exit()
   }
 
   private async tryWrite(path: string, data: Buffer) {
@@ -223,7 +217,7 @@ export default class Update {
           const newExeFile = await this.apiGetContent(updateURL)
           await this.tryWrite(newExePath, newExeFile)
 
-          await this.restart(newExePath, [`-updateState=${UpdateStateEnum.CLONE}`, `-oldPath="${proc.execPath}"`])
+          await this.restart(newExePath, [`-updateState=${UpdateStateEnum.CLONE}`, `-oldPath=${proc.execPath}`])
           break
         }
         case UpdateStateEnum.CLONE: {
@@ -235,7 +229,7 @@ export default class Update {
           const newExeFile = await readFile(newExePath)
           await this.tryWrite(oldExePath, newExeFile)
 
-          await this.restart(oldExePath, [`-updateState=${UpdateStateEnum.CLEAN}`, `-updatePath="${newExePath}"`])
+          await this.restart(oldExePath, [`-updateState=${UpdateStateEnum.CLEAN}`, `-updatePath=${newExePath}`])
           break
         }
         case UpdateStateEnum.CLEAN: {
@@ -246,7 +240,7 @@ export default class Update {
           await this.tryDelete(updateExePath)
           logger.info('Cleanup complete.')
 
-          await this.restart(proc.argv0, [])
+          await this.restart(proc.execPath, [])
           break
         }
         default: {

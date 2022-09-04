@@ -3,11 +3,41 @@ import { ClientStateEnum } from '@/types/enum'
 import { PacketHead } from '@/types/kcp'
 import { WaitOnBlock } from '@/utils/asyncWait'
 import { xor } from '@/utils/xor'
-import { verbosePackets } from '.'
 import Client from './client'
 const logger = new Logger('PACKET', 0x8810cd)
 
 const WAIT_TIMEOUT = 1800
+
+export const verbosePackets = [
+  'AbilityInvocationsNotify',
+  'AvatarFightPropUpdateNotify',
+  'ClientAbilityChangeNotify',
+  'ClientAbilityInitFinishNotify',
+  'ClientReportNotify',
+  'CombatInvocationsNotify',
+  'EntityAiSyncNotify',
+  'EntityConfigHashNotify',
+  'EntityFightPropChangeReasonNotify',
+  'EntityFightPropUpdateNotify',
+  'EvtAiSyncCombatThreatInfoNotify',
+  'EvtAiSyncSkillCdNotify',
+  'EvtAvatarUpdateFocusNotify',
+  'EvtDoSkillSuccNotify',
+  'EvtEntityRenderersChangedNotify',
+  'MonsterAIConfigHashNotify',
+  'PingReq',
+  'PingRsp',
+  'QueryPathReq',
+  'QueryPathRsp',
+  'SceneAudioNotify',
+  'SceneEntityMoveNotify',
+  'ScenePlayerLocationNotify',
+  'SceneTimeNotify',
+  'SetEntityClientDataNotify',
+  'UnionCmdNotify',
+  'WorldPlayerLocationNotify',
+  'WorldPlayerRTTNotify'
+]
 
 export interface PacketInterface {
   name: string
@@ -128,6 +158,10 @@ export default class Packet implements PacketInterface {
     return head
   }
 
+  static isPacket(buf: Buffer): boolean {
+    return buf.length > 5 && buf.readInt16BE(0) === 0x4567 && buf.readUInt16BE(buf.byteLength - 2) === 0x89AB
+  }
+
   static decode(buf: Buffer): { head: Buffer, data: Buffer } {
     const headLen = buf.readUInt16BE(4)
     const dataLen = buf.readUInt32BE(6)
@@ -156,12 +190,12 @@ export default class Packet implements PacketInterface {
 
   async response(context: PacketContext, data: any): Promise<void> {
     await context.wob.waitTick()
-    await context.client.sendProtobuf(`${this.name}Rsp`, this.getHead(context), data)
+    await context.client.sendPacket(`${this.name}Rsp`, this.getHead(context), data)
   }
 
   async sendNotify(context: PacketContext, data: any, ..._any: any[]): Promise<void> {
     await context.wob.waitTick()
-    await context.client.sendProtobuf(`${this.name}Notify`, this.getHead(context), data)
+    await context.client.sendPacket(`${this.name}Notify`, this.getHead(context), data)
   }
 
   async broadcastNotify(contextList: PacketContext[], ...data: any[]): Promise<void> {

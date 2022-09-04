@@ -149,7 +149,7 @@ export default class Game {
 
     // Logged in with another device
     if (!player && !mpWorld && playerMap[auid]) {
-      await server.disconnect(playerMap[auid].client.id, ENetReasonEnum.ENET_SERVER_RELOGIN)
+      await server.disconnect(playerMap[auid].client.conv, ENetReasonEnum.ENET_SERVER_RELOGIN)
     }
 
     if (!player) {

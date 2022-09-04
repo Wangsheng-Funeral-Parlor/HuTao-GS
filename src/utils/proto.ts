@@ -58,20 +58,20 @@ export const objToProtobuffer = async (obj: object, cmdId: number | string, comm
   }
 }
 
-export const dataToProtobuffer = async (data: Buffer, cmdId: number | string, common: boolean = false): Promise<any> => {
+export const dataToProtobuffer = async <T extends object>(data: Buffer, cmdId: number | string, common: boolean = false): Promise<T> => {
   const protoName = getNameByCmdId(cmdId)
   try {
     const type = await getProtoType(protoName.toString(), common)
     if (type == null) {
       if (canLogProto(protoName)) logger.warn('Missing proto:', protoName)
       await dumpProto(protoName, data)
-      return {}
+      return <T>{}
     }
-    return type.decode(data)
+    return <T>type.decode(data)
   } catch (err) {
     if (canLogProto(protoName)) logger.error((<Error>err).message)
     await dumpProto(protoName, data)
-    return {}
+    return <T>{}
   }
 }
 

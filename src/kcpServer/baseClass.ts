@@ -6,7 +6,7 @@ function getPropNames(proto: any): string[] {
   const ret = Object.getOwnPropertyNames(proto)
   ret.push(...getPropNames(proto.__proto__))
 
-  return ret
+  return ret.filter((n, i, arr) => arr.indexOf(n) === i)
 }
 
 export default class BaseClass extends EventEmitter {

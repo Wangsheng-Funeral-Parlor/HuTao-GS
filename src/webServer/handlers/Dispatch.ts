@@ -21,7 +21,8 @@ const {
   hostIp,
   dispatchHost,
   dispatchRegion,
-  autoPatch
+  autoPatch,
+  kcpPort
 } = config
 
 const clientCustomConfig = {
@@ -191,7 +192,7 @@ class DispatchHandler extends Handler {
     }
 
     curRegionData.regionInfo.gateserverIp = hostIp
-    curRegionData.regionInfo.gateserverPort = 22102
+    curRegionData.regionInfo.gateserverPort = Array.isArray(kcpPort) ? kcpPort[Math.floor(Math.random() * kcpPort.length)] : kcpPort
     curRegionData.regionInfo.payCallbackUrl = `https://${hostIp}/recharge`
 
     return objToProtobuffer(curRegionData, 'QueryCurrRegionHttpRsp', true)

@@ -1,20 +1,9 @@
 import Logger from '@/logger'
-import { exec } from 'child_process'
 import { join } from 'path'
+import { execCommand } from './childProcess'
 import { fileExists, readFile } from './fileSystem'
 
 const logger = new Logger('OPNSSL', 0x730c0a)
-
-function execCommand(cmd: string): Promise<string> {
-  return new Promise((res, rej) => {
-    const cp = exec(cmd)
-    let buffer = ''
-    cp.stdout.setEncoding('utf8')
-    cp.stdout.on('data', data => buffer += data)
-    cp.on('exit', () => res(buffer))
-    cp.on('error', (err) => rej(err))
-  })
-}
 
 function trimBuffer(buf: Buffer): Buffer {
   let i = 0

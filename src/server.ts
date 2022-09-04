@@ -2,18 +2,18 @@ import GlobalState from '@/globalState'
 import KcpServer from '@/kcpServer'
 import { waitMs } from '@/utils/asyncWait'
 import WebServer from '@/webServer'
-import { exec, spawn } from 'child_process'
 import { mkdirSync, statSync } from 'fs'
 import * as hostile from 'hostile'
 import { join } from 'path'
 import { PerformanceObserver } from 'perf_hooks'
-import { cwd } from 'process'
+import { argv, cwd, execPath, exit } from 'process'
 import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
 import DnsServer from './dnsServer'
 import Logger from './logger'
 import { cRGB } from './tty'
 import { Announcement } from './types/announcement'
 import Update from './update'
+import { detachedSpawn, execCommand } from './utils/childProcess'
 
 const {
   version,
@@ -132,12 +132,8 @@ export default class Server {
     return this.globalState.get(key)
   }
 
-  flushDNS(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const cp = exec('ipconfig /flushdns')
-      cp.on('exit', () => resolve())
-      cp.on('error', (err) => reject(err))
-    })
+  async flushDNS(): Promise<void> {
+    await execCommand('ipconfig /flushdns')
   }
 
   async setHosts(): Promise<void> {
@@ -250,9 +246,8 @@ export default class Server {
     await this.runShutdownTasks()
     await waitMs(delay)
 
-    process.argv[1] = `"${process.argv[1]}"`
-    spawn(`"${process.argv0}"`, process.argv.slice(1), { detached: true, shell: true, stdio: 'ignore' }).unref()
-    process.exit()
+    await detachedSpawn(execPath, argv.slice(1))
+    exit()
   }
 
   async stop(delay: number = 1e3): Promise<void> {
@@ -261,7 +256,7 @@ export default class Server {
     await this.runShutdownTasks(true)
     await waitMs(delay)
 
-    process.exit()
+    exit()
   }
 
   async runShutdownTasks(fullShutdown: boolean = false) {

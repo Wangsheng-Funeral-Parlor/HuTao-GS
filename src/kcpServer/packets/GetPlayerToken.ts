@@ -108,7 +108,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
 
     await this.response(context, rsp)
 
-    client.setKeyFromSeed(seed)
+    await client.setKeyFromSeed(seed)
     client.setUid(accountUid, uid)
 
     // Set client state

@@ -95,7 +95,7 @@ class PlayerLoginPacket extends Packet implements PacketInterface {
   async request(context: PacketContext, _data: PlayerLoginReq): Promise<void> {
     const { server, game, client } = context
 
-    if (!await game.playerLogin(context)) server.disconnect(client.id, ENetReasonEnum.ENET_LOGIN_UNFINISHED)
+    if (!await game.playerLogin(context)) server.disconnect(client.conv, ENetReasonEnum.ENET_LOGIN_UNFINISHED)
   }
 
   async response(context: PacketContext): Promise<void> {

@@ -1,7 +1,7 @@
 import fs from 'fs'
 const { appendFile } = fs.promises
 import { join } from 'path'
-import { cwd } from 'process'
+import { argv, cwd } from 'process'
 import { PerformanceObserverEntryList, performance } from 'perf_hooks'
 import getTTY, { TTY, cRGB, noColor } from './tty'
 import parseArgs from './utils/parseArgs'
@@ -47,7 +47,7 @@ export default class Logger {
   color: number
 
   constructor(name?: string, color: number = 0xffffff) {
-    this.tty = getTTY()
+    this.tty = parseArgs(argv).lm != null ? null : getTTY()
 
     this.name = name
     this.color = color
@@ -62,7 +62,7 @@ export default class Logger {
   }
 
   write(str: string) {
-    this.tty.write(str)
+    this.tty?.write(str)
   }
 
   log(level: LogLevel, ...args: any[]) {
@@ -101,7 +101,7 @@ export default class Logger {
 
     if (name != null) prefix += `[${cRGB(color, name)}]`
 
-    const logStr = tty.print(prefix, ...args)
+    const logStr = tty?.print(prefix, ...args)
     if (logHistory == null) return
 
     logHistory.push(noColor(logStr))
