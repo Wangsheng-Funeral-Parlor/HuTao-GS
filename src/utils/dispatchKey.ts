@@ -5,21 +5,21 @@ import { fileExists, readFile, writeFile } from './fileSystem'
 import { genEc2b, getEc2bKey } from './mhyCrypto/ec2b'
 import OpenSSL, { KeyPair } from './openssl'
 
-const { version, dispatchKeyId, signingKeySize } = config
+const { version, dispatchKeyId, serverKeySize } = config
 
 export default class DispatchKey {
-  static async getEncryptKeyPair(keyId: number = dispatchKeyId): Promise<KeyPair> {
-    return OpenSSL.getKeyPair(join(cwd(), `data/key/${keyId}`), 'encrypt')
+  static async getClientKeyPair(keyId: number = dispatchKeyId): Promise<KeyPair> {
+    return OpenSSL.getKeyPair(join(cwd(), `data/key/${keyId}`), 'client')
   }
 
-  static async getSigningKeyPair(keyId: number = dispatchKeyId): Promise<KeyPair> {
-    return OpenSSL.getKeyPair(join(cwd(), `data/key/${keyId}`), 'signing', Math.min(signingKeySize, 2048)) // 3.0.5+ ua patch limit
+  static async getServerKeyPair(keyId: number = dispatchKeyId): Promise<KeyPair> {
+    return OpenSSL.getKeyPair(join(cwd(), `data/key/${keyId}`), 'server', Math.min(serverKeySize, 2048)) // 3.0.5+ ua patch limit
   }
 
-  static async getKeyPairs(keyId: number = dispatchKeyId): Promise<{ encrypt: KeyPair, signing: KeyPair }> {
+  static async getKeyPairs(keyId: number = dispatchKeyId): Promise<{ client: KeyPair, server: KeyPair }> {
     return {
-      encrypt: await DispatchKey.getEncryptKeyPair(keyId),
-      signing: await DispatchKey.getSigningKeyPair(keyId)
+      client: await DispatchKey.getClientKeyPair(keyId),
+      server: await DispatchKey.getServerKeyPair(keyId)
     }
   }
 

@@ -45,13 +45,16 @@ export const patchMetadata = async (src: string, dst: string) => {
   const rsaKeys = stringLiterals.match(/<RSAKeyValue>.*?<\/RSAKeyValue>/gs)
   if (rsaKeys == null) throw new Error('Unable to find rsa keys.')
 
-  const originalKey = rsaKeys[rsaKeys.indexOf(rsaKeys.find(k => k.match(/<P>.+<\/P>/s) != null)) - 1]
-  const originalKeyOffset = originalKey ? data.indexOf(originalKey) : null
-  const originalKeyPointer = pointers.find(p => p.offset === originalKeyOffset)
-  if (originalKeyPointer == null) throw new Error('Unable to find signature key.')
-
-  const signingKey = await DispatchKey.getSigningKeyPair(config.dispatchKeyId)
-  buf = replaceStringLiteral(buf, originalKeyPointer, Buffer.from(signingKey.public.xml))
+  const serverPublicKey = rsaKeys[rsaKeys.indexOf(rsaKeys.find(k => k.match(/<P>.+<\/P>/s) != null)) - 1]
+  const serverPublicKeyOffset = serverPublicKey ? data.indexOf(serverPublicKey) : null
+  const serverPublicKeyPointer = pointers.find(p => p.offset === serverPublicKeyOffset)
+  if (serverPublicKeyPointer == null) {
+    console.log('Unable to find server public key.')
+  } else {
+    console.log('Replacing server public key...')
+    const serverKey = await DispatchKey.getServerKeyPair(config.dispatchKeyId)
+    buf = replaceStringLiteral(buf, serverPublicKeyPointer, Buffer.from(serverKey.public.xml))
+  }
 
   encryptGlobalMetadata(buf)
 

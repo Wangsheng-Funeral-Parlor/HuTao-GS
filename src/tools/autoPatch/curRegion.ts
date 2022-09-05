@@ -30,10 +30,10 @@ async function decryptResponse(keyId: number, data: string): Promise<string> {
 
   try {
     const response = JSON.parse(data)
-    const encryptKeyPair = await DispatchKey.getEncryptKeyPair(keyId)
+    const clientKeyPair = await DispatchKey.getClientKeyPair(keyId)
 
     return rsaDecrypt(
-      encryptKeyPair.private.pem,
+      clientKeyPair.private.pem,
       Buffer.from(response.content, 'base64')
     ).toString('base64')
   } catch (err) {

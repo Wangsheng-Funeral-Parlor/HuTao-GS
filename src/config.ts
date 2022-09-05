@@ -20,8 +20,10 @@ interface Config {
   dispatchSeed: string
   dispatchRegion: string
   dispatchKeyId: number
-  signingKeySize: number
   autoPatch: boolean
+
+  // RSA key
+  serverKeySize: number
 
   // port binding
   dnsPort: number
@@ -52,8 +54,9 @@ export const DEFAULT_CONFIG: Config = {
   dispatchSeed: null,
   dispatchRegion: 'OSREL',
   dispatchKeyId: 3,
-  signingKeySize: 2048,
   autoPatch: false,
+
+  serverKeySize: 2048,
 
   dnsPort: 53,
   httpPort: 80,

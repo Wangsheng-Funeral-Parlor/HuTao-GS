@@ -38,12 +38,6 @@ const clientCustomConfig = {
 }
 
 class DispatchHandler extends Handler {
-  keyMap: {
-    [id: number]: {
-      encrypt: string
-      signing: string
-    }
-  }
   nfvcCache: string
 
   constructor() {
@@ -59,8 +53,6 @@ class DispatchHandler extends Handler {
         '/dispatch/dispatch/getGateAddress'
       ]
     )
-
-    this.keyMap = {}
   }
 
   async request(req: HttpRequest): Promise<HttpResponse> {
@@ -93,8 +85,8 @@ class DispatchHandler extends Handler {
         const encoded = await this.curRegionRsp(searchParams.get('dispatchSeed'))
 
         response = {
-          content: rsaEncrypt(keyPairs.encrypt.public.pem, encoded).toString('base64'),
-          sign: rsaSign(keyPairs.signing.private.pem, encoded).toString('base64')
+          content: rsaEncrypt(keyPairs.client.public.pem, encoded).toString('base64'),
+          sign: rsaSign(keyPairs.server.private.pem, encoded).toString('base64')
         }
         break
       }

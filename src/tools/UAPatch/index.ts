@@ -116,10 +116,10 @@ export const UAPatch = async (src: string, dst: string): Promise<void> => {
 
   const buf = await readFile(src)
   const key = (await listKeys(buf)).find(k => !k.data.includes('<P>'))
-  if (key == null) throw new Error('Unable to find signature key.')
+  if (key == null) throw new Error('Unable to find server public key.')
 
-  const signingKey = await DispatchKey.getSigningKeyPair(config.dispatchKeyId)
-  writeKey(buf, key.offset, Buffer.from(signingKey.public.xml))
+  const serverKey = await DispatchKey.getServerKeyPair(config.dispatchKeyId)
+  writeKey(buf, key.offset, Buffer.from(serverKey.public.xml))
 
   await writeFile(dst, buf)
 }
