@@ -147,9 +147,7 @@ export default class WebServer extends EventEmitter {
       rsp.end('404')
       return
     } catch (err) {
-      const errMsg = (<Error>err).message
-
-      if (errMsg !== 'aborted') logger.error('Error handling request:', errMsg)
+      if (err?.message !== 'aborted') logger.error('Error handling request:', err)
 
       rsp.writeHead(500)
       rsp.end('500')
