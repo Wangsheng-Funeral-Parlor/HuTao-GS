@@ -9,7 +9,7 @@ import { UpdateApiResponse, UpdateContent } from './types/update'
 import { waitMs } from './utils/asyncWait'
 import { detachedSpawn } from './utils/childProcess'
 import { deleteFile, readFile, writeFile } from './utils/fileSystem'
-import OpenSSL, { Key, KeyPair } from './utils/openssl'
+import OpenSSL, { RSAKey, RSAKeyPair } from './utils/openssl'
 import parseArgs from './utils/parseArgs'
 import { rsaSign, rsaVerify } from './utils/rsa'
 import { stringXorDecode, stringXorEncode } from './utils/xor'
@@ -82,11 +82,11 @@ export default class Update {
     throw lastErr
   }
 
-  private async getKeyPair(): Promise<KeyPair> {
+  private async getKeyPair(): Promise<RSAKeyPair> {
     return OpenSSL.getKeyPair(join(cwd(), 'data/key'), 'update', 4096)
   }
 
-  private async getPublicKey(): Promise<Key> {
+  private async getPublicKey(): Promise<RSAKey> {
     return OpenSSL.getPublicKey(join(cwd(), 'data/key'), 'update')
   }
 
@@ -99,7 +99,7 @@ export default class Update {
 
     const decoded = <Buffer>stringXorDecode(contentBuf, contentBuf[contentBuf.length - 1] ^ (v & 0xFF), true)
     const publicKey = await this.getPublicKey()
-    const isValid = rsaVerify(publicKey.pem, decoded, signBuf)
+    const isValid = rsaVerify(publicKey, decoded, signBuf)
 
     if (isValid !== true) throw new Error('Invalid signature')
 
@@ -190,7 +190,7 @@ export default class Update {
     const buildVersion = this.getBuildVersion()
     const exeFile = await readFile(proc.execPath)
     const encodedContent = stringXorEncode(exeFile, buildVersion & 0xFF)
-    const contentSign = rsaSign((await this.getKeyPair()).private.pem, exeFile)
+    const contentSign = rsaSign((await this.getKeyPair()).private, exeFile)
 
     return {
       v: buildVersion,

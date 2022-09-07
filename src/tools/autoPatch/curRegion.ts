@@ -33,7 +33,7 @@ async function decryptResponse(keyId: number, data: string): Promise<string> {
     const clientKeyPair = await DispatchKey.getClientKeyPair(keyId)
 
     return rsaDecrypt(
-      clientKeyPair.private.pem,
+      clientKeyPair.private,
       Buffer.from(response.content, 'base64')
     ).toString('base64')
   } catch (err) {

@@ -86,7 +86,7 @@ export default class Authenticator {
     if (isCrypto) {
       try {
         const passwordKeyPair = await OpenSSL.getKeyPair(join(cwd(), 'data/key'), 'password', config.passwordKeySize)
-        pass = rsaDecrypt(passwordKeyPair.private.pem, Buffer.from(pass, 'base64')).toString('utf8')
+        pass = rsaDecrypt(passwordKeyPair.private, Buffer.from(pass, 'base64')).toString('utf8')
       } catch (err) {
         return {
           success: false,

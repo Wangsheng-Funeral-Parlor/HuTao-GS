@@ -94,13 +94,13 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
       const { client, server } = await DispatchKey.getKeyPairs(keyId)
 
       const cseedEncrypted = Buffer.from(clientSeed, 'base64')
-      const cseed = rsaDecrypt(server.private.pem, cseedEncrypted)
+      const cseed = rsaDecrypt(server.private, cseedEncrypted)
 
       const seedBuf = Buffer.alloc(8)
       seedBuf.writeBigUInt64BE(seed ^ cseed.readBigUInt64BE())
 
-      rsp.encryptedSeed = rsaEncrypt(client.public.pem, seedBuf).toString('base64')
-      rsp.seedSignature = rsaSign(server.private.pem, seedBuf).toString('base64')
+      rsp.encryptedSeed = rsaEncrypt(client.public, seedBuf).toString('base64')
+      rsp.seedSignature = rsaSign(server.private, seedBuf).toString('base64')
     } else {
       // < 2.7.50
       rsp.secretKeySeed = seed.toString()
