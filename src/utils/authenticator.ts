@@ -134,6 +134,17 @@ export default class Authenticator {
     const account = accounts.find(acc => acc?.uid === uid)
     const { name, tokens } = account || {}
 
+    if (tokens != null) {
+      let modified = false
+      for (const t in tokens) {
+        if (Date.now() - tokens[t] <= TOKEN_TTL) continue
+        delete tokens[t]
+        modified = true
+      }
+
+      if (modified) await setJsonAsync(dataPath, accounts)
+    }
+
     if (name == null || tokens?.[token] == null) {
       return {
         success: false,
@@ -141,21 +152,8 @@ export default class Authenticator {
       }
     }
 
-    if (tokens[token] < 0) {
-      delete tokens[token]
-    } else {
-      if (Date.now() - tokens[token] > TOKEN_TTL) {
-        delete tokens[token]
-        await setJsonAsync(dataPath, accounts)
-
-        return {
-          success: false,
-          message: 'Token expired'
-        }
-      }
-
-      tokens[token] = Date.now()
-    }
+    if (tokens[token] < 0) delete tokens[token]
+    else tokens[token] = Date.now()
 
     await setJsonAsync(dataPath, accounts)
 
