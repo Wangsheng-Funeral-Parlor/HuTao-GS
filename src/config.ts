@@ -23,6 +23,7 @@ interface Config {
   autoPatch: boolean
 
   // RSA key
+  passwordKeySize: number
   serverKeySize: number
 
   // port binding
@@ -56,6 +57,7 @@ export const DEFAULT_CONFIG: Config = {
   dispatchKeyId: 3,
   autoPatch: false,
 
+  passwordKeySize: 4096,
   serverKeySize: 2048,
 
   dnsPort: 53,

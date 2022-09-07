@@ -2,6 +2,7 @@ import KcpServer from '#/.'
 import Player from '$/player'
 import Server from '@/server'
 import { cRGB } from '@/tty'
+import accountCommands from './accountCommands'
 import avatarCommands from './avatarCommands'
 import configCommands from './configCommands'
 import debugCommands from './debugCommands'
@@ -62,6 +63,7 @@ const commands: CommandDefinition[] = [
   ...toolsCommands,
   ...configCommands,
 
+  ...accountCommands,
   ...worldCommands,
   ...entityCommands,
   ...avatarCommands,

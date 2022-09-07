@@ -9,6 +9,10 @@ export async function fileExists(path: string): Promise<boolean> {
   try { return (await stat(path)).isFile() } catch (err) { return false }
 }
 
+export async function fileSize(path: string): Promise<number> {
+  try { return (await stat(path)).size } catch (err) { return -1 }
+}
+
 export async function mkdir(path: string, opts?: fs.MakeDirectoryOptions): Promise<string> {
   return makeDirectory(path, opts)
 }

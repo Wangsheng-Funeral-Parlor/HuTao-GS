@@ -4,7 +4,9 @@ import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { getStringLiteralInfo, replaceStringLiteral } from '@/utils/metadata'
 import { decryptGlobalMetadata, encryptGlobalMetadata } from '@/utils/mhyCrypto/metadata'
-import { resolve } from 'path'
+import OpenSSL from '@/utils/openssl'
+import { join, resolve } from 'path'
+import { cwd } from 'process'
 
 export const decryptMetadata = async (src: string, dst: string) => {
   const srcPath = resolve(src)
@@ -45,6 +47,24 @@ export const patchMetadata = async (src: string, dst: string) => {
   const rsaKeys = stringLiterals.match(/<RSAKeyValue>.*?<\/RSAKeyValue>/gs)
   if (rsaKeys == null) throw new Error('Unable to find rsa keys.')
 
+  // Replace password key
+  const isCryptoOffset = stringLiterals.indexOf('is_crypto')
+  const passwordPublicKey = rsaKeys[
+    rsaKeys
+      .map((key, i) => [i, Math.abs(isCryptoOffset - stringLiterals.indexOf(key))])
+      .sort((a, b) => a[1] - b[1])[0]?.[0]
+  ]
+  const passwordPublicKeyOffset = passwordPublicKey ? data.indexOf(passwordPublicKey) : null
+  const passwordPublicKeyPointer = pointers.find(p => p.offset === passwordPublicKeyOffset)
+  if (passwordPublicKeyPointer == null) {
+    console.log('Unable to find password public key.')
+  } else {
+    console.log('Replacing password public key...')
+    const passwordKey = await OpenSSL.getKeyPair(join(cwd(), 'data/key'), 'password', config.passwordKeySize)
+    buf = replaceStringLiteral(buf, passwordPublicKeyPointer, Buffer.from(passwordKey.public.xml))
+  }
+
+  // Replace server key
   const serverPublicKey = rsaKeys[rsaKeys.indexOf(rsaKeys.find(k => k.match(/<P>.+<\/P>/s) != null)) - 1]
   const serverPublicKeyOffset = serverPublicKey ? data.indexOf(serverPublicKey) : null
   const serverPublicKeyPointer = pointers.find(p => p.offset === serverPublicKeyOffset)

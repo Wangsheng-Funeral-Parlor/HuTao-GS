@@ -1,8 +1,6 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 import config from '@/config'
-import UserData from '@/types/user'
-import hash from '@/utils/hash'
-import { getJson } from '@/utils/json'
+import { AuthResponse } from '@/utils/authenticator'
 import md5 from 'md5'
 import priceTier from '../priceTier.json'
 
@@ -38,10 +36,6 @@ class Hk4eSdkHandler extends Handler {
       default:
         return new HttpResponse('404 page not found', 404)
     }
-  }
-
-  private loadUserData(auid: string): false | UserData {
-    return getJson(`data/user/${hash(auid).slice(5, -5)}.json`, false)
   }
 
   private async compareProtocolVersion(req: HttpRequest): Promise<HttpResponse> {
@@ -128,100 +122,21 @@ class Hk4eSdkHandler extends Handler {
   }
 
   private async accountLogin(req: HttpRequest): Promise<HttpResponse> {
-    const { body } = req
+    const { webServer, body } = req
+    const { server } = webServer
+    const { auth } = server
     const { account, password, is_crypto } = body
 
-    console.log(body)
-
-    const uid = hash(`HTGS:${account}:${password}:${Number(is_crypto)}`).slice(0, 9)
-    const tokenBuf = Buffer.alloc(3)
-    tokenBuf.writeUInt16LE(Math.floor(0x10000 * Math.random()))
-    tokenBuf.writeUInt8(Math.floor(0x100 * Math.random()))
-
-    let name = 'New Player'
-
-    const userData = this.loadUserData(uid)
-    if (userData) name = userData.profileData.nickname
-
-    return new HttpResponse({
-      retcode: 0,
-      message: 'OK',
-      data: {
-        account: {
-          uid,
-          name: '',
-          email: name,
-          mobile: '',
-          is_email_verify: '0',
-          realname: '',
-          identity_card: '',
-          token: tokenBuf.toString('base64'),
-          safe_mobile: '',
-          facebook_name: '',
-          google_name: '',
-          twitter_name: '',
-          game_center_name: '',
-          apple_name: '',
-          sony_name: '',
-          tap_name: '',
-          country: 'HK',
-          reactivate_ticket: '',
-          area_code: '**',
-          device_grant_ticket: '',
-          steam_name: ''
-        },
-        device_grant_required: false,
-        safe_moblie_required: false,
-        reactivate_required: false,
-        realperson_required: false,
-        realname_operation: 'None'
-      }
-    })
+    return new HttpResponse(this.loginResponse(await auth.login(account, password, !!is_crypto)))
   }
 
   private async tokenLogin(req: HttpRequest): Promise<HttpResponse> {
-    const { body } = req
+    const { webServer, body } = req
+    const { server } = webServer
+    const { auth } = server
     const { uid, token } = body
 
-    let name = 'New Player'
-
-    const userData = this.loadUserData(uid)
-    if (userData) name = userData.profileData.nickname
-
-    return new HttpResponse({
-      retcode: 0,
-      message: 'OK',
-      data: {
-        account: {
-          uid,
-          name: '',
-          email: name,
-          mobile: '',
-          is_email_verify: '0',
-          realname: '',
-          identity_card: '',
-          token,
-          safe_mobile: '',
-          facebook_name: '',
-          google_name: '',
-          twitter_name: '',
-          game_center_name: '',
-          apple_name: '',
-          sony_name: '',
-          tap_name: '',
-          country: 'HK',
-          reactivate_ticket: '',
-          area_code: '**',
-          device_grant_ticket: '',
-          steam_name: ''
-        },
-        device_grant_required: false,
-        safe_moblie_required: false,
-        reactivate_required: false,
-        realperson_required: false,
-        realname_operation: 'None'
-      }
-    })
+    return new HttpResponse(this.loginResponse(await auth.verify(parseInt(uid), token)))
   }
 
   private async listPriceTier(_req: HttpRequest): Promise<HttpResponse> {
@@ -230,6 +145,51 @@ class Hk4eSdkHandler extends Handler {
       message: 'OK',
       data: priceTier
     })
+  }
+
+  private loginResponse(rsp: AuthResponse) {
+    const { success, message, uid, name, token } = rsp
+    if (success) {
+      return {
+        retcode: 0,
+        message,
+        data: {
+          account: {
+            uid,
+            name: '',
+            email: name,
+            mobile: '',
+            is_email_verify: '0',
+            realname: '',
+            identity_card: '',
+            token,
+            safe_mobile: '',
+            facebook_name: '',
+            google_name: '',
+            twitter_name: '',
+            game_center_name: '',
+            apple_name: '',
+            sony_name: '',
+            tap_name: '',
+            country: 'HK',
+            reactivate_ticket: '',
+            area_code: '**',
+            device_grant_ticket: '',
+            steam_name: ''
+          },
+          device_grant_required: false,
+          safe_moblie_required: false,
+          reactivate_required: false,
+          realperson_required: false,
+          realname_operation: 'None'
+        }
+      }
+    } else {
+      return {
+        retcode: -201,
+        message
+      }
+    }
   }
 }
 

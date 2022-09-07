@@ -13,6 +13,7 @@ import Logger from './logger'
 import { cRGB } from './tty'
 import { Announcement } from './types/announcement'
 import Update from './update'
+import Authenticator from './utils/authenticator'
 import { detachedSpawn, execCommand } from './utils/childProcess'
 
 const {
@@ -72,6 +73,7 @@ export default class Server {
   observer: PerformanceObserver
 
   update: Update
+  auth: Authenticator
 
   dnsServer: DnsServer
   webServer: WebServer
@@ -114,6 +116,7 @@ export default class Server {
     this.observer = new PerformanceObserver(list => logger.performance(list))
 
     this.update = new Update(this)
+    this.auth = new Authenticator('data/auth.json')
 
     this.dnsServer = new DnsServer(this)
     this.webServer = new WebServer(this)
