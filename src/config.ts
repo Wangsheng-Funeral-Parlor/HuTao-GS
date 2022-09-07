@@ -12,6 +12,7 @@ interface Config {
   packetsToDump: string[]
 
   // auto patcher
+  autoGamePatch: boolean
   gameDir: string | null
 
   // auto update
@@ -51,6 +52,7 @@ export const DEFAULT_CONFIG: Config = {
   version: '3.0.0',
   packetsToDump: [],
 
+  autoGamePatch: false,
   gameDir: null,
 
   hostUpdate: false,

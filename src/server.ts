@@ -10,15 +10,19 @@ import { argv, cwd, execPath, exit } from 'process'
 import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
 import DnsServer from './dnsServer'
 import Logger from './logger'
+import { patchGame, unpatchGame } from './tools/patcher'
 import { cRGB } from './tty'
 import { Announcement } from './types/announcement'
 import Update from './update'
 import Authenticator from './utils/authenticator'
 import { detachedSpawn, execCommand } from './utils/childProcess'
+import { dirExists } from './utils/fileSystem'
 
 const {
-  version,
   serverName,
+  version,
+  autoGamePatch,
+  gameDir,
   dispatchRegion,
   dispatchSeed,
   dispatchKeyId,
@@ -135,6 +139,24 @@ export default class Server {
     return this.globalState.get(key)
   }
 
+  async tryPatchGame() {
+    if (!autoGamePatch || !await dirExists(gameDir)) return
+    try {
+      await patchGame(gameDir)
+    } catch (err) {
+      logger.error('Error patching game:', err)
+    }
+  }
+
+  async tryUnpatchGame() {
+    if (!autoGamePatch || !await dirExists(gameDir)) return
+    try {
+      await unpatchGame(gameDir)
+    } catch (err) {
+      logger.error('Error unpatching game:', err)
+    }
+  }
+
   async flushDNS(): Promise<void> {
     await execCommand('ipconfig /flushdns')
   }
@@ -237,6 +259,8 @@ export default class Server {
       ])
       await kcpServer.start()
       await onListening()
+
+      await this.tryPatchGame()
     } catch (err) {
       logger.error('Error while starting:', err)
     }
@@ -274,6 +298,7 @@ export default class Server {
 
     if (fullShutdown) {
       await this.removeHosts()
+      await this.tryUnpatchGame()
     }
 
     observer.disconnect()
