@@ -212,7 +212,6 @@ export default class Server {
     observer.observe({ entryTypes: ['measure'], buffered: true })
 
     Logger.mark('Start')
-
     logger.info('Starting...')
 
     await this.setHosts()
@@ -222,22 +221,22 @@ export default class Server {
     async function onListening(): Promise<void> {
       if (++listening < 3) return
 
-      logger.info('Started.')
+      logger.info('Started. For help, type "help"')
       Logger.measure('Server start', 'Start')
     }
 
     dnsServer.on('listening', onListening)
     webServer.on('listening', onListening)
-    kcpServer.on('listening', onListening)
 
     try {
       dnsServer.start()
-      webServer.start([
+      await webServer.start([
         { port: httpPort },
         { port: httpsPort, useHttps: true },
         { port: recorderPort }
       ])
-      kcpServer.start()
+      await kcpServer.start()
+      await onListening()
     } catch (err) {
       logger.error('Error while starting:', err)
     }
