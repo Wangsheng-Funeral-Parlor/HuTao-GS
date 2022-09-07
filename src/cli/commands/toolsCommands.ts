@@ -1,7 +1,9 @@
+import config from '@/config'
 import { update } from '@/tools/autoPatch'
 import { dumpEc2bKey } from '@/tools/ec2b'
 import keyGen from '@/tools/keyGen'
 import { decryptMetadata, dumpStringLiterals, encryptMetadata, patchMetadata } from '@/tools/metadata'
+import { patchGame, unpatchGame } from '@/tools/patcher'
 import { UAList, UAPatch } from '@/tools/UAPatch'
 import { CommandDefinition } from '.'
 
@@ -29,6 +31,42 @@ const toolsCommands: CommandDefinition[] = [
 
       const key = await dumpEc2bKey(args[0], args[1])
       print(key.toString('hex'))
+    }
+  },
+  {
+    name: 'patchGame',
+    desc: 'Patch metadata & UA',
+    args: [
+      { name: 'gameDir', type: 'str', optional: true }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await patchGame(args[0] || config.gameDir)
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
+    }
+  },
+  {
+    name: 'unpatchGame',
+    desc: 'Unpatch metadata & UA',
+    args: [
+      { name: 'gameDir', type: 'str', optional: true }
+    ],
+    exec: async (cmdInfo) => {
+      const { args, cli } = cmdInfo
+      const { print, printError } = cli
+
+      try {
+        await unpatchGame(args[0] || config.gameDir)
+        print('Success.')
+      } catch (err) {
+        printError(err)
+      }
     }
   },
   {

@@ -11,6 +11,9 @@ interface Config {
   version: string
   packetsToDump: string[]
 
+  // auto patcher
+  gameDir: string | null
+
   // auto update
   hostUpdate: boolean
   updateURL: string | null
@@ -47,6 +50,8 @@ export const DEFAULT_CONFIG: Config = {
   sslDir: './ssl',
   version: '3.0.0',
   packetsToDump: [],
+
+  gameDir: null,
 
   hostUpdate: false,
   updateURL: null,
