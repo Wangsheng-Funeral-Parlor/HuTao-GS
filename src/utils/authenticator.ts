@@ -90,7 +90,7 @@ export default class Authenticator {
       } catch (err) {
         return {
           success: false,
-          message: 'Password decrypt fail'
+          message: err?.message || 'Password decrypt fail'
         }
       }
     }
