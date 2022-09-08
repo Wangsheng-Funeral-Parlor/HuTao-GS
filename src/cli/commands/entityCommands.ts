@@ -107,7 +107,7 @@ const entityCommands: CommandDefinition[] = [
   },
   {
     name: 'killall',
-    desc: 'Kill all nearby monsters (10 Max)',
+    desc: 'Kill all nearby monsters (32 Max)',
     args: [
       { name: 'uid', type: 'int', optional: true }
     ],
@@ -142,7 +142,7 @@ const entityCommands: CommandDefinition[] = [
 
       let i = 0
       for (const entity of entityList) {
-        if (i++ > 10) break
+        if (i++ > 32) break
         await entity.kill(0, PlayerDieTypeEnum.PLAYER_DIE_NONE, undefined, true)
       }
 
