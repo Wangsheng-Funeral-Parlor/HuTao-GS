@@ -180,11 +180,14 @@ export default class Scene extends BaseClass {
   }
 
   async initSceneBlocks() {
-    const { sceneBlockList, sceneBlockInit } = this
+    const { world, sceneBlockList, sceneBlockInit } = this
+    const { game } = world
+    const { server } = game
 
     if (sceneBlockInit) return
     this.sceneBlockInit = true
 
+    if (!server.getGState('WorldSpawn')) return
     for (const block of sceneBlockList) await block.initNew()
   }
 

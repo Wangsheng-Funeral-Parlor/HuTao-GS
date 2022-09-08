@@ -16,6 +16,7 @@ export interface GlobalStateData {
   PacketDump: boolean
   ShowPacketId: boolean
   UseProtoMatch: boolean
+  WorldSpawn: boolean
 }
 
 export default class GlobalState extends EventEmitter {
@@ -31,7 +32,8 @@ export default class GlobalState extends EventEmitter {
       SaveReport: false,
       PacketDump: false,
       ShowPacketId: false,
-      UseProtoMatch: false
+      UseProtoMatch: false,
+      WorldSpawn: true
     }
     this.modified = false
   }

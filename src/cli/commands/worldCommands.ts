@@ -5,6 +5,11 @@ import { CommandDefinition } from '.'
 
 const worldCommands: CommandDefinition[] = [
   {
+    name: 'worldSpawn',
+    desc: 'Enable/Disable world entity spawning',
+    exec: async (cmdInfo) => cmdInfo.server.globalState.toggle('WorldSpawn')
+  },
+  {
     name: 'coop',
     desc: 'Change to coop world',
     args: [
