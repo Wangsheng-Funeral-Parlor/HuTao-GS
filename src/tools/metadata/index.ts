@@ -48,12 +48,13 @@ export const patchMetadata = async (src: string, dst: string) => {
   if (rsaKeys == null) throw new Error('Unable to find rsa keys.')
 
   // Replace password key
-  const isCryptoOffset = stringLiterals.indexOf('is_crypto')
-  const passwordPublicKey = rsaKeys[
-    rsaKeys
-      .map((key, i) => [i, Math.abs(isCryptoOffset - stringLiterals.indexOf(key))])
-      .sort((a, b) => a[1] - b[1])[0]?.[0]
-  ]
+  const isCryptoOffset = data.indexOf('is_crypto')
+  const possiblyPasswordPublicKeyPointer = pointers[pointers.indexOf(pointers.find(p => p.offset === isCryptoOffset)) - 1]
+  const possiblyPasswordPublicKey = data.subarray(
+    possiblyPasswordPublicKeyPointer.offset,
+    possiblyPasswordPublicKeyPointer.offset + possiblyPasswordPublicKeyPointer.length
+  ).toString('utf8')
+  const passwordPublicKey = possiblyPasswordPublicKey.includes('<RSAKeyValue>') ? possiblyPasswordPublicKey : rsaKeys[0]
   const passwordPublicKeyOffset = passwordPublicKey ? data.indexOf(passwordPublicKey) : null
   const passwordPublicKeyPointer = pointers.find(p => p.offset === passwordPublicKeyOffset)
   if (passwordPublicKeyPointer == null) {

@@ -1,5 +1,6 @@
 import config from '@/config'
 import { deleteFile, dirExists, fileExists, fileSize, readFile, writeFile } from '@/utils/fileSystem'
+import { versionStrToNum } from '@/utils/version'
 import { join } from 'path'
 import { patchMetadata } from '../metadata'
 import { UAPatch } from '../UAPatch'
@@ -29,11 +30,7 @@ export async function patchGame(gameDir: string) {
     console.log(err)
   }
 
-  const clientVersion = (config.version?.match(/[\d.]+/)?.[0] || '0')
-    .split('.')
-    .map((n, i, arr) => (parseInt(n) & 0xFF) << (8 * ((arr.length - 1) - i)))
-    .reduce((sum, v) => sum + v, 0)
-  if (clientVersion < 0x030032) return
+  if (versionStrToNum(config.version) < 0x030032) return
 
   try {
     console.log('Patching UA...')
@@ -67,11 +64,7 @@ export async function unpatchGame(gameDir: string) {
     console.log(err)
   }
 
-  const clientVersion = (config.version?.match(/[\d.]+/)?.[0] || '0')
-    .split('.')
-    .map((n, i, arr) => (parseInt(n) & 0xFF) << (8 * ((arr.length - 1) - i)))
-    .reduce((sum, v) => sum + v, 0)
-  if (clientVersion < 0x030032) return
+  if (versionStrToNum(config.version) < 0x030032) return
 
   try {
     console.log('Unpatching UA...')

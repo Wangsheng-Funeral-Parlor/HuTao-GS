@@ -8,6 +8,7 @@ import { AddressInfo } from 'net'
 import EventEmitter from 'promise-events'
 import Handler, { HttpRequest, HttpResponse } from './handler'
 import AbtestApi from './handlers/AbtestApi'
+import Account from './handlers/Account'
 import ApiAccount from './handlers/ApiAccount'
 import Dispatch from './handlers/Dispatch'
 import Hk4eApi from './handlers/Hk4eApi'
@@ -54,6 +55,7 @@ export default class WebServer extends EventEmitter {
       AbtestApi,
       SdkStatic,
       Update,
+      Account,
       WebstaticSea
     ]
 

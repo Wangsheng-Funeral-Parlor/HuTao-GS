@@ -1,10 +1,12 @@
 import BaseClass from '#/baseClass'
 import Player from '$/player'
+import config from '@/config'
 import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
 import { PacketHead } from '@/types/kcp'
 import { ENetReasonEnum } from '@/types/proto/enum'
 import MT19937 from '@/utils/mt19937'
+import { versionStrToNum } from '@/utils/version'
 import KcpServer from './'
 import KcpWorkerInterface from './socket/worker/kcpWorker/kcpWorkerInterface'
 import protoCleanup from './utils/protoCleanup'
@@ -88,12 +90,16 @@ export default class Client extends BaseClass {
     const worker = socket.getWorker<KcpWorkerInterface>(workerId)
     if (!worker) return
 
-    logger.debug('Seed:', seed)
+    const doubleInit = versionStrToNum(config.version) >= 0x010500
+    logger.debug('Seed:', seed, doubleInit)
 
     const mt = new MT19937()
     mt.seed(seed)
-    mt.seed(mt.int64())
-    mt.int64()
+
+    if (doubleInit) {
+      mt.seed(mt.int64())
+      mt.int64()
+    }
 
     const key = Buffer.alloc(4096)
     for (let i = 0; i < 4096; i += 8) key.writeBigUInt64BE(mt.int64(), i)

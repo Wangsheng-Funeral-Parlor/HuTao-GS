@@ -10,6 +10,7 @@ class ReportHandler extends Handler {
     super(
       /^.*?log-upload.*?\..*$/,
       [
+        '/client/event/dataUpload',
         '/crash/dataUpload',
         '/perf/config/verify',
         '/perf/dataUpload',
