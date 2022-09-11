@@ -1,6 +1,6 @@
 import AbilityManager from '$/manager/abilityManager'
 import { AbilityEmbryo } from '@/types/proto'
-import abilityHash from './abilityHash'
+import { getStringHash } from '@/utils/hash'
 
 export default class Embryo {
   manager: AbilityManager
@@ -21,8 +21,8 @@ export default class Embryo {
     const { id, name, overrideName } = this
     return {
       abilityId: id,
-      abilityNameHash: abilityHash(name),
-      abilityOverrideNameHash: abilityHash(overrideName)
+      abilityNameHash: getStringHash(name),
+      abilityOverrideNameHash: getStringHash(overrideName)
     }
   }
 }

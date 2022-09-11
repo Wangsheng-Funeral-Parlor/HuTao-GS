@@ -8,7 +8,7 @@ import ActionConfig from '@/types/gameData/BinOutput/ConfigAbility/Action'
 import HealHP from '@/types/gameData/BinOutput/ConfigAbility/Action/HealHP'
 import LoseHP from '@/types/gameData/BinOutput/ConfigAbility/Action/LoseHP'
 import { ChangeHpReasonEnum } from '@/types/proto/enum'
-import abilityHash from './abilityHash'
+import { getStringHash } from '@/utils/hash'
 import AppliedAbility from './appliedAbility'
 
 const MathOp = ['MUL', 'ADD']
@@ -73,7 +73,7 @@ export default class AbilityAction extends BaseClass {
     val = val.toString()
     if (!isNaN(parseFloat(val))) return parseFloat(val)
 
-    return Number(ability?.overrideMapContainer?.getValue({ hash: abilityHash(val), str: val })?.val || 0)
+    return Number(ability?.overrideMapContainer?.getValue({ hash: getStringHash(val), str: val })?.val || 0)
   }
 
   private getTargetList(config: HealHP | LoseHP, target?: Entity): Entity[] {

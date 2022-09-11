@@ -1,4 +1,3 @@
-import abilityHash from '$/ability/abilityHash'
 import Loader from '$/gameData/loader'
 import { AbilityConfigIdxEnum, AbilityModifierConfigIdxEnum } from '@/types/enum'
 import AbilityDataGroup from '@/types/gameData/AbilityData'
@@ -6,6 +5,7 @@ import AbilityGroupConfig from '@/types/gameData/BinOutput/AbilityGroup'
 import AbilityConfig from '@/types/gameData/BinOutput/ConfigAbility'
 import ActionConfig from '@/types/gameData/BinOutput/ConfigAbility/Action'
 import { AbilityString } from '@/types/proto'
+import { getStringHash } from '@/utils/hash'
 
 const sortStr = (a: string, b: string) => a < b ? -1 : 1
 
@@ -60,7 +60,7 @@ class AbilityDataLoader extends Loader {
 
   private addString(str: string): void {
     if (typeof str !== 'string') return
-    this.hashMap[abilityHash(str)] = str
+    this.hashMap[getStringHash(str)] = str
   }
 
   private loadAbilityConfig(config: AbilityConfig) {

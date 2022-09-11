@@ -4,7 +4,6 @@ import AbilityInvocations from '#/packets/AbilityInvocations'
 import ClientAbilityChange from '#/packets/ClientAbilityChange'
 import ClientAbilityInitFinish from '#/packets/ClientAbilityInitFinish'
 import AbilityAction from '$/ability/abilityAction'
-import abilityHash from '$/ability/abilityHash'
 import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
 import AppliedAbility from '$/ability/appliedAbility'
 import AppliedModifier from '$/ability/appliedModifier'
@@ -14,6 +13,7 @@ import AbilityData from '$/gameData/data/AbilityData'
 import Logger from '@/logger'
 import { AbilityActionCreateGadget, AbilityActionGenerateElemBall, AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaModifierDurabilityChange, AbilityMetaReInitOverrideMap, AbilityMetaSetKilledState, AbilityScalarValueEntry, AbilityString, AbilitySyncStateInfo } from '@/types/proto'
 import { AbilityInvokeArgumentEnum, ModifierActionEnum } from '@/types/proto/enum'
+import { getStringHash } from '@/utils/hash'
 import { dataToProtobuffer } from '@/utils/proto'
 
 const protoLookupTable = {
@@ -228,8 +228,8 @@ export default class AbilityManager extends BaseClass {
 
       const ability = this.applyAbility(id)
 
-      ability.setAbilityName({ hash: abilityHash(name) })
-      ability.setAbilityOverride({ hash: abilityHash(overrideName) })
+      ability.setAbilityName({ hash: getStringHash(name) })
+      ability.setAbilityOverride({ hash: getStringHash(overrideName) })
     }
   }
 
