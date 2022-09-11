@@ -23,6 +23,9 @@ export default class PlayerProps {
       if (isNaN(parseInt(type))) continue
       this.set(parseInt(type), userData[type])
     }
+
+    this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
+    this.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
   }
 
   initNew() {
@@ -32,11 +35,13 @@ export default class PlayerProps {
     this.set(PlayerPropEnum.PROP_CUR_SPRING_VOLUME, 8000000)
     this.set(PlayerPropEnum.PROP_SPRING_AUTO_USE_PERCENT, 0.5)
     this.set(PlayerPropEnum.PROP_MAX_STAMINA, 24000)
-    this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, 24000)
     this.set(PlayerPropEnum.PROP_IS_FLYABLE, true)
     this.set(PlayerPropEnum.PROP_IS_TRANSFERABLE, true)
     this.set(PlayerPropEnum.PROP_IS_MP_MODE_AVAILABLE, true)
     this.set(PlayerPropEnum.PROP_PLAYER_MP_SETTING_TYPE, MpSettingTypeEnum.MP_SETTING_ENTER_AFTER_APPLY)
+
+    this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
+    this.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
   }
 
   get(id: number) {

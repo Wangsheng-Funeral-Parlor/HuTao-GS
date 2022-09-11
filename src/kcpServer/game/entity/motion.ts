@@ -2,8 +2,11 @@ import { GRID_SIZE } from '$/manager/entityManager'
 import Vector from '$/utils/vector'
 import { MotionInfo } from '@/types/proto'
 import { MotionStateEnum } from '@/types/proto/enum'
+import Entity from '.'
 
 export default class Motion {
+  entity: Entity
+
   pos: Vector
   rot: Vector
   speed: Vector
@@ -21,10 +24,13 @@ export default class Motion {
   hasLastSafeState: boolean
 
   constructor(
+    entity: Entity,
     pos: Vector = new Vector(0, 0, 0),
     rot: Vector = new Vector(0, 0, 0),
     speed: Vector = new Vector(0, 0, 0)
   ) {
+    this.entity = entity
+
     pos.setGridSize(GRID_SIZE)
 
     this.pos = pos
@@ -64,22 +70,26 @@ export default class Motion {
   }
 
   update(motionInfo: MotionInfo, sceneTime?: number, reliableSeq?: number) {
+    const { entity, state: oldState } = this
     const { pos, rot, speed, state } = motionInfo
 
     if (pos != null) this.pos.setData(pos)
     if (rot != null) this.rot.setData(rot)
     if (speed != null) this.speed.setData(speed)
 
-    if (state != null) this.state = state
+    if (state != null) {
+      this.state = state
+      if (state !== oldState) entity.emit('MotionStateChanged', state)
+    }
 
     if (sceneTime) this.sceneTime = sceneTime
     if (reliableSeq) this.reliableSeq = reliableSeq
 
-    if (pos && state === MotionStateEnum.MOTION_STANDBY) {
-      if (pos != null) this.lastSafePos.setData(pos)
-      if (rot != null) this.lastSafeRot.setData(rot)
-      if (pos != null || rot != null) this.hasLastSafeState = true
-    }
+    if (state !== MotionStateEnum.MOTION_STANDBY) return
+
+    if (pos != null) this.lastSafePos.setData(pos)
+    if (rot != null) this.lastSafeRot.setData(rot)
+    if (pos != null || rot != null) this.hasLastSafeState = true
   }
 
   export(): MotionInfo {

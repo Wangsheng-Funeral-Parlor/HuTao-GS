@@ -537,12 +537,30 @@ export default class Player extends BaseClass {
     return true
   }
 
+  async returnToSafePos(changeHpReason: ChangeHpReasonEnum) {
+    const { teamManager, currentScene, currentAvatar, context } = this
+    const { lastSafePos, lastSafeRot } = currentAvatar.motion
+
+    const team = teamManager.getTeam()
+    const avatarList = team.getAliveAvatarList()
+
+    for (const avatar of avatarList) {
+      const { fightProps } = avatar
+      await fightProps.drainEnergy(true)
+      await fightProps.takeDamage(0, fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, changeHpReason)
+    }
+
+    if (team.getAliveAvatar()) {
+      if (!currentAvatar.isAlive()) await waitUntil(() => this.currentAvatar?.isAlive())
+      await currentScene.join(context, lastSafePos.clone(), lastSafeRot.clone(), SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.FORCE_DRAG_BACK)
+    }
+  }
+
   async dragBack(): Promise<void> {
-    const { state, teamManager, currentWorld, currentScene, currentAvatar, lastDragBack, draggingBack, prevScene, context } = this
+    const { state, currentWorld, currentScene, currentAvatar, lastDragBack, draggingBack, prevScene } = this
     const now = Date.now()
 
     if (!currentWorld || !currentScene || !currentAvatar?.isAlive() || draggingBack) return
-    const { lastSafePos, lastSafeRot } = currentAvatar.motion
 
     const continuousFall = lastDragBack != null && now - lastDragBack < 10e3
     if (continuousFall) {
@@ -561,18 +579,7 @@ export default class Player extends BaseClass {
     }
 
     // Falling into the void, go back to last safe pos
-    const team = teamManager.getTeam()
-    const avatarList = team.getAliveAvatarList()
-    for (const avatar of avatarList) {
-      const { fightProps } = avatar
-      await fightProps.drainEnergy(true)
-      await fightProps.takeDamage(0, fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS)
-    }
-
-    if (team.getAliveAvatar()) {
-      if (!currentAvatar.isAlive()) await waitUntil(() => this.currentAvatar?.isAlive())
-      await currentScene.join(context, lastSafePos.clone(), lastSafeRot.clone(), SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.FORCE_DRAG_BACK)
-    }
+    await this.returnToSafePos(ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS)
   }
 
   exportEnterSceneInfo(): PlayerEnterSceneInfoNotify {

@@ -180,10 +180,10 @@ export default class CombatManager extends BaseClass {
       case MotionStateEnum.MOTION_FALL_ON_GROUND:
       case MotionStateEnum.MOTION_FIGHT: {
         const speedInfo = landSpeedInfoMap[entityId]
+        if (speedInfo != null) delete landSpeedInfoMap[entityId]
         if (speedInfo == null || Date.now() - speedInfo[2] > 500) break
 
         await this.takeFallDamage(entity, speedInfo, motionState === MotionStateEnum.MOTION_FIGHT, seqId)
-        delete landSpeedInfoMap[entityId]
         break
       }
     }

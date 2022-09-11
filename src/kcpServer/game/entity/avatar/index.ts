@@ -9,6 +9,7 @@ import Weapon from '$/equip/weapon'
 import AvatarData from '$/gameData/data/AvatarData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import SkillManager from '$/manager/skillManager'
+import StaminaManager from '$/manager/staminaManager'
 import Player from '$/player'
 import { EntityTypeEnum, EquipTypeEnum, PlayerPropEnum } from '@/types/enum'
 import { AvatarEnterSceneInfo, AvatarInfo, AvatarSatiationData, SceneAvatarInfo, SceneTeamAvatar } from '@/types/proto'
@@ -36,6 +37,7 @@ export default class Avatar extends Entity {
 
   equipMap: { [type: number]: Equip }
 
+  staminaManager: StaminaManager
   skillManager: SkillManager
   fetterList: FetterList
   excelInfo: ExcelInfo
@@ -54,6 +56,7 @@ export default class Avatar extends Entity {
 
     this.equipMap = {}
 
+    this.staminaManager = new StaminaManager(this)
     this.skillManager = new SkillManager(this)
     this.fetterList = new FetterList(this)
     this.excelInfo = new ExcelInfo(this)

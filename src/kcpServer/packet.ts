@@ -27,6 +27,7 @@ export const verbosePackets = [
   'MonsterAIConfigHashNotify',
   'PingReq',
   'PingRsp',
+  'PlayerPropNotify',
   'QueryPathReq',
   'QueryPathRsp',
   'SceneAudioNotify',
@@ -35,6 +36,7 @@ export const verbosePackets = [
   'SceneTimeNotify',
   'SetEntityClientDataNotify',
   'UnionCmdNotify',
+  'VehicleStaminaNotify',
   'WorldPlayerLocationNotify',
   'WorldPlayerRTTNotify'
 ]

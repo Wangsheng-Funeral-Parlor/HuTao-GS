@@ -54,7 +54,7 @@ export default class Entity extends BaseClass {
     this.fightProps = new FightProp(this)
     if (!offScene) {
       this.abilityManager = new AbilityManager(this)
-      this.motion = new Motion()
+      this.motion = new Motion(this)
       this.bornPos = new Vector()
     }
 

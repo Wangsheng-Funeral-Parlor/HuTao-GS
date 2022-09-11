@@ -14,9 +14,11 @@ import protoCleanup from './utils/protoCleanup'
 const logger = new Logger('CLIENT', 0xffdb4a)
 
 const noCleanupPackets = [
-  "AvatarFightPropUpdateNotify",
-  "EntityFightPropChangeReasonNotify",
-  "EntityFightPropUpdateNotify"
+  'AvatarFightPropUpdateNotify',
+  'EntityFightPropChangeReasonNotify',
+  'EntityFightPropUpdateNotify',
+  'PlayerPropNotify',
+  'VehicleStaminaNotify'
 ]
 
 export default class Client extends BaseClass {

@@ -1,5 +1,6 @@
 import { PacketContext } from '#/packet'
 import VehicleInteract from '#/packets/VehicleInteract'
+import StaminaManager from '$/manager/staminaManager'
 import VehicleManager from '$/manager/vehicleManager'
 import Player from '$/player'
 import { FightPropEnum } from '@/types/enum'
@@ -11,6 +12,8 @@ export default class Vehicle extends Gadget {
   vehicleManager: VehicleManager
   player: Player
 
+  staminaManager: StaminaManager
+
   pointId: number
   memberList: { pos: number, player: Player }[]
 
@@ -19,6 +22,8 @@ export default class Vehicle extends Gadget {
 
     this.vehicleManager = manager
     this.player = player
+
+    this.staminaManager = new StaminaManager(this)
 
     this.pointId = pointId
     this.memberList = []

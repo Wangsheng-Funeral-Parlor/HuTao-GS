@@ -312,6 +312,8 @@ export default class EntityManager extends BaseClass {
       const { stateChanged } = this.playerLoadEntity(player, entity, visionType, param)
       if (stateChanged && !batch) await this.appearQueueFlush(player, seqId)
     }
+
+    await entity.emit('OnScene')
   }
 
   async remove(entity: Entity | number, visionType: VisionTypeEnum = VisionTypeEnum.VISION_MISS, seqId?: number, batch: boolean = false): Promise<void> {
@@ -339,6 +341,8 @@ export default class EntityManager extends BaseClass {
     }
 
     this.removeEntityFromMap(targetEntity)
+
+    await targetEntity.emit('OffScene')
   }
 
   async replace(oldEntity: Entity, newEntity: Entity, seqId?: number) {
