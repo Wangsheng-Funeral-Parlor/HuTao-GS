@@ -103,10 +103,12 @@ export default class KcpWorker extends Worker {
   }
 
   private async waitPacketRsp(seqId: number) {
-    while (true) {
-      const [rspSeqId] = <[number]>await this.waitForMessage(WorkerOpcode.RecvPacketRsp)
-      if (rspSeqId === seqId) break
-    }
+    try {
+      while (true) {
+        const [rspSeqId] = <[number]>await this.waitForMessage(WorkerOpcode.RecvPacketRsp, 2e3)
+        if (rspSeqId === seqId) break
+      }
+    } catch (err) { }
   }
 
   async sendToRecvWorker(opcode: WorkerOpcode, ...args: AcceptTypes[]) {
@@ -144,7 +146,7 @@ export default class KcpWorker extends Worker {
       this.sendToInterface(WorkerOpcode.InitKcpRsp, true)
       this.log(LogLevel.DEBUG, 'Init kcp complete:', conv.toString(16).padStart(8, '0').toUpperCase())
     } catch (err) {
-      this.log(LogLevel.ERROR, err)
+      this.log(LogLevel.ERROR, 'Init kcp error:', err)
       this.sendToInterface(WorkerOpcode.InitKcpRsp, false)
     }
   }
@@ -182,7 +184,7 @@ export default class KcpWorker extends Worker {
         if (!skipWaitPackets.includes(<string>getNameByCmdId(packetID))) await this.waitPacketRsp(seqId)
       }
     } catch (err) {
-      this.log(LogLevel.ERROR, err)
+      this.log(LogLevel.ERROR, 'UDP error:', err)
     } finally {
       this.receiving = false
     }
@@ -209,7 +211,7 @@ export default class KcpWorker extends Worker {
       kcp.send(Packet.encode(packetHead, packetData, packetID, key))
       this.sendToInterface(WorkerOpcode.SendPacketRsp, true)
     } catch (err) {
-      this.log(LogLevel.ERROR, err)
+      this.log(LogLevel.ERROR, 'Send packet error:', err)
       this.sendToInterface(WorkerOpcode.SendPacketRsp, false)
     }
   }
