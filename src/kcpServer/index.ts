@@ -87,7 +87,7 @@ export default class KcpServer extends EventEmitter {
     await client.destroy(enetReason)
     await socket.disconnect(conv, enetReason)
 
-    logger.info('Client disconnect:', conv, 'Reason:', ENetReasonEnum[enetReason] || enetReason)
+    logger.info('Client disconnect:', conv?.toString(16)?.padStart(8, '0')?.toUpperCase(), 'Reason:', ENetReasonEnum[enetReason] || enetReason)
     clientList.splice(clientList.indexOf(client), 1)
 
     return true
