@@ -9,6 +9,7 @@ import DoWatcherSystemAction from './DoWatcherSystemAction'
 import DungeonFogEffects from './DungeonFogEffects'
 import EnableBulletCollisionPluginTrigger from './EnableBulletCollisionPluginTrigger'
 import EnableHitBoxByName from './EnableHitBoxByName'
+import ExecuteGadgetLua from './ExecuteGadgetLua'
 import FireEffect from './FireEffect'
 import FixedMonsterRushMove from './FixedMonsterRushMove'
 import HealHP from './HealHP'
@@ -48,6 +49,7 @@ type ActionConfig =
   DungeonFogEffects |
   EnableBulletCollisionPluginTrigger |
   EnableHitBoxByName |
+  ExecuteGadgetLua |
   FireEffect |
   FixedMonsterRushMove |
   HealHP |
