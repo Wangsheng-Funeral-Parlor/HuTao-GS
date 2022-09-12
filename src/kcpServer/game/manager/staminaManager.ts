@@ -111,6 +111,7 @@ export default class StaminaManager extends BaseClass {
 
     if (startConsumeTime == null) return 0
     const duration = Math.max(0, sceneTime - startConsumeTime)
+    if (duration <= 0) return 0
 
     this.startConsumeTime = sceneTime
     return (duration / UPDATE_INTERVAL) * consumeAmount
@@ -121,6 +122,7 @@ export default class StaminaManager extends BaseClass {
 
     if (startRecoverTime == null) return 0
     const duration = Math.max(0, sceneTime - startRecoverTime)
+    if (duration <= 0) return 0
 
     this.startRecoverTime = sceneTime
     return (duration / UPDATE_INTERVAL) * RECOVER_AMOUNT
