@@ -1,9 +1,10 @@
 import { GadgetInteractRsp } from '#/packets/GadgetInteract'
+import GadgetState from '#/packets/GadgetState'
 import Entity from '$/entity'
 import GadgetData from '$/gameData/data/GadgetData'
 import GrowCurveData from '$/gameData/data/GrowCurveData'
 import Player from '$/player'
-import { EntityTypeEnum } from '@/types/enum'
+import { EntityTypeEnum, GadgetStateEnum } from '@/types/enum'
 import { SceneGadgetInfo } from '@/types/proto'
 import { InteractTypeEnum, InterOpTypeEnum, LifeStateEnum, ProtEntityTypeEnum, ResinCostTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
@@ -26,6 +27,8 @@ export default class Gadget extends Entity {
   destructible: boolean
   flammable: boolean
 
+  gadgetState: GadgetStateEnum
+
   constructor(gadgetId: number) {
     super()
 
@@ -35,6 +38,8 @@ export default class Gadget extends Entity {
 
     this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_GADGET
     this.entityType = EntityTypeEnum.Gadget
+
+    this.gadgetState = GadgetStateEnum.Default
 
     super.initHandlers(this)
   }
@@ -87,13 +92,23 @@ export default class Gadget extends Entity {
     }
   }
 
+  async setGadgetState(state: GadgetStateEnum) {
+    const { manager } = this
+
+    this.gadgetState = state
+
+    if (manager == null) return
+    await GadgetState.broadcastNotify(manager.scene.broadcastContextList, this)
+  }
+
   exportSceneGadgetInfo(): SceneGadgetInfo {
-    const { gadgetId, groupId, configId, interactId } = this
+    const { gadgetId, groupId, configId, interactId, gadgetState } = this
 
     const info: SceneGadgetInfo = {
       gadgetId,
       groupId,
-      configId
+      configId,
+      gadgetState
     }
 
     if (interactId != null) {
