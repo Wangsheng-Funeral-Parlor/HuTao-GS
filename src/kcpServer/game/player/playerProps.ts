@@ -1,4 +1,5 @@
 import PlayerProp from '#/packets/PlayerProp'
+import PlayerPropChange from '#/packets/PlayerPropChange'
 import { PlayerPropEnum } from '@/types/enum'
 import { PropPair, PropValue } from '@/types/proto'
 import { MpSettingTypeEnum } from '@/types/proto/enum'
@@ -25,7 +26,7 @@ export default class PlayerProps {
     }
 
     this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
-    this.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
+    this.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, 0)
   }
 
   initNew() {
@@ -41,7 +42,7 @@ export default class PlayerProps {
     this.set(PlayerPropEnum.PROP_PLAYER_MP_SETTING_TYPE, MpSettingTypeEnum.MP_SETTING_ENTER_AFTER_APPLY)
 
     this.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
-    this.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, this.get(PlayerPropEnum.PROP_MAX_STAMINA))
+    this.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, 0)
   }
 
   get(id: number) {
@@ -50,9 +51,17 @@ export default class PlayerProps {
 
   async set(type: number, val: number | boolean, notify: boolean = false): Promise<void> {
     const { player, propMap } = this
-    propMap[type] = Number(val) || 0
 
-    if (notify) await PlayerProp.sendNotify(player.context, type)
+    val = Number(val) || 0
+
+    const delta = val - this.get(type)
+    propMap[type] = val
+
+    if (!notify) return
+
+    const { context } = player
+    await PlayerProp.sendNotify(context, type)
+    await PlayerPropChange.sendNotify(context, type, delta)
   }
 
   clear() {

@@ -9,6 +9,8 @@ const UPDATE_INTERVAL = 200
 const RECOVER_AMOUNT = 500
 
 export default class StaminaManager extends BaseClass {
+  private _curStamina: number
+
   entity: Avatar | Vehicle
 
   startConsumeTime: number | null
@@ -20,6 +22,8 @@ export default class StaminaManager extends BaseClass {
 
   constructor(entity: Avatar | Vehicle) {
     super()
+
+    this._curStamina = null
 
     this.entity = entity
 
@@ -43,9 +47,9 @@ export default class StaminaManager extends BaseClass {
   }
 
   get curStamina() {
-    const { entity } = this
-    const propType = entity instanceof Vehicle ? PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA : PlayerPropEnum.PROP_CUR_PERSIST_STAMINA
-    return entity.player.props.get(propType)
+    const { _curStamina, entity, maxStamina } = this
+    if (entity instanceof Vehicle) return _curStamina == null ? maxStamina : _curStamina
+    return entity.player.props.get(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA)
   }
 
   private async tick() {
@@ -158,7 +162,7 @@ export default class StaminaManager extends BaseClass {
     if (entity instanceof Avatar) {
       await player.props.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, value, true)
     } else if (entity instanceof Vehicle) {
-      await player.props.set(PlayerPropEnum.PROP_CUR_TEMPORARY_STAMINA, value)
+      this._curStamina = value
       if (manager) await VehicleStamina.broadcastNotify(manager.scene.broadcastContextList, entity)
     }
   }

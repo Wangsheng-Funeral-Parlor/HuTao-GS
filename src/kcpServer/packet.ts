@@ -27,6 +27,7 @@ export const verbosePackets = [
   'MonsterAIConfigHashNotify',
   'PingReq',
   'PingRsp',
+  'PlayerPropChangeNotify',
   'PlayerPropNotify',
   'QueryPathReq',
   'QueryPathRsp',
