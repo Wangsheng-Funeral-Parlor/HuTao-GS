@@ -131,7 +131,10 @@ export default class StaminaManager extends BaseClass {
     this.timer = setInterval(this.tick.bind(this), UPDATE_INTERVAL)
   }
 
-  stop() {
+  async stop() {
+    await this.stopConsume()
+    await this.stopRecover()
+
     const { timer } = this
     if (timer == null) return
 
@@ -167,6 +170,18 @@ export default class StaminaManager extends BaseClass {
     }
   }
 
+  async step() {
+    const { entity } = this
+    const { motion } = entity
+    const { state } = motion
+
+    switch (state) { // NOSONAR
+      case MotionStateEnum.MOTION_CLIMB:
+        await this.setRelativeStamina(-150)
+        break
+    }
+  }
+
   /**Events**/
 
   // MotionStateChanged
@@ -178,9 +193,6 @@ export default class StaminaManager extends BaseClass {
         break
       case MotionStateEnum.MOTION_DASH_BEFORE_SHAKE:
         await this.startConsume(0, 1800)
-        break
-      case MotionStateEnum.MOTION_CLIMB:
-        await this.startConsume(150)
         break
       case MotionStateEnum.MOTION_CLIMB_JUMP:
         await this.startConsume(0, 2500)
@@ -200,6 +212,8 @@ export default class StaminaManager extends BaseClass {
       case MotionStateEnum.MOTION_LADDER_SLIP:
       case MotionStateEnum.MOTION_FLY_IDLE:
       case MotionStateEnum.MOTION_SWIM_IDLE:
+      // stamina step
+      case MotionStateEnum.MOTION_CLIMB:
         await this.stopConsume()
         await this.stopRecover()
         break
@@ -223,6 +237,6 @@ export default class StaminaManager extends BaseClass {
 
   // OffScene
   async handleOffScene() {
-    this.stop()
+    await this.stop()
   }
 }
