@@ -1,5 +1,5 @@
-import { SelectTarget } from '.'
+import { SelectTargets } from '.'
 
-export default interface SelectTargetByTag extends SelectTarget {
+export default interface SelectTargetsByTag extends SelectTargets {
   Tag: string
 }

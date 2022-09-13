@@ -1,5 +1,5 @@
-import { SelectTarget } from '.'
+import { SelectTargets } from '.'
 
-export default interface SelectTargetByChildren extends SelectTarget {
+export default interface SelectTargetsByChildren extends SelectTargets {
   ConfigID: number
 }

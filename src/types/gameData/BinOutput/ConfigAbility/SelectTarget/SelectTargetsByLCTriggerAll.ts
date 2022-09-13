@@ -1,3 +1,3 @@
-import { SelectTarget } from '.'
+import { SelectTargets } from '.'
 
-export default interface SelectTargetByLCTriggerAll extends SelectTarget { }
+export default interface SelectTargetsByLCTriggerAll extends SelectTargets { }

@@ -1,5 +1,5 @@
 import PredicateConfig from '../Predicate'
-import SelectTargetConfig from '../SelectTarget'
+import SelectTargetsConfig from '../SelectTarget'
 import ActCameraShake from './ActCameraShake'
 import AddGlobalValue from './AddGlobalValue'
 import ApplyModifier from './ApplyModifier'
@@ -39,7 +39,7 @@ import TurnDirection from './TurnDirection'
 export interface Action {
   $type: string
   Target?: string
-  OtherTargets?: SelectTargetConfig
+  OtherTargets?: SelectTargetsConfig
   DoOffStage?: boolean
   DoAfterDie?: boolean
   CanBeHandledOnRecover?: boolean

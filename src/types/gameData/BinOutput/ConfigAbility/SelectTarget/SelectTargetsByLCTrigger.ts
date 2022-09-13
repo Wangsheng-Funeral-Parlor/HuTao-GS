@@ -1,5 +1,5 @@
-import { SelectTarget } from '.'
+import { SelectTargets } from '.'
 
-export default interface SelectTargetByLCTrigger extends SelectTarget {
+export default interface SelectTargetsByLCTrigger extends SelectTargets {
   CampTargetType: string
 }

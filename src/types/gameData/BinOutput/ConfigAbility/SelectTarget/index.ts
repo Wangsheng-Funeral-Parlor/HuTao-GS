@@ -1,23 +1,23 @@
-import SelectTargetByChildren from "./SelectTargetsByChildren"
-import SelectTargetByEquipParts from "./SelectTargetsByEquipParts"
-import SelectTargetByLCTrigger from "./SelectTargetsByLCTrigger"
-import SelectTargetByLCTriggerAll from "./SelectTargetsByLCTriggerAll"
-import SelectTargetBySelfGroup from "./SelectTargetsBySelfGroup"
-import SelectTargetByShape from "./SelectTargetsByShape"
-import SelectTargetByTag from "./SelectTargetsByTag"
+import SelectTargetsByChildren from "./SelectTargetsByChildren"
+import SelectTargetsByEquipParts from "./SelectTargetsByEquipParts"
+import SelectTargetsByLCTrigger from "./SelectTargetsByLCTrigger"
+import SelectTargetsByLCTriggerAll from "./SelectTargetsByLCTriggerAll"
+import SelectTargetsBySelfGroup from "./SelectTargetsBySelfGroup"
+import SelectTargetsByShape from "./SelectTargetsByShape"
+import SelectTargetsByTag from "./SelectTargetsByTag"
 
-export interface SelectTarget {
+export interface SelectTargets {
   $type: string
   Target?: string
 }
 
-type SelectTargetConfig =
-  SelectTargetByChildren |
-  SelectTargetByEquipParts |
-  SelectTargetByLCTrigger |
-  SelectTargetByLCTriggerAll |
-  SelectTargetBySelfGroup |
-  SelectTargetByShape |
-  SelectTargetByTag
+type SelectTargetsConfig =
+  SelectTargetsByChildren |
+  SelectTargetsByEquipParts |
+  SelectTargetsByLCTrigger |
+  SelectTargetsByLCTriggerAll |
+  SelectTargetsBySelfGroup |
+  SelectTargetsByShape |
+  SelectTargetsByTag
 
-export default SelectTargetConfig
+export default SelectTargetsConfig

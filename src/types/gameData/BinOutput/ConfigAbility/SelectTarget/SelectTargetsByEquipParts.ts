@@ -1,5 +1,5 @@
-import { SelectTarget } from '.'
+import { SelectTargets } from '.'
 
-export default interface SelectTargetByEquipParts extends SelectTarget {
+export default interface SelectTargetsByEquipParts extends SelectTargets {
   EquipPartNames: string[]
 }
