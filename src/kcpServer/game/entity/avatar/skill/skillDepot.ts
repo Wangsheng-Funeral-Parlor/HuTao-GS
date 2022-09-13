@@ -58,6 +58,11 @@ export default class SkillDepot {
 
     // skills
     skills.push(...depotData.Skills.filter(skillId => skillId !== 0).map(skillId => new Skill(this, skillId)))
+
+    // sub skills
+    skills.push(...depotData.SubSkills.filter(skillId => skillId !== 0).map(skillId => new Skill(this, skillId)))
+
+    // energy skill
     if (depotData.EnergySkill != null) this.energySkill = new Skill(this, depotData.EnergySkill)
 
     // talents
@@ -159,6 +164,10 @@ export default class SkillDepot {
       const embryo = abilityEmbryos.shift()
       embryo.manager.removeEmbryo(embryo)
     }
+  }
+
+  getSkill(id: number): Skill {
+    return this.skills.find(skill => skill.id === id)
   }
 
   exportSkillLevelMap() {

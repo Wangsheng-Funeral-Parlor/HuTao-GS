@@ -128,23 +128,7 @@ export default class StaminaManager extends BaseClass {
     return (duration / UPDATE_INTERVAL) * RECOVER_AMOUNT
   }
 
-  start() {
-    if (this.timer) this.stop()
-    this.timer = setInterval(this.tick.bind(this), UPDATE_INTERVAL)
-  }
-
-  async stop() {
-    await this.stopConsume()
-    await this.stopRecover()
-
-    const { timer } = this
-    if (timer == null) return
-
-    clearInterval(timer)
-    this.timer = null
-  }
-
-  async setRelativeStamina(value: number) {
+  private async setRelativeStamina(value: number) {
     const { maxStamina, curStamina } = this
 
     if (
@@ -156,7 +140,7 @@ export default class StaminaManager extends BaseClass {
     await this.setStamina(curStamina + value)
   }
 
-  async setStamina(value: number) {
+  private async setStamina(value: number) {
     const { entity, maxStamina } = this
     const { manager, player, godMode } = entity
 
@@ -170,6 +154,29 @@ export default class StaminaManager extends BaseClass {
       this._curStamina = value
       if (manager) await VehicleStamina.broadcastNotify(manager.scene.broadcastContextList, entity)
     }
+  }
+
+  start() {
+    if (this.timer) this.stop()
+    this.timer = setInterval(this.tick.bind(this), UPDATE_INTERVAL)
+  }
+
+  async immediate(value: number) {
+    const { startRecoverTime, sceneTime } = this
+    if (startRecoverTime != null) this.startRecoverTime = sceneTime + 1e3
+
+    await this.setRelativeStamina(value)
+  }
+
+  async stop() {
+    await this.stopConsume()
+    await this.stopRecover()
+
+    const { timer } = this
+    if (timer == null) return
+
+    clearInterval(timer)
+    this.timer = null
   }
 
   async step() {

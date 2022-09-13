@@ -305,8 +305,9 @@ export default class AbilityManager extends BaseClass {
     const ability = this.getAbility(instancedAbilityId)
     if (ability == null) return logger.debug(entity.entityId, 'AbilityNone', 'NoAbility', head)
 
-    const actionConfig = await AbilityData.getActionByLocalId(AbilityData.lookupString(ability.abilityName), localId)
-    if (actionConfig == null) return logger.debug(entity.entityId, 'AbilityNone', 'NoAction', head, ability?.abilityName)
+    const abilityName = AbilityData.lookupString(ability.abilityName)
+    const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
+    if (actionConfig == null) return logger.debug(entity.entityId, 'AbilityNone', 'NoAction', head, abilityName)
 
     await action.runActionConfig(context, ability, actionConfig, entityManager.getEntity(targetId))
   }

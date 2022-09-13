@@ -52,7 +52,7 @@ export default class Monster extends Entity {
   }
 
   private async loadMonsterData() {
-    const { player, monsterId } = this
+    const { player, monsterId, abilityManager } = this
 
     this.config = await MonsterData.getFightPropConfig(monsterId)
     this.growCurve = await GrowCurveData.getGrowCurve('Monster')
@@ -71,10 +71,17 @@ export default class Monster extends Entity {
     this.killDropId = monsterData.KillDropId || 0
 
     const describeData = await MonsterData.getDescribe(monsterData.DescribeId)
-    if (!describeData) return
+    if (describeData) {
+      this.titleId = describeData.TitleID || 0
+      this.specialNameId = (await MonsterData.getSpecialName(describeData.SpecialNameLabID))?.Id || 0
+    }
 
-    this.titleId = describeData.TitleID || 0
-    this.specialNameId = (await MonsterData.getSpecialName(describeData.SpecialNameLabID))?.Id || 0
+    if (!Array.isArray(monsterData?.Config?.Abilities)) return
+    for (const ability of monsterData.Config.Abilities) {
+      abilityManager.addEmbryo(ability.AbilityName || undefined, ability.AbilityOverride || undefined)
+    }
+
+    abilityManager.initFromEmbryos()
   }
 
   async init(userData: EntityUserData): Promise<void> {
