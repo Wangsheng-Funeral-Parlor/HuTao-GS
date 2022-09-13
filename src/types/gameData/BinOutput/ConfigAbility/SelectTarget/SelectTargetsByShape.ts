@@ -6,5 +6,5 @@ export default interface SelectTargetByShape extends SelectTarget {
   CenterBasedOn: string
   CampTargetType: string
   CampBasedOn: string
-  SizeRatio: DynamicNumber
+  SizeRatio: DynamicNumber | number
 }
