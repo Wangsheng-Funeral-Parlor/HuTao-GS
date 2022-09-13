@@ -6,6 +6,8 @@ import { join, resolve } from 'path'
 
 const logger = new Logger('SSLGEN', 0xa0ff00)
 
+const domains = Object.keys(config.domains)
+
 const caCnfData = [
   '[req]',
   'distinguished_name = req_distinguished_name',
@@ -33,12 +35,8 @@ const srvCnfData = [
   'extendedKeyUsage = 1.3.6.1.5.5.7.3.1',
   '[alt_names]',
   'IP.1=' + config.hostIp,
-  'DNS.1=mihoyo.com',
-  'DNS.2=hoyoverse.com',
-  'DNS.3=yuanshen.com',
-  'DNS.4=*.mihoyo.com',
-  'DNS.5=*.hoyoverse.com',
-  'DNS.6=*.yuanshen.com'
+  ...domains.map((d, i) => `DNS.${i + 1}=${d}`),
+  ...domains.map((d, i) => `DNS.${domains.length + i + 1}=*.${d}`)
 ].join('\n')
 
 const caFiles = {
