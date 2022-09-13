@@ -1,5 +1,3 @@
 import { Born } from '.'
 
-export default interface ConfigBornByCollisionPoint extends Born {
-  AlongGround?: boolean
-}
+export default interface ConfigBornByCollisionPoint extends Born { }

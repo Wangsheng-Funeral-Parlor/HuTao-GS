@@ -1,8 +1,9 @@
 import { Action } from '.'
+import Vector from '../../Common/Vector'
 
 export default interface DungeonFogEffects extends Action {
-  MuteRemoteAction?: boolean
   Enable?: boolean
   CameraFogEffectName: string
   PlayerFogEffectName: string
+  LocalOffset?: Vector
 }

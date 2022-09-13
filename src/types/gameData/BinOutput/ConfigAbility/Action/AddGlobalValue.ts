@@ -1,11 +1,10 @@
 import { Action } from '.'
-import PredicateConfig from '../Predicate'
 
 export default interface AddGlobalValue extends Action {
-  Predicates?: PredicateConfig[]
   Value: number
   Key: string
   UseLimitRange?: boolean
+  RandomInRange?: boolean
   MaxValue: number
   MinValue: number
 }

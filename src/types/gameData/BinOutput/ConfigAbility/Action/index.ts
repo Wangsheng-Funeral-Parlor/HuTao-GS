@@ -1,8 +1,11 @@
+import PredicateConfig from '../Predicate'
+import SelectTargetConfig from '../SelectTarget'
 import ActCameraShake from './ActCameraShake'
 import AddGlobalValue from './AddGlobalValue'
 import ApplyModifier from './ApplyModifier'
 import AttachEffect from './AttachEffect'
 import AttachModifier from './AttachModifier'
+import AvatarSkillStart from './AvatarSkillStart'
 import CreateGadget from './CreateGadget'
 import DamageByAttackValue from './DamageByAttackValue'
 import DoWatcherSystemAction from './DoWatcherSystemAction'
@@ -35,6 +38,14 @@ import TurnDirection from './TurnDirection'
 
 export interface Action {
   $type: string
+  Target?: string
+  OtherTargets?: SelectTargetConfig
+  DoOffStage?: boolean
+  DoAfterDie?: boolean
+  CanBeHandledOnRecover?: boolean
+  MuteRemoteAction?: boolean
+  Predicates?: PredicateConfig[]
+  PredicatesForeach?: PredicateConfig[]
 }
 
 type ActionConfig =
@@ -43,6 +54,7 @@ type ActionConfig =
   ApplyModifier |
   AttachEffect |
   AttachModifier |
+  AvatarSkillStart |
   CreateGadget |
   DamageByAttackValue |
   DoWatcherSystemAction |

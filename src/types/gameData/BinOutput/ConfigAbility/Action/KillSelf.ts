@@ -1,7 +1,11 @@
 import { Action } from '.'
 
 export default interface KillSelf extends Action {
-  BanDrop: boolean
-  BanExp: boolean
+  Duration?: number
+  DieStateFlag?: string
+  BanDrop?: boolean
+  BanExp?: boolean
+  BanHPPercentageDrop?: boolean
   KillSelfType: string
+  HideEntity?: boolean
 }

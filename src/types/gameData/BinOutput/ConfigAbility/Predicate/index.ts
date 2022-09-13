@@ -6,6 +6,7 @@ import ByTargetPositionToSelfPosition from './ByTargetPositionToSelfPosition'
 
 export interface Predicate {
   $type: string
+  Target?: string
 }
 
 type PredicateConfig =

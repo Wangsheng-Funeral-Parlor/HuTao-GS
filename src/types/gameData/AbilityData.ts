@@ -11,9 +11,12 @@ export default interface AbilityDataGroup {
   Equip: {
     [name: string]: { [override: string]: AbilityConfig }[]
   }
+  Gadget: {
+    [name: string]: { [override: string]: AbilityConfig }[]
+  }
   Monster: {
     [name: string]: { [override: string]: AbilityConfig }[]
-  },
+  }
   Group: {
     [name: string]: AbilityGroupConfig
   }

@@ -7,4 +7,6 @@ export default interface FixedMonsterRushMove extends Action {
   MaxRange?: number
   AnimatorStateIDs: string[]
   OverrideMoveCollider: string
+  IsInAir?: boolean
+  CheckAnimatorStateOnExitOnly?: boolean
 }
