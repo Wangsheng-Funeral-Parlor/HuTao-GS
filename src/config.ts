@@ -1,4 +1,4 @@
-import { getJson } from '@/utils/json'
+import { getJson, setJson } from '@/utils/json'
 import Logger from './logger'
 
 const logger = new Logger('CONFIG', 0xcacaff)
@@ -95,7 +95,15 @@ const allConfigs = getJson('config.json', {})
 const curConfigName = allConfigs.current || 'default'
 const curConfig = allConfigs[curConfigName]
 
-if (curConfig == null) logger.error('Config not found:', curConfigName)
+if (curConfig == null) {
+  logger.error('Config not found:', curConfigName)
+  const configName = 'default'
+  const allConfigs = getJson('config.json', {})
+  logger.info('Creating config:', configName)
+  allConfigs[configName] = DEFAULT_CONFIG
+  setJson('config.json', allConfigs)
+  logger.info('Complete.')
+}
 else logger.info('Loaded config:', curConfigName)
 
 const config: Config = Object.assign({}, DEFAULT_CONFIG, curConfig || {})
