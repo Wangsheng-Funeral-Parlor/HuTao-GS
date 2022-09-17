@@ -1,6 +1,7 @@
 import BaseClass from '#/baseClass'
 import AbilityData from '$/gameData/data/AbilityData'
 import AbilityManager from '$/manager/abilityManager'
+import { DynamicFloat } from '$DT/BinOutput/Common/DynamicNumber'
 import { AbilityAppliedModifier, AbilityString } from '@/types/proto'
 
 export default class AppliedModifier extends BaseClass {
@@ -18,7 +19,8 @@ export default class AppliedModifier extends BaseClass {
   existsTime: number
 
   reduceRatio: number
-  remainingDurability: number
+  remainingDurability: DynamicFloat
+  remainingDurabilityEval: number
 
   added: boolean
 
@@ -40,6 +42,7 @@ export default class AppliedModifier extends BaseClass {
 
     this.reduceRatio = 0
     this.remainingDurability = 0
+    this.remainingDurabilityEval = 0
 
     this.added = false
 
@@ -92,7 +95,7 @@ export default class AppliedModifier extends BaseClass {
   }
 
   export(): AbilityAppliedModifier {
-    const { id, abilityId, parentAbilityName, parentAbilityOverride, localId, applyEntityId, attachedParent, existsTime, reduceRatio, remainingDurability } = this
+    const { id, abilityId, parentAbilityName, parentAbilityOverride, localId, applyEntityId, attachedParent, existsTime, reduceRatio, remainingDurabilityEval } = this
     return {
       modifierLocalId: localId,
       parentAbilityName,
@@ -104,7 +107,7 @@ export default class AppliedModifier extends BaseClass {
       applyEntityId,
       modifierDurability: {
         reduceRatio,
-        remainingDurability
+        remainingDurability: remainingDurabilityEval
       }
     }
   }

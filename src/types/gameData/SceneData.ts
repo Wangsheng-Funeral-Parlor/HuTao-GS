@@ -1,5 +1,5 @@
-import Vector from './BinOutput/Common/Vector'
-import ScenePointConfig from './BinOutput/ScenePoint'
+import { DynamicVector } from './BinOutput/Common/DynamicNumber'
+import ConfigScene from './BinOutput/Config/ConfigScene'
 import { SceneBlockScriptConfig, SceneGroupScriptConfig } from './Script/SceneScriptConfig'
 
 export interface CityData {
@@ -27,16 +27,16 @@ export interface SceneData {
   Type: string
   IsMainScene: boolean
   IsLocked: boolean
-  BeginPos: Vector
-  Size: Vector
-  BornPos: Vector
-  BornRot: Vector
+  BeginPos: DynamicVector
+  Size: DynamicVector
+  BornPos: DynamicVector
+  BornRot: DynamicVector
   DieY: number
-  VisionAnchor: Vector
+  VisionAnchor: DynamicVector
   SpecifiedAvatarList?: number[]
   MaxSpecifiedAvatarNum?: number
   City: CityData[]
-  ScenePoint: ScenePointConfig
+  Config: ConfigScene
   Tag: SceneTagData[]
   Group: { [groupId: number]: SceneGroupScriptConfig }
   Block: { [blockId: number]: SceneBlockScriptConfig }

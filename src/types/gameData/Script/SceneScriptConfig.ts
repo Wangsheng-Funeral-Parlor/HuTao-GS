@@ -1,4 +1,4 @@
-import Vector from '../BinOutput/Common/Vector'
+import { DynamicVector } from '../BinOutput/Common/DynamicNumber'
 
 export interface SceneGroupScriptConfig {
   Monsters: SceneMonsterScriptConfig[]
@@ -24,8 +24,8 @@ export interface SceneGroupScriptConfig {
 export interface SceneMonsterScriptConfig {
   ConfigId: number
   MonsterId: number
-  Pos: Vector
-  Rot: Vector
+  Pos: DynamicVector
+  Rot: DynamicVector
   Level: number
   DropTag: string
   PoseId?: number
@@ -36,16 +36,16 @@ export interface SceneMonsterScriptConfig {
 export interface SceneNpcScriptConfig {
   ConfigId: number
   NpcId: number
-  Pos: Vector
-  Rot: Vector
+  Pos: DynamicVector
+  Rot: DynamicVector
   AreaId: number
 }
 
 export interface SceneGadgetScriptConfig {
   ConfigId: number
   GadgetId: number
-  Pos: Vector
-  Rot: Vector
+  Pos: DynamicVector
+  Rot: DynamicVector
   Level: number
   DropTag: string
   IsOneoff?: boolean
@@ -62,7 +62,7 @@ export interface SceneRegionScriptConfig {
   ConfigId: number
   Shape: {}
   Radius: number
-  Pos: Vector
+  Pos: DynamicVector
   AreaId: number
 }
 
@@ -77,8 +77,8 @@ export interface SceneTriggerScriptConfig {
 
 export interface ScenePointScriptConfig {
   ConfigId: number
-  Pos: Vector
-  Rot: Vector
+  Pos: DynamicVector
+  Rot: DynamicVector
   AreaId: number
 }
 
@@ -125,7 +125,7 @@ export interface SceneBlockScriptConfig {
   Groups: {
     Id: number
     Area: number
-    Pos: Vector
+    Pos: DynamicVector
     DynamicLoad?: boolean
     IsReplaceable?: {
       Value: boolean
@@ -138,19 +138,19 @@ export interface SceneBlockScriptConfig {
     VisionType?: number
   }[]
   Rect: {
-    Min: Vector
-    Max: Vector
+    Min: DynamicVector
+    Max: DynamicVector
   } | null
 }
 
 export interface SceneScriptConfig {
   Config: {
-    BeginPos: Vector
-    Size: Vector
-    BornPos: Vector
-    BornRot: Vector
+    BeginPos: DynamicVector
+    Size: DynamicVector
+    BornPos: DynamicVector
+    BornRot: DynamicVector
     DieY: number
-    VisionAnchor: Vector
+    VisionAnchor: DynamicVector
   }
   Group: { [groupId: number]: SceneGroupScriptConfig }
   Block: { [blockId: number]: SceneBlockScriptConfig }

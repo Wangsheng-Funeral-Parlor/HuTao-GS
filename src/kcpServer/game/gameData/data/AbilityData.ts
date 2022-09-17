@@ -1,9 +1,9 @@
 import Loader from '$/gameData/loader'
+import ConfigAbility from '$DT/BinOutput/Config/ConfigAbility'
+import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
+import ConfigAbilityGroup from '$DT/BinOutput/Config/ConfigAbilityGroup'
 import { AbilityConfigIdxEnum, AbilityModifierConfigIdxEnum } from '@/types/enum'
 import AbilityDataGroup from '@/types/gameData/AbilityData'
-import AbilityGroupConfig from '@/types/gameData/BinOutput/AbilityGroup'
-import AbilityConfig from '@/types/gameData/BinOutput/ConfigAbility'
-import ActionConfig from '@/types/gameData/BinOutput/ConfigAbility/Action'
 import { AbilityString } from '@/types/proto'
 import { getStringHash } from '@/utils/hash'
 
@@ -13,7 +13,7 @@ class AbilityDataLoader extends Loader {
   declare data: AbilityDataGroup
 
   hashMap: { [hash: number]: string }
-  abilityMap: { [name: string]: AbilityConfig }
+  abilityMap: { [name: string]: ConfigAbility }
 
   constructor() {
     super('AbilityData')
@@ -63,7 +63,7 @@ class AbilityDataLoader extends Loader {
     this.hashMap[getStringHash(str)] = str
   }
 
-  private loadAbilityConfig(config: AbilityConfig) {
+  private loadAbilityConfig(config: ConfigAbility) {
     if (config == null) return
 
     const { abilityMap } = this
@@ -89,7 +89,7 @@ class AbilityDataLoader extends Loader {
     for (const groupName in data) {
       if (groupName === 'Group') continue
 
-      const group: { [name: string]: { [override: string]: AbilityConfig }[] } = data[groupName]
+      const group: { [name: string]: { [override: string]: ConfigAbility }[] } = data[groupName]
       if (group == null) continue
 
       for (const name in group) {
@@ -105,17 +105,17 @@ class AbilityDataLoader extends Loader {
     return super.getData()
   }
 
-  async getAbilityGroup(name: string): Promise<AbilityGroupConfig> {
+  async getAbilityGroup(name: string): Promise<ConfigAbilityGroup> {
     await this.getData()
     return this.data?.Group?.[name] || null
   }
 
-  async getAbility(name: string): Promise<AbilityConfig> {
+  async getAbility(name: string): Promise<ConfigAbility> {
     await this.getData()
     return this.abilityMap[name] || null
   }
 
-  async getActionByLocalId(abilityName: string, localId: number): Promise<ActionConfig> {
+  async getActionByLocalId(abilityName: string, localId: number): Promise<ConfigAbilityAction> {
     const configInfo = this.parseLocalId(localId)
     const abilityData = await this.getAbility(abilityName)
     if (configInfo == null || !abilityData) return null

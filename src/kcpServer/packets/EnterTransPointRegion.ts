@@ -1,6 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
-import SceneTransPoint from '@/types/gameData/BinOutput/ScenePoint/Point/SceneTransPoint'
 import { ClientStateEnum } from '@/types/enum'
 
 export interface EnterTransPointRegionNotify {
@@ -20,7 +19,7 @@ class EnterTransPointRegionPacket extends Packet implements PacketInterface {
     const { player } = context
     const { sceneId, pointId } = data
 
-    const scenePointData = await SceneData.getScenePoint(sceneId, pointId) as SceneTransPoint
+    const scenePointData = await SceneData.getScenePoint(sceneId, pointId)
     if (scenePointData?.Type !== 'TOWER') return
 
     player.teamManager.getTeam()?.reviveAllAvatar()

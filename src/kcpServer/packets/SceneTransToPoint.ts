@@ -2,7 +2,6 @@ import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
 import Vector from '$/utils/vector'
 import { ClientStateEnum } from '@/types/enum'
-import SceneTransPoint from '@/types/gameData/BinOutput/ScenePoint/Point/SceneTransPoint'
 import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 
 export interface SceneTransToPointReq {
@@ -31,7 +30,7 @@ class SceneTransToPointPacket extends Packet implements PacketInterface {
     const { sceneId, pointId } = data
 
     const scene = await currentWorld.getScene(sceneId)
-    const { Type, TranPos, TranRot } = <SceneTransPoint>(await SceneData.getScenePoint(sceneId, pointId)) || {}
+    const { Type, TranPos, TranRot } = (await SceneData.getScenePoint(sceneId, pointId)) || {}
 
     if (!scene || !TranPos) {
       await this.response(context, { retcode: RetcodeEnum.RET_POINT_NOT_UNLOCKED })

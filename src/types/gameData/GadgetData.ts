@@ -1,4 +1,4 @@
-import GadgetConfig from "./BinOutput/ConfigGadget"
+import ConfigGadget from './BinOutput/Config/ConfigGadget'
 
 export interface GadgetData {
   JsonName: string
@@ -30,7 +30,7 @@ export interface GadgetData {
   ControllerPathHashSuffix?: number
   ControllerPathHashPre?: number
 
-  Config: GadgetConfig
+  Config: ConfigGadget
 }
 
 export interface GadgetPropData {

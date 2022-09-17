@@ -1,8 +1,8 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
 import SceneData from '$/gameData/data/SceneData'
 import Vector from '$/utils/vector'
+import PersonalSceneJumpPoint from '$DT/BinOutput/Config/ConfigScenePoint/Child/PersonalSceneJumpPoint'
 import { ClientStateEnum } from '@/types/enum'
-import PersonalSceneJumpPoint from '@/types/gameData/BinOutput/ScenePoint/Point/PersonalSceneJumpPoint'
 import { VectorInfo } from '@/types/proto'
 import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 

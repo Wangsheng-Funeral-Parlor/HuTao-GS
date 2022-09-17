@@ -1,4 +1,4 @@
-import DataVector from '@/types/gameData/BinOutput/Common/Vector'
+import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
 import { VectorInfo } from '@/types/proto'
 
 export default class Vector {
@@ -69,16 +69,16 @@ export default class Vector {
     return this
   }
 
-  setData(vec: DataVector | VectorInfo | Vector) {
+  setData(vec: DynamicVector | VectorInfo | Vector) {
     const v = vec || {}
-    const x = (<VectorInfo | Vector>v).x || (<DataVector>v).X
-    const y = (<VectorInfo | Vector>v).y || (<DataVector>v).Y
-    const z = (<VectorInfo | Vector>v).z || (<DataVector>v).Z
+    const x = (<VectorInfo | Vector>v).x || (<DynamicVector>v).X
+    const y = (<VectorInfo | Vector>v).y || (<DynamicVector>v).Y
+    const z = (<VectorInfo | Vector>v).z || (<DynamicVector>v).Z
 
     this.set(
-      typeof x === 'number' ? x : x?.[1],
-      typeof y === 'number' ? y : y?.[1],
-      typeof z === 'number' ? z : z?.[1]
+      typeof x === 'number' ? x : Number(x?.[1]),
+      typeof y === 'number' ? y : Number(y?.[1]),
+      typeof z === 'number' ? z : Number(z?.[1])
     )
 
     return this

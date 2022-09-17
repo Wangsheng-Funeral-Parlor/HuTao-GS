@@ -17,6 +17,9 @@
     "outDir": "buildDev",
     "baseUrl": "./src",
     "paths": {
+      "$DT/*": [
+        "types/gameData/*"
+      ],
       "$/*": [
         "kcpServer/game/*"
       ],

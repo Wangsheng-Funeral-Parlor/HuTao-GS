@@ -6,19 +6,18 @@ import Gadget from '$/entity/gadget'
 import ClientGadget from '$/entity/gadget/clientGadget'
 import AbilityManager from '$/manager/abilityManager'
 import Vector from '$/utils/vector'
+import { DynamicFloat, DynamicInt } from '$DT/BinOutput/Common/DynamicNumber'
+import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
+import AvatarSkillStart from '$DT/BinOutput/Config/ConfigAbility/Action/Child/AvatarSkillStart'
+import ExecuteGadgetLua from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ExecuteGadgetLua'
+import HealHP from '$DT/BinOutput/Config/ConfigAbility/Action/Child/HealHP'
+import LoseHP from '$DT/BinOutput/Config/ConfigAbility/Action/Child/LoseHP'
+import SelectTargets from '$DT/BinOutput/Config/SelectTargets'
+import SelectTargetsByShape from '$DT/BinOutput/Config/SelectTargets/Child/SelectTargetsByShape'
 import Logger from '@/logger'
 import { AbilityTargettingEnum, EntityTypeEnum, FightPropEnum, GadgetStateEnum, TargetTypeEnum } from '@/types/enum'
-import { DynamicNumber } from '@/types/gameData/BinOutput/Common/Dynamic'
-import ActionConfig from '@/types/gameData/BinOutput/ConfigAbility/Action'
-import AvatarSkillStart from '@/types/gameData/BinOutput/ConfigAbility/Action/AvatarSkillStart'
-import ExecuteGadgetLua from '@/types/gameData/BinOutput/ConfigAbility/Action/ExecuteGadgetLua'
-import HealHP from '@/types/gameData/BinOutput/ConfigAbility/Action/HealHP'
-import LoseHP from '@/types/gameData/BinOutput/ConfigAbility/Action/LoseHP'
-import SelectTargetsConfig from '@/types/gameData/BinOutput/ConfigAbility/SelectTarget'
-import SelectTargetsByShape from '@/types/gameData/BinOutput/ConfigAbility/SelectTarget/SelectTargetsByShape'
 import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
-import { ActionParam } from '../../../types/gameData/BinOutput/Common/ActionParam'
 import AppliedAbility from './appliedAbility'
 
 const MathOp = ['MUL', 'ADD']
@@ -79,7 +78,7 @@ export default class AbilityAction extends BaseClass {
     return state.val
   }
 
-  private eval(ability: AppliedAbility, val: ActionParam | DynamicNumber): number {
+  private eval(ability: AppliedAbility, val: DynamicFloat | DynamicInt): number {
     if (val == null) return 0
     if (Array.isArray(val)) return this.calc(ability, Array.from(val))
 
@@ -180,7 +179,7 @@ export default class AbilityAction extends BaseClass {
     }
   }
 
-  private getOtherTargets(ability: AppliedAbility, config: SelectTargetsConfig) {
+  private getOtherTargets(ability: AppliedAbility, config: SelectTargets) {
     const { $type } = config
 
     const targetList: Entity[] = []
@@ -193,7 +192,7 @@ export default class AbilityAction extends BaseClass {
         break
       }
       case 'SelectTargetsByShape': {
-        this.selectTargetsByShape(targetList, ability, <SelectTargetsByShape>config)
+        this.selectTargetsByShape(targetList, ability, config)
         break
       }
       case 'SelectTargetsByTag': {
@@ -275,7 +274,7 @@ export default class AbilityAction extends BaseClass {
     return amount
   }
 
-  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ActionConfig, target?: Entity) {
+  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ConfigAbilityAction, target?: Entity) {
     if (ability == null || config == null) return
 
     logger.debug('RunAction:', config?.$type, config, target ? target.entityId : 'self')

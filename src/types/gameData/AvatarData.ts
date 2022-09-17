@@ -1,4 +1,4 @@
-import AvatarConfig from './BinOutput/ConfigAvatar'
+import ConfigAvatar from './BinOutput/Config/ConfigAvatar'
 import FetterDataList from './FetterData'
 
 export interface AvatarData {
@@ -43,7 +43,7 @@ export interface AvatarData {
   ControllerPathRemoteHashSuffix: number
   ControllerPathRemoteHashPre: number
 
-  Config: AvatarConfig
+  Config: ConfigAvatar
   Fetters: FetterDataList
 }
 
