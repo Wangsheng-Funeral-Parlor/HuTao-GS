@@ -517,6 +517,8 @@ export default class EntityManager extends BaseClass {
     // Send notify
     await this.appearQueueFlush(player, seqId)
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)
+
+    logger.debug('PlayerJoin event handled.')
   }
 
   async handlePlayerLeave(player: Player) {

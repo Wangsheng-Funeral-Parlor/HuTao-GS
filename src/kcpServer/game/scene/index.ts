@@ -426,6 +426,8 @@ export default class Scene extends BaseClass {
   async handlePlayerJoin() {
     const { sceneBlockList } = this
     for (const sceneBlock of sceneBlockList) await sceneBlock.updateNonDynamic()
+
+    logger.debug('PlayerJoin event handled.')
   }
 
   // EntityUpdate

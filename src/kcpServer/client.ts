@@ -22,12 +22,12 @@ const noCleanupPackets = [
 ]
 
 export default class Client extends BaseClass {
+  private _state: ClientStateEnum
+
   server: KcpServer
 
   conv: number
   workerId: number
-
-  state: ClientStateEnum
 
   auid: string
   uid: number
@@ -47,7 +47,7 @@ export default class Client extends BaseClass {
     this.conv = conv
     this.workerId = workerId
 
-    this.state = ClientStateEnum.NONE
+    this._state = ClientStateEnum.NONE
 
     this.auid = null
     this.uid = null
@@ -57,6 +57,17 @@ export default class Client extends BaseClass {
     this.rtt = 0
 
     this.readyToSave = false
+  }
+
+  get state() {
+    return this._state
+  }
+  set state(v) {
+    this._state = v
+    const m = v & 0xF000
+    const t = v & 0x0F00
+    const s = v & 0x00FF
+    logger.debug('State change:', 'M', ClientStateEnum[m], 'T', t > 0 ? ClientStateEnum[t] : null, 'S', s)
   }
 
   // Destroy client

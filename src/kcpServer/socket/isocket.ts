@@ -3,8 +3,9 @@ import { waitUntil } from '@/utils/asyncWait'
 import * as dgram from 'dgram'
 import { AcceptTypes, encodeData } from './worker/utils/data'
 
-const ISocketBufferSize = 24
-const ISocketMaxIdx = 0x10000
+const ISocketBufferSize = 32
+const ISocketMessageChunkSize = 65280
+const ISocketMaxNum = 0x10000
 
 const ISocketPacketMagic1 = 0x89AB
 const ISocketPacketMagic2 = 0xCDEF
@@ -17,8 +18,9 @@ class ISocketChannel {
   is: ISocket
   port: number
 
-  sendBuf: Buffer[]
+  sendBuf: { buf: Buffer, ts: number }[]
   recvBuf: { [idx: number]: Buffer }
+  msgBuf: Buffer
 
   private sendIdx: number
   private recvIdx: number | null
@@ -29,6 +31,7 @@ class ISocketChannel {
 
     this.sendBuf = []
     this.recvBuf = {}
+    this.msgBuf = Buffer.alloc(0)
 
     this.sendIdx = 0
     this.recvIdx = null
@@ -37,21 +40,25 @@ class ISocketChannel {
   private calcDiff(current: number, target: number): number {
     return [
       (target - current),
-      (target - (current + ISocketMaxIdx)),
-      (target - (current - ISocketMaxIdx))
+      (target - (current + ISocketMaxNum)),
+      (target - (current - ISocketMaxNum))
     ].map(v => [v, Math.abs(v)]).sort((a, b) => a[1] - b[1])[0][0]
   }
 
   private incIdx(): number {
     this.sendIdx++
-    this.sendIdx %= ISocketMaxIdx
+    this.sendIdx %= ISocketMaxNum
     return this.sendIdx
   }
 
-  private getMessage(idx: number): Buffer | null {
+  private getMessage(idx: number, ts: number): Buffer | null {
     const { sendIdx, sendBuf } = this
     const diff = this.calcDiff(sendIdx, idx)
-    return sendBuf[(sendBuf.length - 1) + diff] || null
+
+    const msg = sendBuf[(sendBuf.length - 1) + diff]
+    if (msg == null || this.calcDiff(ts, msg.ts) < 0) return null
+
+    return msg.buf
   }
 
   private async send(opcode: ISocketPacketOpcode, sndIdx: number, data: Buffer = Buffer.alloc(0)) {
@@ -82,11 +89,13 @@ class ISocketChannel {
   }
 
   private async requestResend(idx: number) {
-    await this.send(ISocketPacketOpcode.Resend, idx)
+    const ts = Buffer.alloc(2)
+    ts.writeUInt16LE(Date.now() % ISocketMaxNum)
+    await this.send(ISocketPacketOpcode.Resend, idx, ts)
   }
 
-  private async resendMessage(idx: number) {
-    const msg = this.getMessage(idx)
+  private async resendMessage(idx: number, ts: number) {
+    const msg = this.getMessage(idx, ts)
     if (msg == null) return
 
     await this.send(ISocketPacketOpcode.Message, idx, msg)
@@ -95,10 +104,20 @@ class ISocketChannel {
   async sendMessage(msg: Buffer) {
     const { sendBuf } = this
 
-    sendBuf.push(msg)
-    while (sendBuf.length > ISocketBufferSize) sendBuf.shift()
+    const len = Buffer.alloc(4)
+    len.writeUInt32LE(msg.length)
+    msg = Buffer.concat([len, msg])
 
-    await this.send(ISocketPacketOpcode.Message, this.incIdx(), msg)
+    while (msg.length > 0) {
+      const end = Math.min(ISocketMessageChunkSize, msg.length)
+      const chunk = msg.subarray(0, end)
+      msg = msg.subarray(end)
+
+      sendBuf.push({ buf: chunk, ts: Date.now() % ISocketMaxNum })
+      await this.send(ISocketPacketOpcode.Message, this.incIdx(), chunk)
+    }
+
+    while (sendBuf.length > ISocketBufferSize) sendBuf.shift()
   }
 
   async recv(packet: Buffer) {
@@ -118,7 +137,7 @@ class ISocketChannel {
         await this.handleMessage(sndIdx, packet.subarray(10, 10 + dtSize))
         break
       case ISocketPacketOpcode.Resend:
-        await this.resendMessage(sndIdx)
+        await this.resendMessage(sndIdx, packet.readUInt16LE(10))
         break
       default:
         console.log('Invalid opcode:', opcode)
@@ -134,19 +153,33 @@ class ISocketChannel {
   }
 
   async flushRecvBuf() {
-    const { is, recvBuf } = this
+    const { recvBuf } = this
 
     while (true) {
-      const msg = recvBuf[this.recvIdx]
-      if (msg == null) return this.requestResend(this.recvIdx)
+      const recv = recvBuf[this.recvIdx]
+      if (recv == null) return this.requestResend(this.recvIdx)
 
       delete recvBuf[this.recvIdx]
 
       this.recvIdx++
-      this.recvIdx %= ISocketMaxIdx
+      this.recvIdx %= ISocketMaxNum
 
-      await is.emit('Message', msg)
+      this.msgBuf = Buffer.concat([this.msgBuf, recv])
+      await this.flushMsgBuf()
     }
+  }
+
+  async flushMsgBuf() {
+    const { is, msgBuf } = this
+    if (msgBuf.length < 4) return
+
+    const len = msgBuf.readUInt32LE()
+    if (msgBuf.length < 4 + len) return
+
+    const msg = msgBuf.subarray(4, 4 + len)
+    this.msgBuf = msgBuf.subarray(4 + len)
+
+    await is.emit('Message', msg)
   }
 }
 

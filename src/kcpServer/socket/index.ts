@@ -93,13 +93,13 @@ export default class Socket extends BaseClass {
   }
 
   async sendPacket(conv: number, packetName: string, head: PacketHead, obj: object) {
-    const { server } = this
-    const client = server.getClient(conv)
-    if (!client) return
-    const worker = this.getWorker<KcpWorkerInterface>(client.workerId)
-    if (!worker) return
-
     try {
+      const { server } = this
+      const client = server.getClient(conv)
+      if (!client) throw new Error('client == null')
+      const worker = this.getWorker<KcpWorkerInterface>(client.workerId)
+      if (!worker) throw new Error('worker == null')
+
       const packetID = <number>getCmdIdByName(packetName)
       const packetHead = await objToProtobuffer(head, PACKET_HEAD, true)
       const packetData = await objToProtobuffer(obj, packetID)
