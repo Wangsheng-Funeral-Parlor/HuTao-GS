@@ -15,10 +15,8 @@ class EntityAuthorityChangePacket extends Packet implements PacketInterface {
     this.entityList = []
   }
 
-  async sendNotify(context: PacketContext): Promise<void> {
-    const entityList = this.entityList.splice(0)
-
-    if (entityList.length === 0) return
+  async sendNotify(context: PacketContext, entityList: Entity[]): Promise<void> {
+    if (entityList.length <= 0) return
 
     const notifyData: EntityAuthorityChangeNotify = {
       authorityChangeList: entityList.map(entity => ({
@@ -32,7 +30,7 @@ class EntityAuthorityChangePacket extends Packet implements PacketInterface {
   }
 
   async broadcastNotify(contextList: PacketContext[]): Promise<void> {
-    await super.broadcastNotify(contextList)
+    await super.broadcastNotify(contextList, this.entityList.splice(0))
   }
 
   addEntity(entity: Entity) {

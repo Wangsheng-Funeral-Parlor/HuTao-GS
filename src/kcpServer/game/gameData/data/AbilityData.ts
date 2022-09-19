@@ -1,6 +1,7 @@
 import Loader from '$/gameData/loader'
 import ConfigAbility from '$DT/BinOutput/Config/ConfigAbility'
 import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
+import ConfigAbilityMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin'
 import ConfigAbilityGroup from '$DT/BinOutput/Config/ConfigAbilityGroup'
 import { AbilityConfigIdxEnum, AbilityModifierConfigIdxEnum } from '@/types/enum'
 import AbilityDataGroup from '@/types/gameData/AbilityData'
@@ -56,6 +57,33 @@ class AbilityDataLoader extends Loader {
       default:
         return null
     }
+  }
+
+  private getActionList(actions: (ConfigAbilityAction | ConfigAbilityMixin)[]): (ConfigAbilityAction | ConfigAbilityMixin)[] {
+    const actionList = []
+    if (!Array.isArray(actions)) return actionList
+
+    for (const action of actions) {
+      actionList.push(action)
+      switch (action.$type) {
+        case 'DummyAction':
+          actionList.push(...this.getActionList(action.ActionList))
+          break
+        case 'Predicated':
+        case 'Randomed':
+          actionList.push(...this.getActionList(action.SuccessActions))
+          actionList.push(...this.getActionList(action.FailActions))
+          break
+        case 'Repeated':
+          actionList.push(...this.getActionList(action.Actions))
+          break
+        case 'TryTriggerPlatformStartMove':
+          actionList.push(...this.getActionList(action.FailActions))
+          break
+      }
+    }
+
+    return actionList
   }
 
   private addString(str: string): void {
@@ -115,12 +143,12 @@ class AbilityDataLoader extends Loader {
     return this.abilityMap[name] || null
   }
 
-  async getActionByLocalId(abilityName: string, localId: number): Promise<ConfigAbilityAction> {
+  async getActionByLocalId(abilityName: string, localId: number): Promise<ConfigAbilityAction | ConfigAbilityMixin> {
     const configInfo = this.parseLocalId(localId)
     const abilityData = await this.getAbility(abilityName)
     if (configInfo == null || !abilityData) return null
 
-    const { typeTag, actionID, configIdx, modifierIdx } = configInfo
+    const { typeTag, actionID, configIdx, mixinIdx, modifierIdx } = configInfo
 
     switch (typeTag) {
       case 1: {
@@ -130,24 +158,25 @@ class AbilityDataLoader extends Loader {
         return actionList[actionID - 1]
       }
       case 2: {
-        break
+        return abilityData.AbilityMixins?.[mixinIdx]
       }
       case 3: {
         const modifier = Object.entries(abilityData.Modifiers || {})
           .sort((a, b) => sortStr(a[0], b[0]))[modifierIdx]?.[1]
         if (modifier == null) return null
 
-        const actionList = modifier[AbilityModifierConfigIdxEnum[configIdx]]
-        if (!Array.isArray(actionList)) return null
-
-        return actionList[actionID - 1]
+        return this.getActionList(modifier[AbilityModifierConfigIdxEnum[configIdx]])[actionID - 1]
       }
       case 4: {
-        break
-      }
-    }
+        const modifier = Object.entries(abilityData.Modifiers || {})
+          .sort((a, b) => sortStr(a[0], b[0]))[modifierIdx]?.[1]
+        if (modifier == null) return null
 
-    return null
+        return modifier.ModifierMixins?.[mixinIdx]
+      }
+      default:
+        return null
+    }
   }
 
   lookupString(abilityString: AbilityString) {

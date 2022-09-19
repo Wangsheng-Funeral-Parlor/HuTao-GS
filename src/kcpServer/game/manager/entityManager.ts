@@ -204,7 +204,10 @@ export default class EntityManager extends BaseClass {
       loadedEntityIdList.splice(loadedEntityIdList.indexOf(entityId), 1)
 
       const entityCountMap = entityGridCountMap[gridHash]
-      if (entityCountMap?.[entityType] != null) entityCountMap[entityType]--
+      if (entityCountMap?.[entityType] != null) {
+        entityCountMap[entityType]--
+        if (entityCountMap[entityType] < 0) logger.debug('Entity count < 0, WTF?')
+      }
 
       this.disappearQueuePush(player, entityId, visionType)
 
@@ -294,7 +297,7 @@ export default class EntityManager extends BaseClass {
     if (entity.manager !== this) await this.register(entity)
 
     const { scene } = this
-    const { playerList } = scene
+    const { playerList, broadcastContextList } = scene
     const { entityId, motion } = entity
 
     this.addEntityToMap(entity)
@@ -313,6 +316,7 @@ export default class EntityManager extends BaseClass {
       if (stateChanged && !batch) await this.appearQueueFlush(player, seqId)
     }
 
+    await EntityAuthorityChange.broadcastNotify(broadcastContextList)
     await entity.emit('OnScene')
   }
 
@@ -322,7 +326,7 @@ export default class EntityManager extends BaseClass {
     if (targetEntity == null) return
 
     const { scene } = this
-    const { playerList } = scene
+    const { playerList, broadcastContextList } = scene
     const { entityId } = targetEntity
 
     // Reset entity state
@@ -335,13 +339,14 @@ export default class EntityManager extends BaseClass {
     for (const player of playerList) {
       const { stateChanged } = this.playerUnloadEntity(player, targetEntity, visionType, true)
       if (stateChanged) {
-        this.updateAllEntity(player)
+        await this.updateAllEntity(player)
         if (!batch) await this.disappearQueueFlush(player, seqId)
       }
     }
 
     this.removeEntityFromMap(targetEntity)
 
+    await EntityAuthorityChange.broadcastNotify(broadcastContextList)
     await targetEntity.emit('OffScene')
   }
 
@@ -354,9 +359,9 @@ export default class EntityManager extends BaseClass {
     await this.add(newEntity, VisionTypeEnum.VISION_REPLACE, oldEntityId, seqId)
   }
 
-  updateEntity(entity: Entity) {
+  async updateEntity(entity: Entity) {
     const { scene } = this
-    const { playerList } = scene
+    const { playerList, broadcastContextList } = scene
     const { entityId, entityType, gridHash: oldHash } = entity
 
     logger.debug('Update EntityID:', entityId)
@@ -380,16 +385,19 @@ export default class EntityManager extends BaseClass {
       const loadState = this.playerLoadEntity(player, entity, VisionTypeEnum.VISION_MEET)
       if (!loadState.stateChanged && loadState.loaded) {
         const unloadState = this.playerUnloadEntity(player, entity, VisionTypeEnum.VISION_MISS)
-        if (unloadState.stateChanged) this.updateAllEntity(player)
+        if (unloadState.stateChanged) await this.updateAllEntity(player)
       }
     }
 
-    if (entityType === EntityTypeEnum.Avatar) this.updateAllEntity((<Avatar>entity).player)
+    if (entityType === EntityTypeEnum.Avatar) await this.updateAllEntity((<Avatar>entity).player)
 
+    await EntityAuthorityChange.broadcastNotify(broadcastContextList)
     scene.emit('EntityUpdate', entity)
   }
 
-  updateAllEntity(player: Player) {
+  async updateAllEntity(player: Player) {
+    const { scene } = this
+    const { broadcastContextList } = scene
     const { currentAvatar, loadedEntityIdList } = player
 
     const nearbyEntityList = this.getNearbyEntityList(currentAvatar)
@@ -411,6 +419,8 @@ export default class EntityManager extends BaseClass {
 
       this.playerUnloadEntity(player, entity, VisionTypeEnum.VISION_MISS)
     }
+
+    await EntityAuthorityChange.broadcastNotify(broadcastContextList)
   }
 
   /**Queue functions**/

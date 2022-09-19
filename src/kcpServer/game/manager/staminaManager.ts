@@ -15,6 +15,7 @@ export default class StaminaManager extends BaseClass {
 
   startConsumeTime: number | null
   startRecoverTime: number | null
+  immediateQueue: number[]
 
   consumeAmount: number
 
@@ -29,6 +30,7 @@ export default class StaminaManager extends BaseClass {
 
     this.startConsumeTime = null
     this.startRecoverTime = null
+    this.immediateQueue = []
 
     this.consumeAmount = 0
 
@@ -53,11 +55,19 @@ export default class StaminaManager extends BaseClass {
   }
 
   private async tick() {
-    const amount = this.calcRecoverAmount() - this.calcConsumeAmount()
+    const { startRecoverTime, immediateQueue, sceneTime } = this
+
+    // Reset recover timer
+    if (immediateQueue.length > 0 && startRecoverTime != null) this.startRecoverTime = sceneTime + 1e3
+
+    // Update stamina
+    const amount = (this.calcRecoverAmount() - this.calcConsumeAmount()) +
+      immediateQueue.splice(0).reduce((p, v) => p + v, 0)
     if (amount === 0) return
 
     await this.setRelativeStamina(amount)
 
+    // Check for drowning
     const { entity, maxStamina, curStamina } = this
     if (!entity.isAlive() || curStamina > 0) return
 
@@ -68,16 +78,14 @@ export default class StaminaManager extends BaseClass {
     }
   }
 
-  private async startConsume(value: number, burst?: number) {
+  private async startConsume(value: number) {
     await this.stopConsume()
     await this.stopRecover()
 
     const { startConsumeTime, sceneTime } = this
     if (startConsumeTime != null || sceneTime == null) return
 
-    if (burst) await this.setRelativeStamina(-burst)
-
-    this.startConsumeTime = burst ? sceneTime + 1e3 : sceneTime
+    this.startConsumeTime = sceneTime
     this.consumeAmount = value
   }
 
@@ -141,10 +149,10 @@ export default class StaminaManager extends BaseClass {
   }
 
   private async setStamina(value: number) {
-    const { entity, maxStamina } = this
+    const { entity, maxStamina, curStamina } = this
     const { manager, player, godMode } = entity
 
-    if (godMode) return
+    if (godMode && value < curStamina) return
 
     value = Math.max(0, Math.min(maxStamina, value))
 
@@ -161,11 +169,11 @@ export default class StaminaManager extends BaseClass {
     this.timer = setInterval(this.tick.bind(this), UPDATE_INTERVAL)
   }
 
-  async immediate(value: number) {
-    const { startRecoverTime, sceneTime } = this
-    if (startRecoverTime != null) this.startRecoverTime = sceneTime + 1e3
+  immediate(value: number) {
+    const { immediateQueue } = this
+    if (value <= 0) return
 
-    await this.setRelativeStamina(value)
+    immediateQueue.push(-value)
   }
 
   async stop() {
@@ -201,10 +209,10 @@ export default class StaminaManager extends BaseClass {
         await this.startConsume(360)
         break
       case MotionStateEnum.MOTION_DASH_BEFORE_SHAKE:
-        await this.startConsume(0, 1800)
+        this.immediate(1800)
         break
       case MotionStateEnum.MOTION_CLIMB_JUMP:
-        await this.startConsume(0, 2500)
+        this.immediate(2500)
         break
       case MotionStateEnum.MOTION_FLY:
       case MotionStateEnum.MOTION_FLY_FAST:
@@ -212,7 +220,7 @@ export default class StaminaManager extends BaseClass {
         await this.startConsume(60)
         break
       case MotionStateEnum.MOTION_SWIM_DASH:
-        await this.startConsume(204, 2000)
+        await this.startConsume(204)
         break
       case MotionStateEnum.MOTION_SWIM_MOVE:
         await this.startConsume(80)

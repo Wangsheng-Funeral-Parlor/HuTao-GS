@@ -11,7 +11,7 @@ import Embryo from '$/ability/embryo'
 import Entity from '$/entity'
 import AbilityData from '$/gameData/data/AbilityData'
 import Logger from '@/logger'
-import { AbilityActionCreateGadget, AbilityActionGenerateElemBall, AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaModifierDurabilityChange, AbilityMetaReInitOverrideMap, AbilityMetaSetKilledState, AbilityScalarValueEntry, AbilityString, AbilitySyncStateInfo } from '@/types/proto'
+import { AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaModifierDurabilityChange, AbilityMetaReInitOverrideMap, AbilityMetaSetKilledState, AbilityScalarValueEntry, AbilityString, AbilitySyncStateInfo } from '@/types/proto'
 import { AbilityInvokeArgumentEnum, ModifierActionEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
 import { dataToProtobuffer } from '@/utils/proto'
@@ -67,6 +67,13 @@ const protoLookupTable = {
   ABILITY_MIXIN_WIDGET_MP_SUPPORT: 'AbilityMixinWidgetMpSupport'
 }
 
+export interface AbilityInvokeEntryParsed {
+  type: string,
+  head: AbilityInvokeEntryHead,
+  data: any,
+  buf: Buffer
+}
+
 const logger = new Logger('ABILIT', 0x10ff10)
 
 export default class AbilityManager extends BaseClass {
@@ -111,7 +118,7 @@ export default class AbilityManager extends BaseClass {
     return id
   }
 
-  private async parseEntry(entry: AbilityInvokeEntry): Promise<{ type: string, head: AbilityInvokeEntryHead, data: any, buf: Buffer }> {
+  private async parseEntry(entry: AbilityInvokeEntry): Promise<AbilityInvokeEntryParsed> {
     const { head, argumentType, abilityData } = entry
     const argType = AbilityInvokeArgumentEnum[argumentType]
     const buf = Buffer.from(abilityData, 'base64')
@@ -128,6 +135,24 @@ export default class AbilityManager extends BaseClass {
       data: await dataToProtobuffer(buf, proto),
       buf
     }
+  }
+
+  private async runAction(context: PacketContext, entry: AbilityInvokeEntryParsed) {
+    const { entity, action } = this
+    const { manager: entityManager } = entity
+    const { type, head, data } = entry
+    const { instancedAbilityId, localId, targetId } = head
+
+    if (!localId) return
+
+    const ability = this.getAbility(instancedAbilityId)
+    if (ability == null) return logger.debug(entity.entityId, type, 'ability == null', head)
+
+    const abilityName = AbilityData.lookupString(ability.abilityName)
+    const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
+    if (actionConfig == null) return logger.debug(entity.entityId, type, 'action == null', head, abilityName)
+
+    await action.runActionConfig(context, ability, actionConfig, data, entityManager.getEntity(targetId))
   }
 
   addEmbryo(name: string = 'Default', overrideName: string = 'Default'): Embryo {
@@ -265,6 +290,7 @@ export default class AbilityManager extends BaseClass {
     logger.verbose(type)
 
     await this.emit(type, context, head, data, buf)
+    await this.runAction(context, parsed)
   }
 
   // ClientAbilityChange
@@ -278,6 +304,7 @@ export default class AbilityManager extends BaseClass {
     const { type, head, data, buf } = parsed
 
     await this.emit(type, context, head, data, buf)
+    await this.runAction(context, parsed)
   }
 
   // ClientAbilityInitFinish
@@ -293,24 +320,10 @@ export default class AbilityManager extends BaseClass {
     const { type, head, data, buf } = parsed
 
     await this.emit(type, context, head, data, buf)
+    await this.runAction(context, parsed)
   }
 
   /**Ability Events**/
-
-  // AbilityNone
-  async handleAbilityNone(context: PacketContext, head: AbilityInvokeEntryHead) {
-    const { entity, action } = this
-    const { manager: entityManager } = entity
-    const { instancedAbilityId, localId, targetId } = head
-    const ability = this.getAbility(instancedAbilityId)
-    if (ability == null) return logger.debug(entity.entityId, 'AbilityNone', 'NoAbility', head)
-
-    const abilityName = AbilityData.lookupString(ability.abilityName)
-    const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
-    if (actionConfig == null) return logger.debug(entity.entityId, 'AbilityNone', 'NoAction', head, abilityName)
-
-    await action.runActionConfig(context, ability, actionConfig, entityManager.getEntity(targetId))
-  }
 
   // AbilityMetaAddNewAbility
   async handleAbilityMetaAddNewAbility(_context: PacketContext, _head: AbilityInvokeEntryHead, data: AbilityMetaAddAbility) {
@@ -415,23 +428,5 @@ export default class AbilityManager extends BaseClass {
     const ability = this.getAbility(instancedAbilityId)
 
     logger.debug(entity.entityId, 'MetaSetKilledState', ability?.abilityName, head, data, buf)
-  }
-
-  // AbilityActionCreateGadget
-  async handleAbilityActionCreateGadget(_context: PacketContext, head: AbilityInvokeEntryHead, data: AbilityActionCreateGadget, buf: Buffer) {
-    const { entity } = this
-    const { instancedAbilityId } = head
-    const ability = this.getAbility(instancedAbilityId)
-
-    logger.debug(entity.entityId, 'ActionCreateGadget', ability?.abilityName, head, data, buf.toString('base64'))
-  }
-
-  // AbilityActionGenerateElemBall
-  async handleAbilityActionGenerateElemBall(_context: PacketContext, head: AbilityInvokeEntryHead, data: AbilityActionGenerateElemBall, buf: Buffer) {
-    const { entity } = this
-    const { instancedAbilityId } = head
-    const ability = this.getAbility(instancedAbilityId)
-
-    logger.debug(entity.entityId, 'ActionGenerateElemBall', ability?.abilityName, head, data, buf.toString('base64'))
   }
 }

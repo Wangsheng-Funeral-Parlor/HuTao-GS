@@ -10,12 +10,18 @@ import { DynamicFloat, DynamicInt } from '$DT/BinOutput/Common/DynamicNumber'
 import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
 import AvatarSkillStart from '$DT/BinOutput/Config/ConfigAbility/Action/Child/AvatarSkillStart'
 import ExecuteGadgetLua from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ExecuteGadgetLua'
+import GenerateElemBall from '$DT/BinOutput/Config/ConfigAbility/Action/Child/GenerateElemBall'
 import HealHP from '$DT/BinOutput/Config/ConfigAbility/Action/Child/HealHP'
 import LoseHP from '$DT/BinOutput/Config/ConfigAbility/Action/Child/LoseHP'
+import ReviveAvatar from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ReviveAvatar'
+import ReviveDeadAvatar from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ReviveDeadAvatar'
+import ConfigAbilityMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin'
+import CostStaminaMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin/Child/CostStaminaMixin'
 import SelectTargets from '$DT/BinOutput/Config/SelectTargets'
 import SelectTargetsByShape from '$DT/BinOutput/Config/SelectTargets/Child/SelectTargetsByShape'
 import Logger from '@/logger'
 import { AbilityTargettingEnum, EntityTypeEnum, FightPropEnum, GadgetStateEnum, TargetTypeEnum } from '@/types/enum'
+import { AbilityActionGenerateElemBall } from '@/types/proto'
 import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
 import AppliedAbility from './appliedAbility'
@@ -254,7 +260,7 @@ export default class AbilityAction extends BaseClass {
     return targetList
   }
 
-  private calcAmount(ability: AppliedAbility, caster: Entity, target: Entity, config: HealHP | LoseHP): number {
+  private calcAmount(ability: AppliedAbility, caster: Entity, target: Entity, config: HealHP | LoseHP | ReviveAvatar | ReviveDeadAvatar): number {
     const { fightProps: casterFightProps } = caster
     const { fightProps: targetFightProps } = target
     const {
@@ -274,11 +280,11 @@ export default class AbilityAction extends BaseClass {
     return amount
   }
 
-  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ConfigAbilityAction, target?: Entity) {
+  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ConfigAbilityAction | ConfigAbilityMixin, param: object, target?: Entity) {
     if (ability == null || config == null) return
 
-    logger.debug('RunAction:', config?.$type, config, target ? target.entityId : 'self')
-    await this.emit(config?.$type, context, ability, config, target)
+    logger.debug('RunAction:', config?.$type, config, param, target ? target.entityId : 'self')
+    await this.emit(config?.$type, context, ability, config, param, target)
   }
 
   /**Actions Events**/
@@ -294,7 +300,19 @@ export default class AbilityAction extends BaseClass {
     const skill = currentDepot?.getSkill(SkillID)
     if (staminaManager == null || skill == null) return
 
-    await staminaManager.immediate(-(this.eval(ability, CostStaminaRatio || 1) * skill.costStamina * 100))
+    staminaManager.immediate(this.eval(ability, CostStaminaRatio || 1) * skill.costStamina * 100)
+  }
+
+  // CostStaminaMixin
+  async handleCostStaminaMixin(_context: PacketContext, ability: AppliedAbility, config: CostStaminaMixin) {
+    const { manager } = this
+    const { entity } = manager
+    const { staminaManager } = (<Avatar>entity)
+    const { CostStaminaDelta } = config
+
+    if (staminaManager == null) return
+
+    staminaManager.immediate(this.eval(ability, CostStaminaDelta || 1) * 30)
   }
 
   // ExecuteGadgetLua
@@ -307,8 +325,25 @@ export default class AbilityAction extends BaseClass {
     await (<Gadget>entity).setGadgetState(config.Param1 || GadgetStateEnum.Default)
   }
 
+  // GenerateElemBall
+  async handleGenerateElemBall(context: PacketContext, ability: AppliedAbility, config: GenerateElemBall, param: AbilityActionGenerateElemBall) {
+    const { manager } = this
+    const { entity } = manager
+    const { player } = (<Avatar>entity)
+    if (!player) return
+
+    const { energyManager } = player
+    const { seqId } = context
+    const { ConfigID, Ratio, BaseEnergy } = config
+    const { pos } = param
+
+    if (ConfigID == null) return
+
+    await energyManager.spawnDrop((new Vector()).setData(pos), ConfigID, Math.floor(BaseEnergy * this.eval(ability, Ratio || 1)), seqId)
+  }
+
   // HealHP
-  async handleHealHP(context: PacketContext, ability: AppliedAbility, config: HealHP, target?: Entity) {
+  async handleHealHP(context: PacketContext, ability: AppliedAbility, config: HealHP, _param: object, target?: Entity) {
     const targetList = this.getTargetList(ability, config, target)
 
     for (const targetEntity of targetList) {
@@ -328,7 +363,7 @@ export default class AbilityAction extends BaseClass {
   }
 
   // LoseHP
-  async handleLoseHP(context: PacketContext, ability: AppliedAbility, config: LoseHP, target?: Entity) {
+  async handleLoseHP(context: PacketContext, ability: AppliedAbility, config: LoseHP, _param: object, target?: Entity) {
     const { Lethal } = config
 
     const targetList = this.getTargetList(ability, config, target)
@@ -340,6 +375,37 @@ export default class AbilityAction extends BaseClass {
       if (fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) - amount <= 0 && !Lethal) continue
 
       await fightProps.takeDamage(null, amount, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABILITY, context.seqId)
+    }
+  }
+
+  // ReviveDeadAvatar
+  async handleReviveDeadAvatar(context: PacketContext, ability: AppliedAbility, config: ReviveDeadAvatar, _param: object, target?: Entity) {
+    const { manager } = this
+    const { entity } = manager
+    const { player } = <Avatar>entity
+    if (!player) return
+
+    const { teamManager, currentScene } = player
+    if (!currentScene) return
+
+    const { playerList } = currentScene
+    const { IsReviveOtherPlayerAvatar, Range } = config
+
+    const avatarList = teamManager.getTeam().getAvatarList()
+    if (IsReviveOtherPlayerAvatar) {
+      for (const p of playerList) {
+        if (p === player) continue
+        avatarList.push(...p.teamManager.getTeam().getAvatarList())
+      }
+    }
+
+    const range = Range || 40
+    for (const avatar of avatarList) {
+      const distance = avatar.player.currentAvatar.distanceTo(entity)
+      if (!avatar.isDead() || distance > range) continue
+
+      const amount = this.calcAmount(ability, this.getCaster(), avatar, config)
+      await avatar.revive(amount)
     }
   }
 }
