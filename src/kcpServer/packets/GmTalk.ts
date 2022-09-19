@@ -25,8 +25,8 @@ class GmTalkPacket extends Packet implements PacketInterface {
   private async gmtHp(context: PacketContext, amount: number) {
     const { player, seqId } = context
     const { currentAvatar } = player
-    if (amount > 0) await currentAvatar.fightProps.heal(amount, true, ChangeHpReasonEnum.CHANGE_HP_ADD_GM, seqId)
-    else await currentAvatar.fightProps.takeDamage(0, -amount, true, ChangeHpReasonEnum.CHANGE_HP_SUB_GM, seqId)
+    if (amount > 0) await currentAvatar.heal(amount, true, ChangeHpReasonEnum.CHANGE_HP_ADD_GM, seqId)
+    else await currentAvatar.takeDamage(0, -amount, true, ChangeHpReasonEnum.CHANGE_HP_SUB_GM, seqId)
   }
 
   private async gmtMonster(context: PacketContext, id: number, count: number, lvl: number, x?: number, y?: number, z?: number) {

@@ -78,13 +78,8 @@ export default class Avatar extends Entity {
 
     this.name = avatarData.Name || null
 
-    // Default abilities
     for (const name of AvatarDefaultAbilities) abilityManager.addEmbryo(name)
-
-    if (!Array.isArray(avatarData?.Config?.Abilities)) return
-    for (const ability of avatarData.Config.Abilities) {
-      abilityManager.addEmbryo(ability.AbilityName || undefined, ability.AbilityOverride || undefined)
-    }
+    this.loadAbilities(avatarData?.Config?.Abilities)
   }
 
   async init(userData: AvatarUserData) {

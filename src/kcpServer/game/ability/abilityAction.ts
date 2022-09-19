@@ -261,8 +261,6 @@ export default class AbilityAction extends BaseClass {
   }
 
   private calcAmount(ability: AppliedAbility, caster: Entity, target: Entity, config: HealHP | LoseHP | ReviveAvatar | ReviveDeadAvatar): number {
-    const { fightProps: casterFightProps } = caster
-    const { fightProps: targetFightProps } = target
     const {
       Amount,
       AmountByCasterAttackRatio,
@@ -272,10 +270,10 @@ export default class AbilityAction extends BaseClass {
     } = config
 
     let amount = this.eval(ability, Amount)
-    amount += casterFightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * this.eval(ability, AmountByCasterMaxHPRatio)
-    amount += casterFightProps.get(FightPropEnum.FIGHT_PROP_CUR_ATTACK) * this.eval(ability, AmountByCasterAttackRatio)
-    amount += targetFightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * this.eval(ability, AmountByTargetMaxHPRatio)
-    amount += targetFightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) * this.eval(ability, AmountByTargetCurrentHPRatio)
+    amount += caster.getProp(FightPropEnum.FIGHT_PROP_MAX_HP) * this.eval(ability, AmountByCasterMaxHPRatio)
+    amount += caster.getProp(FightPropEnum.FIGHT_PROP_CUR_ATTACK) * this.eval(ability, AmountByCasterAttackRatio)
+    amount += target.getProp(FightPropEnum.FIGHT_PROP_MAX_HP) * this.eval(ability, AmountByTargetMaxHPRatio)
+    amount += target.getProp(FightPropEnum.FIGHT_PROP_CUR_HP) * this.eval(ability, AmountByTargetCurrentHPRatio)
 
     return amount
   }
@@ -347,10 +345,8 @@ export default class AbilityAction extends BaseClass {
     const targetList = this.getTargetList(ability, config, target)
 
     for (const targetEntity of targetList) {
-      const { fightProps } = targetEntity
       const amount = this.calcAmount(ability, this.getCaster(), targetEntity, config)
-
-      await fightProps.heal(amount, true, ChangeHpReasonEnum.CHANGE_HP_ADD_ABILITY, context.seqId)
+      await targetEntity.heal(amount, true, ChangeHpReasonEnum.CHANGE_HP_ADD_ABILITY, context.seqId)
     }
   }
 
@@ -369,17 +365,15 @@ export default class AbilityAction extends BaseClass {
     const targetList = this.getTargetList(ability, config, target)
 
     for (const targetEntity of targetList) {
-      const { fightProps } = targetEntity
       const amount = this.calcAmount(ability, this.getCaster(), targetEntity, config)
+      if (targetEntity.getProp(FightPropEnum.FIGHT_PROP_CUR_HP) - amount <= 0 && !Lethal) continue
 
-      if (fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) - amount <= 0 && !Lethal) continue
-
-      await fightProps.takeDamage(null, amount, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABILITY, context.seqId)
+      await targetEntity.takeDamage(null, amount, true, ChangeHpReasonEnum.CHANGE_HP_SUB_ABILITY, context.seqId)
     }
   }
 
   // ReviveDeadAvatar
-  async handleReviveDeadAvatar(context: PacketContext, ability: AppliedAbility, config: ReviveDeadAvatar, _param: object, target?: Entity) {
+  async handleReviveDeadAvatar(_context: PacketContext, ability: AppliedAbility, config: ReviveDeadAvatar, _param: object, target?: Entity) {
     const { manager } = this
     const { entity } = manager
     const { player } = <Avatar>entity

@@ -3,14 +3,15 @@ import LifeStateChange from '#/packets/LifeStateChange'
 import AbilityManager from '$/manager/abilityManager'
 import EntityManager from '$/manager/entityManager'
 import Vector from '$/utils/vector'
+import ConfigEntityAbilityEntry from '$DT/BinOutput/Config/ConfigEntityAbilityEntry'
 import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
 import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
-import { ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 import EntityProps from './entityProps'
-import FightProp from './fightProps'
+import FightProp, { FightPropChangeReason } from './fightProps'
 import Motion from './motion'
 
 export default class Entity extends BaseClass {
@@ -39,6 +40,8 @@ export default class Entity extends BaseClass {
   bornPos: Vector
 
   lifeState: LifeStateEnum
+  isInvincible: boolean
+  isLockHP: boolean
   godMode: boolean
 
   dieType: PlayerDieTypeEnum
@@ -58,13 +61,29 @@ export default class Entity extends BaseClass {
       this.bornPos = new Vector()
     }
 
-    this.authorityPeerId = null
-
     this.groupId = 0
     this.configId = 0
     this.blockId = 0
 
+    this.authorityPeerId = null
+
+    this.lifeState = LifeStateEnum.LIFE_NONE
+    this.isInvincible = false
+    this.isLockHP = false
+    this.godMode = false
+
     this.isOnScene = false
+  }
+
+  protected loadAbilities(abilities: ConfigEntityAbilityEntry[], init: boolean = false) {
+    const { abilityManager } = this
+    if (abilityManager == null || !Array.isArray(abilities)) return
+
+    for (const ability of abilities) {
+      abilityManager.addEmbryo(ability.AbilityName || undefined, ability.AbilityOverride || undefined)
+    }
+
+    if (init) abilityManager.initFromEmbryos()
   }
 
   async init(userData: EntityUserData) {
@@ -147,8 +166,79 @@ export default class Entity extends BaseClass {
     return authorityPeerId != null
   }
 
+  getProp(type: FightPropEnum): number {
+    return this.fightProps.get(type)
+  }
+
+  async setProp(type: FightPropEnum, val: number, notify?: boolean, changeReason?: FightPropChangeReason, seqId?: number) {
+    await this.fightProps.set(type, val, notify, changeReason, seqId)
+  }
+
+  async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+    if (this.godMode) return
+
+    await this.fightProps.drainEnergy(notify, changeEnergyReason, seqId)
+  }
+
+  async gainEnergy(val: number, flat: boolean = false, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+    await this.fightProps.gainEnergy(val, flat, notify, changeEnergyReason, seqId)
+  }
+
+  async rechargeEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+    await this.fightProps.rechargeEnergy(notify, changeEnergyReason, seqId)
+  }
+
   async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    await this.fightProps.takeDamage(attackerId, val, notify, changeHpReason, seqId)
+    const { isInvincible, isLockHP, godMode } = this
+    if (isInvincible || isLockHP || godMode || !this.isAlive()) return
+
+    const killed = await this.fightProps.takeDamage(val, notify, changeHpReason, seqId)
+    if (!killed) return
+
+    let dieType: PlayerDieTypeEnum
+
+    switch (changeHpReason) {
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_MONSTER:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_KILL_BY_MONSTER
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_GEAR:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_KILL_BY_GEAR
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_FALL:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_FALL
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_DRAWN:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_DRAWN
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_ABYSS
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_GM:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_GM
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_CLIMATE_COLD:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_CLIMATE_COLD
+        break
+      case ChangeHpReasonEnum.CHANGE_HP_SUB_STORM_LIGHTNING:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_STORM_LIGHTING
+        break
+      default:
+        dieType = PlayerDieTypeEnum.PLAYER_DIE_NONE
+    }
+
+    await this.kill(attackerId, dieType, seqId)
+  }
+
+  async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    if (this.isLockHP || !this.isAlive()) return
+
+    await this.fightProps.heal(val, notify, changeHpReason, seqId)
+  }
+
+  async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    if (this.isLockHP || !this.isAlive()) return
+
+    await this.fightProps.fullHeal(notify, changeHpReason, seqId)
   }
 
   async kill(attackerId: number, dieType: PlayerDieTypeEnum, seqId?: number, batch: boolean = false): Promise<void> {
@@ -178,8 +268,8 @@ export default class Entity extends BaseClass {
     this.attackerId = null
 
     // Update cur hp
-    const maxHp = this.fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP)
-    await this.fightProps.set(FightPropEnum.FIGHT_PROP_CUR_HP, val != null ? Math.min(maxHp, Math.max(1, val)) : (maxHp * 0.4), true)
+    const maxHp = this.getProp(FightPropEnum.FIGHT_PROP_MAX_HP)
+    await this.setProp(FightPropEnum.FIGHT_PROP_CUR_HP, val != null ? Math.min(maxHp, Math.max(1, val)) : (maxHp * 0.4), true)
 
     // Emit revive event
     await this.emit('Revive')

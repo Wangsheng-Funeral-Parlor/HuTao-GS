@@ -545,9 +545,8 @@ export default class Player extends BaseClass {
     const avatarList = team.getAliveAvatarList()
 
     for (const avatar of avatarList) {
-      const { fightProps } = avatar
-      await fightProps.drainEnergy(true)
-      await fightProps.takeDamage(0, fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, changeHpReason)
+      await avatar.drainEnergy(true)
+      await avatar.takeDamage(0, avatar.getProp(FightPropEnum.FIGHT_PROP_MAX_HP) * 0.1, true, changeHpReason)
     }
 
     if (team.getAliveAvatar()) {

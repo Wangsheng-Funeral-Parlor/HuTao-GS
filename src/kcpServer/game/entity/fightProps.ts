@@ -7,7 +7,7 @@ import { CurveArithEnum, ElemTypeEnum, FightPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
 import { FightPropPair } from '@/types/proto'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import PropsUserData from '@/types/user/PropsUserData'
 import Entity from '.'
 import Avatar from './avatar'
@@ -314,8 +314,6 @@ export default class FightProp {
   }
 
   async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
-    if (this.entity.godMode) return
-
     const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     await this.set(type, 0, notify, { changeEnergyReason }, seqId)
   }
@@ -334,54 +332,17 @@ export default class FightProp {
     await this.set(type, this.getCostElemVal(), notify, { changeEnergyReason }, seqId)
   }
 
-  async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    if (this.entity.godMode || !this.entity.isAlive()) return
-
+  async takeDamage(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<boolean> {
     const damage = Math.min(
       this.get(FightPropEnum.FIGHT_PROP_CUR_HP),
       Math.max(0, val)
     )
-
     if (isFinite(damage) && damage > 0) this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason }, seqId)
 
-    // Check if entity is dead
-    if (this.get(FightPropEnum.FIGHT_PROP_CUR_HP) > 0) return
-    let dieType: PlayerDieTypeEnum
-
-    switch (changeHpReason) {
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_MONSTER:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_KILL_BY_MONSTER
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_GEAR:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_KILL_BY_GEAR
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_FALL:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_FALL
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_DRAWN:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_DRAWN
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_ABYSS:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_ABYSS
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_GM:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_GM
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_CLIMATE_COLD:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_CLIMATE_COLD
-        break
-      case ChangeHpReasonEnum.CHANGE_HP_SUB_STORM_LIGHTNING:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_STORM_LIGHTING
-        break
-      default:
-        dieType = PlayerDieTypeEnum.PLAYER_DIE_NONE
-    }
-
-    await this.entity.kill(attackerId, dieType, seqId)
+    return this.get(FightPropEnum.FIGHT_PROP_CUR_HP) <= 0
   }
 
   async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    if (!this.entity.isAlive()) return
     const healAmount = Math.min(
       this.get(FightPropEnum.FIGHT_PROP_MAX_HP) - this.get(FightPropEnum.FIGHT_PROP_CUR_HP)
       , Math.max(0, val)
@@ -390,7 +351,6 @@ export default class FightProp {
   }
 
   async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    if (!this.entity.isAlive()) return
     this.set(FightPropEnum.FIGHT_PROP_CUR_HP, this.get(FightPropEnum.FIGHT_PROP_MAX_HP), notify, { changeHpReason }, seqId)
   }
 

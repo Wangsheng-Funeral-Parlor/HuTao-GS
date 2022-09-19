@@ -52,7 +52,7 @@ export default class Monster extends Entity {
   }
 
   private async loadMonsterData() {
-    const { player, monsterId, abilityManager } = this
+    const { player, monsterId } = this
 
     this.config = await MonsterData.getFightPropConfig(monsterId)
     this.growCurve = await GrowCurveData.getGrowCurve('Monster')
@@ -76,12 +76,7 @@ export default class Monster extends Entity {
       this.specialNameId = (await MonsterData.getSpecialName(describeData.SpecialNameLabID))?.Id || 0
     }
 
-    if (!Array.isArray(monsterData?.Config?.Abilities)) return
-    for (const ability of monsterData.Config.Abilities) {
-      abilityManager.addEmbryo(ability.AbilityName || undefined, ability.AbilityOverride || undefined)
-    }
-
-    abilityManager.initFromEmbryos()
+    this.loadAbilities(monsterData?.Config?.Abilities, true)
   }
 
   async init(userData: EntityUserData): Promise<void> {
@@ -95,12 +90,12 @@ export default class Monster extends Entity {
   }
 
   async takeDamage(attackerId: number, val: number, notify?: boolean, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    const { manager, motion, fightProps, hpDropList } = this
+    const { manager, motion, hpDropList } = this
 
-    const maxHp = fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP)
-    const hpBefore = fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) / maxHp
+    const maxHp = this.getProp(FightPropEnum.FIGHT_PROP_MAX_HP)
+    const hpBefore = this.getProp(FightPropEnum.FIGHT_PROP_CUR_HP) / maxHp
     await super.takeDamage(attackerId, val, notify, changeHpReason, seqId)
-    const hpAfter = fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP) / maxHp
+    const hpAfter = this.getProp(FightPropEnum.FIGHT_PROP_CUR_HP) / maxHp
 
     for (const hpDrop of hpDropList) {
       const { id, hp } = hpDrop

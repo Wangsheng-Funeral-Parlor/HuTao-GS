@@ -115,7 +115,7 @@ export default class Vehicle extends Gadget {
   }
 
   exportVehicleLocationInfo(): VehicleLocationInfo {
-    const { player, gadgetId, entityId, fightProps, motion, memberList } = this
+    const { player, gadgetId, entityId, motion, memberList } = this
     const { pos, rot } = motion
 
     return {
@@ -124,8 +124,8 @@ export default class Vehicle extends Gadget {
       ownerUid: player.uid,
       pos: pos.export(),
       rot: rot.export(),
-      curHp: fightProps.get(FightPropEnum.FIGHT_PROP_CUR_HP),
-      maxHp: fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP),
+      curHp: this.getProp(FightPropEnum.FIGHT_PROP_CUR_HP),
+      maxHp: this.getProp(FightPropEnum.FIGHT_PROP_MAX_HP),
       uidList: memberList.map(m => m.player.uid)
     }
   }

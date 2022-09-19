@@ -75,10 +75,8 @@ export default class CombatManager extends BaseClass {
 
     logger.debug('[FALL]', 'Type:', index, 'Speed:', speed, 'Mul:', mul)
 
-    const { fightProps } = entity
-    const damage = fightProps.get(FightPropEnum.FIGHT_PROP_MAX_HP) * mul
-
-    await fightProps.takeDamage(0, damage, true, ChangeHpReasonEnum.CHANGE_HP_SUB_FALL, seqId)
+    const damage = entity.getProp(FightPropEnum.FIGHT_PROP_MAX_HP) * mul
+    await entity.takeDamage(0, damage, true, ChangeHpReasonEnum.CHANGE_HP_SUB_FALL, seqId)
   }
 
   /**Events**/

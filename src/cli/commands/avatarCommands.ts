@@ -46,7 +46,7 @@ const avatarCommands: CommandDefinition[] = [
       const avatarList = player.teamManager.getTeam()?.avatarList || []
       for (const avatar of avatarList) {
         if (!avatar.isAlive()) await avatar.revive()
-        await avatar.fightProps.fullHeal(true)
+        await avatar.fullHeal(true)
       }
     }
   },
@@ -70,7 +70,7 @@ const avatarCommands: CommandDefinition[] = [
       print('Recharged energy.')
 
       const avatarList = player.teamManager.getTeam()?.avatarList || []
-      for (const avatar of avatarList) avatar.fightProps.rechargeEnergy(true)
+      for (const avatar of avatarList) await avatar.rechargeEnergy(true)
     }
   },
   {
@@ -135,7 +135,7 @@ const avatarCommands: CommandDefinition[] = [
         return
       }
 
-      currentAvatar.fightProps.set(prop, args[1], true)
+      await currentAvatar.setProp(prop, args[1], true)
       print(`Set ${FightPropEnum[prop]}(${prop}) to ${args[1]}.`)
     }
   },

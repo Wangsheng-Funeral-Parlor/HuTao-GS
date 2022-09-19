@@ -30,17 +30,20 @@ class GadgetDataLoader extends Loader {
   }
 
   async getFightPropConfig(id: number): Promise<EntityFightPropConfig> {
-    const data = await this.getProp(id)
-    if (!data) {
+    const propData = await this.getProp(id)
+    if (!propData) {
+      const gadgetData = await this.getGadget(id)
+      const { HP, Attack, Defense } = gadgetData?.Config?.Combat?.Property || {}
+
       return {
-        HpBase: 0,
-        AttackBase: 0,
-        DefenseBase: 0,
+        HpBase: HP || 0,
+        AttackBase: Attack || 0,
+        DefenseBase: Defense || 0,
         PropGrowCurves: []
       }
     }
 
-    const { Hp, Attack, Defense, HpCurve, AttackCurve, DefenseCurve } = data
+    const { Hp, Attack, Defense, HpCurve, AttackCurve, DefenseCurve } = propData
 
     return {
       HpBase: Hp,

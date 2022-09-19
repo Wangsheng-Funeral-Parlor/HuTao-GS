@@ -72,7 +72,7 @@ export default class EnergyManager {
     const penaltyMul = Math.max(0.1, 1 - (currentScene.exportSceneTeamAvatarList().length * 0.1))
     const { avatarList } = teamManager.getTeam()
     for (const avatar of avatarList) {
-      avatar.fightProps.gainEnergy(energy * (avatar === currentAvatar ? 1 : penaltyMul), false, true)
+      await avatar.gainEnergy(energy * (avatar === currentAvatar ? 1 : penaltyMul), false, true)
     }
   }
 
@@ -84,9 +84,9 @@ export default class EnergyManager {
     const penaltyMul = Math.max(0.1, 1 - (currentScene.exportSceneTeamAvatarList().length * 0.1))
     const { avatarList } = teamManager.getTeam()
     for (const avatar of avatarList) {
-      const { skillManager, fightProps } = avatar
+      const { skillManager } = avatar
       const energy = skillManager.costElemType === elemType ? sameElemEnergy : diffElemEnergy
-      fightProps.gainEnergy(energy * (avatar === currentAvatar ? 1 : penaltyMul), false, true)
+      await avatar.gainEnergy(energy * (avatar === currentAvatar ? 1 : penaltyMul), false, true)
     }
   }
 }
