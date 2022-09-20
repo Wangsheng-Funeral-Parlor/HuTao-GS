@@ -1,10 +1,14 @@
 const ARGUMENT_SEPARATION_REGEX = /([^=\s]+)=?\s*(.*)/
 
+export interface ParsedArgs {
+  [name: string]: string | number | boolean
+}
+
 export default function parseArgs(argv: string[]) {
   // Removing node/bin and called script name
   argv = argv.slice(2)
 
-  const parsedArgs: { [name: string]: string | number | boolean } = {}
+  const parsedArgs: ParsedArgs = {}
   let argName: string
   let argValue: string | number | boolean
 
