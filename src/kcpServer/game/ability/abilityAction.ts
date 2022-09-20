@@ -209,7 +209,7 @@ export default class AbilityAction extends BaseClass {
     return targetList
   }
 
-  private getTargetList(ability: AppliedAbility, config: HealHP | LoseHP, target?: Entity): Entity[] {
+  private getTargetList(ability: AppliedAbility, config: HealHP | LoseHP, target: Entity): Entity[] {
     const { manager } = this
     const { entity } = manager
     const { manager: entityManager, player } = <Avatar>entity
@@ -278,10 +278,10 @@ export default class AbilityAction extends BaseClass {
     return amount
   }
 
-  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ConfigAbilityAction | ConfigAbilityMixin, param: object, target?: Entity) {
+  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ConfigAbilityAction | ConfigAbilityMixin, param: object, target: Entity) {
     if (ability == null || config == null) return
 
-    logger.debug('RunAction:', config?.$type, config, param, target ? target.entityId : 'self')
+    logger.debug('RunAction:', config?.$type, config, param, target.entityId)
     await this.emit(config?.$type, context, ability, config, param, target)
   }
 
@@ -341,7 +341,7 @@ export default class AbilityAction extends BaseClass {
   }
 
   // HealHP
-  async handleHealHP(context: PacketContext, ability: AppliedAbility, config: HealHP, _param: object, target?: Entity) {
+  async handleHealHP(context: PacketContext, ability: AppliedAbility, config: HealHP, _param: object, target: Entity) {
     const targetList = this.getTargetList(ability, config, target)
 
     for (const targetEntity of targetList) {
@@ -359,7 +359,7 @@ export default class AbilityAction extends BaseClass {
   }
 
   // LoseHP
-  async handleLoseHP(context: PacketContext, ability: AppliedAbility, config: LoseHP, _param: object, target?: Entity) {
+  async handleLoseHP(context: PacketContext, ability: AppliedAbility, config: LoseHP, _param: object, target: Entity) {
     const { Lethal } = config
 
     const targetList = this.getTargetList(ability, config, target)
@@ -373,7 +373,7 @@ export default class AbilityAction extends BaseClass {
   }
 
   // ReviveDeadAvatar
-  async handleReviveDeadAvatar(_context: PacketContext, ability: AppliedAbility, config: ReviveDeadAvatar, _param: object, target?: Entity) {
+  async handleReviveDeadAvatar(_context: PacketContext, ability: AppliedAbility, config: ReviveDeadAvatar, _param: object) {
     const { manager } = this
     const { entity } = manager
     const { player } = <Avatar>entity

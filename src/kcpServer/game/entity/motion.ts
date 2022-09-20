@@ -79,7 +79,7 @@ export default class Motion {
 
     if (state != null) {
       this.state = state
-      if (state !== oldState) entity.emit('MotionStateChanged', state)
+      if (state !== oldState) entity.emit('MotionStateChanged', state, oldState)
     }
 
     if (sceneTime) this.sceneTime = sceneTime

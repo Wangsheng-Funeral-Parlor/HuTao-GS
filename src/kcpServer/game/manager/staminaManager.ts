@@ -202,7 +202,7 @@ export default class StaminaManager extends BaseClass {
   /**Events**/
 
   // MotionStateChanged
-  async handleMotionStateChanged(state: MotionStateEnum) {
+  async handleMotionStateChanged(state: MotionStateEnum, oldState: MotionStateEnum) {
     switch (state) {
       case MotionStateEnum.MOTION_DASH:
       case MotionStateEnum.MOTION_DANGER_DASH:
@@ -225,6 +225,7 @@ export default class StaminaManager extends BaseClass {
       case MotionStateEnum.MOTION_SWIM_MOVE:
         await this.startConsume(80)
         break
+      case MotionStateEnum.MOTION_NOTIFY:
       case MotionStateEnum.MOTION_SLIP:
       case MotionStateEnum.MOTION_LADDER_SLIP:
       case MotionStateEnum.MOTION_FLY_IDLE:
@@ -242,7 +243,7 @@ export default class StaminaManager extends BaseClass {
         this.startRecover()
         break
       default:
-        this.startRecover(true)
+        this.startRecover(oldState !== MotionStateEnum.MOTION_NOTIFY)
         break
     }
   }

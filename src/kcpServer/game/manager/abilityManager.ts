@@ -152,7 +152,10 @@ export default class AbilityManager extends BaseClass {
     const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
     if (actionConfig == null) return logger.debug(entity.entityId, type, 'action == null', head, abilityName)
 
-    await action.runActionConfig(context, ability, actionConfig, data, entityManager.getEntity(targetId))
+    const target = entityManager.getEntity(targetId) || entity
+    if (target == null) return logger.debug(entity.entityId, type, 'target == null', head, abilityName)
+
+    await action.runActionConfig(context, ability, actionConfig, data, target)
   }
 
   addEmbryo(name: string = 'Default', overrideName: string = 'Default'): Embryo {

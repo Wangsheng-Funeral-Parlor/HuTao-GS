@@ -68,7 +68,7 @@ export default class Team {
     return this.getAvatarList().find(avatar => avatar.isAlive())
   }
 
-  async setUpAvatarTeam(data: SetUpAvatarTeamReq, noNotify: boolean = false, seqId?: number): Promise<RetcodeEnum> {
+  async setUpAvatarTeam(data: SetUpAvatarTeamReq, noNotify: boolean = false, seqId?: number, revive: boolean = false): Promise<RetcodeEnum> {
     const { teamManager, avatarList } = this
     const { player, currentTeam } = teamManager
     const { currentScene, currentAvatar: oldAvatar } = player
@@ -78,7 +78,7 @@ export default class Team {
 
     const avatarTeamList = avatarTeamGuidList.map(guid => player.getAvatar(BigInt(guid))).filter(avatar => avatar != null)
     if (avatarTeamList.length === 0) avatarTeamList.push(player.avatarList[0])
-    if (!avatarTeamList.find(avatar => avatar.isAlive())) return RetcodeEnum.RET_AVATAR_NOT_ALIVE
+    if (!revive && !avatarTeamList.find(avatar => avatar.isAlive())) return RetcodeEnum.RET_AVATAR_NOT_ALIVE
 
     avatarList.splice(0)
     avatarList.push(...avatarTeamList)
@@ -89,9 +89,9 @@ export default class Team {
     if (!isCurTeam) return RetcodeEnum.RET_SUCC
 
     if (!avatarTeamGuidList.includes(curAvatarGuid)) {
-      player.currentAvatar = this.getAliveAvatar()
+      player.currentAvatar = this.getAliveAvatar() || avatarList[0]
     } else if (oldAvatar?.guid !== BigInt(curAvatarGuid)) {
-      player.currentAvatar = this.getAvatar(BigInt(curAvatarGuid)) || this.getAliveAvatar()
+      player.currentAvatar = this.getAvatar(BigInt(curAvatarGuid)) || this.getAliveAvatar() || avatarList[0]
     }
 
     const { currentAvatar } = player

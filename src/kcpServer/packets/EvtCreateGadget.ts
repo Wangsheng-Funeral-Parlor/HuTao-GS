@@ -32,7 +32,7 @@ class EvtCreateGadgetPacket extends Packet implements PacketInterface {
 
   async recvNotify(context: PacketContext, data: EvtCreateGadgetNotify): Promise<void> {
     const { player, seqId } = context
-    const { forwardBuffer, loadedEntityIdList, entityGridCountMap, currentScene } = player
+    const { forwardBuffer, currentScene } = player
     const { entityManager } = currentScene
     const { entityId } = data
 
@@ -46,16 +46,10 @@ class EvtCreateGadgetPacket extends Packet implements PacketInterface {
     await entity.initNew()
 
     // add entity to loaded entity list
-    loadedEntityIdList.push(entityId)
+    player.loadEntity(entity)
 
     // add entity to scene
     await entityManager.add(entity)
-
-    // add to entity counter
-    const { entityType, gridHash } = entity
-    const entityCountMap = entityGridCountMap[gridHash] = entityGridCountMap[gridHash] || {}
-    if (entityCountMap[entityType] == null) entityCountMap[entityType] = 0
-    entityCountMap[entityType]++
   }
 
   async sendNotify(context: PacketContext, data: EvtCreateGadgetNotify): Promise<void> {

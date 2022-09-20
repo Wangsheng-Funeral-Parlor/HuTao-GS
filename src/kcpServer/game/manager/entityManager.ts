@@ -87,9 +87,8 @@ export default class EntityManager extends BaseClass {
     return (protEntityType << 24) | entityIdCounter[protEntityType]
   }
 
-  private isGridAvailable(player: Player, entity: Entity): boolean {
+  private isGridAvailable(player: Player, entityType: EntityTypeEnum, gridHash: number): boolean {
     const { entityGridCountMap } = player
-    const { entityType, gridHash } = entity
 
     const entityLimit = ENTITY_LIMIT[entityType] || DEFAULT_ENTITY_LIMIT
     const entityCount = entityGridCountMap[gridHash]?.[entityType] || 0
@@ -100,13 +99,14 @@ export default class EntityManager extends BaseClass {
   private isEntityLoadable(player: Player, entity: Entity, loaded: boolean): boolean {
     const { scene, viewDistance } = this
     const { state, currentScene, currentAvatar } = player
+    const { entityType, isOnScene, gridHash } = entity
 
     return (
-      entity.isOnScene &&
+      isOnScene &&
       (state & 0xF0FF) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE) &&
       entity.distanceTo2D(currentAvatar) <= viewDistance &&
       scene === currentScene &&
-      (loaded || this.isGridAvailable(player, entity))
+      (loaded || this.isGridAvailable(player, entityType, gridHash))
     )
   }
 
@@ -171,20 +171,15 @@ export default class EntityManager extends BaseClass {
   }
 
   private playerLoadEntity(player: Player, entity: Entity, visionType: VisionTypeEnum, param?: number): EntityLoadState {
-    const { loadedEntityIdList, entityGridCountMap } = player
-    const { entityId, entityType, gridHash } = entity
+    const { loadedEntityIdList } = player
+    const { entityId } = entity
 
     const canLoad = this.canLoadEntity(player, entity)
 
     if (canLoad) {
-      loadedEntityIdList.push(entityId)
-
-      const entityCountMap = entityGridCountMap[gridHash] = entityGridCountMap[gridHash] || {}
-      if (entityCountMap[entityType] == null) entityCountMap[entityType] = 0
-      entityCountMap[entityType]++
+      player.loadEntity(entity)
 
       this.appearQueuePush(player, entity, visionType, param)
-
       if (entity.updateAuthorityPeer()) EntityAuthorityChange.addEntity(entity)
     }
 
@@ -195,22 +190,15 @@ export default class EntityManager extends BaseClass {
   }
 
   private playerUnloadEntity(player: Player, entity: Entity, visionType: VisionTypeEnum, force: boolean = false): EntityLoadState {
-    const { loadedEntityIdList, entityGridCountMap } = player
-    const { entityId, entityType, gridHash } = entity
+    const { loadedEntityIdList } = player
+    const { entityId } = entity
 
     const canUnload = this.canUnloadEntity(player, entity, force)
 
     if (canUnload) {
-      loadedEntityIdList.splice(loadedEntityIdList.indexOf(entityId), 1)
-
-      const entityCountMap = entityGridCountMap[gridHash]
-      if (entityCountMap?.[entityType] != null) {
-        entityCountMap[entityType]--
-        if (entityCountMap[entityType] < 0) logger.debug('Entity count < 0, WTF?')
-      }
+      player.unloadEntity(entity)
 
       this.disappearQueuePush(player, entityId, visionType)
-
       if (entity.updateAuthorityPeer()) EntityAuthorityChange.addEntity(entity)
     }
 
@@ -240,7 +228,7 @@ export default class EntityManager extends BaseClass {
 
   getNearbyEntityList(entity: Entity): Entity[] {
     const { entityGridMap } = this
-    const { gridHash } = entity
+    const { gridHash } = entity || {}
 
     const entityGrid = entityGridMap[gridHash]
     if (!entityGrid) return []
@@ -327,7 +315,7 @@ export default class EntityManager extends BaseClass {
 
     const { scene } = this
     const { playerList, broadcastContextList } = scene
-    const { entityId } = targetEntity
+    const { entityId, entityType, gridHash } = targetEntity
 
     // Reset entity state
     targetEntity.authorityPeerId = null
@@ -338,13 +326,12 @@ export default class EntityManager extends BaseClass {
 
     for (const player of playerList) {
       const { stateChanged } = this.playerUnloadEntity(player, targetEntity, visionType, true)
-      if (stateChanged) {
-        await this.updateAllEntity(player)
-        if (!batch) await this.disappearQueueFlush(player, seqId)
-      }
+      if (stateChanged && !batch) await this.disappearQueueFlush(player, seqId)
     }
 
     this.removeEntityFromMap(targetEntity)
+
+    await this.updateGrid(entityType, gridHash)
 
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)
     await targetEntity.emit('OffScene')
@@ -361,38 +348,46 @@ export default class EntityManager extends BaseClass {
 
   async updateEntity(entity: Entity) {
     const { scene } = this
-    const { playerList, broadcastContextList } = scene
+    const { playerList } = scene
     const { entityId, entityType, gridHash: oldHash } = entity
 
     logger.debug('Update EntityID:', entityId)
 
-    // Update entity grid
+    const loadedPlayerList = playerList.filter(p => p.loadedEntityIdList.includes(entityId))
+
+    // Move to new grid
+    for (const player of loadedPlayerList) player.unloadEntity(entity)
     this.removeEntityFromMap(entity)
     this.addEntityToMap(entity)
+    for (const player of loadedPlayerList) player.loadEntity(entity)
 
     const { gridHash: newHash } = entity
 
-    for (const player of playerList) {
-      const { entityGridCountMap } = player
-
-      const oldEntityCountMap = entityGridCountMap[oldHash]
-      if (oldEntityCountMap?.[entityType] != null) oldEntityCountMap[entityType]--
-
-      const newEntityCountMap = entityGridCountMap[newHash] = entityGridCountMap[newHash] || {}
-      if (newEntityCountMap[entityType] == null) newEntityCountMap[entityType] = 0
-      newEntityCountMap[entityType]++
-
-      const loadState = this.playerLoadEntity(player, entity, VisionTypeEnum.VISION_MEET)
-      if (!loadState.stateChanged && loadState.loaded) {
-        const unloadState = this.playerUnloadEntity(player, entity, VisionTypeEnum.VISION_MISS)
-        if (unloadState.stateChanged) await this.updateAllEntity(player)
-      }
-    }
+    await this.updateGrid(entityType, oldHash)
+    await this.updateGrid(entityType, newHash)
 
     if (entityType === EntityTypeEnum.Avatar) await this.updateAllEntity((<Avatar>entity).player)
 
-    await EntityAuthorityChange.broadcastNotify(broadcastContextList)
     scene.emit('EntityUpdate', entity)
+  }
+
+  async updateGrid(entityType: EntityTypeEnum, gridHash: number) {
+    const { scene, entityGridMap } = this
+    const { playerList, broadcastContextList } = scene
+
+    const entityList = Object.values(entityGridMap[gridHash]?.entityTypeMap?.[entityType] || {})
+
+    for (const player of playerList) {
+      const { loadedEntityIdList } = player
+      for (const entity of entityList) {
+        const { entityId } = entity
+
+        if (loadedEntityIdList.includes(entityId)) this.playerUnloadEntity(player, entity, VisionTypeEnum.VISION_MISS)
+        else this.playerLoadEntity(player, entity, VisionTypeEnum.VISION_MEET)
+      }
+    }
+
+    await EntityAuthorityChange.broadcastNotify(broadcastContextList)
   }
 
   async updateAllEntity(player: Player) {
@@ -534,20 +529,22 @@ export default class EntityManager extends BaseClass {
   async handlePlayerLeave(player: Player) {
     const { scene } = this
     const { broadcastContextList } = scene
-    const { loadedEntityIdList, missedEntityIdList, entityGridCountMap } = player
+    const { loadedEntityIdList, missedEntityIdList } = player
 
-    const entityList = loadedEntityIdList.splice(0)
+    while (loadedEntityIdList.length > 0) {
+      const entityId = loadedEntityIdList[0]
+      const entity = this.getEntity(entityId)
 
-    for (const entityId of entityList) {
-      const entity = this.getEntity(entityId, true)
-      if (!entity) continue
+      if (entity == null) {
+        loadedEntityIdList.shift()
+        continue
+      }
+
+      player.unloadEntity(entity)
 
       if (entity.updateAuthorityPeer()) EntityAuthorityChange.addEntity(entity)
+      missedEntityIdList.push(entityId)
     }
-
-    missedEntityIdList.push(...entityList)
-
-    for (const hash in entityGridCountMap) delete entityGridCountMap[hash]
 
     // Send notify
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)

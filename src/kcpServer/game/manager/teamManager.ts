@@ -50,14 +50,14 @@ export default class TeamManager extends BaseClass {
           teamId: i,
           avatarTeamGuidList: avatarGuidList,
           curAvatarGuid: curAvatarGuid || null
-        }, true)
+        }, true, undefined, true)
       } else {
         await teamList[i].setUpAvatarTeam({
           teamId: i,
           avatarTeamGuidList: [
             player.avatarList[0].guid.toString()
           ]
-        }, true)
+        }, true, undefined, true)
       }
     }
   }

@@ -5,6 +5,7 @@ import DelTeamEntity from '#/packets/DelTeamEntity'
 import { PlayerEnterSceneInfoNotify } from '#/packets/PlayerEnterSceneInfo'
 import PlayerGameTime from '#/packets/PlayerGameTime'
 import WindSeedClient from '#/packets/WindSeedClient'
+import Entity from '$/entity'
 import Avatar from '$/entity/avatar'
 import Vehicle from '$/entity/gadget/vehicle'
 import Equip from '$/equip'
@@ -398,6 +399,31 @@ export default class Player extends BaseClass {
 
     // Add new costumes to costume list
     costumeList.push(...newCostumes)
+  }
+
+  loadEntity(entity: Entity) {
+    const { loadedEntityIdList, entityGridCountMap } = this
+    const { entityId, entityType, gridHash } = entity
+
+    if (loadedEntityIdList.includes(entityId)) return
+
+    loadedEntityIdList.push(entityId)
+
+    const entityCountMap = entityGridCountMap[gridHash] = entityGridCountMap[gridHash] || {}
+    if (entityCountMap[entityType] == null) entityCountMap[entityType] = 0
+    entityCountMap[entityType]++
+  }
+
+  unloadEntity(entity: Entity) {
+    const { loadedEntityIdList, entityGridCountMap } = this
+    const { entityId, entityType, gridHash } = entity
+
+    if (!loadedEntityIdList.includes(entityId)) return
+
+    loadedEntityIdList.splice(loadedEntityIdList.indexOf(entityId), 1)
+
+    const entityCountMap = entityGridCountMap[gridHash]
+    if (entityCountMap?.[entityType] != null) entityCountMap[entityType]--
   }
 
   async changeAvatar(avatar: Avatar, pos?: Vector, seqId?: number): Promise<RetcodeEnum> {
