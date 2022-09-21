@@ -57,15 +57,15 @@ export default class TTYPrompt extends TTYModule {
   render() {
     const { tty, prompt, cursor, buffer, y, promptLen, visibleInputLen, overflowLeft, overflowRight } = this
 
-    this.clear()
-    tty.setCursor(0, y)
+    this.clear(true)
 
     let input = buffer.join('').slice(overflowLeft, overflowLeft + visibleInputLen)
-    if (overflowLeft > 0) input = '[' + input.slice(1)
-    if (overflowRight > 0) input = input.slice(1) + ']'
 
-    tty.write(`\x1b[97m${prompt}>${input}\x1b[m`)
-    tty.setCursor(promptLen + (cursor - overflowLeft - (overflowRight > 0 ? 1 : 0)), y)
+    if (overflowLeft) input = input.slice(1)
+    if (overflowRight) input = input.slice(1)
+
+    tty.write(`\x1b[97m${prompt}>${overflowLeft ? '[' : ''}${input}\x1b[97m${overflowRight ? ']' : ''}\x1b[m`)
+    tty.setCursor(promptLen + (cursor - overflowLeft - (overflowRight ? 1 : 0)), y, false)
   }
 
   nextInput(): Promise<string> {

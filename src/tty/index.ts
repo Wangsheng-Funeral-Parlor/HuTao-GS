@@ -18,6 +18,7 @@ export class TTY extends EventEmitter {
 
   cursorX: number
   cursorY: number
+  cursorH: boolean
 
   constructor() {
     super()
@@ -28,6 +29,7 @@ export class TTY extends EventEmitter {
 
     this.cursorX = 0
     this.cursorY = 0
+    this.cursorH = false
 
     const ownPropNames = Object.getOwnPropertyNames(this.constructor.prototype)
     for (const name of ownPropNames) {
@@ -153,17 +155,18 @@ export class TTY extends EventEmitter {
     return formatted
   }
 
-  setCursor(x: number, y: number) {
+  setCursor(x: number, y: number, hidden: boolean = false) {
     this.cursorX = x
     this.cursorY = y
+    this.cursorH = hidden
 
-    this.write(`\x1b[${y + 1};${x + 1}H`)
+    this.write(`\x1b[${y + 1};${x + 1}H\x1b[?25${hidden ? 'l' : 'h'}`)
   }
 
   clearLine(lines: number = 1) {
-    const { cursorX, cursorY } = this
+    const { cursorX, cursorY, cursorH } = this
     this.write('\x1b[2K\x1b[B'.repeat(lines))
-    this.setCursor(cursorX, cursorY)
+    this.setCursor(cursorX, cursorY, cursorH)
   }
 
   refresh() {

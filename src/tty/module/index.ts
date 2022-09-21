@@ -22,10 +22,13 @@ export default class TTYModule extends EventEmitter {
     return this.tty.stdout?.rows || 1
   }
 
-  clear() {
+  clear(hideCursor: boolean = false) {
     const { tty, y, height } = this
+    const { cursorH } = tty
 
-    tty.setCursor(0, y)
+    tty.setCursor(0, y, true)
+    tty.cursorH = hideCursor || cursorH
+
     tty.clearLine(height)
   }
 }

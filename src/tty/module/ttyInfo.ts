@@ -27,7 +27,7 @@ export default class TTYInfo extends TTYModule {
     const { log, cursorX, cursorY } = tty
     const { scrollIndex } = log
 
-    this.clear()
+    this.clear(true)
 
     const timestamp = getTimestamp()
     const timestampLen = timestamp.length
@@ -54,6 +54,6 @@ export default class TTYInfo extends TTYModule {
     )
 
     // restore cursor position
-    tty.setCursor(cursorX, cursorY)
+    tty.setCursor(cursorX, cursorY, false)
   }
 }

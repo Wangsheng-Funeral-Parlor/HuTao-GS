@@ -75,7 +75,7 @@ export default class TTYLog extends TTYModule {
     const { tty, y, visibleLines } = this
     const { cursorX, cursorY } = tty
 
-    this.clear()
+    this.clear(true)
 
     let offsetY = 0
     for (const line of visibleLines) {
@@ -85,7 +85,7 @@ export default class TTYLog extends TTYModule {
     }
 
     // restore cursor position
-    tty.setCursor(cursorX, cursorY)
+    tty.setCursor(cursorX, cursorY, false)
   }
 
   write(str: string) {
@@ -97,7 +97,10 @@ export default class TTYLog extends TTYModule {
     this.updated = scrollIndex == null || Math.abs((lines.length - 1) - scrollIndex) <= height
 
     lines.push(...newLines)
-    while (lines.length > MAX_LINES) lines.shift()
+    while (lines.length > MAX_LINES) {
+      lines.shift()
+      if (scrollIndex != null && this.scrollIndex >= height) this.scrollIndex--
+    }
   }
 
   scrollUp() {
