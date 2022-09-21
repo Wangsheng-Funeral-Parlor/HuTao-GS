@@ -1,5 +1,5 @@
 import { LogLevel } from '@/logger'
-import { cRGB } from '@/tty'
+import { cRGB } from '@/tty/utils'
 import { waitUntil } from '@/utils/asyncWait'
 import * as dgram from 'dgram'
 import Worker, { WorkerOpcode } from '../'

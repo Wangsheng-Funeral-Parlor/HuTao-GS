@@ -6,12 +6,12 @@ import { mkdirSync, statSync } from 'fs'
 import * as hostile from 'hostile'
 import { join } from 'path'
 import { PerformanceObserver } from 'perf_hooks'
-import { argv, cwd, execPath, exit } from 'process'
+import { cwd, execPath, exit } from 'process'
 import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
 import DnsServer from './dnsServer'
 import Logger from './logger'
 import { patchGame, unpatchGame } from './tools/patcher'
-import { cRGB } from './tty'
+import { cRGB } from './tty/utils'
 import { Announcement } from './types/announcement'
 import Update from './update'
 import Authenticator from './utils/authenticator'
@@ -272,7 +272,7 @@ export default class Server {
     await this.runShutdownTasks()
     await waitMs(delay)
 
-    await detachedSpawn(execPath, argv.slice(1))
+    await detachedSpawn(execPath, process.argv.slice(1))
     exit()
   }
 

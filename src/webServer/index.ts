@@ -1,6 +1,6 @@
 import Logger from '@/logger'
 import Server from '@/server'
-import { cRGB } from '@/tty'
+import { cRGB } from '@/tty/utils'
 import { Announcement, AnnouncementType } from '@/types/announcement'
 import * as http from 'http'
 import * as https from 'https'

@@ -1,6 +1,6 @@
 import BaseClass from '#/baseClass'
 import CLI from '@/cli'
-import { noColor } from '@/tty'
+import { noColor } from '@/tty/utils'
 import { ChatInfo } from '@/types/proto'
 import { waitMs } from '@/utils/asyncWait'
 import { getTimeSeconds } from '@/utils/time'

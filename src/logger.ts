@@ -1,10 +1,12 @@
 import fs from 'fs'
-const { appendFile } = fs.promises
 import { join } from 'path'
-import { argv, cwd } from 'process'
-import { PerformanceObserverEntryList, performance } from 'perf_hooks'
-import getTTY, { TTY, cRGB, noColor } from './tty'
+import { performance, PerformanceObserverEntryList } from 'perf_hooks'
+import { cwd } from 'process'
+import { getTTY, TTY } from './tty'
+import { cRGB, noColor } from './tty/utils'
 import parseArgs from './utils/parseArgs'
+import { getTimestamp } from './utils/time'
+const { appendFile } = fs.promises
 
 export enum LogLevel {
   NONE = 0,
@@ -18,7 +20,9 @@ export enum LogLevel {
   VERBH = 8
 }
 
-let logLevel = parseArgs(process.argv).ll
+const args = parseArgs(process.argv)
+
+let logLevel = args.ll
 if (typeof logLevel !== 'number') logLevel = LogLevel.INFO
 
 let logFileName = null
@@ -28,18 +32,6 @@ let logger: Logger
 const entryMap: { [name: string]: number[] } = {}
 const ENTRY_BUF_LEN = 32
 
-function getTimestamp(): string {
-  const d = new Date()
-  const Y = d.getFullYear().toString()
-  const M = (d.getMonth() + 1).toString().padStart(2, '0')
-  const D = d.getDate().toString().padStart(2, '0')
-  const h = d.getHours().toString().padStart(2, '0')
-  const m = d.getMinutes().toString().padStart(2, '0')
-  const s = d.getSeconds().toString().padStart(2, '0')
-
-  return `${Y}-${M}-${D} ${h}:${m}:${s}`
-}
-
 export default class Logger {
   tty: TTY
 
@@ -47,7 +39,7 @@ export default class Logger {
   color: number
 
   constructor(name?: string, color: number = 0xffffff) {
-    this.tty = parseArgs(argv).lm != null ? null : getTTY()
+    this.tty = args.lm == null ? getTTY() : null
 
     this.name = name
     this.color = color

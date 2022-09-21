@@ -1,5 +1,5 @@
 import Server from '@/server'
-import { noColor } from '@/tty'
+import { noColor } from '@/tty/utils'
 import commands, { CommandDefinition, helpFormatCommand } from '.'
 import CLI from '..'
 

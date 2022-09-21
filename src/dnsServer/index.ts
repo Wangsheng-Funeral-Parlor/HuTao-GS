@@ -1,7 +1,7 @@
 import config from '@/config'
 import Logger from '@/logger'
 import Server from '@/server'
-import { cRGB } from '@/tty'
+import { cRGB } from '@/tty/utils'
 import { writeFile } from '@/utils/fileSystem'
 import * as dgram from 'dgram'
 import Tcp, { AddressInfo } from 'net'

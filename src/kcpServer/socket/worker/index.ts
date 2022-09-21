@@ -2,7 +2,7 @@ import { LogLevel } from '@/logger'
 import parseArgs from '@/utils/parseArgs'
 import { appendFileSync } from 'fs'
 import { join } from 'path'
-import { argv, cwd, exit, stdin } from 'process'
+import { cwd, exit, stdin } from 'process'
 import { formatWithOptions } from 'util'
 import ISocket from '../isocket'
 import { AcceptTypes, decodeDataList } from './utils/data'
@@ -52,8 +52,10 @@ export default class Worker extends ISocket {
   constructor() {
     super()
 
-    this.id = Number(parseArgs(argv).workerId)
-    this.iPort = Number(parseArgs(argv).workerIPort)
+    const args = parseArgs(process.argv)
+
+    this.id = Number(args.workerId)
+    this.iPort = Number(args.workerIPort)
 
     this.hasError = false
     this.callbackMap = {}

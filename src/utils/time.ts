@@ -5,7 +5,7 @@ export function getTimeSeconds(d?: Date | number): number {
   return Math.floor(d / 1e3)
 }
 
-export function getTimestamp(t: number): string {
+export function getTimestamp(t: number = Date.now()): string {
   const d = new Date(t)
   const Y = d.getFullYear().toString().padStart(4, '0')
   const M = (d.getMonth() + 1).toString().padStart(2, '0')

@@ -1,7 +1,6 @@
 import Logger, { LogLevel } from '@/logger'
 import { attachedSpawn } from '@/utils/childProcess'
 import { ChildProcess } from 'child_process'
-import { argv, execPath } from 'process'
 import Socket from '../'
 import ISocket from '../isocket'
 import { WorkerOpcode } from './'
@@ -81,8 +80,8 @@ export default class WorkerInterface extends ISocket {
 
     await this.createISocket()
 
-    const workerProcess = await attachedSpawn(execPath, [
-      argv[1],
+    const workerProcess = await attachedSpawn(process.execPath, [
+      process.argv[1],
       '--stack_trace_limit=200',
       `-lm=${type}`,
       `-workerId=${id}`,

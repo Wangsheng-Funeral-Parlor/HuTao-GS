@@ -1,7 +1,4 @@
-import Logger from '@/logger'
 import Denque from 'denque'
-
-const logger = new Logger('KCPLIB', 0xff17cd)
 
 type u8 = number
 type u16 = number
@@ -312,8 +309,6 @@ export class Kcp {
       seg.data.copy(buf, offset)
       offset += seg.data.length
 
-      logger.extremelyVerbose('[RECV]', `recv sn=${seg.sn}`)
-
       if (seg.frg === 0) break
     }
 
@@ -521,14 +516,10 @@ export class Kcp {
         } else if (sn - maxAck > 0) {
           maxAck = sn
         }
-
-        logger.extremelyVerbose('[IACK]', `input ack: sn=${sn} rtt=${rtt} rto=${this.rxRto}`)
         break
       }
 
       case KCP_CMD_PUSH: {
-        logger.extremelyVerbose('[IPSH]', `input psh: sn=${sn} ts=${ts}`)
-
         if (sn - (this.rcvNxt + this.rcvWnd) >= 0) break
 
         this.ackPush(sn, ts)
@@ -553,13 +544,11 @@ export class Kcp {
 
       case KCP_CMD_WASK: {
         this.probe |= KCP_ASK_TELL
-        logger.extremelyVerbose('[IASK]', 'input probe')
         break
       }
 
       case KCP_CMD_WINS: {
         // Do nothing
-        logger.extremelyVerbose('[ITEL]', `input wins: ${wnd}`)
         break
       }
     }

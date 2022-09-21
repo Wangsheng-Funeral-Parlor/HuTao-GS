@@ -1,7 +1,7 @@
 import KcpServer from '#/.'
 import Player from '$/player'
 import Server from '@/server'
-import { cRGB } from '@/tty'
+import { cRGB } from '@/tty/utils'
 import accountCommands from './accountCommands'
 import avatarCommands from './avatarCommands'
 import configCommands from './configCommands'

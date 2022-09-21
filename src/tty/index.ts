@@ -1,0 +1,287 @@
+import EventEmitter from 'promise-events'
+import { ReadStream, WriteStream } from 'tty'
+import { formatWithOptions } from 'util'
+import TTYInfo from './module/ttyInfo'
+import TTYLog from './module/ttyLog'
+import TTYPrompt from './module/ttyPrompt'
+import { escSeqSplitString } from './utils'
+
+const MAX_HISTORY_COUNT = 10
+
+export class TTY extends EventEmitter {
+  stdin: ReadStream
+  stdout: WriteStream
+
+  info: TTYInfo
+  log: TTYLog
+  promptList: TTYPrompt[]
+
+  cursorX: number
+  cursorY: number
+
+  constructor() {
+    super()
+
+    this.info = new TTYInfo(this)
+    this.log = new TTYLog(this)
+    this.promptList = []
+
+    this.cursorX = 0
+    this.cursorY = 0
+
+    const ownPropNames = Object.getOwnPropertyNames(this.constructor.prototype)
+    for (const name of ownPropNames) {
+      if (typeof this[name] === 'function') this[name] = this[name].bind(this)
+    }
+
+    const defaultPrompt = new TTYPrompt(this, '>')
+    defaultPrompt.on('input', input => this.emit('line', input))
+
+    this.addPrompt(defaultPrompt)
+
+    setInterval(this.update.bind(this), 250)
+  }
+
+  private prevInput() {
+    const ttyp = this.getCurPrompt()
+    if (ttyp == null) return
+
+    const { buffer, history, historyCursor, historyIndex } = ttyp
+    if (history.length <= 0) return
+
+    // clear buffer
+    buffer.splice(0)
+
+    // update index
+    const index = Math.max(0, historyIndex == null ? history.length - 1 : historyIndex - 1)
+    ttyp.historyIndex = index
+
+    // update buffer
+    const entry = history[index]
+    buffer.push(...entry.split(''))
+
+    // update cursor
+    ttyp.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
+  }
+
+  private nextInput() {
+    const ttyp = this.getCurPrompt()
+    if (ttyp == null) return
+
+    const { buffer, history, historyCursor, historyIndex } = ttyp
+    if (history.length <= 0 || historyIndex == null) return
+
+    // clear buffer
+    buffer.splice(0)
+
+    // update index
+    const index = historyIndex + 1
+    ttyp.historyIndex = index >= history.length ? null : index
+
+    // update buffer
+    const entry = index < history.length ? history[index] : ''
+    buffer.push(...entry.split(''))
+
+    // update cursor
+    ttyp.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
+  }
+
+  update() {
+    const { info, log } = this
+
+    info.render()
+    log.update()
+  }
+
+  setIO(stdin?: ReadStream, stdout?: WriteStream) {
+    this.unsetIO()
+
+    stdin = stdin || process.stdin
+    stdout = stdout || process.stdout
+
+    this.stdin = stdin
+    this.stdout = stdout
+
+    stdin?.setRawMode(true)
+    stdin?.resume()
+    stdin?.setEncoding('utf8')
+    stdin?.on('data', this.handleInput)
+    stdout?.on('resize', this.refresh)
+
+    this.refresh()
+  }
+
+  unsetIO() {
+    const { stdin, stdout } = this
+
+    stdin?.off('data', this.handleInput)
+    stdout?.off('resize', this.refresh)
+
+    this.stdin = null
+    this.stdout = null
+  }
+
+  addPrompt(prompt: TTYPrompt) {
+    const { promptList } = this
+    if (promptList.includes(prompt)) return
+
+    promptList.push(prompt)
+    this.getCurPrompt()?.render()
+  }
+
+  removePrompt(prompt: TTYPrompt) {
+    const { promptList } = this
+    if (!promptList.includes(prompt)) return
+
+    promptList.splice(promptList.indexOf(prompt), 1)
+    this.getCurPrompt()?.render()
+  }
+
+  getCurPrompt(): TTYPrompt {
+    return this.promptList[0]
+  }
+
+  write(str: string) {
+    this.stdout?.write(str)
+  }
+
+  print(...args: any[]): string {
+    const { log } = this
+    const formatted = formatWithOptions({ colors: true }, ...args)
+
+    log.write(formatted)
+    return formatted
+  }
+
+  setCursor(x: number, y: number) {
+    this.cursorX = x
+    this.cursorY = y
+
+    this.write(`\x1b[${y + 1};${x + 1}H`)
+  }
+
+  clearLine(lines: number = 1) {
+    const { cursorX, cursorY } = this
+    this.write('\x1b[2K\x1b[B'.repeat(lines))
+    this.setCursor(cursorX, cursorY)
+  }
+
+  refresh() {
+    // clear screen
+    this.write('\x1b[3J')
+
+    this.info.render()
+    this.log.render()
+    this.getCurPrompt()?.render()
+  }
+
+  pushHistory(line: string) {
+    if (line.trim().length <= 0) return
+
+    const ttyp = this.getCurPrompt()
+    if (ttyp == null) return
+
+    const { history } = ttyp
+
+    while (history.length > MAX_HISTORY_COUNT) history.shift()
+    history.push(line)
+  }
+
+  handleInput(data: string) {
+    const chars: string[] = escSeqSplitString(data)
+    for (const char of chars) this.handleChar(char)
+  }
+
+  handleChar(char: string) {
+    const ttyp = this.getCurPrompt()
+    if (ttyp == null) return
+
+    const { log } = this
+    const { cursor, buffer } = ttyp
+
+    let resetHistory = true
+
+    switch (char) {
+      case '\x03': { // ctrl-c
+        this.emit('exit')
+        break
+      }
+      case '\x08': { // backspace
+        if (buffer.length <= 0 || cursor <= 0) break
+
+        buffer.splice(cursor - 1, 1)
+        ttyp.cursor--
+        break
+      }
+      case '\x0d': { // carriage return
+        if (buffer.join('').trim().length <= 0) break
+
+        const line = buffer.splice(0, buffer.length).join('')
+        ttyp.cursor = 0
+
+        ttyp.emit('input', line)
+        this.pushHistory(line)
+        break
+      }
+      case '\x09': { // tab
+        resetHistory = false
+        break
+      }
+      case '\x1b[A': { // cursor up
+        resetHistory = false
+        this.prevInput()
+        break
+      }
+      case '\x1b[B': { // cursor down
+        resetHistory = false
+        this.nextInput()
+        break
+      }
+      case '\x1b[C': { // cursor forward
+        resetHistory = false
+        if (cursor >= buffer.length) break
+
+        ttyp.cursor++
+        ttyp.historyCursor = ttyp.cursor
+        break
+      }
+      case '\x1b[D': { // cursor back
+        resetHistory = false
+        if (cursor <= 0) break
+
+        ttyp.cursor--
+        ttyp.historyCursor = ttyp.cursor
+        break
+      }
+      case '\x1b[5~': { // page up
+        log.scrollUp()
+        break
+      }
+      case '\x1b[6~': { // page down
+        log.scrollDown()
+        break
+      }
+      default: {
+        buffer.splice(cursor, 0, char)
+        ttyp.cursor += char.length
+      }
+    }
+
+    ttyp.render()
+
+    if (resetHistory) {
+      ttyp.historyCursor = null
+      ttyp.historyIndex = null
+    }
+  }
+}
+
+let TTYInstance: TTY = null
+export const getTTY = (): TTY => {
+  if (TTYInstance) return TTYInstance
+
+  TTYInstance = new TTY()
+  console.log = TTYInstance.print
+
+  return TTYInstance
+}

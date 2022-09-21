@@ -2,7 +2,7 @@ import CLI from '@/cli'
 import Logger from '@/logger'
 import printIcon from '@/printIcon'
 import Server from '@/server'
-import getTTY from '@/tty'
+import { getTTY } from '@/tty'
 import { ParsedArgs } from '@/utils/parseArgs'
 import { appendFileSync } from 'fs'
 import { join } from 'path'
@@ -10,7 +10,7 @@ import { cwd } from 'process'
 
 export default async (args: ParsedArgs) => {
   // initialize tty
-  getTTY()
+  getTTY().setIO()
 
   // print icon to terminal
   printIcon()
