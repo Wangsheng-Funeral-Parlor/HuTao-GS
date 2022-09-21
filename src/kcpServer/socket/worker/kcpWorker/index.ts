@@ -133,7 +133,7 @@ export default class KcpWorker extends Worker {
       const { token } = info
       const kcp = new Kcp(conv, token, this.sendUdpPacket.bind(this))
 
-      kcp.setNodelay(true, 0, false)
+      kcp.setNodelay(true, 8, false)
       kcp.setInterval(0)
       kcp.setMaxResend(1024)
 

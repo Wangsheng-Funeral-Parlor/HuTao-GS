@@ -3,7 +3,7 @@ import { waitUntil } from '@/utils/asyncWait'
 import * as dgram from 'dgram'
 import { AcceptTypes, encodeData } from './worker/utils/data'
 
-const ISocketBufferSize = 32
+const ISocketBufferTTL = 10e3 // 10 seconds
 const ISocketMessageChunkSize = 65280
 const ISocketMaxNum = 0x10000
 
@@ -53,11 +53,14 @@ class ISocketChannel {
 
   private getMessage(idx: number, ts: number): Buffer | null {
     const { sendIdx, sendBuf } = this
-    const diff = this.calcDiff(sendIdx, idx)
 
-    const msg = sendBuf[(sendBuf.length - 1) + diff]
+    const diff = this.calcDiff(sendIdx, idx)
+    const index = (sendBuf.length - 1) + diff
+
+    const msg = sendBuf[index]
     if (msg == null || this.calcDiff(ts, msg.ts) < 0) return null
 
+    sendBuf.splice(0, index + 1)
     return msg.buf
   }
 
@@ -104,6 +107,7 @@ class ISocketChannel {
   async sendMessage(msg: Buffer) {
     const { sendBuf } = this
 
+    const now = Date.now()
     const len = Buffer.alloc(4)
     len.writeUInt32LE(msg.length)
     msg = Buffer.concat([len, msg])
@@ -113,11 +117,11 @@ class ISocketChannel {
       const chunk = msg.subarray(0, end)
       msg = msg.subarray(end)
 
-      sendBuf.push({ buf: chunk, ts: Date.now() % ISocketMaxNum })
+      sendBuf.push({ buf: chunk, ts: now % ISocketMaxNum })
       await this.send(ISocketPacketOpcode.Message, this.incIdx(), chunk)
     }
 
-    while (sendBuf.length > ISocketBufferSize) sendBuf.shift()
+    sendBuf.push(...sendBuf.splice(0).filter(b => now - b.ts <= ISocketBufferTTL))
   }
 
   async recv(packet: Buffer) {
