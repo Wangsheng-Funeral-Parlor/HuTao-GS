@@ -11,6 +11,7 @@ const MAX_HISTORY_COUNT = 10
 export class TTY extends EventEmitter {
   stdin: ReadStream
   stdout: WriteStream
+  stderr: WriteStream
 
   info: TTYInfo
   log: TTYLog
@@ -95,32 +96,44 @@ export class TTY extends EventEmitter {
     log.update()
   }
 
-  setIO(stdin?: ReadStream, stdout?: WriteStream) {
+  setIO(stdin?: ReadStream, stdout?: WriteStream, stderr?: WriteStream) {
     this.unsetIO()
 
     stdin = stdin || process.stdin
     stdout = stdout || process.stdout
+    stderr = stderr || process.stderr
 
     this.stdin = stdin
     this.stdout = stdout
+    this.stderr = stderr
 
     stdin?.setRawMode(true)
     stdin?.resume()
     stdin?.setEncoding('utf8')
+
     stdin?.on('data', this.handleInput)
     stdout?.on('resize', this.refresh)
+
+    stdin?.on('error', this.handleError)
+    stdout?.on('error', this.handleError)
+    stderr?.on('error', this.handleError)
 
     this.refresh()
   }
 
   unsetIO() {
-    const { stdin, stdout } = this
+    const { stdin, stdout, stderr } = this
 
     stdin?.off('data', this.handleInput)
     stdout?.off('resize', this.refresh)
 
+    stdin?.off('error', this.handleError)
+    stdout?.off('error', this.handleError)
+    stderr?.off('error', this.handleError)
+
     this.stdin = null
     this.stdout = null
+    this.stderr = null
   }
 
   addPrompt(prompt: TTYPrompt) {
@@ -165,7 +178,7 @@ export class TTY extends EventEmitter {
 
   clearLine(lines: number = 1) {
     const { cursorX, cursorY, cursorH } = this
-    this.write('\x1b[2K\x1b[B'.repeat(lines))
+    this.write('\x1b[2K\x1b[B'.repeat(Math.max(1, lines)))
     this.setCursor(cursorX, cursorY, cursorH)
   }
 
@@ -188,6 +201,10 @@ export class TTY extends EventEmitter {
 
     while (history.length > MAX_HISTORY_COUNT) history.shift()
     history.push(line)
+  }
+
+  handleError(err: Error) {
+    this.print('stdio error:', err)
   }
 
   handleInput(data: string) {

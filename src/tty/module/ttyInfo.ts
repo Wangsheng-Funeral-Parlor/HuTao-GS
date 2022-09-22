@@ -15,7 +15,7 @@ export default class TTYInfo extends TTYModule {
   }
 
   private getLine(size: number) {
-    return BORDER_H.repeat(size)
+    return BORDER_H.repeat(Math.max(1, size))
   }
 
   get height(): number {
