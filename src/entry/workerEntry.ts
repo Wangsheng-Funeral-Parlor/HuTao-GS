@@ -1,7 +1,7 @@
 import Worker from '#/socket/worker'
-import { ParsedArgs } from '@/utils/parseArgs'
+import parseArgs, { ParsedArgs } from '@/utils/parseArgs'
 
-export default async (args: ParsedArgs) => {
+(async (args: ParsedArgs) => {
   let worker: typeof Worker
 
   switch (args.lm) {
@@ -16,4 +16,4 @@ export default async (args: ParsedArgs) => {
   }
 
   worker.create()
-}
+})(parseArgs(process.argv))

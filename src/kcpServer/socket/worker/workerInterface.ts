@@ -81,7 +81,7 @@ export default class WorkerInterface extends ISocket {
     await this.createISocket()
 
     const workerProcess = await attachedSpawn(process.execPath, [
-      process.argv[1],
+      process.argv[1].replace('mainEntry', 'workerEntry'),
       '--stack_trace_limit=200',
       `-lm=${type}`,
       `-workerId=${id}`,

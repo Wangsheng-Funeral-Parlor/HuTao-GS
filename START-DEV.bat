@@ -6,9 +6,9 @@ set /p insp=Inspect? (Y/N):
 if "%insp%" equ "Y" goto launch-inspect
 
 :launch
-node .\buildDev -ll=5
+node .\buildDev\entry\mainEntry -ll=5
 exit
 
 :launch-inspect
-node --inspect .\buildDev -ll=5
+node --inspect .\buildDev\entry\mainEntry -ll=5
 exit

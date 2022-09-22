@@ -1,3 +1,3 @@
 @echo off
 cls
-node .\buildRel
+node .\buildRel\mainEntry

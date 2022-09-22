@@ -3,12 +3,12 @@ import Logger from '@/logger'
 import printIcon from '@/printIcon'
 import Server from '@/server'
 import { getTTY } from '@/tty'
-import { ParsedArgs } from '@/utils/parseArgs'
+import parseArgs, { ParsedArgs } from '@/utils/parseArgs'
 import { appendFileSync } from 'fs'
 import { join } from 'path'
 import { cwd } from 'process'
 
-export default async (args: ParsedArgs) => {
+(async (args: ParsedArgs) => {
   // initialize tty
   getTTY().setIO()
 
@@ -47,4 +47,4 @@ export default async (args: ParsedArgs) => {
     // check for update
     server.update?.checkForUpdate()
   }
-}
+})(parseArgs(process.argv))

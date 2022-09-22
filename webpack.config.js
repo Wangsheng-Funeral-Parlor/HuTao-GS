@@ -18,7 +18,10 @@ const commitHash = (() => {
 module.exports = {
   mode: 'production',
   target: 'node',
-  entry: './buildDev/index.js',
+  entry: {
+    mainEntry: './buildDev/entry/mainEntry.js',
+    workerEntry: './buildDev/entry/workerEntry.js'
+  },
   module: {
     rules: [
       {
@@ -93,7 +96,7 @@ module.exports = {
     })
   ],
   output: {
-    filename: 'index.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'buildRel')
   }
 }
