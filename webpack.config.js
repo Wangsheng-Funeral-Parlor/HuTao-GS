@@ -52,7 +52,7 @@ module.exports = {
       disableConsoleOutput: false,
       forceTransformStrings: [],
       identifierNamesCache: null,
-      identifierNamesGenerator: 'hexadecimal',
+      identifierNamesGenerator: 'mangled',
       identifiersDictionary: [],
       identifiersPrefix: '',
       ignoreRequireImports: false,
