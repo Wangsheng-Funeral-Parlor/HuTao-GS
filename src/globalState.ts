@@ -19,6 +19,16 @@ export interface GlobalStateData {
   WorldSpawn: boolean
 }
 
+export const DEFAULT_GSTATE = {
+  SaveLog: false,
+  SaveRecorder: false,
+  SaveReport: false,
+  PacketDump: false,
+  ShowPacketId: false,
+  UseProtoMatch: false,
+  WorldSpawn: true
+}
+
 export default class GlobalState extends EventEmitter {
   state: GlobalStateData
   modified: boolean
@@ -26,33 +36,35 @@ export default class GlobalState extends EventEmitter {
   constructor() {
     super()
 
-    this.state = {
-      SaveLog: false,
-      SaveRecorder: false,
-      SaveReport: false,
-      PacketDump: false,
-      ShowPacketId: false,
-      UseProtoMatch: false,
-      WorldSpawn: true
-    }
+    this.state = Object.assign({}, DEFAULT_GSTATE)
     this.modified = false
   }
 
-  toggle(key: string) {
+  toggle(key: string): boolean {
     const { state } = this
-    if (state[key] == null) return
-
-    this.set(key, !state[key])
+    return this.set(key, !state[key])
   }
 
-  set(key: string, val: any) {
+  set(key: string, val: any): boolean {
     const { state } = this
-    if (state[key] == null) return
+    if (state[key] == null) return false
 
     if (state[key] !== val) {
       state[key] = val
       this.modified = true
     }
+
+    this.print(key)
+    return true
+  }
+
+  get(key: string) {
+    return this.state[key]
+  }
+
+  print(key: string) {
+    const val = this.get(key)
+    if (val == null) return
 
     let msg = `Set: ${cRGB(0xffffff, key)}${cRGB(0x57ff65, ' -> ')}`
 
@@ -62,28 +74,25 @@ export default class GlobalState extends EventEmitter {
     logger.info(msg)
   }
 
-  get(key: string) {
-    return this.state[key]
+  printAll() {
+    const { state } = this
+    for (const key in state) this.print(key)
   }
 
   load() {
     const { state } = this
 
     try {
-      if (!existsSync(stateFilePath)) {
-        logger.info('No saved state, using default.')
-        return
-      }
+      if (!existsSync(stateFilePath)) return logger.info('No saved state, using default.')
 
       logger.info('Loading...')
 
       const saved = JSON.parse(readFileSync(stateFilePath, 'utf8'))
-
       for (const key in state) {
-        if (saved[key] != null) this.set(key, saved[key])
+        if (saved[key] != null) state[key] = saved[key]
       }
-      this.modified = false
 
+      this.printAll()
       logger.info('Loaded.')
     } catch (err) {
       logger.error('Failed to load state file:', err)

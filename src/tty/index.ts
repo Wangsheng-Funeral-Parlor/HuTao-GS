@@ -38,6 +38,7 @@ export class TTY extends EventEmitter {
     }
 
     const defaultPrompt = new TTYPrompt(this, '>')
+    defaultPrompt.on('change', input => this.emit('change', input))
     defaultPrompt.on('input', input => this.emit('line', input))
 
     this.addPrompt(defaultPrompt)
@@ -65,6 +66,8 @@ export class TTY extends EventEmitter {
 
     // update cursor
     ttyp.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
+
+    ttyp.emit('change')
   }
 
   private nextInput() {
@@ -87,6 +90,8 @@ export class TTY extends EventEmitter {
 
     // update cursor
     ttyp.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
+
+    ttyp.emit('change')
   }
 
   update() {
@@ -137,6 +142,8 @@ export class TTY extends EventEmitter {
   }
 
   addPrompt(prompt: TTYPrompt) {
+    if (prompt.tty !== this) throw new Error('Mismatch instance')
+
     const { promptList } = this
     if (promptList.includes(prompt)) return
 
@@ -153,7 +160,7 @@ export class TTY extends EventEmitter {
   }
 
   getCurPrompt(): TTYPrompt {
-    return this.promptList[0]
+    return this.promptList.slice(-1)[0]
   }
 
   write(str: string) {
@@ -231,6 +238,8 @@ export class TTY extends EventEmitter {
 
         buffer.splice(cursor - 1, 1)
         ttyp.cursor--
+
+        ttyp.emit('change')
         break
       }
       case '\x0d': { // carriage return
@@ -244,7 +253,12 @@ export class TTY extends EventEmitter {
         break
       }
       case '\x09': { // tab
+        ttyp.fillAutocomplete()
+        break
+      }
+      case '\x1b': { // esc
         resetHistory = false
+        ttyp.emit('cancel')
         break
       }
       case '\x1b[A': { // cursor up
@@ -259,7 +273,10 @@ export class TTY extends EventEmitter {
       }
       case '\x1b[C': { // cursor forward
         resetHistory = false
-        if (cursor >= buffer.length) break
+        if (cursor >= buffer.length) {
+          ttyp.fillAutocomplete()
+          break
+        }
 
         ttyp.cursor++
         ttyp.historyCursor = ttyp.cursor
@@ -284,6 +301,8 @@ export class TTY extends EventEmitter {
       default: {
         buffer.splice(cursor, 0, char)
         ttyp.cursor += char.length
+
+        ttyp.emit('change')
       }
     }
 

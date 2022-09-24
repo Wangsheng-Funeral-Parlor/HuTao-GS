@@ -1,11 +1,11 @@
 import KcpServer from '#/.'
 import Player from '$/player'
 import Server from '@/server'
-import { cRGB } from '@/tty/utils'
+import { TTY } from '@/tty'
+import CLI from '..'
 import accountCommands from './accountCommands'
 import avatarCommands from './avatarCommands'
 import configCommands from './configCommands'
-import debugCommands from './debugCommands'
 import entityCommands from './entityCommands'
 import inventoryCommands from './inventoryCommands'
 import playerCommands from './playerCommands'
@@ -16,6 +16,7 @@ import worldCommands from './worldCommands'
 export interface ArgumentDefinition {
   name: string
   type?: 'str' | 'flt' | 'int' | 'num' | 'b64' | 'hex'
+  values?: (string | number)[]
   optional?: boolean
   dynamic?: boolean
 }
@@ -23,6 +24,7 @@ export interface ArgumentDefinition {
 export interface CommandDefinition {
   name: string
   desc: string
+  usage?: string[]
   args?: ArgumentDefinition[]
   allowPlayer?: boolean
   onlyAllowPlayer?: boolean
@@ -38,37 +40,21 @@ export interface CmdInfo {
   args?: any[]
   sender?: Player
   cli: CLILike
+  tty?: TTY
   server?: Server
   kcpServer?: KcpServer
 }
 
-export function helpFormatArgument(argument: ArgumentDefinition) {
-  const { name, optional, dynamic, type } = argument
-
-  const bracket = optional ? '[]' : '<>'
-  const spread = dynamic ? '...' : ''
-  const argType = type == null ? '' : `:${type}`
-
-  return `${bracket[0]}${spread}${name}${argType}${bracket[1]}`
+export function registerBuiltInCommands() {
+  CLI.registerCommands([
+    ...serverCommands,
+    ...configCommands,
+    ...toolsCommands,
+    ...accountCommands,
+    ...worldCommands,
+    ...entityCommands,
+    ...avatarCommands,
+    ...playerCommands,
+    ...inventoryCommands
+  ])
 }
-
-export function helpFormatCommand(command: CommandDefinition, prefix: string = '') {
-  const { name, args, desc } = command
-  return `${cRGB(0xffffff, prefix + name)}${cRGB(0xffb71c, (args != null && args.length > 0) ? (' ' + args.map(helpFormatArgument).join(' ')) : '')} - ${desc}`
-}
-
-const commands: CommandDefinition[] = [
-  ...serverCommands,
-  ...debugCommands,
-  ...toolsCommands,
-  ...configCommands,
-
-  ...accountCommands,
-  ...worldCommands,
-  ...entityCommands,
-  ...avatarCommands,
-  ...playerCommands,
-  ...inventoryCommands
-]
-
-export default commands

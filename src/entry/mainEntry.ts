@@ -1,4 +1,5 @@
 import CLI from '@/cli'
+import { registerBuiltInCommands } from '@/cli/commands'
 import Logger from '@/logger'
 import printIcon from '@/printIcon'
 import Server from '@/server'
@@ -40,6 +41,9 @@ import { cwd } from 'process'
     // start update
     server.update?.start()
   } else {
+    // register commands
+    registerBuiltInCommands()
+
     // start server
     server.start()
     cli.start()

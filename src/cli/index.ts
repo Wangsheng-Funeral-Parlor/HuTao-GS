@@ -4,7 +4,9 @@ import { getTTY, TTY } from '@/tty'
 import { ansiToHTML } from '@/tty/utils'
 import { Announcement } from '@/types/announcement'
 import { escapeHtml } from '@/utils/escape'
-import commands, { ArgumentDefinition, CmdInfo, CommandDefinition, helpFormatCommand } from './commands'
+import { CmdInfo, CommandDefinition } from './commands'
+import { getCommandInfo } from './commands/serverCommands/helpCommand'
+import { parseCLIArgs, splitArgs } from './utils'
 
 const commandsAnnouncement: Announcement = {
   type: 2, // Game
@@ -21,128 +23,9 @@ const commandsAnnouncement: Announcement = {
 const errLogger = new Logger('CLIERR', 0xff8080)
 const logger = new Logger('CLIOUT', 0xffffff)
 
-type ParseArgError = { error: string }
-type ParseArgResult = string | number | Buffer | ParseArgError
-const ARGS_CTYPES = [
-  { type: 'GRP', list: ['"', '`', "'"] },
-  { type: 'SEP', list: [' '] }
-]
-
-function splitArgs(str: string): string[] {
-  const args: string[] = []
-
-  str = str.trim()
-
-  let chunk = ''
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i]
-
-    const { type } = ARGS_CTYPES.find(ct => ct.list.find(c => c === char)) || {}
-    const isGrp = type === 'GRP'
-    const isSep = type === 'SEP'
-
-    // Start group
-    if (isGrp) {
-      const end = str.slice(i + 1).indexOf(char) + (i + 1)
-      if (end <= 0) throw new Error(`Missing ${char}`)
-      chunk += str.slice(i + 1, end)
-      i += end // NOSONAR
-      continue
-    }
-
-    if (isSep) {
-      if (chunk.length > 0) args.push(chunk)
-      chunk = ''
-      continue
-    }
-
-    chunk += char
-  }
-
-  if (chunk.length > 0) args.push(chunk)
-
-  return args
-}
-
-function parseArg(arg: string, def: ArgumentDefinition): ParseArgResult {
-  // optional argument check
-  if (def.optional && arg == null) return
-
-  // argument type check
-  const type = def.type || 'str'
-  switch (type) {
-    case 'str': {
-      if (typeof arg !== 'string') return { error: `Type error: (${def.name}) must be a ${type}.` }
-      return arg
-    }
-    case 'flt': {
-      const float = parseFloat(arg)
-      if (isNaN(float)) return { error: `Type error: (${def.name}) must be a ${type}.` }
-      return float
-    }
-    case 'int': {
-      const int = parseInt(arg)
-      if (isNaN(int)) return { error: `Type error: (${def.name}) must be a ${type}.` }
-      return int
-    }
-    case 'num': {
-      const num = Number(arg)
-      if (isNaN(num)) return { error: `Type error: (${def.name}) must be a ${type}.` }
-      return num
-    }
-    case 'b64':
-    case 'hex': {
-      try {
-        return Buffer.from(arg, type.split('-')[0] as BufferEncoding)
-      } catch (err) {
-        return { error: `Type error: (${def.name}) must be a ${type}.` }
-      }
-    }
-    default:
-      return { error: `Definition error: Unknown argument type (${type}).` }
-  }
-}
-
-function parseArgs(args: string[], cmdDef: CommandDefinition): any {
-  const { args: argDef } = cmdDef
-  const parsedArgs = []
-
-  if (argDef == null) return []
-
-  let parsingDynamic = false
-  let result: ParseArgResult
-
-  for (let i = 0; i < argDef.length; i++) {
-    const def = argDef[i]
-    const nextDef = argDef[i + 1]
-    let arg = args[i]
-
-    // definition error check
-    if (nextDef && def.optional && !nextDef.optional) {
-      return { error: 'Definition error: Cannot have required argument after optional argument.' }
-    }
-    if (parsingDynamic) {
-      return { error: 'Definition error: Cannot have any argument after dynamic argument.' }
-    }
-
-    if (def.dynamic) {
-      parsingDynamic = true
-      arg = args.slice(i).join(' ')
-    }
-
-    result = parseArg(arg, def)
-
-    if (result == null) continue
-    if ((<ParseArgError>result).error) return { error: (<ParseArgError>result).error }
-
-    parsedArgs.push(result)
-  }
-
-  return { args: parsedArgs }
-}
-
 export default class CLI {
   static prefix: string = '/'
+  static commands: CommandDefinition[] = []
 
   tty: TTY
   server: Server
@@ -151,6 +34,7 @@ export default class CLI {
     this.tty = getTTY()
     this.server = server
 
+    this.handleChange = this.handleChange.bind(this)
     this.handleLine = this.handleLine.bind(this)
 
     this.tty.on('exit', async () => {
@@ -158,12 +42,54 @@ export default class CLI {
       this.server.stop()
     })
 
-    for (const command of commands) {
-      if (!command.allowPlayer) continue
-      commandsAnnouncement.content += `<p style="white-space: pre-wrap;background: black;color: white;">◇ ${ansiToHTML(escapeHtml(helpFormatCommand(command, CLI.prefix)))}</p>`
+    server.webServer?.announcements.push(commandsAnnouncement)
+  }
+
+  static registerCommands(cmds: CommandDefinition[]) {
+    const { commands } = CLI
+    commands.push(...cmds.filter(c => !commands.includes(c)))
+
+    for (const cmd of cmds) {
+      if (!cmd.allowPlayer) continue
+      commandsAnnouncement.content += `<p style="white-space: pre-wrap;background: black;color: white;">◇ ${ansiToHTML(escapeHtml(getCommandInfo(cmd, CLI.prefix, true)))}</p>`
+    }
+  }
+
+  static registerCommand(cmd: CommandDefinition) {
+    CLI.registerCommands([cmd])
+  }
+
+  static getSuggestion(input: string): string | null {
+    const lastChar = input.slice(-1)[0]
+    if (lastChar == null || lastChar.trim().length === 0) return null
+
+    const { commands } = CLI
+
+    let cmdName: string
+    let args: string[]
+
+    try {
+      cmdName = input.split(' ')[0]
+      args = splitArgs(input.split(' ').slice(1).join(' '))
+    } catch (err) {
+      return null
     }
 
-    server.webServer?.announcements.push(commandsAnnouncement)
+    if (input.includes(' ')) {
+      // suggest argument values
+      const cmdDef = commands.find(c => c.name === cmdName)
+      if (!cmdDef) return null
+      return cmdDef.args?.[args.length - 1]?.values
+        ?.map(v => v?.toString && v.toString())
+        ?.filter(v => v != null && v.indexOf(args.slice(-1)[0]) === 0)
+        ?.sort((a, b) => a.length - b.length)?.[0] || null
+    } else {
+      // suggest command
+      return commands
+        .map(c => c.name)
+        .filter(cn => cn.indexOf(cmdName) === 0)
+        .sort((a, b) => a.length - b.length)[0] || null
+    }
   }
 
   static async execCommand(input: string, cmdInfo: CmdInfo): Promise<false | any[]> {
@@ -177,16 +103,16 @@ export default class CLI {
       return ['Failed to parse command:', err]
     }
 
-    const cmdDef = commands.find(cmd => cmd.name === cmdName)
+    const cmdDef = CLI.commands.find(cmd => cmd.name === cmdName)
     if (!cmdDef) return [`Unknown command: ${cmdName}`]
 
     if (!cmdDef.allowPlayer && cmdInfo.sender != null) return ['This command can only be used in console.']
     if (cmdDef.onlyAllowPlayer && cmdInfo.sender == null) return ['This command can only be used in game.']
 
-    const parsed = parseArgs(args, cmdDef)
+    const parsed = parseCLIArgs(args, cmdDef)
     if (parsed.error) return [parsed.error]
 
-    cmdInfo.args = parsed.args
+    cmdInfo.args = parsed.parsedArgs
 
     try {
       await cmdDef.exec(cmdInfo)
@@ -197,11 +123,15 @@ export default class CLI {
   }
 
   start() {
-    this.tty.on('line', this.handleLine)
+    const { tty } = this
+    tty.on('change', this.handleChange)
+    tty.on('line', this.handleLine)
   }
 
   stop() {
-    this.tty.off('line', this.handleLine)
+    const { tty } = this
+    tty.off('change', this.handleChange)
+    tty.off('line', this.handleLine)
   }
 
   print(...args: any[]) {
@@ -212,11 +142,26 @@ export default class CLI {
     errLogger.info(...args)
   }
 
+  async handleChange(): Promise<void> {
+    const { tty } = this
+    const ttyp = tty.getCurPrompt()
+    if (ttyp == null) return
+
+    const { buffer, cursor } = ttyp
+    if (cursor < buffer.length) return ttyp.clearAutocomplete()
+
+    const suggestion = CLI.getSuggestion(buffer.join(''))
+    if (suggestion) ttyp.setAutocomplete(suggestion)
+    else ttyp.clearAutocomplete()
+  }
+
   async handleLine(line: string): Promise<void> {
+    const { tty, server } = this
     const err = await CLI.execCommand(line, {
       cli: this,
-      server: this.server,
-      kcpServer: this.server.kcpServer
+      tty,
+      server,
+      kcpServer: server.kcpServer
     })
     if (err) this.printError(...err)
   }

@@ -255,7 +255,7 @@ export default class Update {
   async checkForUpdate() {
     try {
       if (await this.isSameVersion()) return
-      logger.info('New update available, use /update to update.')
+      logger.info('New update available, type "update" to update.')
     } catch (err) {
       logger.error(err)
     }

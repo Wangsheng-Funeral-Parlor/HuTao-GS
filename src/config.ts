@@ -110,4 +110,5 @@ else logger.info('Loaded config:', curConfigName)
 
 const config: Config = Object.assign({}, DEFAULT_CONFIG, curConfig || {})
 
+export const NO_CONFIG = curConfig == null
 export default config

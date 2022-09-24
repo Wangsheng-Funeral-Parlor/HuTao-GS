@@ -29,6 +29,8 @@ export default class TTYInfo extends TTYModule {
 
     this.clear(true)
 
+    const ttyp = tty.getCurPrompt()
+
     const timestamp = getTimestamp()
     const timestampLen = timestamp.length
     const appTitleLen = noColor(APP_TITLE).length
@@ -40,7 +42,10 @@ export default class TTYInfo extends TTYModule {
       BORDER_V +
       APP_TITLE +
       BORDER_V +
-      (scrollIndex == null ? '\u2b9f' : '\u2b0d') // auto scroll indicator
+      (scrollIndex == null ? 'Auto' : '    ') + // auto scroll indicator
+      BORDER_V +
+      (ttyp && ttyp.overflowLeft ? '<' : ' ') + // overflow indicator left
+      (ttyp && ttyp.overflowRight ? '>' : ' ') // overflow indicator right
     )
 
     tty.setCursor(0, y + 1)
@@ -50,7 +55,9 @@ export default class TTYInfo extends TTYModule {
       BORDER_HV +
       this.getLine(appTitleLen) +
       BORDER_HV +
-      this.getLine(width - (timestampLen + appTitleLen + 3))
+      this.getLine(4) +
+      BORDER_HV +
+      this.getLine(width - (timestampLen + appTitleLen + 8))
     )
 
     // restore cursor position

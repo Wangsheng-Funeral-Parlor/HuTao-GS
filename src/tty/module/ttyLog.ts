@@ -110,7 +110,7 @@ export default class TTYLog extends TTYModule {
     const lastIndex = lines.length - 1
     const curIndex = scrollIndex == null ? lastIndex : scrollIndex
 
-    this.scrollIndex = Math.min(lastIndex, Math.max(height - 1, curIndex - height))
+    this.scrollIndex = Math.min(lastIndex, Math.max(height - 1, Math.ceil(curIndex - height / 2)))
 
     this.updated = true
   }
@@ -123,7 +123,7 @@ export default class TTYLog extends TTYModule {
     const curIndex = scrollIndex == null ? lastIndex : scrollIndex
 
     if (curIndex + height >= lastIndex) this.scrollIndex = null
-    else this.scrollIndex = Math.min(lastIndex, Math.max(height - 1, curIndex + height))
+    else this.scrollIndex = Math.min(lastIndex, Math.max(height - 1, Math.ceil(curIndex + height / 2)))
 
     this.updated = true
   }
