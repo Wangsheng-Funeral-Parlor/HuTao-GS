@@ -722,6 +722,13 @@
           "give": "Give mora: %0"
         }
       },
+      "lightning": {
+        "desc": "Spawn lightning at player continuously",
+        "info": {
+          "start": "Started lightning.",
+          "stop": "Stopped lightning."
+        }
+      },
       "material": {
         "desc": "Give material",
         "usage": {

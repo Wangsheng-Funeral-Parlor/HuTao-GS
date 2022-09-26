@@ -722,6 +722,13 @@
           "give": "给予摩拉: %0"
         }
       },
+      "lightning": {
+        "desc": "连续在玩家身上产生闪电",
+        "info": {
+          "start": "开始闪电.",
+          "stop": "停止闪电."
+        }
+      },
       "material": {
         "desc": "给予材料",
         "usage": {

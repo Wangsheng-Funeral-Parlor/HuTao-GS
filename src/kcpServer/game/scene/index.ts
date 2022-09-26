@@ -6,6 +6,7 @@ import ScenePlayerLocation from '#/packets/ScenePlayerLocation'
 import SceneTime from '#/packets/SceneTime'
 import uidPrefix from '#/utils/uidPrefix'
 import Entity from '$/entity'
+import Gadget from '$/entity/gadget'
 import Vehicle from '$/entity/gadget/vehicle'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
@@ -56,6 +57,7 @@ export default class Scene extends BaseClass {
   isLocked: boolean
   beginTime: number
 
+  lastThunder: number
   lastLocUpdate: number
   lastTimeUpdate: number
 
@@ -372,6 +374,22 @@ export default class Scene extends BaseClass {
     await this.destroy()
   }
 
+  async spawnThunder(player: Player) {
+    const { entityManager } = this
+    const { level, currentAvatar } = player
+    if (currentAvatar == null) return
+
+    const { motion } = currentAvatar
+    const { pos, speed } = motion
+
+    const entity = new Gadget(70330117)
+    entity.motion.pos.copy(speed).mulScalar(3).add(pos) // predict player position
+
+    await entity.initNew(level)
+
+    await entityManager.add(entity)
+  }
+
   exportSceneTeamAvatarList(): SceneTeamAvatar[] {
     const { playerList } = this
     return [].concat(...playerList.map(player => player.teamManager.exportSceneTeamAvatarList()))
@@ -404,9 +422,15 @@ export default class Scene extends BaseClass {
 
   // SceneUpdate
   async handleSceneUpdate() {
-    const { id, vehicleManager, sceneBlockList, playerList, broadcastContextList, lastLocUpdate, lastTimeUpdate } = this
+    const { id, vehicleManager, sceneBlockList, playerList, broadcastContextList, lastThunder, lastLocUpdate, lastTimeUpdate } = this
 
     for (const sceneBlock of sceneBlockList) await sceneBlock.emit('Update')
+
+    if (lastThunder == null || Date.now() - lastThunder > 5e3) {
+      this.lastThunder = Date.now() - (Math.random() * 5e3)
+      const thunderTargets = playerList.filter(p => p.thunderTarget)
+      for (const player of thunderTargets) await this.spawnThunder(player)
+    }
 
     if (lastLocUpdate == null || Date.now() - lastLocUpdate > 5e3) {
       this.lastLocUpdate = Date.now()

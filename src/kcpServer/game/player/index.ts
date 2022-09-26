@@ -92,6 +92,8 @@ export default class Player extends BaseClass {
   prevScenePos: Vector
   prevSceneRot: Vector
 
+  thunderTarget: boolean
+
   constructor(game: Game, client: Client) {
     super()
 
@@ -127,6 +129,8 @@ export default class Player extends BaseClass {
     this.prevSceneRot = new Vector()
 
     this.dragBackCount = 0
+
+    this.thunderTarget = false
 
     super.initHandlers(this)
   }
