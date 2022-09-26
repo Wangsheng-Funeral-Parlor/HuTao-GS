@@ -21,7 +21,9 @@ const versionMap: { [version: string]: CmdIds } = {
   '3.0.0': ver2_8,
   '3.0.50': ver2_8,
   '3.0.51': ver2_8,
-  '3.0.52': ver2_8
+  '3.0.52': ver2_8,
+  '3.0.53': ver2_8,
+  '3.1.0': ver2_8
 }
 
 export const cmdIds: CmdIds = versionMap[config.version] || versionMap[DEFAULT_CONFIG.version] || {}
