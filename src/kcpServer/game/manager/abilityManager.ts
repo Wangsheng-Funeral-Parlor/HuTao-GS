@@ -10,7 +10,7 @@ import AppliedModifier from '$/ability/appliedModifier'
 import Embryo from '$/ability/embryo'
 import Entity from '$/entity'
 import AbilityData from '$/gameData/data/AbilityData'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaModifierDurabilityChange, AbilityMetaReInitOverrideMap, AbilityMetaSetKilledState, AbilityScalarValueEntry, AbilityString, AbilitySyncStateInfo } from '@/types/proto'
 import { AbilityInvokeArgumentEnum, ModifierActionEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
@@ -74,7 +74,7 @@ export interface AbilityInvokeEntryParsed {
   buf: Buffer
 }
 
-const logger = new Logger('ABILIT', 0x10ff10)
+const logger = new TLogger('ABILIT', 0x10ff10)
 
 export default class AbilityManager extends BaseClass {
   entity: Entity
@@ -125,7 +125,7 @@ export default class AbilityManager extends BaseClass {
     const proto = protoLookupTable[argType]
 
     if (proto == null) {
-      logger.warn('No proto for argument type:', argumentType, argType, buf.toString('base64'))
+      logger.warn('message.ability.warn.noProto', argumentType, argType, buf.toString('base64'))
       return null
     }
 
@@ -146,14 +146,14 @@ export default class AbilityManager extends BaseClass {
     if (!localId) return
 
     const ability = this.getAbility(instancedAbilityId)
-    if (ability == null) return logger.debug(entity.entityId, type, 'ability == null', head)
+    if (ability == null) return logger.debug('generic.param4', entity.entityId, type, 'ability == null', head)
 
     const abilityName = AbilityData.lookupString(ability.abilityName)
     const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
-    if (actionConfig == null) return logger.debug(entity.entityId, type, 'action == null', head, abilityName)
+    if (actionConfig == null) return logger.debug('generic.param4', entity.entityId, type, 'action == null', head, abilityName)
 
     const target = entityManager.getEntity(targetId) || entity
-    if (target == null) return logger.debug(entity.entityId, type, 'target == null', head, abilityName)
+    if (target == null) return logger.debug('generic.param4', entity.entityId, type, 'target == null', head, abilityName)
 
     await action.runActionConfig(context, ability, actionConfig, data, target)
   }
@@ -163,7 +163,7 @@ export default class AbilityManager extends BaseClass {
     const embryo = new Embryo(this, id, name, overrideName)
 
     this.embryoList.push(embryo)
-    logger.verbose('Register:', id, '->', `${name}[${overrideName}]`)
+    logger.verbose('message.ability.debug.register', id, name, overrideName)
 
     return embryo
   }
@@ -175,7 +175,7 @@ export default class AbilityManager extends BaseClass {
 
     embryoList.splice(embryoList.indexOf(embryo), 1)
 
-    logger.verbose('Unregister:', id, '->', `${name}[${overrideName}]`)
+    logger.verbose('message.ability.debug.unregister', id, name, overrideName)
   }
 
   clearEmbryo() {
@@ -290,7 +290,7 @@ export default class AbilityManager extends BaseClass {
     if (parsed == null) return
     const { type, head, data, buf } = parsed
 
-    logger.verbose(type)
+    logger.verbose('generic.param1', type)
 
     await this.emit(type, context, head, data, buf)
     await this.runAction(context, parsed)
@@ -401,7 +401,7 @@ export default class AbilityManager extends BaseClass {
         break
       }
       default:
-        logger.warn(entity.entityId, 'MetaModifierChange', 'Unknown action:', action)
+        logger.warn('generic.param4', entity.entityId, 'MetaModifierChange', 'Unknown action:', action)
     }
   }
 
@@ -421,7 +421,7 @@ export default class AbilityManager extends BaseClass {
     const { instancedAbilityId } = head
     const ability = this.getAbility(instancedAbilityId)
 
-    logger.debug(entity.entityId, 'MetaLoseHp', ability?.abilityName, head, data, buf)
+    logger.debug('generic.param6', entity.entityId, 'MetaLoseHp', ability?.abilityName, head, data, buf)
   }
 
   // AbilityMetaSetKilledState
@@ -430,6 +430,6 @@ export default class AbilityManager extends BaseClass {
     const { instancedAbilityId } = head
     const ability = this.getAbility(instancedAbilityId)
 
-    logger.debug(entity.entityId, 'MetaSetKilledState', ability?.abilityName, head, data, buf)
+    logger.debug('generic.param6', entity.entityId, 'MetaSetKilledState', ability?.abilityName, head, data, buf)
   }
 }

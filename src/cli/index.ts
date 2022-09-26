@@ -1,5 +1,6 @@
 import Logger from '@/logger'
 import Server from '@/server'
+import translate from '@/translate'
 import { getTTY, TTY } from '@/tty'
 import { ansiToHTML } from '@/tty/utils'
 import { Announcement } from '@/types/announcement'
@@ -92,7 +93,7 @@ export default class CLI {
     }
   }
 
-  static async execCommand(input: string, cmdInfo: CmdInfo): Promise<false | any[]> {
+  static async execCommand(input: string, cmdInfo: CmdInfo): Promise<false | string> {
     let cmdName: string
     let args: string[]
 
@@ -100,17 +101,17 @@ export default class CLI {
       cmdName = input.split(' ')[0]
       args = splitArgs(input.split(' ').slice(1).join(' '))
     } catch (err) {
-      return ['Failed to parse command:', err]
+      return translate('cli.error.parseFail', err)
     }
 
     const cmdDef = CLI.commands.find(cmd => cmd.name === cmdName)
-    if (!cmdDef) return [`Unknown command: ${cmdName}`]
+    if (!cmdDef) return translate('cli.error.unknownCommand', cmdName)
 
-    if (!cmdDef.allowPlayer && cmdInfo.sender != null) return ['This command can only be used in console.']
-    if (cmdDef.onlyAllowPlayer && cmdInfo.sender == null) return ['This command can only be used in game.']
+    if (!cmdDef.allowPlayer && cmdInfo.sender != null) return translate('cli.error.consoleOnly')
+    if (cmdDef.onlyAllowPlayer && cmdInfo.sender == null) return translate('cli.error.playerOnly')
 
     const parsed = parseCLIArgs(args, cmdDef)
-    if (parsed.error) return [parsed.error]
+    if (parsed.error != null) return translate(parsed.error[0], ...parsed.error.slice(1))
 
     cmdInfo.args = parsed.parsedArgs
 
@@ -118,7 +119,7 @@ export default class CLI {
       await cmdDef.exec(cmdInfo)
       return false
     } catch (err) {
-      return ['Failed to execute command:', err]
+      return translate('cli.error.execFail', err)
     }
   }
 
@@ -163,6 +164,6 @@ export default class CLI {
       server,
       kcpServer: server.kcpServer
     })
-    if (err) this.printError(...err)
+    if (err) this.printError(err)
   }
 }

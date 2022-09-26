@@ -1,16 +1,11 @@
 import config from '@/config'
 import { patchGame, unpatchGame } from '@/tools/patcher'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const gpatchCommand: CommandDefinition = {
   name: 'gpatch',
-  desc: 'Game patching tools',
-  usage: [
-    'gpatch patch <gameDir>   - Patch metadata & ua with backup in game directory',
-    'gpatch patch             - Same but gameDir is set to config.gameDir',
-    'gpatch unpatch <gameDir> - Unpatch metadata & ua from backup in game directory',
-    'gpatch unpatch           - Same but gameDir is set to config.gameDir'
-  ],
+  usage: 4,
   args: [
     { name: 'mode', type: 'str', values: ['patch', 'unpatch'] },
     { name: 'gameDir', type: 'str', optional: true }
@@ -28,12 +23,10 @@ const gpatchCommand: CommandDefinition = {
         case 'unpatch':
           await unpatchGame(gameDir || config.gameDir)
           break
-        default:
-          throw new Error(`Unknown mode: ${mode}`)
       }
-      print('Success')
+      print(translate('cli.commands.gpatch.info.success'))
     } catch (err) {
-      printError((<Error>err).message || 'Unknown error')
+      printError((<Error>err).message || err)
     }
   }
 }

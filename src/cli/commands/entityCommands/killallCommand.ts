@@ -1,13 +1,10 @@
+import translate from '@/translate'
 import { PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { CommandDefinition } from '..'
 
 const killallCommand: CommandDefinition = {
   name: 'killall',
-  desc: 'Kill all nearby monsters (32 Max)',
-  usage: [
-    'killall <uid> - Kill all nearby monsters for player',
-    'killall       - (In game) Kill all nearby monsters'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -17,13 +14,13 @@ const killallCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const { currentScene, currentAvatar, loadedEntityIdList } = player
-    if (!currentAvatar) return printError('Current avatar is null.')
-    if (!currentScene) return printError('Not in scene.')
+    if (!currentAvatar) return printError(translate('generic.playerNoCurAvatar'))
+    if (!currentScene) return printError(translate('generic.notInScene'))
 
-    print('Killing monsters')
+    print(translate('cli.commands.killall.info.killMonsters'))
 
     const { entityManager } = currentScene
     const entityList = loadedEntityIdList

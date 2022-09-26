@@ -1,13 +1,10 @@
 import Vector from '$/utils/vector'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const vehicleCommand: CommandDefinition = {
   name: 'vehicle',
-  desc: 'Spawn vehicle',
-  usage: [
-    'vehicle <uid> - Spawn vehicle at player\'s current avatar position',
-    'vehicle       - (In game) Spawn vehicle at current avatar position'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -17,12 +14,12 @@ const vehicleCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const { currentScene, pos } = player
-    if (!currentScene || !pos) return printError('Unable to get player position.')
+    if (!currentScene || !pos) return printError(translate('generic.playerNoPos'))
 
-    print('Spawning vehicle')
+    print(translate('cli.commands.vehicle.info.spawn'))
 
     await currentScene.vehicleManager.createVehicle(player, 45001001, 0, pos, new Vector())
   }

@@ -1,4 +1,6 @@
 import config from '@/config'
+import translate from '@/translate'
+import TError from '@/translate/terror'
 import { waitTick } from '@/utils/asyncWait'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
@@ -12,7 +14,7 @@ export const decryptMetadata = async (src: string, dst: string) => {
   const srcPath = resolve(src)
   const dstPath = resolve(dst)
 
-  if (!await fileExists(srcPath)) throw new Error('File not found.')
+  if (!await fileExists(srcPath)) throw new TError('generic.fileNotFound', srcPath)
 
   const buf = await readFile(srcPath)
   decryptGlobalMetadata(buf)
@@ -24,7 +26,7 @@ export const encryptMetadata = async (src: string, dst: string) => {
   const srcPath = resolve(src)
   const dstPath = resolve(dst)
 
-  if (!await fileExists(srcPath)) throw new Error('File not found.')
+  if (!await fileExists(srcPath)) throw new TError('generic.fileNotFound', srcPath)
 
   const buf = await readFile(srcPath)
   encryptGlobalMetadata(buf)
@@ -36,7 +38,7 @@ export const patchMetadata = async (src: string, dst: string) => {
   const srcPath = resolve(src)
   const dstPath = resolve(dst)
 
-  if (!await fileExists(srcPath)) throw new Error('File not found.')
+  if (!await fileExists(srcPath)) throw new TError('generic.fileNotFound', srcPath)
 
   let buf = await readFile(srcPath)
   decryptGlobalMetadata(buf)
@@ -45,7 +47,7 @@ export const patchMetadata = async (src: string, dst: string) => {
   const stringLiterals = data.toString()
 
   const rsaKeys = stringLiterals.match(/<RSAKeyValue>.*?<\/RSAKeyValue>/gs)
-  if (rsaKeys == null) throw new Error('Unable to find rsa keys.')
+  if (rsaKeys == null) throw new TError('message.tools.meta.error.noRSAKeys')
 
   // Replace password key
   const isCryptoOffset = data.indexOf('is_crypto')
@@ -58,9 +60,9 @@ export const patchMetadata = async (src: string, dst: string) => {
   const passwordPublicKeyOffset = passwordPublicKey ? data.indexOf(passwordPublicKey) : null
   const passwordPublicKeyPointer = pointers.find(p => p.offset === passwordPublicKeyOffset)
   if (passwordPublicKeyPointer == null) {
-    console.log('Unable to find password public key.')
+    console.log(translate('message.tools.meta.error.noPasswordPublicKey'))
   } else {
-    console.log('Replacing password public key...')
+    console.log(translate('message.tools.meta.info.replacePasswordPublicKey'))
     const passwordKey = await OpenSSL.getKeyPair(join(cwd(), 'data/key'), 'password', config.passwordKeySize)
     buf = replaceStringLiteral(buf, passwordPublicKeyPointer, Buffer.from(passwordKey.public.xml))
   }
@@ -70,9 +72,9 @@ export const patchMetadata = async (src: string, dst: string) => {
   const serverPublicKeyOffset = serverPublicKey ? data.indexOf(serverPublicKey) : null
   const serverPublicKeyPointer = pointers.find(p => p.offset === serverPublicKeyOffset)
   if (serverPublicKeyPointer == null) {
-    console.log('Unable to find server public key.')
+    console.log(translate('message.tools.meta.error.noServerPublicKey'))
   } else {
-    console.log('Replacing server public key...')
+    console.log(translate('message.tools.meta.info.replaceServerPublicKey'))
     const serverKey = await DispatchKey.getServerKeyPair(config.dispatchKeyId)
     buf = replaceStringLiteral(buf, serverPublicKeyPointer, Buffer.from(serverKey.public.xml))
   }
@@ -86,7 +88,7 @@ export const dumpStringLiterals = async (src: string, dst: string) => {
   const srcPath = resolve(src)
   const dstPath = resolve(dst)
 
-  if (!await fileExists(srcPath)) throw new Error('File not found.')
+  if (!await fileExists(srcPath)) throw new TError('generic.fileNotFound', srcPath)
 
   let buf = await readFile(srcPath)
   decryptGlobalMetadata(buf)
@@ -100,7 +102,7 @@ export const dumpStringLiterals = async (src: string, dst: string) => {
     stringLiterals.push(`${offset}:${length};${data.subarray(offset, offset + length).toString()}`)
 
     if (++i % 1000 === 0) {
-      console.log(`Dumping: (${i}/${pointers.length})`)
+      console.log(`${i}/${pointers.length}`)
       await waitTick()
     }
   }

@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const godCommand: CommandDefinition = {
   name: 'god',
-  desc: 'Toggle god mode',
-  usage: [
-    'god <uid> - Toggle god mode for player',
-    'god       - (In game) Toggle god mode for yourself'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -16,11 +13,12 @@ const godCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     player.godMode = !player.godMode
 
-    print(`God mode ${player.godMode ? 'enabled' : 'disabled'}.`)
+    if (player.godMode) print(translate('cli.commands.god.info.enable'))
+    else print(translate('cli.commands.god.info.disable'))
   }
 }
 

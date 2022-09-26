@@ -1,10 +1,10 @@
 import { getCmdIdByName } from '#/cmdIds'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { cwd } from 'process'
 
-const logger = new Logger('KEYGEN', 0xfcba03)
+const logger = new TLogger('KEYGEN', 0xfcba03)
 
 const KNOWN_VALUES = [0x45, 0x67, 0, 0, 0, 0x89, 0xAB]
 
@@ -36,10 +36,11 @@ function parseDump(keyGenBuf: Buffer, progressBuf: Buffer, dumpBuf: Buffer, pack
     const key = dumpValue ^ knownValue
 
     logger.debug(
-      'O:', offset,
-      'K:', key.toString(16).toUpperCase().padStart(2, '0'),
-      'DV:', dumpValue.toString(16).toUpperCase().padStart(2, '0'),
-      'KV:', knownValue.toString(16).toUpperCase().padStart(2, '0')
+      'message.tools.keyGen.debug.dump',
+      offset,
+      key.toString(16).toUpperCase().padStart(2, '0'),
+      dumpValue.toString(16).toUpperCase().padStart(2, '0'),
+      knownValue.toString(16).toUpperCase().padStart(2, '0')
     )
 
     keyGenBuf.writeUInt8(key, offset)
@@ -53,7 +54,7 @@ function parseDump(keyGenBuf: Buffer, progressBuf: Buffer, dumpBuf: Buffer, pack
 
 export default function keyGen() {
   try {
-    logger.info('Generating key...')
+    logger.info('message.tools.keyGen.info.generate')
 
     const dumpDirPath = join(cwd(), 'data/log/dump')
     const keyGenPath = join(cwd(), 'data/bin/keyGen.bin')
@@ -78,22 +79,22 @@ export default function keyGen() {
 
         modified = parseDump(keyGenBuf, progressBuf, dumpBuf, dumpFile.slice(0, -4).split('-')[2]) || modified
       } catch (err) {
-        logger.error(`Skip dump (${dumpFile}):`, err)
+        logger.error('message.tools.keyGen.error.dump', dumpFile, err)
       }
     }
 
     if (!modified) {
-      logger.info('No change.')
+      logger.info('message.tools.keyGen.info.notModified')
       return
     }
 
-    logger.info('Saving changes...')
+    logger.info('message.tools.keyGen.info.save')
 
     writeFileSync(keyGenPath, keyGenBuf)
     writeFileSync(progressPath, progressBuf)
 
-    logger.info('KeyGen success.')
+    logger.info('message.tools.keyGen.info.success')
   } catch (err) {
-    logger.error('KeyGen Error:', err)
+    logger.error('message.tools.keyGen.error.unknown', err)
   }
 }

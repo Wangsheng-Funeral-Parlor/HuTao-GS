@@ -1,13 +1,10 @@
 import Monster from '$/entity/monster'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const monsterCommand: CommandDefinition = {
   name: 'monster',
-  desc: 'Spawn monster',
-  usage: [
-    'monster <id> <lv> <uid> - Spawn monster at player\'s current avatar position',
-    'monster <id> <lv>       - (In game) Spawn monster at current avatar position'
-  ],
+  usage: 2,
   args: [
     { name: 'id', type: 'int' },
     { name: 'lv', type: 'int' },
@@ -19,12 +16,12 @@ const monsterCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const { currentScene, pos } = player
-    if (!currentScene || !pos) return printError('Unable to get player position.')
+    if (!currentScene || !pos) return printError(translate('generic.playerNoPos'))
 
-    print('Spawning monster:', args[0])
+    print(translate('cli.commands.monster.info.spawn', args[0]))
 
     const entity = new Monster(args[0], player)
 

@@ -1,4 +1,7 @@
-import Logger, { LogLevel } from '@/logger'
+import { LogLevel } from '@/logger'
+import translate from '@/translate'
+import TError from '@/translate/terror'
+import TLogger from '@/translate/tlogger'
 import { attachedSpawn } from '@/utils/childProcess'
 import { ChildProcess } from 'child_process'
 import Socket from '../'
@@ -6,7 +9,7 @@ import ISocket from '../isocket'
 import { WorkerOpcode } from './'
 import { AcceptTypes, decodeDataList } from './utils/data'
 
-const logger = new Logger('WORKER', 0x7a34eb)
+const logger = new TLogger('WORKER', 0x7a34eb)
 
 export default class WorkerInterface extends ISocket {
   socket: Socket
@@ -52,7 +55,7 @@ export default class WorkerInterface extends ISocket {
       try {
         cbList.shift()(args)
       } catch (err) {
-        logger.error(err)
+        logger.error('generic.param1', err)
       }
     }
   }
@@ -75,7 +78,7 @@ export default class WorkerInterface extends ISocket {
 
     const { id, type } = this
 
-    logger.debug('Starting:', id)
+    logger.debug('message.worker.debug.start', id)
     this.active = true
 
     await this.createISocket()
@@ -90,18 +93,18 @@ export default class WorkerInterface extends ISocket {
     this.workerProcess = workerProcess
     this.running = true
 
-    logger.debug('Worker spawn:', id, 'ISocket port:', this.getIPort())
+    logger.debug('message.worker.debug.spawn', id, this.getIPort())
 
     workerProcess.stderr.setEncoding('utf8')
     workerProcess.stdout.setEncoding('utf8')
-    workerProcess.stdout.on('data', data => logger.debug('stdout:', id, data.trim()))
-    workerProcess.stderr.on('data', data => logger.debug('stderr:', id, data.trim()))
+    workerProcess.stdout.on('data', data => logger.debug('message.worker.debug.stdout', id, data.trim()))
+    workerProcess.stderr.on('data', data => logger.debug('message.worker.debug.stderr', id, data.trim()))
 
     workerProcess.on('exit', (code, signal) => this.emit('Exit', code, signal))
     workerProcess.on('error', err => this.emit('Error', err))
 
     const [wid, wport] = <[number, number]>await this.waitForMessage(WorkerOpcode.WorkerReadyNotify)
-    if (wid !== id) throw new Error('Mismatch worker id')
+    if (wid !== id) throw new TError('message.worker.error.invalidId', wid)
 
     this.iPort = wport
   }
@@ -110,7 +113,7 @@ export default class WorkerInterface extends ISocket {
     if (!this.running) return
 
     const { id, workerProcess } = this
-    logger.debug('Stopping:', id)
+    logger.debug('message.worker.debug.stop', id)
     this.active = false
 
     return new Promise<void>(resolve => {
@@ -133,11 +136,11 @@ export default class WorkerInterface extends ISocket {
 
     switch (opcode) { // NOSONAR
       case WorkerOpcode.LogNotify: {
-        logger.log(<LogLevel>args[0], `[Worker:${id}]`, args[1])
+        logger.log(<LogLevel>args[0], `[Worker:${id}]`, translate(<string>args[1], ...(<(string | number)[]>args.slice(2))))
         break
       }
       default: {
-        if (WorkerOpcode[opcode] == null) return logger.error('Invalid opcode:', opcode)
+        if (WorkerOpcode[opcode] == null) return logger.error('message.worker.error.invalidOpcode', opcode)
         this.tryCallback(opcode, args)
       }
     }
@@ -145,7 +148,7 @@ export default class WorkerInterface extends ISocket {
 
   // Error
   async handleError(err: Error) {
-    logger.error(err)
+    logger.error('generic.param1', err)
   }
 
   // Exit
@@ -158,17 +161,17 @@ export default class WorkerInterface extends ISocket {
 
     this.running = false
 
-    logger.info('Worker exit:', id, 'Code:', code, 'Signal:', signal)
+    logger.info('message.worker.info.exit', id, code, signal)
     if (!active || exitCount >= 3) return
 
     try {
-      logger.info('Restarting worker:', id)
+      logger.info('message.worker.info.restart', id)
 
       await this.stop()
       await this.start()
       this.emit('Restart')
     } catch (err) {
-      logger.error('Worker failed to restart:', err)
+      logger.error('message.worker.error.restartFail', err)
     }
   }
 }

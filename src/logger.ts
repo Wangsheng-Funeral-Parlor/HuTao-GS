@@ -53,6 +53,10 @@ export default class Logger {
     return logLevel
   }
 
+  isLogLevelVisible(level: LogLevel) {
+    return level <= logLevel
+  }
+
   write(str: string) {
     this.tty?.write(str)
   }
@@ -60,7 +64,7 @@ export default class Logger {
   log(level: LogLevel, ...args: any[]) {
     const { name, color, tty } = this
 
-    if (level > logLevel) return
+    if (!this.isLogLevelVisible(level)) return
 
     let prefix = `[${getTimestamp()}]`
 

@@ -2,8 +2,9 @@ import { get } from 'https'
 import { join } from 'path'
 import { cwd } from 'process'
 import config from './config'
-import Logger from './logger'
 import Server from './server'
+import TError from './translate/terror'
+import TLogger from './translate/tlogger'
 import { UpdateApiRetcodeEnum } from './types/enum'
 import { UpdateApiResponse, UpdateContent } from './types/update'
 import { waitMs } from './utils/asyncWait'
@@ -29,7 +30,7 @@ interface PkgProcess extends NodeJS.Process {
 
 const { updateURL } = config
 const proc: PkgProcess = process
-const logger = new Logger('UPDATE', 0x96ffc7)
+const logger = new TLogger('UPDATE', 0x96ffc7)
 
 export default class Update {
   server: Server
@@ -39,16 +40,13 @@ export default class Update {
   }
 
   private async restart(path: string, args: string[]) {
-    logger.info('Stopping...')
+    logger.info('message.update.info.stop')
     await this.server.runShutdownTasks(true)
 
-    logger.info('Restarting...')
-    logger.info('Path:', path)
-    logger.info('Args:', args)
-
+    logger.info('message.update.info.restart')
     await detachedSpawn(path, [process.argv[1], ...args])
 
-    logger.info('Exiting...')
+    logger.info('message.update.info.exit')
     proc.exit()
   }
 
@@ -92,7 +90,7 @@ export default class Update {
 
   private async decodeContent(content: UpdateContent): Promise<Buffer> {
     const { v, c, s } = content
-    if (v == null || c == null || s == null) throw new Error('Invalid content data')
+    if (v == null || c == null || s == null) throw new TError('message.update.error.invalidContent')
 
     const contentBuf = Buffer.from(c, 'base64')
     const signBuf = Buffer.from(s, 'base64')
@@ -101,7 +99,7 @@ export default class Update {
     const publicKey = await this.getPublicKey()
     const isValid = rsaVerify(publicKey, decoded, signBuf)
 
-    if (isValid !== true) throw new Error('Invalid signature')
+    if (isValid !== true) throw new TError('message.update.error.invalidSignature')
 
     return decoded
   }
@@ -125,11 +123,11 @@ export default class Update {
         res.on('end', async () => {
           try {
             const rsp: UpdateApiResponse = JSON.parse(resData)
-            if (rsp == null) throw new Error('Invalid json')
+            if (rsp == null) throw new TError('message.update.error.invalidJson')
 
             const { code, msg, data } = rsp
             if (code !== UpdateApiRetcodeEnum.SUCC) throw new Error(msg || 'Unknown error')
-            if (data == null) throw new Error('data is null')
+            if (data == null) throw new TError('message.update.error.noData')
 
             resolve((<UpdateContent>data).v)
           } catch (err) {
@@ -159,11 +157,11 @@ export default class Update {
         res.on('end', async () => {
           try {
             const rsp: UpdateApiResponse = JSON.parse(resData)
-            if (rsp == null) throw new Error('Invalid json')
+            if (rsp == null) throw new TError('message.update.error.invalidJson')
 
             const { code, msg, data } = rsp
             if (code !== UpdateApiRetcodeEnum.SUCC) throw new Error(msg || 'Unknown error')
-            if (data == null) throw new Error('data is null')
+            if (data == null) throw new TError('message.update.error.noData')
 
             resolve(await this.decodeContent(<UpdateContent>data))
           } catch (err) {
@@ -201,18 +199,18 @@ export default class Update {
 
   async start() {
     try {
-      if (proc.pkg == null) return logger.error('Not executable, cannot update.')
+      if (proc.pkg == null) return logger.error('message.update.error.invalidBuildType')
 
       const args = parseArgs(proc.argv)
       const updateState = args.updateState || UpdateStateEnum.START
       switch (updateState) {
         case UpdateStateEnum.START: {
-          if (updateURL == null) return logger.error('No update url.')
+          if (updateURL == null) return logger.error('message.update.error.missingURL')
 
-          logger.info('Comparing version...')
-          if (await this.isSameVersion()) return logger.info('Same version, stop update.')
+          logger.info('message.update.info.compare')
+          if (await this.isSameVersion()) return logger.info('message.update.info.noDiff')
 
-          logger.info('Mismatch version, downloading update...')
+          logger.info('message.update.info.download')
           const newExePath = join(cwd(), 'Update.exe')
           const newExeFile = await this.apiGetContent(updateURL)
           await this.tryWrite(newExePath, newExeFile)
@@ -222,9 +220,9 @@ export default class Update {
         }
         case UpdateStateEnum.CLONE: {
           const oldExePath = args.oldPath?.toString()
-          if (oldExePath == null) return logger.error('Missing argument')
+          if (oldExePath == null) return logger.error('message.update.error.missingArg')
 
-          logger.info('Copying exe...')
+          logger.info('message.update.info.copy')
           const newExePath = proc.execPath
           const newExeFile = await readFile(newExePath)
           await this.tryWrite(oldExePath, newExeFile)
@@ -233,31 +231,31 @@ export default class Update {
           break
         }
         case UpdateStateEnum.CLEAN: {
-          logger.info('Cleaning up...')
+          logger.info('message.update.info.clean')
           const updateExePath = args.updatePath?.toString()
-          if (updateExePath == null) return logger.error('Missing argument')
+          if (updateExePath == null) return logger.error('message.update.error.missingArg')
 
           await this.tryDelete(updateExePath)
-          logger.info('Cleanup complete.')
+          logger.info('message.update.info.cleanSuccess')
 
           await this.restart(proc.execPath, [])
           break
         }
         default: {
-          logger.error('Invalid update state: ' + updateState)
+          logger.error('message.update.error.invalidState', updateState?.toString())
         }
       }
     } catch (err) {
-      logger.error(err)
+      logger.error('generic.param1', err)
     }
   }
 
   async checkForUpdate() {
     try {
       if (await this.isSameVersion()) return
-      logger.info('New update available, type "update" to update.')
+      logger.info('message.update.info.updateAvailable')
     } catch (err) {
-      logger.error(err)
+      logger.error('generic.param1', err)
     }
   }
 }

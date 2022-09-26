@@ -4,7 +4,6 @@ import { CommandDefinition } from '..'
 
 const restartCommand: CommandDefinition = {
   name: 'restart',
-  desc: 'Restart server',
   exec: async (cmdInfo) => {
     const { cli, server } = cmdInfo as { cli: CLI, server: Server }
     cli.stop()

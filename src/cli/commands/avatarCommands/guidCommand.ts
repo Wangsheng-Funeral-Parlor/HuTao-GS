@@ -1,13 +1,10 @@
+import translate from '@/translate'
 import { EquipTypeEnum } from '@/types/enum'
 import { CommandDefinition } from '..'
 
 const guidCommand: CommandDefinition = {
   name: 'guid',
-  desc: 'Show current avatar guid & equips guid',
-  usage: [
-    'guid <uid> - Show player\'s current avatar guid & equips guid',
-    'guid       - (In game) Show current avatar guid & equips guid'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -17,10 +14,10 @@ const guidCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const { currentAvatar } = player
-    if (!currentAvatar) return printError('Current avatar is null.')
+    if (!currentAvatar) return printError(translate('generic.playerNoCurAvatar'))
 
     const { guid, equipMap } = currentAvatar
     const equips = Object.entries(equipMap).map(e => `${EquipTypeEnum[parseInt(e[0])]}: ${e[1]?.guid?.toString()}`)

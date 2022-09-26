@@ -1,5 +1,5 @@
-import Logger from '@/logger'
 import Server from '@/server'
+import TLogger from '@/translate/tlogger'
 import { cRGB } from '@/tty/utils'
 import { Announcement, AnnouncementType } from '@/types/announcement'
 import * as http from 'http'
@@ -21,7 +21,7 @@ import Update from './handlers/Update'
 import WebstaticSea from './handlers/WebstaticSea'
 import SSL from './ssl'
 
-const logger = new Logger('WEBSRV', 0x00ff00)
+const logger = new TLogger('WEBSRV', 0x00ff00)
 
 export interface ServerConfig {
   port: number,
@@ -86,7 +86,7 @@ export default class WebServer extends EventEmitter {
 
     const httpsConfig = await ssl.exportHttpsConfig()
     if (httpsConfig == null) {
-      logger.error('Unable to generate ssl config, abort.')
+      logger.error('message.webServer.error.noSSL')
       return
     }
 
@@ -101,10 +101,10 @@ export default class WebServer extends EventEmitter {
       total++
 
       server.on('checkContinue', requestListener)
-      server.on('error', err => logger.error(err))
+      server.on('error', err => logger.error('generic.param1', err))
 
       server.listen(port, () => {
-        logger.info(`Listening on port ${cRGB(0xffffff, (server.address() as AddressInfo).port.toString())}`)
+        logger.info('message.webServer.info.listen', cRGB(0xffffff, (server.address() as AddressInfo).port.toString()))
         if (++listening >= total) this.emit('listening')
       })
 
@@ -138,18 +138,18 @@ export default class WebServer extends EventEmitter {
       }
 
       if (response != null) {
-        logger[isVerbose ? 'verbose' : 'debug'](`Handled: (${response.code})${fullUrl}`)
+        logger[isVerbose ? 'verbose' : 'debug']('message.webServer.debug.handle', response.code, fullUrl)
         response.sendResponse(rsp)
         return
       }
 
-      logger.debug(`Unhandled: ${fullUrl}`)
+      logger.debug('message.webServer.debug.noHandler', fullUrl)
 
       rsp.writeHead(404)
       rsp.end('404')
       return
     } catch (err) {
-      if (err?.message !== 'aborted') logger.error('Error handling request:', err)
+      if (err?.message !== 'aborted') logger.error('message.webServer.error.handler', err)
 
       rsp.writeHead(500)
       rsp.end('500')

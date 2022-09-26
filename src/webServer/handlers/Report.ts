@@ -1,4 +1,5 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
+import GlobalState from '@/globalState'
 import { fileExists } from '@/utils/fileSystem'
 import fs from 'fs'
 import { join } from 'path'
@@ -22,7 +23,7 @@ class ReportHandler extends Handler {
   }
 
   async request(req: HttpRequest): Promise<HttpResponse> {
-    if (req.url.pathname.indexOf('verify') === -1 && req.getGState('SaveReport')) {
+    if (req.url.pathname.indexOf('verify') === -1 && GlobalState.get('SaveReport')) {
       const path = join(cwd(), 'data/log/client/report.json')
       const exists = await fileExists(path)
 

@@ -144,9 +144,9 @@ export default class KcpWorker extends Worker {
       this.timer = setInterval(this.updateKcp.bind(this), 1e3 / 30)
 
       this.sendToInterface(WorkerOpcode.InitKcpRsp, true)
-      this.log(LogLevel.DEBUG, 'Init kcp complete:', conv.toString(16).padStart(8, '0').toUpperCase())
+      this.log(LogLevel.DEBUG, 'message.worker.debug.initKcpSuccess', conv.toString(16).padStart(8, '0').toUpperCase())
     } catch (err) {
-      this.log(LogLevel.ERROR, 'Init kcp error:', err)
+      this.log(LogLevel.ERROR, 'message.worker.error.initKcpFail', err)
       this.sendToInterface(WorkerOpcode.InitKcpRsp, false)
     }
   }
@@ -169,7 +169,7 @@ export default class KcpWorker extends Worker {
         xor(packet, this.key)
 
         if (!Packet.isPacket(packet)) {
-          this.log(LogLevel.WARN, 'Invalid packet received, xor decrypt failed?')
+          this.log(LogLevel.WARN, 'message.worker.warn.invalidPacket')
           continue
         }
 
@@ -184,7 +184,7 @@ export default class KcpWorker extends Worker {
         if (!skipWaitPackets.includes(<string>getNameByCmdId(packetID))) await this.waitPacketRsp(seqId)
       }
     } catch (err) {
-      this.log(LogLevel.ERROR, 'UDP error:', err)
+      this.log(LogLevel.ERROR, 'message.worker.error.UDPError', err)
     } finally {
       this.receiving = false
     }
@@ -211,7 +211,7 @@ export default class KcpWorker extends Worker {
       kcp.send(Packet.encode(packetHead, packetData, packetID, key))
       this.sendToInterface(WorkerOpcode.SendPacketRsp, true)
     } catch (err) {
-      this.log(LogLevel.ERROR, 'Send packet error:', err)
+      this.log(LogLevel.ERROR, 'message.worker.error.sendPacketError', err)
       this.sendToInterface(WorkerOpcode.SendPacketRsp, false)
     }
   }

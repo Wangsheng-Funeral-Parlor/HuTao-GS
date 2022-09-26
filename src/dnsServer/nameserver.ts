@@ -1,11 +1,11 @@
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import * as dgram from 'dgram'
 import Tcp from 'net'
 import DnsServer from '.'
 import DnsPacket from './packet'
 import { readStream } from './utils'
 
-const logger = new Logger('QURYNS', 0xfc6114)
+const logger = new TLogger('QURYNS', 0xfc6114)
 
 export const QUERY_TIMEOUT = 10e3
 
@@ -45,7 +45,7 @@ export default class NameServer {
     this.loop = setInterval(this.update.bind(this), 1e3)
 
     this.udp.on('message', this.handleUdpMessage)
-    this.udp.on('error', err => logger.error('Socket error:', err))
+    this.udp.on('error', err => logger.error('message.dnsServer.error.socketError', err))
   }
 
   destroy() {
@@ -100,7 +100,7 @@ export default class NameServer {
 
     if (useTcp) {
       const client = new Tcp.Socket()
-      client.on('error', err => logger.error('Socket err:', err))
+      client.on('error', err => logger.error('message.dnsServer.error.socketError', err))
 
       client.connect(port, ip)
 

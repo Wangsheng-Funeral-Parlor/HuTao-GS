@@ -1,4 +1,5 @@
 import config from "@/config"
+import TError from "@/translate/terror"
 import DispatchKey from "@/utils/dispatchKey"
 import { fileExists, readFile, writeFile } from "@/utils/fileSystem"
 
@@ -46,11 +47,11 @@ export const readKey = (buf: Buffer, offset: number): Buffer => {
             offset += 4
             break
           default:
-            throw new Error(`Unknown operand: ${operand?.toString(16)?.toUpperCase()}`)
+            throw new TError('message.tools.ua.error.unknownOperand', operand?.toString(16)?.toUpperCase())
         }
         break
       default:
-        throw new Error(`Unknown instruction: ${inst?.toString(16)?.toUpperCase()}`)
+        throw new TError('message.tools.ua.error.unknownInstruction', inst?.toString(16)?.toUpperCase())
     }
 
     if (Buffer.compare(buffers[buffers.length - 1], KEY_END) === 0) break
@@ -66,7 +67,7 @@ export const writeKey = (buf: Buffer, offset: number, key: Buffer) => {
   offset -= 2
 
   const retInsOffset = buf.subarray(offset).indexOf(RET_INS)
-  if (retInsOffset < 0) throw new Error('Unable to locate return instructions')
+  if (retInsOffset < 0) throw new TError('message.tools.ua.error.noReturn')
 
   const maxSize = buf.readUInt32LE(offset + retInsOffset - 4) + 8
   let addr = 0
@@ -107,16 +108,16 @@ export const listKeys = async (buf: Buffer): Promise<{ offset: number, data: str
 }
 
 export const UAList = async (path: string): Promise<string[]> => {
-  if (!await fileExists(path)) throw new Error('File not found.')
+  if (!await fileExists(path)) throw new TError('generic.fileNotFound', path)
   return (await listKeys(await readFile(path))).map(k => k.data)
 }
 
 export const UAPatch = async (src: string, dst: string): Promise<void> => {
-  if (!await fileExists(src)) throw new Error('File not found.')
+  if (!await fileExists(src)) throw new TError('generic.fileNotFound', src)
 
   const buf = await readFile(src)
   const key = (await listKeys(buf)).find(k => !k.data.includes('<P>'))
-  if (key == null) throw new Error('Unable to find server public key.')
+  if (key == null) throw new TError('message.tools.ua.error.noServerPublicKey')
 
   const serverKey = await DispatchKey.getServerKeyPair(config.dispatchKeyId)
   writeKey(buf, key.offset, Buffer.from(serverKey.public.xml))

@@ -1,13 +1,10 @@
+import translate from '@/translate'
 import { getJson, setJson } from '@/utils/json'
 import { CommandDefinition } from '..'
 
 const deleteConfigCommand: CommandDefinition = {
   name: 'deleteConfig',
-  desc: 'Delete config if it exists',
-  usage: [
-    'deleteConfig <name> - Delete config',
-    'deleteConfig        - Same but name is set to "default"'
-  ],
+  usage: 2,
   args: [
     { name: 'name', type: 'str', optional: true }
   ],
@@ -18,15 +15,15 @@ const deleteConfigCommand: CommandDefinition = {
     const configName = args[0] || 'default'
     const allConfigs = getJson('config.json', {})
 
-    if (configName === 'current') return printError('Invalid name:', configName)
-    if (allConfigs[configName] == null) return printError('Config not found:', configName)
+    if (configName === 'current') return printError(translate('cli.commands.deleteConfig.error.invalidName', configName))
+    if (allConfigs[configName] == null) return printError(translate('cli.commands.deleteConfig.error.notFound', configName))
 
-    print('Deleting config:', configName)
+    print(translate('cli.commands.deleteConfig.info.delete', configName))
 
     delete allConfigs[configName]
     setJson('config.json', allConfigs)
 
-    print('Deleted config.')
+    print(translate('cli.commands.deleteConfig.info.deleted'))
   }
 }
 

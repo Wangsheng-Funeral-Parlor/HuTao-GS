@@ -45,7 +45,7 @@ export default class CommandHandler extends BaseClass {
       kcpServer: game.server,
       sender: player
     })
-    if (err) this.printError(...err)
+    if (err) this.printError(err)
 
     await waitMs(500)
 

@@ -1,15 +1,12 @@
 import CLI from '@/cli'
 import Server from '@/server'
+import translate from '@/translate'
 import { getJson, setJson } from '@/utils/json'
 import { CommandDefinition } from '..'
 
 const loadConfigCommand: CommandDefinition = {
   name: 'loadConfig',
-  desc: 'Change current config',
-  usage: [
-    'loadConfig <name> - Change current config & restart',
-    'loadConfig        - Same but name is set to "default"'
-  ],
+  usage: 2,
   args: [
     { name: 'name', type: 'str', optional: true }
   ],
@@ -20,10 +17,10 @@ const loadConfigCommand: CommandDefinition = {
     const configName = args[0] || 'default'
     const allConfigs = getJson('config.json', {})
 
-    if (configName === 'current') return printError('Invalid name:', configName)
-    if (allConfigs[configName] == null) return printError('Config not found:', configName)
+    if (configName === 'current') return printError(translate('cli.commands.loadConfig.error.invalidName', configName))
+    if (allConfigs[configName] == null) return printError(translate('cli.commands.loadConfig.error.notFound', configName))
 
-    print('Loading config:', configName)
+    print(translate('cli.commands.loadConfig.info.load', configName))
 
     allConfigs.current = configName
     if (allConfigs.current === 'default') delete allConfigs.current

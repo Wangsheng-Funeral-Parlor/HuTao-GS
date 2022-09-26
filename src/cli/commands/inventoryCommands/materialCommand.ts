@@ -1,14 +1,10 @@
 import Material from '$/material'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const materialCommand: CommandDefinition = {
   name: 'material',
-  desc: 'Give material',
-  usage: [
-    'material <id> <count> <uid> - Give materials to player',
-    'material <id> <count>       - (In game) Give materials to yourself',
-    'material <id>               - (In game) Give 1 material to yourself'
-  ],
+  usage: 3,
   args: [
     { name: 'id', type: 'int' },
     { name: 'count', type: 'int', optional: true },
@@ -20,15 +16,15 @@ const materialCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const id = args[0]
     const count = args[1] || 1
 
     const material = await Material.create(player, id, count)
-    print('Give material:', `(${id})x${material.count}`)
+    print(translate('cli.commands.material.info.give', id, material.count))
 
-    if (!await player.inventory.add(material)) printError('Inventory full')
+    if (!await player.inventory.add(material)) printError(translate('generic.inventoryFull'))
   }
 }
 

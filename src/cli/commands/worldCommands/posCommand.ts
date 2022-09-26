@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const posCommand: CommandDefinition = {
   name: 'pos',
-  desc: 'Print current position',
-  usage: [
-    'pos <uid> - Print player current position',
-    'pos       - (In game) Print your current position'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -16,12 +13,12 @@ const posCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const pos = player.pos
-    if (!pos) return printError('Unable to get player position.')
+    if (!pos) return printError(translate('generic.playerNoPos'))
 
-    print('Scene:', player.currentScene?.id || '?', 'X:', pos.x, 'Y:', pos.y, 'Z:', pos.z)
+    print(translate('cli.commands.pos.info.posInfo', player.currentScene?.id || '?', pos.x, pos.y, pos.z))
   }
 }
 

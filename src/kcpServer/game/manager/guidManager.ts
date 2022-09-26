@@ -1,8 +1,8 @@
 import Player from '$/player'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import GuidUserData from '@/types/user/GuidUserData'
 
-const logger = new Logger('GIDMAN', 0x7303fc)
+const logger = new TLogger('GIDMGR', 0x7303fc)
 
 export default class GuidManager {
   player: Player
@@ -40,7 +40,7 @@ export default class GuidManager {
     let id = Math.abs((seed == null ? usedId[usedId.length - 1] : seed) || 0) % 0x100000000
     while (usedId.includes(id)) {
       if (i >= 0xFFFFFFFF) {
-        logger.error('Wait... Did we ran out of guid? WTF?')
+        logger.error('message.guid.error.full')
         break
       }
       i++

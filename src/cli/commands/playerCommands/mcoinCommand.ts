@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const mcoinCommand: CommandDefinition = {
   name: 'mcoin',
-  desc: 'Give genesis crystal',
-  usage: [
-    'mcoin <amount> <uid> - Give genesis crystal to player',
-    'mcoin <amount>       - (In game) Give genesis crystal to yourself'
-  ],
+  usage: 2,
   args: [
     { name: 'amount', type: 'int' },
     { name: 'uid', type: 'int', optional: true }
@@ -17,11 +14,11 @@ const mcoinCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const amount = args[0]
 
-    print('Give genesis crystal:', amount)
+    print(translate('cli.commands.mcoin.info.give', amount))
 
     player.addGenesisCrystal(amount)
   }

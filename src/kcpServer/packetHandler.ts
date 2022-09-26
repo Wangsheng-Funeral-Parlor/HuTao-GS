@@ -1,20 +1,18 @@
 import ProtoMatch from '#/protomatch'
-import Logger from '@/logger'
+import GlobalState from '@/globalState'
+import TLogger from '@/translate/tlogger'
 import { ClientStateEnum } from '@/types/enum'
 import dataUtil from '@/utils/proto'
-import KcpServer from '.'
 import { PacketContext, PacketInterface } from './packet'
 
-const logger = new Logger('PACKET', 0x8810cd)
+const logger = new TLogger('PACKET', 0x8810cd)
 
 export default class PacketHandler {
-  private server: KcpServer
   private ptm: ProtoMatch
 
   private instances: { [name: string]: PacketInterface }
 
-  constructor(server: KcpServer) {
-    this.server = server
+  constructor() {
     this.ptm = new ProtoMatch()
 
     this.instances = {}
@@ -36,12 +34,12 @@ export default class PacketHandler {
   }
 
   private unknownPacket(packetData: Buffer, packetID: number): void {
-    const { server, ptm } = this
+    const { ptm } = this
 
-    logger.warn('Unknown packet:', packetID)
-    if (!server.getGState('UseProtoMatch')) return
+    logger.warn('message.packet.warn.unknownPacket', packetID)
+    if (!GlobalState.get('UseProtoMatch')) return
 
-    logger.debug('ProtoMatch:', packetID, JSON.stringify(ptm.parseBuffer(packetData), null, 2), JSON.stringify(ptm.findProto(packetData), null, 2))
+    logger.debug('generic.param4', 'ProtoMatch:', packetID, JSON.stringify(ptm.parseBuffer(packetData), null, 2), JSON.stringify(ptm.findProto(packetData), null, 2))
   }
 
   async handle(packetID: number, packetName: string, packetData: Buffer, context: PacketContext, ...any: any[]): Promise<void> {
@@ -83,8 +81,8 @@ export default class PacketHandler {
           break
       }
     } catch (err) {
-      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('No handler for packet:', this.server.getGState('ShowPacketId') ? packetID : '-', packetName)
-      else logger.error('Error handling packet:', err)
+      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('message.packet.debug.noHandler', GlobalState.get('ShowPacketId') ? packetID : '-', packetName)
+      else logger.error('message.packet.error.handler', err)
     }
   }
 }

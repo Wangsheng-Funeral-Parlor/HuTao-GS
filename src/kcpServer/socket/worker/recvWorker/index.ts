@@ -42,14 +42,14 @@ export default class RecvWorker extends Worker {
 
   init(port: number) {
     if (isNaN(port)) {
-      this.log(LogLevel.ERROR, 'Invalid port:', port)
+      this.log(LogLevel.ERROR, 'message.worker.error.invalidPort', port)
       this.sendToInterface(WorkerOpcode.InitRecvRsp, false)
       return
     }
 
     const { socket } = this
     socket.bind(port, () => {
-      this.log(LogLevel.INFO, `Listening on port ${cRGB(0xffffff, socket.address().port.toString())}`)
+      this.log(LogLevel.INFO, 'message.worker.info.listen', cRGB(0xffffff, socket.address().port.toString()))
       this.sendToInterface(WorkerOpcode.InitRecvRsp, true)
     })
   }
@@ -59,7 +59,7 @@ export default class RecvWorker extends Worker {
     const connInfo = connInfoMap[conv]
     if (!connInfo) return this.sendToInterface(WorkerOpcode.SetInternalPortRsp, false)
     connInfo.iPort = port
-    this.log(LogLevel.DEBUG, 'Set ISocket port:', conv.toString(16).padStart(8, '0').toUpperCase(), port)
+    this.log(LogLevel.DEBUG, 'message.worker.debug.setISocketPort', conv.toString(16).padStart(8, '0').toUpperCase(), port)
     this.sendToInterface(WorkerOpcode.SetInternalPortRsp, true)
   }
 
@@ -67,7 +67,7 @@ export default class RecvWorker extends Worker {
     const { connInfoMap } = this
     if (connInfoMap[conv] == null) return this.sendToInterface(WorkerOpcode.RemoveConvRsp, false)
     delete connInfoMap[conv]
-    this.log(LogLevel.DEBUG, 'Remove conv:', conv.toString(16).padStart(8, '0').toUpperCase())
+    this.log(LogLevel.DEBUG, 'message.worker.debug.removeConv', conv.toString(16).padStart(8, '0').toUpperCase())
     this.sendToInterface(WorkerOpcode.RemoveConvRsp, true)
   }
 
@@ -78,7 +78,7 @@ export default class RecvWorker extends Worker {
 
     if (!blockedAddressList.includes(connInfo.address)) {
       blockedAddressList.push(connInfo.address)
-      this.log(LogLevel.INFO, 'Blocked address:', connInfo.address)
+      this.log(LogLevel.INFO, 'message.worker.info.blockAddr', connInfo.address)
     }
 
     this.sendToInterface(WorkerOpcode.BlacklistRsp, true)

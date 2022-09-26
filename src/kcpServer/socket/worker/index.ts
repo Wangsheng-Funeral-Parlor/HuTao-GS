@@ -63,7 +63,7 @@ export default class Worker extends ISocket {
     stdin.on('data', data => this.emit('Data', data))
     process.on('uncaughtException', err => this.uncaughtException(err))
 
-    this.log(LogLevel.INFO, 'Worker started.')
+    this.log(LogLevel.INFO, 'message.worker.info.started')
     this.sendReady()
   }
 
@@ -74,7 +74,7 @@ export default class Worker extends ISocket {
   private async sendReady() {
     await this.createISocket()
     await this.sendToInterface(WorkerOpcode.WorkerReadyNotify, this.id, this.getIPort())
-    this.log(LogLevel.DEBUG, 'Ready')
+    this.log(LogLevel.DEBUG, 'message.worker.debug.ready')
   }
 
   private tryCallback(opcode: WorkerOpcode, args: AcceptTypes[]) {
@@ -86,7 +86,7 @@ export default class Worker extends ISocket {
       try {
         cbList.shift()(args)
       } catch (err) {
-        this.log(LogLevel.ERROR, err)
+        this.log(LogLevel.ERROR, 'generic.param1', err)
       }
     }
   }
@@ -123,13 +123,13 @@ export default class Worker extends ISocket {
     } catch (e) { }
   }
 
-  log(level: LogLevel, ...msg: any[]) {
-    this.sendToInterface(WorkerOpcode.LogNotify, level, formatWithOptions({ colors: true }, ...msg))
+  log(level: LogLevel, key: string, ...params: any[]) {
+    this.sendToInterface(WorkerOpcode.LogNotify, level, key, ...params.map(p => formatWithOptions({ colors: true }, p)))
   }
 
   async shutdown() {
     await this.emit('Shutdown')
-    this.log(LogLevel.DEBUG, 'Shutdown')
+    this.log(LogLevel.DEBUG, 'message.worker.debug.shutdown')
     exit()
   }
 
@@ -144,14 +144,14 @@ export default class Worker extends ISocket {
     switch (opcode) { // NOSONAR
       case WorkerOpcode.WorkerShutdownNotify: {
         if (args[0] !== id) {
-          this.log(LogLevel.ERROR, 'Mismatch id:', args[0])
+          this.log(LogLevel.ERROR, 'message.worker.error.invalidId', args[0])
           break
         }
         await this.shutdown()
         break
       }
       default: {
-        if (WorkerOpcode[opcode] == null) return this.log(LogLevel.ERROR, 'Invalid opcode:', opcode)
+        if (WorkerOpcode[opcode] == null) return this.log(LogLevel.ERROR, 'message.worker.error.invalidOpcode', opcode)
         this.tryCallback(opcode, args)
       }
     }

@@ -1,9 +1,10 @@
-import Logger from '@/logger'
+import TError from '@/translate/terror'
+import TLogger from '@/translate/tlogger'
 import { join } from 'path'
 import { execCommand } from './childProcess'
 import { fileExists, readFile } from './fileSystem'
 
-const logger = new Logger('OPNSSL', 0x730c0a)
+const logger = new TLogger('OPNSSL', 0x730c0a)
 
 function trimBuffer(buf: Buffer): Buffer {
   let i = 0
@@ -53,15 +54,15 @@ export default class OpenSSL {
   }
 
   static async isInstalled() {
-    logger.debug('Checking OpenSSL installation...')
+    logger.debug('message.openssl.debug.check')
 
     try {
       if ((await execCommand('openssl version')).indexOf('OpenSSL') >= 0) return true
     } catch (err) {
-      logger.error(err)
+      logger.error('generic.param1', err)
     }
 
-    logger.error('OpenSSL not installed.')
+    logger.error('message.openssl.error.notInstalled')
     return false
   }
 
@@ -112,7 +113,7 @@ export default class OpenSSL {
       Exponent1 == null || Exponent2 == null ||
       Coefficient == null ||
       PrivateExponent == null
-    ) throw new Error('Invalid private key.')
+    ) throw new TError('message.openssl.error.invalidPrivateKey')
 
     // convert to buffer
     let m = Buffer.from(Modulus.split(':').join(''), 'hex')
@@ -156,7 +157,7 @@ export default class OpenSSL {
     if (
       Modulus == null ||
       Exponent == null
-    ) throw new Error('Invalid public key.')
+    ) throw new TError('message.openssl.error.invalidPublicKey')
 
     // convert to buffer
     let m = Buffer.from(Modulus.split(':').join(''), 'hex')
@@ -178,7 +179,7 @@ export default class OpenSSL {
     const publicPath = join(dir, `${name}Public.pem`)
 
     if (!await fileExists(privatePath)) {
-      if (generateKeySize == null) throw new Error(`${name}Private.pem is missing.`)
+      if (generateKeySize == null) throw new TError('generic.fileNotFound', `${name}Private.pem`)
       await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(generateKeySize, 512))
     }
     if (!await fileExists(publicPath)) await OpenSSL.extractRsaPublicKey(privatePath, publicPath)
@@ -208,7 +209,7 @@ export default class OpenSSL {
 
   static async getPublicKey(dir: string, name: string): Promise<RSAKey> {
     const publicPath = join(dir, `${name}Public.pem`)
-    if (!await fileExists(publicPath)) throw new Error(`${name}Public.pem is missing.`)
+    if (!await fileExists(publicPath)) throw new TError('generic.fileNotFound', `${name}Public.pem`)
 
     const pubSize = await OpenSSL.publicKeySize(publicPath)
     const pubPem = (await readFile(publicPath)).toString()

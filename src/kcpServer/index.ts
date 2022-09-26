@@ -1,7 +1,9 @@
 import Client from '#/client'
 import PacketHandler from '#/packetHandler'
+import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import Server from '@/server'
+import TLogger from '@/translate/tlogger'
 import { ClientStateEnum } from '@/types/enum'
 import { ENetReasonEnum } from '@/types/proto/enum'
 import { waitTick } from '@/utils/asyncWait'
@@ -12,7 +14,7 @@ import EventEmitter from 'promise-events'
 import Game from './game'
 import Socket from './socket'
 
-const logger = new Logger('KCPSRV', 0xc824ff)
+const logger = new TLogger('KCPSRV', 0xc824ff)
 
 export default class KcpServer extends EventEmitter {
   private loop: NodeJS.Timer
@@ -33,16 +35,12 @@ export default class KcpServer extends EventEmitter {
 
     this.socket = new Socket(this)
     this.game = new Game(this)
-    this.packetHandler = new PacketHandler(this)
+    this.packetHandler = new PacketHandler()
 
     this.clientList = []
     this.tokens = []
 
     this.frame = 0
-  }
-
-  getGState(key: string) {
-    return this.server.getGState(key)
   }
 
   async start(): Promise<void> {
@@ -69,7 +67,7 @@ export default class KcpServer extends EventEmitter {
     // Set client state
     client.state = ClientStateEnum.CONNECTION
 
-    logger.info(`Client connect: ${conv?.toString(16)?.padStart(8, '0')?.toUpperCase()}`)
+    logger.info('message.kcpServer.info.connect', conv?.toString(16)?.padStart(8, '0')?.toUpperCase())
     this.clientList.push(client)
 
     return client
@@ -87,7 +85,7 @@ export default class KcpServer extends EventEmitter {
     await client.destroy(enetReason)
     await socket.disconnect(conv, enetReason)
 
-    logger.info('Client disconnect:', conv?.toString(16)?.padStart(8, '0')?.toUpperCase(), 'Reason:', ENetReasonEnum[enetReason] || enetReason)
+    logger.info('message.kcpServer.info.disconnect', conv?.toString(16)?.padStart(8, '0')?.toUpperCase(), ENetReasonEnum[enetReason] || enetReason)
     clientList.splice(clientList.indexOf(client), 1)
 
     return true
@@ -117,7 +115,7 @@ export default class KcpServer extends EventEmitter {
   }
 
   async dump(name: string, data: Buffer) {
-    if (!this.getGState('PacketDump')) return
+    if (!GlobalState.get('PacketDump')) return
 
     try {
       const dumpPath = join(cwd(), 'data/log/dump', `${name}.bin`)

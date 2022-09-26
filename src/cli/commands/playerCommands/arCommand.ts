@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const arCommand: CommandDefinition = {
   name: 'ar',
-  desc: 'Set adventure rank',
-  usage: [
-    'ar <level> <uid> - Set adventure rank for player',
-    'ar <level>       - (In game) Set adventure rank for yourself'
-  ],
+  usage: 2,
   args: [
     { name: 'level', type: 'int' },
     { name: 'uid', type: 'int', optional: true }
@@ -17,10 +14,10 @@ const arCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     await player.setLevel(args[0])
-    print(`Adventure rank set to: ${player.level}`)
+    print(translate('cli.commands.ar.info.setAR', player.level))
   }
 }
 

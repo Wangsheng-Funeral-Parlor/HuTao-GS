@@ -1,14 +1,10 @@
 import Weapon from '$/equip/weapon'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const weaponCommand: CommandDefinition = {
   name: 'weapon',
-  desc: 'Give weapon',
-  usage: [
-    'weapon <id> <count> <uid> - Give weapons to player',
-    'weapon <id> <count>       - (In game) Give weapons to yourself',
-    'weapon <id>               - (In game) Give 1 weapon to yourself'
-  ],
+  usage: 3,
   args: [
     { name: 'id', type: 'int' },
     { name: 'count', type: 'int', optional: true },
@@ -20,17 +16,17 @@ const weaponCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const id = args[0]
     const count = args[1] || 1
 
-    print('Give weapon:', `(${id})x${count}`)
+    print(translate('cli.commands.weapon.info.give', id, count))
 
     for (let i = 0; i < count; i++) {
       const weapon = new Weapon(id, player)
       await weapon.initNew()
-      if (!await player.inventory.add(weapon)) return printError('Inventory full')
+      if (!await player.inventory.add(weapon)) return printError(translate('generic.inventoryFull'))
     }
   }
 }

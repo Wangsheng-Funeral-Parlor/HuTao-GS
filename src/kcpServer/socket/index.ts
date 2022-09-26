@@ -3,6 +3,7 @@ import { getCmdIdByName, getNameByCmdId, PACKET_HEAD } from '#/cmdIds'
 import { PacketContext, verbosePackets } from '#/packet'
 import uidPrefix from '#/utils/uidPrefix'
 import config from '@/config'
+import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import { cRGB } from '@/tty/utils'
 import { PacketHead } from '@/types/kcp'
@@ -106,7 +107,7 @@ export default class Socket extends BaseClass {
 
       const log = [
         uidPrefix('SEND', client, 0x7000ff),
-        server.getGState('ShowPacketId') ? packetID : '-',
+        GlobalState.get('ShowPacketId') ? packetID : '-',
         cRGB(0x00e5ff, head?.clientSequenceId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
         packetName
       ]
@@ -156,7 +157,7 @@ export default class Socket extends BaseClass {
 
     const log = [
       uidPrefix('RECV', client, 0x00d5ff),
-      server.getGState('ShowPacketId') ? packetID : '-',
+      GlobalState.get('ShowPacketId') ? packetID : '-',
       cRGB(0xc5ff00, seqId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
       packetName
     ]

@@ -1,11 +1,11 @@
-import { getJsonAsync, hasJsonAsync } from '@/utils/json'
-import Logger from '@/logger'
 import config from '@/config'
+import TLogger from '@/translate/tlogger'
 import { waitUntil } from '@/utils/asyncWait'
+import { getJsonAsync, hasJsonAsync } from '@/utils/json'
 
 const DATA_DIR = 'data/game/' + config.version
 
-const logger = new Logger('LOADER', 0x34fa69)
+const logger = new TLogger('LOADER', 0x34fa69)
 
 export default class Loader {
   path: string
@@ -26,7 +26,7 @@ export default class Loader {
     if (busy) return waitUntil(() => !this.busy)
     this.busy = true
 
-    if (!await hasJsonAsync(filePath)) logger.warn('Missing data:', path)
+    if (!await hasJsonAsync(filePath)) logger.warn('message.loader.warn.noData', path)
     this.data = await getJsonAsync(filePath, defaultData)
 
     this.busy = false

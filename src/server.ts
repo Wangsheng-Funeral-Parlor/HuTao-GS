@@ -11,6 +11,7 @@ import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
 import DnsServer from './dnsServer'
 import Logger from './logger'
 import { patchGame, unpatchGame } from './tools/patcher'
+import TLogger from './translate/tlogger'
 import { cRGB } from './tty/utils'
 import { Announcement } from './types/announcement'
 import Update from './update'
@@ -69,11 +70,9 @@ const welcomeAnnouncement: Announcement = {
   loginAlert: true
 }
 
-const logger = new Logger('SERVER')
+const logger = new TLogger('SERVER')
 
 export default class Server {
-  globalState: GlobalState
-
   observer: PerformanceObserver
 
   update: Update
@@ -92,30 +91,30 @@ export default class Server {
     // Start log capture
     Logger.startCapture()
 
+    // Load global state
+    GlobalState.load()
+
     // Server build info
-    logger.info(`Name: ${cRGB(0xffffff, serverName)}`)
-    logger.info(`Build: ${cRGB(0xffffff, process.env.BUILD_INFO || 'development')}`)
-    logger.info(`Game version: ${cRGB(0xffffff, version)}`)
-    logger.info(`Dispatch region: ${cRGB(0xffffff, dispatchRegion)}`)
-    logger.info(`Dispatch seed: ${cRGB(0xffffff, dispatchSeed)}`)
-    logger.info(`Dispatch key: ${cRGB(0xffffff, dispatchKeyId?.toString())}`)
-    logger.info(`Auto patch: ${cRGB(0xffffff, autoPatch.toString())}`)
-    logger.info(`Log level: ${cRGB(0xffffff, logger.getLogLevel().toString())}`)
+    logger.info('message.server.info.name', cRGB(0xffffff, serverName))
+    logger.info('message.server.info.build', cRGB(0xffffff, process.env.BUILD_INFO || 'development'))
+    logger.info('message.server.info.gameVersion', cRGB(0xffffff, version))
+    logger.info('message.server.info.dispatchRegion', cRGB(0xffffff, dispatchRegion))
+    logger.info('message.server.info.dispatchSeed', cRGB(0xffffff, dispatchSeed))
+    logger.info('message.server.info.dispatchKey', cRGB(0xffffff, dispatchKeyId?.toString()))
+    logger.info('message.server.info.autoPatch', cRGB(0xffffff, autoPatch.toString()))
+    logger.info('message.server.info.logLevel', cRGB(0xffffff, logger.getLogLevel().toString()))
 
     if (!SUPPORT_REGIONS.includes(dispatchRegion)) {
-      logger.error('Unsupported region.')
+      logger.error('message.server.error.invalidRegion')
       return
     }
 
     if (!SUPPORT_VERSIONS.includes(version)) {
-      logger.error('Unsupported version.')
+      logger.error('message.server.error.invalidVersion')
       return
     }
 
     this.checkDirs()
-
-    this.globalState = new GlobalState()
-    this.globalState.load()
 
     this.observer = new PerformanceObserver(list => logger.performance(list))
 
@@ -135,16 +134,12 @@ export default class Server {
     return this.webServer.announcements
   }
 
-  getGState(key: string) {
-    return this.globalState.get(key)
-  }
-
   async tryPatchGame() {
     if (!autoGamePatch || !await dirExists(gameDir)) return
     try {
       await patchGame(gameDir)
     } catch (err) {
-      logger.error('Error patching game:', err)
+      logger.error('message.server.error.patchGame', err)
     }
   }
 
@@ -153,7 +148,7 @@ export default class Server {
     try {
       await unpatchGame(gameDir)
     } catch (err) {
-      logger.error('Error unpatching game:', err)
+      logger.error('message.server.error.unpatchGame', err)
     }
   }
 
@@ -164,7 +159,7 @@ export default class Server {
   async setHosts(): Promise<void> {
     if (!hosts) return
 
-    logger.debug('Setting hosts...')
+    logger.debug('message.server.debug.setHost')
 
     for (const host of hosts) {
       for (let i = 1; i <= 10; i++) {
@@ -174,7 +169,7 @@ export default class Server {
         } catch (err) {
           // only throw error if all attempts failed
           if (i >= 10) {
-            logger.error('Set hosts failed:', err)
+            logger.error('message.server.error.setHost', err)
             this.restart(15e3)
             return
           }
@@ -182,14 +177,14 @@ export default class Server {
       }
     }
 
-    logger.debug('Set hosts success.')
+    logger.debug('message.server.debug.setHostSuccess')
 
-    logger.debug('Flushing dns...')
+    logger.debug('message.server.debug.flushDns')
     try {
       await this.flushDNS()
-      logger.debug('Flush dns success.')
+      logger.debug('message.server.debug.flushDnsSuccess')
     } catch (err) {
-      logger.error('Flush dns failed:', err)
+      logger.error('message.server.error.flushDns', err)
       this.restart(15e3)
     }
   }
@@ -197,7 +192,7 @@ export default class Server {
   async removeHosts(): Promise<void> {
     if (!hosts) return
 
-    logger.debug('Removing hosts...')
+    logger.debug('message.server.debug.removeHost')
 
     for (const host of hosts) {
       for (let i = 1; i <= 10; i++) {
@@ -207,7 +202,7 @@ export default class Server {
         } catch (err) {
           // only throw error if all attempts failed
           if (i >= 10) {
-            logger.error('Remove hosts failed:', err)
+            logger.error('message.server.error.removeHost', err)
             this.restart(15e3)
             return
           }
@@ -215,14 +210,14 @@ export default class Server {
       }
     }
 
-    logger.debug('Remove hosts success.')
+    logger.debug('message.server.debug.removeHostSuccess')
 
-    logger.debug('Flushing dns...')
+    logger.debug('message.server.debug.flushDns')
     try {
       await this.flushDNS()
-      logger.debug('Flush dns success.')
+      logger.debug('message.server.debug.flushDnsSuccess')
     } catch (err) {
-      logger.error('Flush dns failed:', err)
+      logger.error('message.server.error.flushDns', err)
       this.restart(15e3)
     }
   }
@@ -234,7 +229,7 @@ export default class Server {
     observer.observe({ entryTypes: ['measure'], buffered: true })
 
     Logger.mark('Start')
-    logger.info('Starting...')
+    logger.info('message.server.info.starting')
 
     await this.setHosts()
 
@@ -243,7 +238,7 @@ export default class Server {
     async function onListening(): Promise<void> {
       if (++listening < 3) return
 
-      logger.info('Started. For help, type "help"')
+      logger.info('message.server.info.started')
       Logger.measure('Server start', 'Start')
     }
 
@@ -262,12 +257,12 @@ export default class Server {
 
       await this.tryPatchGame()
     } catch (err) {
-      logger.error('Error while starting:', err)
+      logger.error('message.server.error.start', err)
     }
   }
 
   async restart(delay: number = 1e3): Promise<void> {
-    logger.info('Restarting...', `Delay: ${delay}ms`)
+    logger.info('message.server.info.restart', delay)
 
     await this.runShutdownTasks()
     await waitMs(delay)
@@ -277,7 +272,7 @@ export default class Server {
   }
 
   async stop(delay: number = 1e3): Promise<void> {
-    logger.info('Stopping...', `Delay: ${delay}ms`)
+    logger.info('message.server.info.stop', delay)
 
     await this.runShutdownTasks(true)
     await waitMs(delay)
@@ -286,7 +281,7 @@ export default class Server {
   }
 
   async runShutdownTasks(fullShutdown: boolean = false) {
-    const { globalState, observer, dnsServer, webServer, kcpServer, readyToStart } = this
+    const { observer, dnsServer, webServer, kcpServer, readyToStart } = this
     if (!readyToStart) return // Can't shutdown if it never started in the first place...
 
     await kcpServer.stop()
@@ -294,7 +289,7 @@ export default class Server {
     webServer.stop()
     dnsServer.stop()
 
-    globalState.save()
+    GlobalState.save()
 
     if (fullShutdown) {
       await this.removeHosts()
@@ -303,7 +298,7 @@ export default class Server {
 
     observer.disconnect()
 
-    await Logger.stopCapture(!!globalState.get('SaveLog'))
+    await Logger.stopCapture(!!GlobalState.get('SaveLog'))
   }
 
   setLogLevel(level: number) {
@@ -314,10 +309,10 @@ export default class Server {
     for (const path of requiredDirs) {
       try { if (statSync(join(cwd(), path))) continue } catch (err) { }
       try {
-        logger.info('Creating directory:', path)
+        logger.info('message.server.info.mkdir', path)
         mkdirSync(join(cwd(), path), { recursive: true })
       } catch (err) {
-        logger.error(err)
+        logger.error('message.server.error.mkdir', err)
       }
     }
   }

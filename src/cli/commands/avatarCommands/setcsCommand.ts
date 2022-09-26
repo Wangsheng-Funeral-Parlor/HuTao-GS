@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const setcsCommand: CommandDefinition = {
   name: 'setcs',
-  desc: 'Set cand skill for current avatar',
-  usage: [
-    'setcs <id> <uid> - Set cand skill for player\'s current avatar',
-    'setcs <id>       - (In game) Set cand skill for current avatar'
-  ],
+  usage: 2,
   args: [
     { name: 'id', type: 'num' },
     { name: 'uid', type: 'int', optional: true }
@@ -17,15 +14,15 @@ const setcsCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[1] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const { currentAvatar } = player
-    if (!currentAvatar) return printError('Current avatar is null.')
+    if (!currentAvatar) return printError(translate('generic.playerNoCurAvatar'))
 
     if (await currentAvatar.skillManager.setCandSkillId(args[0])) {
-      print(`Set cand skill to ${args[0]}.`)
+      print(translate('cli.commands.setcs.info.setSkill', args[0]))
     } else {
-      printError('Skill not found.')
+      printError(translate('cli.commands.setcs.error.noSkill'))
     }
   }
 }

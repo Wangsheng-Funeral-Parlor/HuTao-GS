@@ -1,12 +1,12 @@
 import { LogLevel } from '@/logger'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const logLevels = Object.values(LogLevel).map(v => parseInt(v.toString())).filter(v => !isNaN(v))
 
 const logLevelCommand: CommandDefinition = {
   name: 'logLevel',
-  desc: 'Set log level',
-  usage: logLevels.map(level => `logLevel ${level} - Set log level to ${LogLevel[level]}`),
+  usage: logLevels.map(level => translate('cli.commands.logLevel.usage', level, LogLevel[level])),
   args: [
     { name: 'level', type: 'int', values: logLevels }
   ],

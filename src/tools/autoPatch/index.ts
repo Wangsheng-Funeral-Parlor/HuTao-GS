@@ -1,19 +1,19 @@
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import * as QueryCurRegion from './curRegion'
 import * as QueryRegionList from './regionList'
 
-const logger = new Logger('APATCH')
+const logger = new TLogger('APATCH')
 
 export const checkForUpdate = async (): Promise<void> => {
-  logger.info('Checking for updates...')
+  logger.info('message.tools.autoPatch.info.check')
   await QueryRegionList.checkForUpdate()
   await QueryCurRegion.checkForUpdate()
-  logger.info('Update complete.')
+  logger.info('message.tools.autoPatch.info.success')
 }
 
 export const update = async (): Promise<void> => {
-  logger.info('Updating...')
+  logger.info('message.tools.autoPatch.info.update')
   await QueryRegionList.update()
   await QueryCurRegion.update()
-  logger.info('Update complete.')
+  logger.info('message.tools.autoPatch.info.success')
 }

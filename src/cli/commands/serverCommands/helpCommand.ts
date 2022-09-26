@@ -1,4 +1,5 @@
 import CLI from '@/cli'
+import translate from '@/translate'
 import { cRGB } from '@/tty/utils'
 import { ArgumentDefinition, CLILike, CommandDefinition } from '..'
 
@@ -13,24 +14,23 @@ export function getArgumentInfo(argument: ArgumentDefinition) {
 }
 
 export function getCommandInfo(command: CommandDefinition, prefix: string = '', showDesc: boolean = false) {
-  const { name, args, desc } = command
-  return `${cRGB(0xffffff, prefix + name)}${cRGB(0xffb71c, (args != null && args.length > 0) ? (' ' + args.map(getArgumentInfo).join(' ')) : '')}${showDesc ? (' - ' + desc) : ''}`
+  const { name, args } = command
+  const cmdName = cRGB(0xffffff, prefix + name)
+  const cmdArgs = cRGB(0xffb71c, (args != null && args.length > 0) ? (' ' + args.map(getArgumentInfo).join(' ')) : '')
+  return `${cmdName}${cmdArgs}${showDesc ? (' - ' + translate(`cli.commands.${name}.desc`)) : ''}`
 }
 
 function consoleHelpPage(cli: CLILike) {
   const { print } = cli
 
-  print('Console controls:')
-  print(' Page up/Page down   - Scroll up/down')
-  print(' Up arrow/Down arrow - Previous/Next command')
-  print(' Tab/Right arrow     - Auto complete')
-  print(' Escape              - Cancel input')
+  print(translate('cli.commands.help.page.console.title'))
+  for (let i = 0; i < 4; i++) print(' ' + translate(`cli.commands.help.page.console.controls.${i}`))
 }
 
 function commandListHelpPage(cli: CLILike) {
   const { print } = cli
 
-  print('Command list')
+  print(translate('cli.commands.help.page.commandList.title'))
 
   const lines = CLI.commands.map(cmd => getCommandInfo(cmd, undefined, true))
   for (const line of lines) print(` ${line}`)
@@ -44,25 +44,24 @@ function commandHelpPage(cli: CLILike, commandName?: string) {
   const command = CLI.commands.find(c => c.name === commandName)
   if (command == null) return printError('Command not found:', commandName)
 
-  print('Command info')
-  print(' Command:', commandName)
-  print(' Syntax:', getCommandInfo(command))
-  print(' Description:', command.desc)
+  print(translate('cli.commands.help.page.commandInfo.title'))
+  print(' ' + translate('cli.commands.help.page.commandInfo.syntax', getCommandInfo(command)))
+  print(' ' + translate('cli.commands.help.page.commandInfo.desc', translate(`cli.commands.${commandName}.desc`)))
 
   if (command.usage == null) return
 
-  print(' Usage:')
-  for (const line of command.usage) print(`  ${line}`)
+  print(' ' + translate('cli.commands.help.page.commandInfo.usage'))
+
+  if (Array.isArray(command.usage)) {
+    for (const usage of command.usage) print(`  ${usage}`)
+  } else {
+    for (let i = 0; i < command.usage; i++) print('  ' + translate(`cli.commands.${commandName}.usage.${i}`))
+  }
 }
 
 const helpCommand: CommandDefinition = {
   name: 'help',
-  desc: 'Show help messages',
-  usage: [
-    'help command           - Command list',
-    'help command <command> - Command info',
-    'help console           - Console controls'
-  ],
+  usage: 3,
   args: [
     { name: 'category', type: 'str', values: ['command', 'console'], optional: true },
     { name: 'command', type: 'str', get values() { return CLI.commands.map(c => c.name) }, optional: true }
@@ -72,7 +71,7 @@ const helpCommand: CommandDefinition = {
     const { args, sender, cli } = cmdInfo
     const { print } = cli
 
-    if (sender) return print('Please visit announcement for list of commands.')
+    if (sender) return print(translate('cli.commands.help.error.inGame'))
 
     const [category, command] = args
     switch (category) {
@@ -83,7 +82,7 @@ const helpCommand: CommandDefinition = {
         consoleHelpPage(cli)
         break
       default:
-        if (category != null) print('Unknown category:', category)
+        if (category != null) print(translate('cli.commands.help.error.invalidCategory', category))
         commandHelpPage(cli, 'help')
     }
   }

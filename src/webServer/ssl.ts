@@ -1,10 +1,10 @@
 import config from '@/config'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { dirExists, fileExists, mkdir, readFile, writeFile } from '@/utils/fileSystem'
 import OpenSSL from '@/utils/openssl'
 import { join, resolve } from 'path'
 
-const logger = new Logger('SSLGEN', 0xa0ff00)
+const logger = new TLogger('SSLGEN', 0xa0ff00)
 
 const domains = Object.keys(config.domains)
 
@@ -68,16 +68,16 @@ export default class SSL {
   async validateCaFiles() {
     const { workDir } = this
 
-    logger.info('Validating ca files...')
+    logger.info('message.ssl.info.checkCA')
 
     for (const key in caFiles) {
       if (!await fileExists(join(workDir, caFiles[key]))) {
-        logger.warn('Missing ca files.')
+        logger.warn('message.ssl.warn.checkCAFail')
         return false
       }
     }
 
-    logger.info('Validation success.')
+    logger.info('message.ssl.info.checkSuccess')
 
     return true
   }
@@ -85,16 +85,16 @@ export default class SSL {
   async validateSrvFiles() {
     const { workDir } = this
 
-    logger.info('Validating srv files...')
+    logger.info('message.ssl.info.checkSRV')
 
     for (const key in srvFiles) {
       if (!await fileExists(join(workDir, srvFiles[key]))) {
-        logger.warn('Missing srv files.')
+        logger.warn('message.ssl.warn.checkSRVFail')
         return false
       }
     }
 
-    logger.info('Validation success.')
+    logger.info('message.ssl.info.checkSuccess')
 
     return true
   }
@@ -103,7 +103,7 @@ export default class SSL {
     const { workDir } = this
     if (await dirExists(workDir)) return
 
-    logger.info('Creating ssl directory...')
+    logger.info('message.ssl.info.mkdir')
     await mkdir(workDir, { recursive: true })
   }
 
@@ -119,25 +119,25 @@ export default class SSL {
 
       await this.mkdir()
 
-      logger.info('Generating ca files...')
+      logger.info('message.ssl.info.generateCA')
 
       // create config if not exists
       if (!await fileExists(caCnfPath)) {
-        logger.info(`Creating ${caCnf}...`)
+        logger.info('message.ssl.info.create', caCnf)
         await writeFile(caCnfPath, caCnfData)
       } else {
-        logger.info(`Found ${caCnf}.`)
+        logger.info('message.ssl.info.found', caCnf)
       }
 
-      logger.info(`Generating ${caKey}...`)
+      logger.info('message.ssl.info.generate', caKey)
       await OpenSSL.generateRsaPrivateKey(caKeyPath, 4096)
 
-      logger.info(`Generating ${caCrt}...`)
+      logger.info('message.ssl.info.generate', caCrt)
       await OpenSSL.generateRootCaCert(caKeyPath, caCnfPath, caCrtPath)
 
       if (!await this.generateSrvFiles()) return false
     } catch (err) {
-      logger.error(err)
+      logger.error('generic.param1', err)
       return false
     }
 
@@ -159,26 +159,26 @@ export default class SSL {
       const srvCsrPath = join(workDir, srvCsr)
       const srvKeyPath = join(workDir, srvKey)
 
-      logger.info('Generating srv files...')
+      logger.info('message.ssl.info.generateSRV')
 
       // create config if not exists
       if (!await fileExists(srvCnfPath)) {
-        logger.info(`Creating ${srvCnf}...`)
+        logger.info('message.ssl.info.create', srvCnf)
         await writeFile(srvCnfPath, srvCnfData)
       } else {
-        logger.info(`Found ${srvCnf}.`)
+        logger.info('message.ssl.info.found', srvCnf)
       }
 
-      logger.info(`Generating ${srvKey}...`)
+      logger.info('message.ssl.info.generate', srvKey)
       await OpenSSL.generateRsaPrivateKey(srvKeyPath, 4096)
 
-      logger.info(`Generating ${srvCsr}...`)
+      logger.info('message.ssl.info.generate', srvCsr)
       await OpenSSL.generateCsr(srvKeyPath, srvCnfPath, srvCsrPath)
 
-      logger.info(`Generating ${srvCrt}...`)
+      logger.info('message.ssl.info.generate', srvCrt)
       await OpenSSL.generateCert(srvCsrPath, caCrtPath, caKeyPath, srvCnfPath, srvCrtPath)
     } catch (err) {
-      logger.error(err)
+      logger.error('generic.param1', err)
       return false
     }
 

@@ -1,8 +1,8 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const scriptCommand: CommandDefinition = {
   name: 'script',
-  desc: 'Windy',
   args: [
     { name: 'name', type: 'str' },
     { name: 'uid', type: 'int' }
@@ -12,13 +12,10 @@ const scriptCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[1])
 
-    if (!player) {
-      printError('Player not found.')
-      return
-    }
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     if (await player.windyRce(args[0])) print('Sending script to client.')
-    else printError('Script not found.')
+    else printError(translate('cli.commands.script.error.scriptNotFound'))
   }
 }
 

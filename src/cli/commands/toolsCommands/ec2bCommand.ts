@@ -3,7 +3,6 @@ import { CommandDefinition } from '..'
 
 const ec2bCommand: CommandDefinition = {
   name: 'ec2b',
-  desc: 'Dump ec2b key',
   args: [
     { name: 'ver', type: 'str' },
     { name: 'name', type: 'str' }

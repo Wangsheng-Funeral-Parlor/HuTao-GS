@@ -1,13 +1,10 @@
 import { UAList, UAPatch } from '@/tools/UAPatch'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const uaCommand: CommandDefinition = {
   name: 'ua',
-  desc: 'UA patching tools',
-  usage: [
-    'ua patch <input file> <output file> - Patch UA RSA keys',
-    'ua dump <input file>                - Print UA RSA keys to console'
-  ],
+  usage: 2,
   args: [
     { name: 'mode', type: 'str', values: ['patch', 'dump'] },
     { name: 'input', type: 'str' },
@@ -26,12 +23,10 @@ const uaCommand: CommandDefinition = {
         case 'dump':
           await UAPatch(input, output)
           break
-        default:
-          throw new Error(`Unknown mode: ${mode}`)
       }
-      print('Success')
+      print(translate('cli.commands.ua.info.success'))
     } catch (err) {
-      printError((<Error>err).message || 'Unknown error')
+      printError((<Error>err).message || err)
     }
   }
 }

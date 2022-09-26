@@ -1,15 +1,10 @@
 import { decryptMetadata, dumpStringLiterals, encryptMetadata, patchMetadata } from '@/tools/metadata'
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const metaCommand: CommandDefinition = {
   name: 'meta',
-  desc: 'Metadata patching tools',
-  usage: [
-    'meta patch <input file> <output file> - Patch metadata',
-    'meta dump <input file> <output file>  - Dump metadata strings',
-    'meta dec <input file> <output file>   - Decrypt metadata',
-    'meta enc <input file> <output file>   - Encrypt metadata'
-  ],
+  usage: 4,
   args: [
     { name: 'mode', type: 'str', values: ['patch', 'dump', 'dec', 'enc'] },
     { name: 'input', type: 'str' },
@@ -34,12 +29,10 @@ const metaCommand: CommandDefinition = {
         case 'dump':
           await dumpStringLiterals(input, output)
           break
-        default:
-          throw new Error(`Unknown mode: ${mode}`)
       }
-      print('Success')
+      print(translate('cli.commands.meta.info.success'))
     } catch (err) {
-      printError((<Error>err).message || 'Unknown error')
+      printError((<Error>err).message || err)
     }
   }
 }

@@ -1,12 +1,12 @@
 import { getNameByCmdId } from '#/cmdIds'
 import config from '@/config'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { join } from 'path'
 import { cwd } from 'process'
 import * as protobuf from 'protobufjs'
 
-const logger = new Logger('PROTOU', 0xc2f542)
+const logger = new TLogger('PROTOU', 0xc2f542)
 
 const protoTypeCache: { [proto: string]: protobuf.Type } = {}
 const logBlacklist: (string | number)[] = []
@@ -46,14 +46,14 @@ export const objToProtobuffer = async (obj: object, cmdId: number | string, comm
   try {
     const type = await getProtoType(protoName.toString(), common)
     if (type == null) {
-      if (canLogProto(protoName)) logger.warn('Missing proto:', protoName)
+      if (canLogProto(protoName)) logger.warn('message.protoUtils.warn.noProto', protoName)
       return Buffer.alloc(0)
     }
 
     const message = type.create(obj)
     return Buffer.from(type.encode(message).finish())
   } catch (err) {
-    if (canLogProto(protoName)) logger.error((<Error>err).message)
+    if (canLogProto(protoName)) logger.error('generic.param1', (<Error>err).message)
     return Buffer.alloc(0)
   }
 }
@@ -63,13 +63,13 @@ export const dataToProtobuffer = async <T extends object>(data: Buffer, cmdId: n
   try {
     const type = await getProtoType(protoName.toString(), common)
     if (type == null) {
-      if (canLogProto(protoName)) logger.warn('Missing proto:', protoName)
+      if (canLogProto(protoName)) logger.warn('message.protoUtils.warn.noProto', protoName)
       await dumpProto(protoName, data)
       return <T>{}
     }
     return <T>type.decode(data)
   } catch (err) {
-    if (canLogProto(protoName)) logger.error((<Error>err).message)
+    if (canLogProto(protoName)) logger.error('generic.param1', (<Error>err).message)
     await dumpProto(protoName, data)
     return <T>{}
   }

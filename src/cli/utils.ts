@@ -1,11 +1,12 @@
-import { ArgumentDefinition, CommandDefinition } from "./commands"
+import TError from '@/translate/terror'
+import { ArgumentDefinition, CommandDefinition } from './commands'
 
 type ParsedCLIArg = string | number | Buffer
 
 interface ParseCLICtx {
   argsDef: ArgumentDefinition[]
   args: string[]
-  error: string | null
+  error: any[] | null
   parsingDynamic: boolean
   parsedArgs: ParsedCLIArg[]
 }
@@ -16,7 +17,7 @@ const ARGS_CTYPES = [
 ]
 
 function typeError(ctx: ParseCLICtx, def: ArgumentDefinition): null {
-  ctx.error = `Type error: (${def.name}) must be a ${def.type || 'str'}.`
+  ctx.error = ['cli.error.typeError', def.name, def.type || 'str']
   return null
 }
 
@@ -55,7 +56,7 @@ export function castCLIArg(ctx: ParseCLICtx, arg: string, def: ArgumentDefinitio
       }
     }
     default:
-      ctx.error = `Definition error: Unknown argument type (${type}).`
+      ctx.error = ['cli.error.defUnexpectedType', type]
       return null
   }
 }
@@ -68,11 +69,11 @@ export function parseCLIArg(ctx: ParseCLICtx, i: number): void {
 
   // definition error check
   if (nextDef && def.optional && !nextDef.optional) {
-    ctx.error = 'Definition error: Cannot have required argument after optional argument.'
+    ctx.error = ['cli.error.defUnexpectedOptional']
     return
   }
   if (parsingDynamic) {
-    ctx.error = 'Definition error: Cannot have any argument after dynamic argument.'
+    ctx.error = ['cli.error.defUnexpectedArg']
     return
   }
 
@@ -85,7 +86,7 @@ export function parseCLIArg(ctx: ParseCLICtx, i: number): void {
   if (result == null || ctx.error) return
 
   if (Array.isArray(def.values) && !def.values.includes(<string | number>result)) {
-    ctx.error = `Invalid value: ${result}, must be one of: ${def.values.join('|')}`
+    ctx.error = ['cli.error.invalidValue', result, def.values.join('|')]
     return
   }
 
@@ -125,7 +126,7 @@ export function splitArgs(str: string): string[] {
     // Start group
     if (isGrp) {
       const end = str.slice(i + 1).indexOf(char) + (i + 1)
-      if (end <= 0) throw new Error(`Missing ${char}`)
+      if (end <= 0) throw new TError('cli.error.missing', char)
       chunk += str.slice(i + 1, end)
       i += end // NOSONAR
       continue

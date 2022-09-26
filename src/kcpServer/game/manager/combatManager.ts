@@ -3,7 +3,7 @@ import { PacketContext } from '#/packet'
 import CombatInvocations from '#/packets/CombatInvocations'
 import Entity from '$/entity'
 import Scene from '$/scene'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { ClientStateEnum, FightPropEnum } from '@/types/enum'
 import { CombatInvokeEntry, EntityMoveInfo, EvtBeingHitInfo } from '@/types/proto'
 import { ChangeHpReasonEnum, CombatTypeArgumentEnum, MotionStateEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
@@ -43,7 +43,7 @@ const protoLookupTable = {
   COMBAT_LIGHT_CORE_MOVE: 'EvtLightCoreMove'
 }
 
-const logger = new Logger('COMBAT', 0xff1010)
+const logger = new TLogger('COMBAT', 0xff1010)
 
 export default class CombatManager extends BaseClass {
   scene: Scene
@@ -73,7 +73,7 @@ export default class CombatManager extends BaseClass {
 
     if (mul == null) return
 
-    logger.debug('[FALL]', 'Type:', index, 'Speed:', speed, 'Mul:', mul)
+    logger.debug('message.combat.debug.fall', index, speed, mul)
 
     const damage = entity.getProp(FightPropEnum.FIGHT_PROP_MAX_HP) * mul
     await entity.takeDamage(0, damage, true, ChangeHpReasonEnum.CHANGE_HP_SUB_FALL, seqId)
@@ -93,12 +93,12 @@ export default class CombatManager extends BaseClass {
 
     if (proto == null) {
       if (argumentType !== CombatTypeArgumentEnum.COMBAT_NONE) {
-        logger.warn('No proto for argument type:', argumentType, argType, buf.toString('base64'))
+        logger.warn('message.combat.warn.noProto', argumentType, argType, buf.toString('base64'))
       }
       return
     }
 
-    logger.verbose(argType)
+    logger.verbose('generic.param1', argType)
 
     await this.emit(
       argType.replace(/(?<=(^|_)[A-Z]).*?(?=($|_))/g, v => v.toLowerCase()).replace(/_/g, ''),

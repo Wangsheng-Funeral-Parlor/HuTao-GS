@@ -1,5 +1,6 @@
 import { getNameByCmdId } from '#/cmdIds'
 import Packet, { PacketContext, PacketInterface } from '#/packet'
+import GlobalState from '@/globalState'
 import Logger from '@/logger'
 import { ClientStateEnum } from '@/types/enum'
 import { waitTick } from '@/utils/asyncWait'
@@ -36,7 +37,7 @@ class UnionCmdPacket extends Packet implements PacketInterface {
       const { messageId, body } = cmd
       const packetName = getNameByCmdId(messageId).toString()
 
-      logger.verbose(server.getGState('ShowPacketId') ? messageId : '-', packetName)
+      logger.verbose(GlobalState.get('ShowPacketId') ? messageId : '-', packetName)
 
       await server.packetHandler.handle(messageId, packetName, Buffer.from(body, 'base64'), context)
     }

@@ -1,13 +1,10 @@
+import translate from '@/translate'
 import { FightPropEnum } from '@/types/enum'
 import { CommandDefinition } from '..'
 
 const setfpCommand: CommandDefinition = {
   name: 'setfp',
-  desc: 'Set fight prop for current avatar',
-  usage: [
-    'setfp <prop> <value> <uid> - Set fight prop for player\'s current avatar',
-    'setfp <prop> <value>       - (In game) Set fight prop for current avatar'
-  ],
+  usage: 2,
   args: [
     { name: 'prop', type: 'str' },
     { name: 'value', type: 'num' },
@@ -19,16 +16,16 @@ const setfpCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[2] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const prop = isNaN(parseInt(args[0])) ? FightPropEnum[<string>args[0]] : args[0]
-    if (FightPropEnum[prop] == null) return printError('Invalid fight prop.')
+    if (FightPropEnum[prop] == null) return printError(translate('cli.commands.setfp.error.invalidFightProp'))
 
     const { currentAvatar } = player
-    if (!currentAvatar) return printError('Current avatar is null.')
+    if (!currentAvatar) return printError(translate('generic.playerNoCurAvatar'))
 
     await currentAvatar.setProp(prop, args[1], true)
-    print(`Set ${FightPropEnum[prop]}(${prop}) to ${args[1]}.`)
+    print(translate('cli.commands.setfp.info.set', FightPropEnum[prop], prop, args[1]))
   }
 }
 

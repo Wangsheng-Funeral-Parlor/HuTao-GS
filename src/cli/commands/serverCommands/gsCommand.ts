@@ -1,36 +1,64 @@
-import { DEFAULT_GSTATE } from '@/globalState'
+import GlobalState, { DEFAULT_GSTATE } from '@/globalState'
+import LanguageData from '@/translate/data'
+import { getTTY } from '@/tty'
 import { CommandDefinition } from '..'
+
+function suggestValue(): (string | number)[] {
+  const values = []
+  const tty = getTTY()
+  const input = tty.getCurPrompt()?.buffer?.join('') || ''
+
+  const key = input.split(' ')[2]
+  if (input.indexOf('gs set') !== 0 || DEFAULT_GSTATE[key] == null) return
+
+  const targetType = typeof key
+  switch (targetType) {
+    case 'string':
+      if (key === 'Language') values.push(...Object.keys(LanguageData))
+      break
+    case 'number':
+      break
+    case 'boolean':
+      values.push(
+        'TRUE', 'FALSE',
+        'True', 'False',
+        'true', 'false',
+        'YES', 'NO',
+        'Yes', 'No',
+        'yes', 'no',
+        'T', 'F',
+        't', 'f',
+        'Y', 'N',
+        'y', 'n'
+      )
+      break
+  }
+
+  return values
+}
 
 const gsCommand: CommandDefinition = {
   name: 'gs',
-  desc: 'Set/Toggle/List global state',
-  usage: [
-    'gs set <name> <value> - Set global state to value',
-    'gs toggle <name>      - Toggle global state',
-    'gs list               - List global state'
-  ],
+  usage: 3,
   args: [
     { name: 'mode', type: 'str', values: ['set', 'toggle', 'list'] },
     { name: 'name', type: 'str', values: Object.keys(DEFAULT_GSTATE), optional: true },
-    { name: 'value', type: 'str', values: ['true', 'false'], optional: true }
+    { name: 'value', type: 'str', get values() { return suggestValue() }, optional: true }
   ],
   exec: async (cmdInfo) => {
-    const { args, cli, server } = cmdInfo
-    const { printError } = cli
-
+    const { args } = cmdInfo
     const [mode, name, value] = args
+
     switch (mode) {
       case 'set':
-        if (!server.globalState.set(name, value === 'true')) printError('Unknown gstate:', name)
+        GlobalState.set(name, value)
         break
       case 'toggle':
-        if (!server.globalState.toggle(name)) printError('Unknown gstate:', name)
+        GlobalState.toggle(name)
         break
       case 'list':
-        server.globalState.printAll()
+        GlobalState.printAll()
         break
-      default:
-        printError('Unknown mode:', mode)
     }
   }
 }

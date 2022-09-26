@@ -2,12 +2,12 @@ import BaseClass from '#/baseClass'
 import SceneData from '$/gameData/data/SceneData'
 import Player from '$/player'
 import Vector from '$/utils/vector'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { WaitOnBlock } from '@/utils/asyncWait'
 import Scene from '.'
 import SceneGroup from './sceneGroup'
 
-const logger = new Logger('GSCENE', 0xefa8ec)
+const logger = new TLogger('GSCENE', 0xefa8ec)
 
 const MAX_BLOCK_MS = 10
 const NON_DYNAMIC_LOAD_DISTANCE = 512
@@ -121,7 +121,7 @@ export default class SceneBlock extends BaseClass {
     if (loaded) return
     this.loaded = true
 
-    logger.debug('Load block:', id)
+    logger.debug('message.scene.debug.loadBlock', id)
 
     for (const group of groupList) {
       if (!group.dynamicLoad) continue
@@ -138,7 +138,7 @@ export default class SceneBlock extends BaseClass {
     if (!loaded) return
     this.loaded = false
 
-    logger.debug('Unload block:', id)
+    logger.debug('message.scene.debug.unloadBlock', id)
 
     for (const group of groupList) {
       if (!group.dynamicLoad) continue

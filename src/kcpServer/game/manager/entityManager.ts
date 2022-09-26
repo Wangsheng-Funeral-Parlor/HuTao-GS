@@ -8,11 +8,11 @@ import Avatar from '$/entity/avatar'
 import Player from '$/player'
 import Scene from '$/scene'
 import Vector from '$/utils/vector'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { ClientStateEnum, EntityTypeEnum } from '@/types/enum'
 import { ProtEntityTypeEnum, SceneEnterTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 
-const logger = new Logger('ENTITY', 0x00a0ff)
+const logger = new TLogger('ENTITY', 0x00a0ff)
 
 export const WORLD_VIEW_DIST = 128
 export const DEFAULT_VIEW_DIST = 256
@@ -262,7 +262,7 @@ export default class EntityManager extends BaseClass {
 
     await entity.emit('Register')
 
-    logger.verbose('Register:', entityId)
+    logger.verbose('message.entity.debug.register', entityId)
   }
 
   async unregister(entity: Entity, batch: boolean = false): Promise<void> {
@@ -271,7 +271,7 @@ export default class EntityManager extends BaseClass {
     if (manager !== this) return
     if (this.getEntity(entityId, true)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, batch)
 
-    logger.verbose('Unregister:', entityId)
+    logger.verbose('message.entity.debug.unregister', entityId)
 
     await entity.emit('Unregister')
 
@@ -296,8 +296,8 @@ export default class EntityManager extends BaseClass {
     motion.sceneTime = null
     motion.reliableSeq = null
 
-    if (batch) logger.verbose('Add:', entityId)
-    else logger.debug('Add:', entityId)
+    if (batch) logger.verbose('message.entity.debug.add', entityId)
+    else logger.debug('message.entity.debug.add', entityId)
 
     for (const player of playerList) {
       const { stateChanged } = this.playerLoadEntity(player, entity, visionType, param)
@@ -321,8 +321,8 @@ export default class EntityManager extends BaseClass {
     targetEntity.authorityPeerId = null
     targetEntity.isOnScene = false
 
-    if (batch) logger.verbose('Remove:', entityId)
-    else logger.debug('Remove:', entityId)
+    if (batch) logger.verbose('message.entity.debug.remove', entityId)
+    else logger.debug('message.entity.debug.remove', entityId)
 
     for (const player of playerList) {
       const { stateChanged } = this.playerUnloadEntity(player, targetEntity, visionType, true)
@@ -340,7 +340,7 @@ export default class EntityManager extends BaseClass {
   async replace(oldEntity: Entity, newEntity: Entity, seqId?: number) {
     const { entityId: oldEntityId } = oldEntity
 
-    logger.debug('Replace:', oldEntity.entityId, '->', newEntity.entityId)
+    logger.debug('message.entity.debug.replace', oldEntity.entityId, newEntity.entityId)
 
     await this.remove(oldEntity, VisionTypeEnum.VISION_REPLACE, seqId)
     await this.add(newEntity, VisionTypeEnum.VISION_REPLACE, oldEntityId, seqId)
@@ -351,7 +351,7 @@ export default class EntityManager extends BaseClass {
     const { playerList } = scene
     const { entityId, entityType, gridHash: oldHash } = entity
 
-    logger.debug('Update EntityID:', entityId)
+    logger.debug('message.entity.debug.updateEntity', entityId)
 
     const loadedPlayerList = playerList.filter(p => p.loadedEntityIdList.includes(entityId))
 
@@ -453,9 +453,9 @@ export default class EntityManager extends BaseClass {
       if (queue.length === 0) continue
 
       if (queue.length <= 4) {
-        for (const entity of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'A', 'EntityID:', entity.entityId)
+        for (const entity of queue) logger.debug('generic.param4', getPrefix(player, parseInt(visionType)), 'A', 'EntityID:', entity.entityId)
       } else {
-        logger.debug(getPrefix(player, parseInt(visionType)), 'A', `x${queue.length}`)
+        logger.debug('generic.param3', getPrefix(player, parseInt(visionType)), 'A', `x${queue.length}`)
       }
 
       await SceneEntityAppear.sendNotify(context, queue, parseInt(visionType), param)
@@ -473,9 +473,9 @@ export default class EntityManager extends BaseClass {
       if (queue.length === 0) continue
 
       if (queue.length <= 4) {
-        for (const entityId of queue) logger.debug(getPrefix(player, parseInt(visionType)), 'D', 'EntityID:', entityId)
+        for (const entityId of queue) logger.debug('generic.param4', getPrefix(player, parseInt(visionType)), 'D', 'EntityID:', entityId)
       } else {
-        logger.debug(getPrefix(player, parseInt(visionType)), 'D', `x${queue.length}`)
+        logger.debug('generic.param3', getPrefix(player, parseInt(visionType)), 'D', `x${queue.length}`)
       }
 
       await SceneEntityDisappear.sendNotify(context, queue.splice(0), parseInt(visionType))
@@ -522,8 +522,6 @@ export default class EntityManager extends BaseClass {
     // Send notify
     await this.appearQueueFlush(player, seqId)
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)
-
-    logger.debug('PlayerJoin event handled.')
   }
 
   async handlePlayerLeave(player: Player) {

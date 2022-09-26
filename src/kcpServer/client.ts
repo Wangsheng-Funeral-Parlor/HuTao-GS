@@ -1,7 +1,7 @@
 import BaseClass from '#/baseClass'
 import Player from '$/player'
 import config from '@/config'
-import Logger from '@/logger'
+import TLogger from '@/translate/tlogger'
 import { ClientStateEnum } from '@/types/enum'
 import { PacketHead } from '@/types/kcp'
 import { ENetReasonEnum } from '@/types/proto/enum'
@@ -11,7 +11,7 @@ import KcpServer from './'
 import KcpWorkerInterface from './socket/worker/kcpWorker/kcpWorkerInterface'
 import protoCleanup from './utils/protoCleanup'
 
-const logger = new Logger('CLIENT', 0xffdb4a)
+const logger = new TLogger('CLIENT', 0xffdb4a)
 
 const noCleanupPackets = [
   'AvatarFightPropUpdateNotify',
@@ -67,7 +67,7 @@ export default class Client extends BaseClass {
     const m = v & 0xF000
     const t = v & 0x0F00
     const s = v & 0x00FF
-    logger.debug('State change:', 'M', ClientStateEnum[m], 'T', t > 0 ? ClientStateEnum[t] : null, 'S', s)
+    logger.debug('message.client.debug.stateChange', ClientStateEnum[m], t > 0 ? ClientStateEnum[t] : null, s)
   }
 
   // Destroy client
@@ -104,7 +104,7 @@ export default class Client extends BaseClass {
     if (!worker) return
 
     const doubleInit = versionStrToNum(config.version) >= 0x010500
-    logger.debug('Seed:', seed, doubleInit)
+    logger.debug('message.client.debug.seed', seed, doubleInit)
 
     const mt = new MT19937()
     mt.seed(seed)
@@ -122,7 +122,7 @@ export default class Client extends BaseClass {
 
   // Set client player uid
   setUid(auid: string, uid: number): void {
-    logger.debug('Set UID:', uid)
+    logger.debug('message.client.debug.uid', uid)
 
     this.auid = auid
     this.uid = uid

@@ -28,10 +28,6 @@ export class HttpRequest {
     return this.url.searchParams
   }
 
-  getGState(key: string) {
-    return this.webServer.server.getGState(key)
-  }
-
   waitBody(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const { req } = this

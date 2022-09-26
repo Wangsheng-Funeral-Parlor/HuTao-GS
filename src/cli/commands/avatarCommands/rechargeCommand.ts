@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const rechargeCommand: CommandDefinition = {
   name: 'recharge',
-  desc: 'Recharge all avatar in current team',
-  usage: [
-    'recharge <uid> - Recharge all avatar in player\'s current team',
-    'recharge       - (In game) Recharge all avatar in current team'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -16,12 +13,12 @@ const rechargeCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const avatarList = player.teamManager.getTeam()?.avatarList || []
     for (const avatar of avatarList) await avatar.rechargeEnergy(true)
 
-    print('Recharged energy.')
+    print(translate('cli.commands.recharge.info.recharge'))
   }
 }
 

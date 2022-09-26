@@ -1,4 +1,6 @@
 import config from '@/config'
+import translate from '@/translate'
+import TError from '@/translate/terror'
 import { compare, hash } from 'bcryptjs'
 import { randomBytes } from 'crypto'
 import { join } from 'path'
@@ -52,7 +54,7 @@ export default class Authenticator {
     if (accounts.find(acc => acc?.name === name)) {
       return {
         success: false,
-        message: 'Account already exists'
+        message: translate('message.authenticator.api.accountExists')
       }
     }
 
@@ -60,7 +62,7 @@ export default class Authenticator {
     let attempt = 0
     while (true) {
       uid = await this.randNumber()
-      if (uid == null || attempt >= 50) throw new Error('Failed to generate uid')
+      if (uid == null || attempt >= 50) throw new TError('message.authenticator.error.generateUidFail')
       if (accounts.find(acc => acc?.uid === uid) == null) break
       attempt++
     }
@@ -90,7 +92,7 @@ export default class Authenticator {
       } catch (err) {
         return {
           success: false,
-          message: err?.message || 'Password decrypt fail'
+          message: err?.message || translate('message.authenticator.api.decryptFail')
         }
       }
     }
@@ -108,7 +110,7 @@ export default class Authenticator {
     ) {
       return {
         success: false,
-        message: 'Incorrect username or password'
+        message: translate('message.authenticator.api.invalidCredentials')
       }
     }
 
@@ -148,7 +150,7 @@ export default class Authenticator {
     if (name == null || tokens?.[token] == null) {
       return {
         success: false,
-        message: 'Invalid token'
+        message: translate('message.authenticator.api.invalidToken')
       }
     }
 

@@ -1,12 +1,9 @@
+import translate from '@/translate'
 import { CommandDefinition } from '..'
 
 const healCommand: CommandDefinition = {
   name: 'heal',
-  desc: 'Heal all avatar in current team',
-  usage: [
-    'heal <uid> - Heal all avatar in player\'s current team',
-    'heal       - (In game) Heal all avatar in current team'
-  ],
+  usage: 2,
   args: [
     { name: 'uid', type: 'int', optional: true }
   ],
@@ -16,7 +13,7 @@ const healCommand: CommandDefinition = {
     const { print, printError } = cli
     const player = kcpServer.game.getPlayerByUid(args[0] || sender?.uid)
 
-    if (!player) return printError('Player not found.')
+    if (!player) return printError(translate('generic.playerNotFound'))
 
     const avatarList = player.teamManager.getTeam()?.avatarList || []
     for (const avatar of avatarList) {
@@ -24,7 +21,7 @@ const healCommand: CommandDefinition = {
       await avatar.fullHeal(true)
     }
 
-    print('Healed all avatar.')
+    print(translate('cli.commands.heal.info.heal'))
   }
 }
 

@@ -1,8 +1,9 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 import config from '@/config'
-import Logger from '@/logger'
 import curRegion from '@/tools/autoPatch/curRegion'
 import regionList from '@/tools/autoPatch/regionList'
+import TError from '@/translate/terror'
+import TLogger from '@/translate/tlogger'
 import { QueryCurrRegionHttpRsp, QueryRegionListHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
@@ -14,7 +15,7 @@ import { xor } from '@/utils/xor'
 import { join } from 'path'
 import { cwd } from 'process'
 
-const logger = new Logger('DIPREQ', 0xffaa00)
+const logger = new TLogger('DIPREQ', 0xffaa00)
 
 const {
   serverName,
@@ -58,7 +59,7 @@ class DispatchHandler extends Handler {
 
   async request(req: HttpRequest): Promise<HttpResponse> {
     const path = req.url.pathname.split('/').slice(-1)[0]
-    logger.debug('Search:', req.searchParams.toString())
+    logger.debug('message.dispatch.debug.reqInfo', req.searchParams.toString())
     switch (path) {
       case 'query_cur_region':
         return this.queryCurRegion(req)
@@ -107,10 +108,10 @@ class DispatchHandler extends Handler {
     let regionListData: QueryRegionListHttpRsp
 
     if (autoPatch) {
-      if (!await regionList.checkForUpdate()) throw new Error('Update failed')
+      if (!await regionList.checkForUpdate()) throw new TError('message.dispatch.error.updateFail')
 
       const binPath = join(cwd(), `data/bin/${version}/QueryRegionListHttpRsp.bin`)
-      if (!await fileExists(binPath)) throw new Error('Missing bin file.')
+      if (!await fileExists(binPath)) throw new TError('generic.fileNotFound', binPath)
 
       regionListData = await dataToProtobuffer(await readFile(binPath), 'QueryRegionListHttpRsp', true)
     } else {
@@ -155,10 +156,10 @@ class DispatchHandler extends Handler {
     let curRegionData: QueryCurrRegionHttpRsp
 
     if (autoPatch) {
-      if (!await curRegion.checkForUpdate(seed)) throw new Error('Update failed')
+      if (!await curRegion.checkForUpdate(seed)) throw new TError('message.dispatch.error.updateFail')
 
       const binPath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
-      if (!await fileExists(binPath)) throw new Error('Missing bin file.')
+      if (!await fileExists(binPath)) throw new TError('generic.fileNotFound', binPath)
 
       curRegionData = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
     } else {

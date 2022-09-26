@@ -15,7 +15,10 @@ import VehicleManager from '$/manager/vehicleManager'
 import Player from '$/player'
 import Vector from '$/utils/vector'
 import World from '$/world'
+import GlobalState from '@/globalState'
 import Logger from '@/logger'
+import translate from '@/translate'
+import TLogger from '@/translate/tlogger'
 import { ClientStateEnum } from '@/types/enum'
 import { AbilityInvokeEntry, CombatInvokeEntry, PlayerWorldSceneInfo, ScenePlayerInfo, SceneTeamAvatar } from '@/types/proto'
 import { ProtEntityTypeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
@@ -24,7 +27,7 @@ import { getTimeSeconds } from '@/utils/time'
 import SceneBlock from './sceneBlock'
 import SceneTag from './sceneTag'
 
-const logger = new Logger('GSCENE', 0xefa8ec)
+const logger = new TLogger('GSCENE', 0xefa8ec)
 
 export default class Scene extends BaseClass {
   world: World
@@ -180,14 +183,12 @@ export default class Scene extends BaseClass {
   }
 
   async initSceneBlocks() {
-    const { world, sceneBlockList, sceneBlockInit } = this
-    const { game } = world
-    const { server } = game
+    const { sceneBlockList, sceneBlockInit } = this
 
     if (sceneBlockInit) return
     this.sceneBlockInit = true
 
-    if (!server.getGState('WorldSpawn')) return
+    if (!GlobalState.get('WorldSpawn')) return
     for (const block of sceneBlockList) await block.initNew()
   }
 
@@ -223,7 +224,7 @@ export default class Scene extends BaseClass {
     for (const entry of invokes) {
       const entity = entityManager.getEntity(entry?.entityId)
       if (entity == null) {
-        logger.debug('Ability invoke to null entity:', entry)
+        logger.debug('message.scene.debug.abilityInvokeNoEntity', entry)
         continue
       }
       await entity?.abilityManager?.emit('AbilityInvoke', context, entry)
@@ -296,7 +297,7 @@ export default class Scene extends BaseClass {
 
     if (currentScene) await player.currentScene.leave(context)
 
-    logger.debug(uidPrefix('JOIN', host, 0xefef00), `UID: ${player.uid} ID: ${id} Pos: [${Math.floor(pos.x)},${Math.floor(pos.y)},${Math.floor(pos.z)}] Type: ${SceneEnterTypeEnum[enterType]} Reason: ${SceneEnterReasonEnum[enterReason]}`)
+    logger.debug('message.scene.debug.joinInfo', uidPrefix(translate('message.scene.debug.join'), host, 0xefef00), player.uid, id, Math.floor(pos.x), Math.floor(pos.y), Math.floor(pos.z), SceneEnterTypeEnum[enterType], SceneEnterReasonEnum[enterReason])
 
     if (!world.isHost(player)) await GuestBeginEnterScene.sendNotify(host.context, this, player)
 
@@ -354,7 +355,7 @@ export default class Scene extends BaseClass {
     // Check if player is in scene
     if (!playerList.includes(player)) return
 
-    logger.debug(uidPrefix('QUIT', host, 0xffff00), `UID: ${uid} ID: ${id}`)
+    logger.debug('message.scene.debug.quitInfo', uidPrefix(translate('message.scene.debug.quit'), host, 0xffff00), uid, id)
 
     // Set client state
     player.state = ClientStateEnum.POST_LOGIN | (player.state & 0x0F00)
@@ -426,8 +427,6 @@ export default class Scene extends BaseClass {
   async handlePlayerJoin() {
     const { sceneBlockList } = this
     for (const sceneBlock of sceneBlockList) await sceneBlock.updateNonDynamic()
-
-    logger.debug('PlayerJoin event handled.')
   }
 
   // EntityUpdate

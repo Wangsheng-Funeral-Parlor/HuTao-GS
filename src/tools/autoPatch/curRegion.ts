@@ -1,5 +1,7 @@
 import config from '@/config'
-import Logger from '@/logger'
+import translate from '@/translate'
+import TError from '@/translate/terror'
+import TLogger from '@/translate/tlogger'
 import { QueryCurrRegionHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
@@ -23,7 +25,7 @@ const host = `${hostMap[dispatchRegion]}.yuanshen.com`
 const protoPath = join(cwd(), `data/proto/QueryCurrRegionHttpRsp.proto`)
 const binFilePath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
 
-const logger = new Logger('APATCH')
+const logger = new TLogger('APATCH')
 
 async function decryptResponse(keyId: number, data: string): Promise<string> {
   if (keyId == null || data?.[0] !== '{') return data
@@ -37,7 +39,7 @@ async function decryptResponse(keyId: number, data: string): Promise<string> {
       Buffer.from(response.content, 'base64')
     ).toString('base64')
   } catch (err) {
-    logger.error(err)
+    logger.error('generic.param1', err)
     return data
   }
 }
@@ -47,7 +49,7 @@ function query(ip: string, overrideSeed?: string) {
 
   return new Promise<void>((resolve, reject) => {
     const path = `/query_cur_region?version=${dispatchRegion}Win${version}&lang=3&platform=3&binary=1&time=38&channel_id=1&sub_channel_id=0&account_type=1&dispatchSeed=${overrideSeed == null ? dispatchSeed : overrideSeed}${keyId}`
-    logger.debug('(QueryCurrRegion) Host:', host, 'Path:', path)
+    logger.debug('message.tools.autoPatch.debug.reqInfo', 'QueryCurrRegion', host, path)
     get(`https://${ip}${path}`, {
       headers: {
         'Host': host,
@@ -69,24 +71,24 @@ function query(ip: string, overrideSeed?: string) {
       let data = ''
 
       res.setEncoding('utf8')
-      res.on('error', err => reject(`IP: ${ip} Host: ${host} Error: ${err.message}`))
+      res.on('error', err => reject(translate('message.tools.autoPatch.error.reqFail', ip, host, err.message)))
       res.on('data', chunk => data += chunk)
       res.on('end', async () => {
         try {
           const buf = Buffer.from(await decryptResponse(dispatchKeyId, data), 'base64')
-          const curRegionRsp = <QueryCurrRegionHttpRsp>await dataToProtobuffer(buf, 'QueryCurrRegionHttpRsp', true)
+          const curRegionRsp = await dataToProtobuffer<QueryCurrRegionHttpRsp>(buf, 'QueryCurrRegionHttpRsp', true)
 
           const retcode = curRegionRsp.retcode || 0
-          if (retcode !== RetcodeEnum.RET_SUCC) return reject(`Query failed: ${RetcodeEnum[retcode]}`)
+          if (retcode !== RetcodeEnum.RET_SUCC) return reject(translate('message.tools.autoPatch.error.queryFail', RetcodeEnum[retcode]))
 
-          logger.debug('Writing to:', binFilePath)
+          logger.debug('message.tools.autoPatch.debug.write', binFilePath)
           writeFileSync(binFilePath, buf)
           resolve()
         } catch (err) {
           reject(err)
         }
       })
-    }).on('error', err => reject(`IP: ${ip} Host: ${host} Error: ${err.message}`))
+    }).on('error', err => reject(translate('message.tools.autoPatch.error.reqFail', ip, host, err.message)))
   })
 }
 
@@ -98,22 +100,22 @@ export const checkForUpdate = async (overrideSeed?: string): Promise<boolean> =>
 
 export const update = async (overrideSeed?: string): Promise<boolean> => {
   try {
-    if (hostMap[dispatchRegion] == null) throw new Error('Auto patch not supported for this version.')
-    if (!await fileExists(protoPath)) throw new Error('Missing proto file.')
-    if (dispatchSeed == null && overrideSeed == null) throw new Error('Missing dispatch seed.')
+    if (hostMap[dispatchRegion] == null) throw new TError('message.tools.autoPatch.error.invalidRegion')
+    if (!await fileExists(protoPath)) throw new TError('message.tools.autoPatch.error.noProto')
+    if (dispatchSeed == null && overrideSeed == null) throw new TError('message.tools.autoPatch.error.noSeed')
 
     const r = new Resolver()
 
     r.setServers(nameservers)
 
     const ip = (await r.resolve4(host))?.[0]
-    logger.debug('(QueryCurrRegion) Resolved:', ip)
+    logger.debug('message.tools.autoPatch.debug.resolve', 'QueryCurrRegion', ip)
 
     await query(ip, overrideSeed)
 
     return true
   } catch (err) {
-    logger.error(err)
+    logger.error('generic.param1', err)
     return false
   }
 }

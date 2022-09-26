@@ -1,6 +1,6 @@
 import config from '@/config'
-import Logger from '@/logger'
 import Server from '@/server'
+import TLogger from '@/translate/tlogger'
 import { cRGB } from '@/tty/utils'
 import { writeFile } from '@/utils/fileSystem'
 import * as dgram from 'dgram'
@@ -13,7 +13,7 @@ import DnsPacket, { PacketQuestion, ResA, ResCNAME, ResHTTPS } from './packet'
 import { NAME_TO_QTYPE, QTYPE_TO_NAME } from './packet/consts'
 import { listAnswer, readStream } from './utils'
 
-const logger = new Logger('DNSSRV', 0xfc9c14)
+const logger = new TLogger('DNSSRV', 0xfc9c14)
 
 export default class DnsServer extends EventEmitter {
   server: Server
@@ -37,22 +37,22 @@ export default class DnsServer extends EventEmitter {
     this.handleUdpMessage = this.handleUdpMessage.bind(this)
 
     this.tcp.on('connection', this.handleTcpConnection)
-    this.tcp.on('error', err => logger.error('TCP err:', err))
+    this.tcp.on('error', err => logger.error('message.dnsServer.error.TCPError', err))
 
     this.udp.on('message', this.handleUdpMessage)
-    this.udp.on('error', err => logger.error('UDP err:', err))
+    this.udp.on('error', err => logger.error('message.dnsServer.error.UDPError', err))
   }
 
   start(): void {
     let listening = 0
 
     this.tcp.listen(config.dnsPort, () => {
-      logger.info('[TCP]', `Listening on port ${cRGB(0xffffff, this.tcpAddress().port.toString())}`)
+      logger.info('message.dnsServer.info.TCPListen', cRGB(0xffffff, this.tcpAddress().port.toString()))
       if (++listening >= 2) this.emit('listening')
     })
 
     this.udp.bind(config.dnsPort, () => {
-      logger.info('[UDP]', `Listening on port ${cRGB(0xffffff, this.udpAddress().port.toString())}`)
+      logger.info('message.dnsServer.info.UDPListen', cRGB(0xffffff, this.udpAddress().port.toString()))
       if (++listening >= 2) this.emit('listening')
     })
   }
@@ -92,7 +92,7 @@ export default class DnsServer extends EventEmitter {
 
       client.end(Buffer.concat([len, rsp]))
     } catch (err) {
-      logger.error('TCP error:', err)
+      logger.error('message.dnsServer.error.TCPError', err)
     }
   }
 
@@ -118,7 +118,7 @@ export default class DnsServer extends EventEmitter {
       const { name, type } = query.question[0]
       const typeName = QTYPE_TO_NAME[type] || type
 
-      logger.verbose(`Qry: ${name} (${typeName})`)
+      logger.verbose('generic.param1', `Qry: ${name} (${typeName})`)
 
       for (const domain in domains) {
         const index = name.indexOf(domain)
@@ -127,7 +127,7 @@ export default class DnsServer extends EventEmitter {
         this.createResponse(query, query.question[0], domain)
 
         const rsp = DnsPacket.write(query, 1024)
-        logger.verbose(`RdRsp: [DM]:${name} [ANS]:${listAnswer(rsp)}`)
+        logger.verbose('generic.param1', `RdRsp: [DM]:${name} [ANS]:${listAnswer(rsp)}`)
         return rsp
       }
 
@@ -135,11 +135,11 @@ export default class DnsServer extends EventEmitter {
         const rsp = await this.queryNS(ns, query.header.id, false, msg)
         if (rsp == null) continue
 
-        logger.verbose(`NsRsp: [NS]:${ns} [QRY]:${name} [TYP]:${typeName} [ANS]:${listAnswer(rsp)}`)
+        logger.verbose('generic.param1', `NsRsp: [NS]:${ns} [QRY]:${name} [TYP]:${typeName} [ANS]:${listAnswer(rsp)}`)
         return rsp
       }
 
-      logger.verbose(`NoRsp: [QRY]:${name} [TYP]:${typeName}`)
+      logger.verbose('generic.param1', `NoRsp: [QRY]:${name} [TYP]:${typeName}`)
 
       query.header.qr = 1
       query.header.rd = 1
@@ -149,7 +149,7 @@ export default class DnsServer extends EventEmitter {
     } catch (err) {
       if ((<Error>err).name === 'RangeError') return null
 
-      logger.error('Error:', (<Error>err).message)
+      logger.error('generic.param1', err)
       try { await writeFile(join(cwd(), 'data/log/dump', `dns-${Date.now()}.bin`), msg) } catch (_err) { }
     }
 
