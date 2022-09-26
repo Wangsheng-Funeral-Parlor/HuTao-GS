@@ -11,7 +11,7 @@
 
 * Logging in
 * Automatically gives all characters
-* Combat (a bit laggy)
+* Combat
 * Spawning monsters
 
 ## Requirements ##
