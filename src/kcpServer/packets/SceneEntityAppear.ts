@@ -22,7 +22,9 @@ class SceneEntityAppearPacket extends Packet implements PacketInterface {
     await this.waitState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE, true, 0xF0FF)
 
     const notifyData: SceneEntityAppearNotify = {
-      entityList: entityList.map(entity => entity.exportSceneEntityInfo()),
+      entityList: entityList
+        .filter(entity => !entity.isDead())
+        .map(entity => entity.exportSceneEntityInfo()),
       appearType
     }
 
