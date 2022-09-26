@@ -13,7 +13,7 @@
     "fileNotFound": "找不到文件: %0",
     "playerNotFound": "未找到玩家.",
     "playerNoPos": "无法获取玩家位置.",
-    "playerNoCurAvatar": "无法获取玩家当前头像",
+    "playerNoCurAvatar": "无法获取玩家当前角色",
     "notInWorld": "不存在于大世界中.",
     "notInScene": "不存在于当前场景中.",
     "inventoryFull": "背包已满."
@@ -334,12 +334,12 @@
       "consoleOnly": "此命令只能在控制台中使用.",
       "playerOnly": "此命令只能在游戏中使用.",
       "execFail": "无法执行命令: %0",
-      "typeError": "类型错误: (%0) must be a %1.",
+      "typeError": "类型错误: (%0) 必须是 %1.",
       "defUnexpectedType": "定义错误：未知参数类型 (%0).",
       "defUnexpectedOptional": "定义错误：可选参数后不能有必需参数.",
-      "defUnexpectedArg": "'定义错误：动态参数后不能有任何参数.'",
-      "invalidValue": "无效的值: %0, must be one of: %1",
-      "missing": "不在的 %0"
+      "defUnexpectedArg": "定义错误：动态参数后不能有任何参数.",
+      "invalidValue": "无效的值: %0, 必须是: %1",
+      "missing": "缺少 %0"
     },
     "commands": {
       "help": {
@@ -405,7 +405,7 @@
         "desc": "断开客户端连接",
         "usage": {
           "0": "disconnect <UID|ID> <reason> - 断开客户端连接",
-          "1": "disconnect <UID|ID>          - 相同，除非原因设置为ENET_SERVER_KICK"
+          "1": "disconnect <UID|ID>          - 相同，除了 reason 设置为 ENET_SERVER_KICK"
         },
         "info": {
           "disconnect": "尝试断开连接: %0"
@@ -489,7 +489,7 @@
         "desc": "UA patching 工具",
         "usage": {
           "0": "ua patch <input file> <output file> - Patch UA RSA keys",
-          "1": "ua dump <input file>                - 将UA RSA密钥打印到控制台"
+          "1": "ua dump <input file>                - 将UA里面的RSA密钥打印到控制台"
         },
         "info": {
           "success": "成功."
@@ -553,23 +553,23 @@
         }
       },
       "coop": {
-        "desc": "修改为 coop 世界",
+        "desc": "切换为 coop 世界",
         "usage": {
-          "0": "coop <uid> - 将某玩家修改为 coop 世界",
-          "1": "coop       -（游戏中）为自己修改为 coop 世界"
+          "0": "coop <uid> - 将某玩家切换为 coop 世界",
+          "1": "coop       - （游戏中）为自己切换为 coop 世界"
         },
         "info": {
-          "changeToCoop": "正在修改为 coop 世界..."
+          "changeToCoop": "正在切换到 coop 世界..."
         },
         "error": {
-          "inCoop": "玩家已经为 coop 世界."
+          "inCoop": "玩家已经在 coop 世界."
         }
       },
       "monster": {
         "desc": "生成怪物",
         "usage": {
           "0": "monster <id> <lv> <uid> - 在该玩家当前位置生成怪物",
-          "1": "monster <id> <lv>       - （游戏中）在当前位置繁殖怪物"
+          "1": "monster <id> <lv>       - （游戏中）在当前位置生成怪物"
         },
         "info": {
           "spawn": "生成怪物中: %0"
@@ -586,23 +586,23 @@
         }
       },
       "vehicle": {
-        "desc": "生成工具",
+        "desc": "生成浪船",
         "usage": {
-          "0": "vehicle <uid> - 在该玩家当前位置生成工具",
-          "1": "vehicle       - （游戏中）在当前位置生成工具"
+          "0": "vehicle <uid> - 在该玩家当前位置生成浪船",
+          "1": "vehicle       - （游戏中）在当前位置生成浪船"
         },
         "info": {
-          "spawn": "生成工具中..."
+          "spawn": "生成浪船中..."
         }
       },
       "killall": {
         "desc": "杀死所有附近的怪物 (32 Max)",
         "usage": {
-          "0": "killall <uid> - 杀死该玩家所有附近的怪物",
-          "1": "killall       - （游戏中）杀死所有附近的怪物"
+          "0": "killall <uid> - 杀死该玩家附近的怪物",
+          "1": "killall       - （游戏中）杀死附近的怪物"
         },
         "info": {
-          "killMonsters": "杀死动物中..."
+          "killMonsters": "杀死怪物中..."
         }
       },
       "god": {
@@ -637,16 +637,16 @@
         }
       },
       "guid": {
-        "desc": "显示当前角色guid和设备guid",
+        "desc": "显示当前角色guid和装备guid",
         "usage": {
           "0": "guid <uid> - 显示该玩家的当前角色guid和装备guid",
-          "1": "guid       - (游戏中) 显示当前角色guid和设备guid"
+          "1": "guid       - (游戏中) 显示当前角色guid和装备guid"
         }
       },
       "equip": {
         "desc": "装备武器或圣遗物",
         "usage": {
-          "0": "equip <guid> <uid> - 为该玩家当前角色装备武器或圣遗物r",
+          "0": "equip <guid> <uid> - 为该玩家当前角色装备武器或圣遗物",
           "1": "equip <guid>       - (游戏中) 为当前角色装备武器或圣遗物"
         },
         "info": {
@@ -727,7 +727,7 @@
         "usage": {
           "0": "material <id> <count> <uid> - 给予某数量的材料到该玩家",
           "1": "material <id> <count>       - （游戏中）给予自己某数量的材料",
-          "2": "material <id>               - (游戏中)给予自己一个材料"
+          "2": "material <id>               - （游戏中）给予自己一个材料"
         },
         "info": {
           "give": "给予材料: (%0)x%1"
@@ -738,7 +738,7 @@
         "usage": {
           "0": "weapon <id> <count> <uid> - 给予某数量的武器到该玩家",
           "1": "weapon <id> <count>       - （游戏中）给予自己某数量的武器",
-          "2": "weapon <id>               -（游戏中）给予自己一件武器"
+          "2": "weapon <id>               - （游戏中）给予自己一件武器"
         },
         "info": {
           "give": "给予武器: (%0)x%1"
@@ -748,7 +748,7 @@
         "desc": "给予圣遗物",
         "usage": {
           "0": "artifact <id> <count> <uid> - 给予某数量的圣遗物到该玩家",
-          "1": "artifact <id> <count>       -（游戏中）给予自己某数量的圣遗物",
+          "1": "artifact <id> <count>       - （游戏中）给予自己某数量的圣遗物",
           "2": "artifact <id>               - （游戏中）给予自己一个圣遗物"
         },
         "info": {
@@ -760,7 +760,7 @@
         "usage": {
           "0": "artSet <id> <count> <uid> -  给予某数量的圣遗物到该玩家",
           "1": "artSet <id> <count>       - （游戏中）给予自己某数量的圣遗物",
-          "2": "artSet <id>               -（游戏中）给予自己一个圣遗物"
+          "2": "artSet <id>               - （游戏中）给予自己一个圣遗物"
         },
         "info": {
           "give": "给予设置过的圣遗物: (%0)x%1"

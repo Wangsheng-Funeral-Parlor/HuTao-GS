@@ -337,7 +337,7 @@
       "typeError": "Type error: (%0) must be a %1.",
       "defUnexpectedType": "Definition error: Unknown argument type (%0).",
       "defUnexpectedOptional": "Definition error: Cannot have required argument after optional argument.",
-      "defUnexpectedArg": "'Definition error: Cannot have any argument after dynamic argument.'",
+      "defUnexpectedArg": "Definition error: Cannot have any argument after dynamic argument.",
       "invalidValue": "Invalid value: %0, must be one of: %1",
       "missing": "Missing %0"
     },
