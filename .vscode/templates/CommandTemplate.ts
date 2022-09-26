@@ -2,8 +2,7 @@ import { CommandDefinition } from '..'
 
 const templateCommand: CommandDefinition = {
   name: 'template',
-  desc: 'template',
-  //usage: [],
+  //usage: 1,
   //args: [],
   //allowPlayer: false,
   //onlyAllowPlayer: false,
