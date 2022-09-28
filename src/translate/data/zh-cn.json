@@ -464,7 +464,7 @@
       "gpatch": {
         "desc": "游戏Patch工具",
         "usage": {
-          "0": "gpatch patch <gameDir>   - 使用游戏目录中的备份 Patch metadata & ua",
+          "0": "gpatch patch <gameDir>   - Patch游戏目录中的metadata & ua并创建备份",
           "1": "gpatch patch             - Same except gameDir is set to config.gameDir",
           "2": "gpatch unpatch <gameDir> - 使用游戏目录中的备份取消patch metadata & ua",
           "3": "gpatch unpatch           - Same except gameDir is set to config.gameDir"
