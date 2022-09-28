@@ -1,7 +1,7 @@
 import Packet, { PacketContext, PacketInterface } from '#/packet'
 import { ClientStateEnum } from '@/types/enum'
 import { VectorInfo } from '@/types/proto'
-import { ChangeEnergyReasonEnum, ForwardTypeEnum } from '@/types/proto/enum'
+import { ForwardTypeEnum } from '@/types/proto/enum'
 
 export interface EvtDoSkillSuccNotify {
   forwardType: ForwardTypeEnum
@@ -19,13 +19,11 @@ class EvtDoSkillSuccPacket extends Packet implements PacketInterface {
   }
 
   async recvNotify(context: PacketContext, data: EvtDoSkillSuccNotify): Promise<void> {
-    const { avatarList } = context.player
-    const { casterId, skillId } = data
+    const { player, seqId } = context
+    const { forwardBuffer } = player
 
-    const avatar = avatarList.find(a => a.entityId === casterId && a.skillManager.energySkill?.id === skillId)
-    if (!avatar) return
-
-    await avatar.drainEnergy(true, ChangeEnergyReasonEnum.CHANGE_ENERGY_SKILL_START)
+    forwardBuffer.addEntry(this, data, seqId)
+    await forwardBuffer.sendAll()
   }
 }
 

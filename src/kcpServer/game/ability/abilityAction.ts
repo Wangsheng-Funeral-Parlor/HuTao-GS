@@ -22,7 +22,7 @@ import SelectTargetsByShape from '$DT/BinOutput/Config/SelectTargets/Child/Selec
 import Logger from '@/logger'
 import { AbilityTargettingEnum, EntityTypeEnum, FightPropEnum, GadgetStateEnum, TargetTypeEnum } from '@/types/enum'
 import { AbilityActionGenerateElemBall } from '@/types/proto'
-import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
 import AppliedAbility from './appliedAbility'
 
@@ -296,9 +296,10 @@ export default class AbilityAction extends BaseClass {
     const { SkillID, CostStaminaRatio } = config
 
     const skill = currentDepot?.getSkill(SkillID)
-    if (staminaManager == null || skill == null) return
+    if (skill == null) return
 
-    staminaManager.immediate(this.eval(ability, CostStaminaRatio || 1) * skill.costStamina * 100)
+    if (currentDepot.energySkill === skill) await entity.drainEnergy(true, ChangeEnergyReasonEnum.CHANGE_ENERGY_SKILL_START)
+    if (staminaManager != null && CostStaminaRatio) staminaManager.immediate(this.eval(ability, CostStaminaRatio) * skill.costStamina * 100)
   }
 
   // CostStaminaMixin

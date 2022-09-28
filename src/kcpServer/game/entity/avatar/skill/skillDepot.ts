@@ -167,6 +167,7 @@ export default class SkillDepot {
   }
 
   getSkill(id: number): Skill {
+    if (this.energySkill.id === id) return this.energySkill
     return this.skills.find(skill => skill.id === id)
   }
 

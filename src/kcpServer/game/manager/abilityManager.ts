@@ -150,10 +150,10 @@ export default class AbilityManager extends BaseClass {
 
     const abilityName = AbilityData.lookupString(ability.abilityName)
     const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
-    if (actionConfig == null) return logger.debug('generic.param4', entity.entityId, type, 'action == null', head, abilityName)
+    if (actionConfig == null) return logger.debug('generic.param5', entity.entityId, type, 'action == null', head, abilityName)
 
     const target = entityManager.getEntity(targetId) || entity
-    if (target == null) return logger.debug('generic.param4', entity.entityId, type, 'target == null', head, abilityName)
+    if (target == null) return logger.debug('generic.param5', entity.entityId, type, 'target == null', head, abilityName)
 
     await action.runActionConfig(context, ability, actionConfig, data, target)
   }
