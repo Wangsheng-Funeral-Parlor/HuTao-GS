@@ -1,8 +1,780 @@
 {
+  "generic": {
+    "param1": "%0",
+    "param2": "%0 %1",
+    "param3": "%0 %1 %2",
+    "param4": "%0 %1 %2 %3",
+    "param5": "%0 %1 %2 %3 %4",
+    "param6": "%0 %1 %2 %3 %4 %5",
+    "param7": "%0 %1 %2 %3 %4 %5 %6",
+    "param8": "%0 %1 %2 %3 %4 %5 %6 %7",
+    "param9": "%0 %1 %2 %3 %4 %5 %6 %7 %8",
+    "param10": "%0 %1 %2 %3 %4 %5 %6 %7 %8 %9",
+    "fileNotFound": "找不到檔案: %0",
+    "playerNotFound": "未找到玩家.",
+    "playerNoPos": "無法獲取玩家位置.",
+    "playerNoCurAvatar": "無法獲取玩家當前角色",
+    "notInWorld": "不存在於大世界中.",
+    "notInScene": "不存在於當前場景中.",
+    "inventoryFull": "背包已滿."
+  },
   "message": {
     "server": {
+      "debug": {
+        "setHost": "正在設定主機...",
+        "setHostSuccess": "設定主機成功.",
+        "removeHost": "正在刪除主機...",
+        "removeHostSuccess": "刪除主機成功.",
+        "flushDns": "正在刷新dns...",
+        "flushDnsSuccess": "dns刷新成功."
+      },
       "info": {
-        "started": "Started. For help, type 'help' (沒有翻譯 (ノಠ益ಠ)ノ彡┻━┻)"
+        "name": "名稱: %0",
+        "build": "編譯: %0",
+        "gameVersion": "遊戲版本: %0",
+        "dispatchRegion": "Dispatch region: %0",
+        "dispatchSeed": "Dispatch seed: %0",
+        "dispatchKey": "Dispatch key: %0",
+        "autoPatch": "自動 patch: %0",
+        "logLevel": "日誌級別: %0",
+        "starting": "開始運行...",
+        "started": "運行成功. 如果需要幫助，請輸入'help'",
+        "restart": "正在重新啟動…延遲: %0ms",
+        "stop": "正在停止…延遲: %0ms",
+        "mkdir": "正在創建目錄: %0"
+      },
+      "error": {
+        "invalidRegion": "不支持的區域.",
+        "invalidVersion": "不支持的版本.",
+        "patchGame": "修補遊戲時出錯: %0",
+        "unpatchGame": "取消修補遊戲時出錯: %0",
+        "setHost": "設定主機失敗: %0",
+        "removeHost": "刪除主機失敗: %0",
+        "flushDns": "DNS刷新失敗: %0",
+        "start": "啟動時出錯: %0",
+        "mkdir": "創建目錄時出錯: %0"
+      }
+    },
+    "update": {
+      "info": {
+        "stop": "正在停止...",
+        "restart": "正在重新啟動...",
+        "exit": "正在退出...",
+        "compare": "正在比較版本...",
+        "noDiff": "版本相同，停止更新.",
+        "download": "版本不匹配，正在下載更新...",
+        "copy": "正在復制 exe...",
+        "clean": "正在清理多余檔案...",
+        "cleanSuccess": "清理完成.",
+        "updateAvailable": "有可用的新更新，請輸入“update”進行更新."
+      },
+      "error": {
+        "invalidBuildType": "不可執行，無法更新.",
+        "missingURL": "沒有更新地址.",
+        "missingArg": "缺少參數.",
+        "invalidState": "更新狀態無效: %0",
+        "invalidContent": "無效的內容數據.",
+        "invalidSignature": "簽名無效.",
+        "invalidJson": "無效的json.",
+        "noData": "沒有數據."
+      }
+    },
+    "openssl": {
+      "debug": {
+        "check": "檢查OpenSSL安裝..."
+      },
+      "error": {
+        "notInstalled": "OpenSSL 沒有安裝.",
+        "invalidPrivateKey": "private key 無效.",
+        "invalidPublicKey": "public key 無效."
+      }
+    },
+    "ssl": {
+      "info": {
+        "checkCA": "正在驗證ca檔案...",
+        "checkSRV": "正在驗證srv檔案...",
+        "checkSuccess": "驗證成功.",
+        "mkdir": "正在創建ssl目錄...",
+        "generateCA": "正在生成ca檔案...",
+        "generateSRV": "正在生成srv檔案...",
+        "create": "創建中 %0...",
+        "generate": "生成中 %0...",
+        "found": "建立完畢 %0."
+      },
+      "warn": {
+        "checkCAFail": "缺少ca檔案.",
+        "checkSRVFail": "缺少srv檔案."
+      }
+    },
+    "tools": {
+      "keyGen": {
+        "debug": {
+          "dump": "O: %0 K: %1 DV: %2 KV: %3"
+        },
+        "info": {
+          "generate": "正在生成密鑰...",
+          "notModified": "沒有修改.",
+          "save": "正在保存修改..",
+          "success": "密鑰生成成功."
+        },
+        "error": {
+          "dump": "跳過dump (%0): %1",
+          "unknown": "密鑰生成失敗: %0"
+        }
+      },
+      "autoPatch": {
+        "debug": {
+          "reqInfo": "(%0) Host: %1 Path: %2",
+          "write": "正在寫入到: %0",
+          "resolve": "(%0) Resolved: %1"
+        },
+        "info": {
+          "check": "正在檢查更新...",
+          "update": "正在更新...",
+          "success": "更新完成."
+        },
+        "error": {
+          "invalidRegion": "此版本不支持自動修補.",
+          "noProto": "缺少proto檔案.",
+          "noSeed": "缺少 dispatch seed.",
+          "reqFail": "IP: %0 Host: %1 Error: %2",
+          "queryFail": "查詢失敗: %0"
+        }
+      },
+      "meta": {
+        "info": {
+          "replacePasswordPublicKey": "替換密碼 public key...",
+          "replaceServerPublicKey": "替換服務器 public key..."
+        },
+        "error": {
+          "noRSAKeys": "找不到rsa密鑰.",
+          "noPasswordPublicKey": "無法找到密碼 public key.",
+          "noServerPublicKey": "找不到服務器 public key."
+        }
+      },
+      "ua": {
+        "error": {
+          "unknownOperand": "未知操作數: %0",
+          "unknownInstruction": "未知指令: %0",
+          "noReturn": "無法找到返回指令.",
+          "noServerPublicKey": "找不到服務器 public key."
+        }
+      },
+      "patcher": {
+        "info": {
+          "patchMeta": "正在 Patch metadata...",
+          "patchUA": "正在 Patch UA...",
+          "unpatchMeta": "正在取消 patch metadata...",
+          "unpatchUA": "正在取消 patch UA..."
+        },
+        "error": {
+          "noDataDir": "找不到數據目錄.",
+          "patched": "完成Patch."
+        }
+      }
+    },
+    "worker": {
+      "debug": {
+        "start": "正在啟動: %0",
+        "spawn": "Worker spawn: %0 ISocket port: %1",
+        "stdout": "stdout: %0 %1",
+        "stderr": "stderr: %0 %1",
+        "stop": "正在停止: %0",
+        "ready": "Ready",
+        "shutdown": "關閉",
+        "initKcpSuccess": "初始化kcp完成: %0",
+        "setISocketPort": "設定ISocket控制台: %0 %1",
+        "removeConv": "刪除conv: %0"
+      },
+      "info": {
+        "exit": "Worker exit: %0 Code: %1 Signal: %2",
+        "restart": "正在重新啟動 worker: %0",
+        "started": "Worker已啟動.",
+        "listen": "監聽控制台 %0",
+        "blockAddr": "被阻止的地址: %0"
+      },
+      "warn": {
+        "invalidPacket": "接收到無效數據包，xor解密失敗?"
+      },
+      "error": {
+        "invalidOpcode": "操作碼無效: %0",
+        "restartFail": "Worker 無法重新啟動: %0",
+        "invalidId": "不匹配的id: %0",
+        "initKcpFail": "初始化kcp錯誤: %0",
+        "UDPError": "UDP 錯誤: %0",
+        "sendPacketError": "發送數據包錯誤: %0",
+        "invalidPort": "無效控制台: %0"
+      }
+    },
+    "webServer": {
+      "debug": {
+        "handle": "已處理: (%0)%1",
+        "noHandler": "未處理: %0"
+      },
+      "info": {
+        "listen": "監聽控制台 %0"
+      },
+      "error": {
+        "noSSL": "無法生成ssl配置，中止.",
+        "handler": "處理請求時出錯: %0"
+      }
+    },
+    "kcpServer": {
+      "info": {
+        "connect": "客戶端連接: %0",
+        "disconnect": "客戶端斷開連接: %0 原因: %1"
+      }
+    },
+    "dnsServer": {
+      "info": {
+        "TCPListen": "[TCP] 監聽控制台 %0",
+        "UDPListen": "[UDP] 監聽控制台 %0"
+      },
+      "error": {
+        "TCPError": "TCP 錯誤: %0",
+        "UDPError": "UDP 錯誤: %0",
+        "socketError": "Socket 錯誤: %0"
+      }
+    },
+    "dispatch": {
+      "debug": {
+        "reqInfo": "搜索參數: %0"
+      },
+      "error": {
+        "updateFail": "更新失敗."
+      }
+    },
+    "authenticator": {
+      "api": {
+        "accountExists": "帳戶已存在.",
+        "decryptFail": "密碼解密失敗.",
+        "invalidCredentials": "用戶名或密碼不正確.",
+        "invalidToken": "無效的 token."
+      },
+      "error": {
+        "generateUidFail": "無法生成uid."
+      }
+    },
+    "guid": {
+      "error": {
+        "full": "guid列表已滿."
+      }
+    },
+    "loader": {
+      "warn": {
+        "noData": "缺少數據: %0"
+      }
+    },
+    "protoUtils": {
+      "warn": {
+        "noProto": "缺少proto: %0"
+      }
+    },
+    "packet": {
+      "debug": {
+        "noHandler": "沒有數據包的處理程序: %0 %1"
+      },
+      "warn": {
+        "unknownPacket": "未知數據包: %0"
+      },
+      "error": {
+        "handler": "處理數據包時出錯: %0"
+      }
+    },
+    "client": {
+      "debug": {
+        "stateChange": "狀態更改: %0 %1 %2",
+        "seed": "設定 seed: %0 %1",
+        "uid": "設定 UID: %0"
+      }
+    },
+    "scene": {
+      "debug": {
+        "loadBlock": "加載 block: %0",
+        "unloadBlock": "取消加載 block: %0",
+        "abilityInvokeNoEntity": "Ability invoke to null entity: %0",
+        "join": "加入",
+        "joinInfo": "%0 UID: %1 ID: %2 Pos: [%3,%4,%5] Type: %6 Reason: %7",
+        "quit": "退出",
+        "quitInfo": "%0 UID: %1 ID: %2"
+      }
+    },
+    "entity": {
+      "debug": {
+        "register": "註冊: %0",
+        "unregister": "註銷: %0",
+        "add": "添加: %0",
+        "remove": "移除: %0",
+        "replace": "代替: %0 -> %1",
+        "updateEntity": "更新 EntityID: %0"
+      }
+    },
+    "combat": {
+      "debug": {
+        "fall": "[FALL] Type: %0 Speed: %1 Mul: %2"
+      },
+      "warn": {
+        "noProto": "對於參數類型沒有proto: %0 %1 %2"
+      }
+    },
+    "ability": {
+      "warn": {
+        "noProto": "對於參數類型沒有proto: %0 %1 %2"
+      },
+      "debug": {
+        "register": "註冊: %0 -> %1[%2]",
+        "unregister": "註銷: %0 -> %1[%2]"
+      }
+    }
+  },
+  "cli": {
+    "error": {
+      "parseFail": "無法分析命令: %0",
+      "unknownCommand": "未知命令: %0",
+      "consoleOnly": "此命令只能在控制台中使用.",
+      "playerOnly": "此命令只能在遊戲中使用.",
+      "execFail": "無法執行命令: %0",
+      "typeError": "類型錯誤: (%0) 必須是 %1.",
+      "defUnexpectedType": "定義錯誤：未知參數類型 (%0).",
+      "defUnexpectedOptional": "定義錯誤：可選參數後不能有必需參數.",
+      "defUnexpectedArg": "定義錯誤：動態參數後不能有任何參數.",
+      "invalidValue": "無效的值: %0, 必須是: %1",
+      "missing": "缺少 %0"
+    },
+    "commands": {
+      "help": {
+        "desc": "顯示幫助消息",
+        "usage": {
+          "0": "help command           - 命令列表",
+          "1": "help command <command> - 顯示命令信息",
+          "2": "help console           - 控制台控制"
+        },
+        "page": {
+          "console": {
+            "title": "控制台控制:",
+            "controls": {
+              "0": "Page up/Page down   - 向上/向下滾動",
+              "1": "Up arrow/Down arrow - 上一個/下一個命令",
+              "2": "Tab/Right arrow     - 自動完成",
+              "3": "Escape              - 取消輸入"
+            }
+          },
+          "commandList": {
+            "title": "命令列表:"
+          },
+          "commandInfo": {
+            "title": "命令信息:",
+            "syntax": "語法: %0",
+            "desc": "描述: %0",
+            "usage": "用法:"
+          }
+        },
+        "error": {
+          "inGame": "請訪問公告以獲取命令列表.",
+          "invalidCategory": "未知類別: %0"
+        }
+      },
+      "stop": {
+        "desc": "停止服務器"
+      },
+      "restart": {
+        "desc": "重新啟動服務器"
+      },
+      "logLevel": {
+        "desc": "設定日誌級別",
+        "usage": "logLevel %0 - 將日誌級別設定為 %1"
+      },
+      "gs": {
+        "desc": "設定/切換/列出全局狀態",
+        "usage": {
+          "0": "gs set <name> <value> - 將全局狀態設定為值",
+          "1": "gs toggle <name>      - 切換全局狀態",
+          "2": "gs list               - 列出全局狀態"
+        }
+      },
+      "update": {
+        "desc": "更新服務器"
+      },
+      "list": {
+        "desc": "列出已連接的客戶端",
+        "info": {
+          "empty": "空的."
+        }
+      },
+      "disconnect": {
+        "desc": "斷開客戶端連接",
+        "usage": {
+          "0": "disconnect <UID|ID> <reason> - 斷開客戶端連接",
+          "1": "disconnect <UID|ID>          - 相同，除了 reason 設定為 ENET_SERVER_KICK"
+        },
+        "info": {
+          "disconnect": "嘗試斷開連接: %0"
+        }
+      },
+      "script": {
+        "desc": "Windy!!",
+        "error": {
+          "scriptNotFound": "Script 未找到."
+        }
+      },
+      "createConfig": {
+        "desc": "如果不存在，則使用預設值創建新config",
+        "usage": {
+          "0": "createConfig <name> - 創建新config",
+          "1": "createConfig        - Same except name is set to \"default\""
+        },
+        "info": {
+          "create": "正在創建config: %0",
+          "created": "已創建 config."
+        },
+        "error": {
+          "invalidName": "無效的名稱: %0",
+          "exists": "Config 已經存在: %0"
+        }
+      },
+      "deleteConfig": {
+        "desc": "刪除config（如果存在）",
+        "usage": {
+          "0": "deleteConfig <name> - 刪除 config",
+          "1": "deleteConfig        - Same except name is set to \"default\""
+        },
+        "info": {
+          "delete": "刪除config中: %0",
+          "deleted": "已刪除config."
+        },
+        "error": {
+          "invalidName": "無效的名稱: %0",
+          "notFound": "Config 未找到: %0"
+        }
+      },
+      "loadConfig": {
+        "desc": "更改當前 config",
+        "usage": {
+          "0": "loadConfig <name> - 更改當前config併重新啟動",
+          "1": "loadConfig        - Same except name is set to \"default\""
+        },
+        "info": {
+          "load": "加載config中: %0"
+        },
+        "error": {
+          "invalidName": "無效的名稱: %0",
+          "notFound": "Config 未找到: %0"
+        }
+      },
+      "gpatch": {
+        "desc": "遊戲Patch工具",
+        "usage": {
+          "0": "gpatch patch <gameDir>   - Patch遊戲目錄中的metadata & ua併創建備份",
+          "1": "gpatch patch             - Same except gameDir is set to config.gameDir",
+          "2": "gpatch unpatch <gameDir> - 使用遊戲目錄中的備份取消patch metadata & ua",
+          "3": "gpatch unpatch           - Same except gameDir is set to config.gameDir"
+        },
+        "info": {
+          "success": "成功."
+        }
+      },
+      "meta": {
+        "desc": "Metadata patching 工具",
+        "usage": {
+          "0": "meta patch <input file> <output file> - Patch metadata",
+          "1": "meta dump <input file> <output file>  - Dump metadata strings",
+          "2": "meta dec <input file> <output file>   - 解密 metadata",
+          "3": "meta enc <input file> <output file>   - 加密 metadata"
+        },
+        "info": {
+          "success": "成功."
+        }
+      },
+      "ua": {
+        "desc": "UA patching 工具",
+        "usage": {
+          "0": "ua patch <input file> <output file> - Patch UA RSA keys",
+          "1": "ua dump <input file>                - 將UA裏面的RSA密鑰打印到控製臺"
+        },
+        "info": {
+          "success": "成功."
+        }
+      },
+      "autopatch": {
+        "desc": "獲取自動Patch數據"
+      },
+      "ec2b": {
+        "desc": "Dump ec2b 密鑰"
+      },
+      "keygen": {
+        "desc": "嘗試從數據包轉儲生成密鑰"
+      },
+      "register": {
+        "desc": "註冊帳戶",
+        "prompt": {
+          "name": "輸入賬戶",
+          "pass": "輸入密碼",
+          "retypePass": "重新輸入密碼"
+        },
+        "info": {
+          "success": "帳戶註冊成功."
+        },
+        "error": {
+          "mismatch": "密碼不一致."
+        }
+      },
+      "pos": {
+        "desc": "打印當前位置",
+        "usage": {
+          "0": "pos <uid> - 打印該玩家當前位置",
+          "1": "pos       - （遊戲中）打印當前位置"
+        },
+        "info": {
+          "posInfo": "場景: %0 X: %1 Y: %2 Z: %3"
+        }
+      },
+      "scene": {
+        "desc": "場景改變",
+        "usage": {
+          "0": "scene <id> <uid> - 將該玩家傳送到該場景",
+          "1": "scene <id>       - （遊戲中）為自己改變場景"
+        },
+        "info": {
+          "changeScene": "修改場景到: %0"
+        },
+        "error": {
+          "sceneNotFound": "該場景未找到.",
+          "sameScene": "相同的場景."
+        }
+      },
+      "tp": {
+        "desc": "傳送到某位置",
+        "usage": {
+          "0": "tp <x> <y> <z> <uid> - 傳送該玩家到某坐標",
+          "1": "tp <x> <y> <z>       - （遊戲中）將自己傳送到某坐標"
+        },
+        "info": {
+          "tp": "傳送到: %0 %1 %2"
+        }
+      },
+      "coop": {
+        "desc": "切換為 coop 世界",
+        "usage": {
+          "0": "coop <uid> - 將某玩家切換為 coop 世界",
+          "1": "coop       - （遊戲中）為自己切換為 coop 世界"
+        },
+        "info": {
+          "changeToCoop": "正在切換到 coop 世界..."
+        },
+        "error": {
+          "inCoop": "玩家已經在 coop 世界."
+        }
+      },
+      "monster": {
+        "desc": "生成怪物",
+        "usage": {
+          "0": "monster <id> <lv> <uid> - 在該玩家當前位置生成怪物",
+          "1": "monster <id> <lv>       - （遊戲中）在當前位置生成怪物"
+        },
+        "info": {
+          "spawn": "生成怪物中: %0"
+        }
+      },
+      "gadget": {
+        "desc": "生成物品",
+        "usage": {
+          "0": "gadget <id> <lv> <uid> - 在該玩家當前位置生成物品",
+          "1": "gadget <id> <lv>       - （遊戲中）在當前位置生成物品"
+        },
+        "info": {
+          "spawn": "生成物品中: %0"
+        }
+      },
+      "vehicle": {
+        "desc": "生成浪船",
+        "usage": {
+          "0": "vehicle <uid> - 在該玩家當前位置生成浪船",
+          "1": "vehicle       - （遊戲中）在當前位置生成浪船"
+        },
+        "info": {
+          "spawn": "生成浪船中..."
+        }
+      },
+      "killall": {
+        "desc": "殺死所有附近的怪物 (32 Max)",
+        "usage": {
+          "0": "killall <uid> - 殺死該玩家附近的怪物",
+          "1": "killall       - （遊戲中）殺死附近的怪物"
+        },
+        "info": {
+          "killMonsters": "殺死怪物中..."
+        }
+      },
+      "god": {
+        "desc": "切換上帝模式",
+        "usage": {
+          "0": "god <uid> - 為該玩家切換上帝模式",
+          "1": "god       - （遊戲中）為自己切換上帝模式"
+        },
+        "info": {
+          "enable": "上帝模式已啟用.",
+          "disable": "上帝模式已關閉."
+        }
+      },
+      "heal": {
+        "desc": "治療當前團隊中的所有角色",
+        "usage": {
+          "0": "heal <uid> - 治療該玩家當前團隊中的所有角色",
+          "1": "heal       - (遊戲中)治療當前團隊中的所有角色"
+        },
+        "info": {
+          "heal": "已治療所有角色."
+        }
+      },
+      "recharge": {
+        "desc": "為當前團隊中的所有角色充能",
+        "usage": {
+          "0": "recharge <uid> - 為該玩家當前團隊中的所有角色充能",
+          "1": "recharge       - (遊戲中) 為當前團隊中的所有角色充能"
+        },
+        "info": {
+          "recharge": "充能完畢."
+        }
+      },
+      "guid": {
+        "desc": "顯示當前角色guid和裝備guid",
+        "usage": {
+          "0": "guid <uid> - 顯示該玩家的當前角色guid和裝備guid",
+          "1": "guid       - (遊戲中) 顯示當前角色guid和裝備guid"
+        }
+      },
+      "equip": {
+        "desc": "裝備武器或聖遺物",
+        "usage": {
+          "0": "equip <guid> <uid> - 為該玩家當前角色裝備武器或聖遺物",
+          "1": "equip <guid>       - (遊戲中) 為當前角色裝備武器或聖遺物"
+        },
+        "info": {
+          "equip": "已裝備 %0 至當前角色."
+        },
+        "error": {
+          "noEquip": "未找到該ID."
+        }
+      },
+      "setcs": {
+        "desc": "為當前角色設定 cand 技能",
+        "usage": {
+          "0": "setcs <id> <uid> - 為該玩家當前角色設定 cand 技能",
+          "1": "setcs <id>       - (遊戲中) 為當前角色設定 cand 技能"
+        },
+        "info": {
+          "setSkill": "設定 cand 技能為 %0"
+        },
+        "error": {
+          "noSkill": "技能ID未找到."
+        }
+      },
+      "setfp": {
+        "desc": "為當前角色設定fight prop",
+        "usage": {
+          "0": "setfp <prop> <value> <uid> - 為該玩家當前角色設定fight prop",
+          "1": "setfp <prop> <value>       - (遊戲中) 為當前角色設定fight prop"
+        },
+        "info": {
+          "set": "設定 %0(%1) to %2."
+        },
+        "error": {
+          "invalidFightProp": "無效的 fight prop."
+        }
+      },
+      "ar": {
+        "desc": "設定冒險等級",
+        "usage": {
+          "0": "ar <level> <uid> - 為該玩家設定冒險等級",
+          "1": "ar <level>       - (遊戲中) 給自己設定冒險等級"
+        },
+        "info": {
+          "setAR": "冒險等級設定為: %0"
+        }
+      },
+      "hcoin": {
+        "desc": "給予原石",
+        "usage": {
+          "0": "hcoin <amount> <uid> - 為該玩家給予某數量的原石",
+          "1": "hcoin <amount>       - (遊戲中)為自己給予某數量的原石"
+        },
+        "info": {
+          "give": "給予原石: %0"
+        }
+      },
+      "mcoin": {
+        "desc": "給予創世結晶",
+        "usage": {
+          "0": "mcoin <amount> <uid> - 給予某數量創世結晶到該玩家",
+          "1": "mcoin <amount>       - (遊戲中) 給自己給予某數量的創世結晶"
+        },
+        "info": {
+          "give": "給予創世結晶: %0"
+        }
+      },
+      "scoin": {
+        "desc": "給予摩拉",
+        "usage": {
+          "0": "scoin <amount> <uid> - 給予某數量摩拉到該玩家",
+          "1": "scoin <amount>       - (遊戲中) 給自己給予某數量的摩拉"
+        },
+        "info": {
+          "give": "給予摩拉: %0"
+        }
+      },
+      "lightning": {
+        "desc": "連續在玩家身上產生閃電",
+        "info": {
+          "start": "開始閃電.",
+          "stop": "停止閃電."
+        }
+      },
+      "material": {
+        "desc": "給予材料",
+        "usage": {
+          "0": "material <id> <count> <uid> - 給予某數量的材料到該玩家",
+          "1": "material <id> <count>       - （遊戲中）給予自己某數量的材料",
+          "2": "material <id>               - （遊戲中）給予自己一個材料"
+        },
+        "info": {
+          "give": "給予材料: (%0)x%1"
+        }
+      },
+      "weapon": {
+        "desc": "給予武器",
+        "usage": {
+          "0": "weapon <id> <count> <uid> - 給予某數量的武器到該玩家",
+          "1": "weapon <id> <count>       - （遊戲中）給予自己某數量的武器",
+          "2": "weapon <id>               - （遊戲中）給予自己一件武器"
+        },
+        "info": {
+          "give": "給予武器: (%0)x%1"
+        }
+      },
+      "artifact": {
+        "desc": "給予聖遺物",
+        "usage": {
+          "0": "artifact <id> <count> <uid> - 給予某數量的聖遺物到該玩家",
+          "1": "artifact <id> <count>       - （遊戲中）給予自己某數量的聖遺物",
+          "2": "artifact <id>               - （遊戲中）給予自己一個聖遺物"
+        },
+        "info": {
+          "give": "給予聖遺物: (%0)x%1"
+        }
+      },
+      "artSet": {
+        "desc": "給予設定過的聖遺物",
+        "usage": {
+          "0": "artSet <id> <count> <uid> -  給予某數量的聖遺物到該玩家",
+          "1": "artSet <id> <count>       - （遊戲中）給予自己某數量的聖遺物",
+          "2": "artSet <id>               - （遊戲中）給予自己一個聖遺物"
+        },
+        "info": {
+          "give": "給予設定過的聖遺物: (%0)x%1"
+        },
+        "error": {
+          "setNotFound": "聖遺物未找到."
+        }
       }
     }
   }
