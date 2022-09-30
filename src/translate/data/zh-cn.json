@@ -553,16 +553,16 @@
         }
       },
       "coop": {
-        "desc": "切换为 coop 世界",
+        "desc": "切换为多人世界",
         "usage": {
-          "0": "coop <uid> - 将某玩家切换为 coop 世界",
-          "1": "coop       - （游戏中）为自己切换为 coop 世界"
+          "0": "coop <uid> - 将某玩家切换为多人世界",
+          "1": "coop       - （游戏中）为自己切换为多人世界"
         },
         "info": {
-          "changeToCoop": "正在切换到 coop 世界..."
+          "changeToCoop": "正在切换到多人世界..."
         },
         "error": {
-          "inCoop": "玩家已经在 coop 世界."
+          "inCoop": "玩家已经在多人世界."
         }
       },
       "monster": {
@@ -576,13 +576,13 @@
         }
       },
       "gadget": {
-        "desc": "生成物品",
+        "desc": "生成gadget",
         "usage": {
-          "0": "gadget <id> <lv> <uid> - 在该玩家当前位置生成物品",
-          "1": "gadget <id> <lv>       - （游戏中）在当前位置生成物品"
+          "0": "gadget <id> <lv> <uid> - 在该玩家当前位置生成gadget",
+          "1": "gadget <id> <lv>       - （游戏中）在当前位置生成gadget"
         },
         "info": {
-          "spawn": "生成物品中: %0"
+          "spawn": "生成gadget: %0"
         }
       },
       "vehicle": {
