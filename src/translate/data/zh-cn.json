@@ -553,16 +553,16 @@
         }
       },
       "coop": {
-        "desc": "切换为 coop 世界",
+        "desc": "切换为多人世界",
         "usage": {
-          "0": "coop <uid> - 将某玩家切换为 coop 世界",
-          "1": "coop       - （游戏中）为自己切换为 coop 世界"
+          "0": "coop <uid> - 将某玩家切换为多人世界",
+          "1": "coop       - （游戏中）为自己切换为多人世界"
         },
         "info": {
-          "changeToCoop": "正在切换到 coop 世界..."
+          "changeToCoop": "正在切换到多人世界..."
         },
         "error": {
-          "inCoop": "玩家已经在 coop 世界."
+          "inCoop": "玩家已经在多人世界."
         }
       },
       "monster": {
@@ -576,13 +576,13 @@
         }
       },
       "gadget": {
-        "desc": "生成物品",
+        "desc": "生成gadget",
         "usage": {
-          "0": "gadget <id> <lv> <uid> - 在该玩家当前位置生成物品",
-          "1": "gadget <id> <lv>       - （游戏中）在当前位置生成物品"
+          "0": "gadget <id> <lv> <uid> - 在该玩家当前位置生成gadget",
+          "1": "gadget <id> <lv>       - （游戏中）在当前位置生成gadget"
         },
         "info": {
-          "spawn": "生成物品中: %0"
+          "spawn": "生成gadget: %0"
         }
       },
       "vehicle": {
@@ -696,7 +696,7 @@
         "desc": "给予原石",
         "usage": {
           "0": "hcoin <amount> <uid> - 为该玩家给予某数量的原石",
-          "1": "hcoin <amount>       - (I游戏中)为自己给予某数量的原石"
+          "1": "hcoin <amount>       - (游戏中)为自己给予某数量的原石"
         },
         "info": {
           "give": "给予原石: %0"
@@ -709,7 +709,7 @@
           "1": "mcoin <amount>       - (游戏中) 给自己给予某数量的创世结晶"
         },
         "info": {
-          "give": "给予创世结晶l: %0"
+          "give": "给予创世结晶: %0"
         }
       },
       "scoin": {
