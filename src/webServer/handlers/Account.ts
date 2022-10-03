@@ -2,7 +2,7 @@ import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
 class AccountHandler extends Handler {
   constructor() {
-    super(/^account\./, [
+    super(/^(account|user)\./, [
       '/pcSdkLogin.html',
       '/geetestV2.html'
     ])

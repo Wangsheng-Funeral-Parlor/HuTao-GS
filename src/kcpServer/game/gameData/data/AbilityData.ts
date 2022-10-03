@@ -152,10 +152,7 @@ class AbilityDataLoader extends Loader {
 
     switch (typeTag) {
       case 1: {
-        const actionList = abilityData[AbilityConfigIdxEnum[configIdx]]
-        if (!Array.isArray(actionList)) return null
-
-        return actionList[actionID - 1]
+        return this.getActionList(abilityData[AbilityConfigIdxEnum[configIdx]])[actionID - 1]
       }
       case 2: {
         return abilityData.AbilityMixins?.[mixinIdx]

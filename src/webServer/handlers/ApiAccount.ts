@@ -2,7 +2,7 @@ import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
 class ApiAccountHandler extends Handler {
   constructor() {
-    super(/^(api-account.*?|api.*?-takumi)\./, [
+    super(/^(.*?api-account.*?|api.*?-takumi)\./, [
       '/account/risky/api/check'
     ])
   }
