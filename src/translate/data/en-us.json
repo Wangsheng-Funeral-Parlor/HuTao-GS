@@ -657,13 +657,13 @@
         }
       },
       "setcs": {
-        "desc": "Set cand skill for current avatar",
+        "desc": "Set candidate skill for current avatar",
         "usage": {
-          "0": "setcs <id> <uid> - Set cand skill for player\\'s current avatar",
-          "1": "setcs <id>       - (In game) Set cand skill for current avatar"
+          "0": "setcs <id> <uid> - Set candidate skill for player\\'s current avatar",
+          "1": "setcs <id>       - (In game) Set candidate skill for current avatar"
         },
         "info": {
-          "setSkill": "Set cand skill to %0"
+          "setSkill": "Set candidate skill to %0"
         },
         "error": {
           "noSkill": "Skill not found."

@@ -178,6 +178,17 @@ export default class SkillDepot {
     )
   }
 
+  exportInherentProudSkillList() {
+    const { manager, inherentProudSkills } = this
+    const { avatar } = manager
+    const { props } = avatar
+    const promoteLevel = props.get(PlayerPropEnum.PROP_BREAK_LEVEL)
+
+    return inherentProudSkills
+      .filter(proudSkill => proudSkill.promoteLevel == null || promoteLevel >= proudSkill.promoteLevel)
+      .map(s => s.id)
+  }
+
   exportProudSkillExtraLevelMap() {
     const { skills } = this
     return Object.fromEntries(
@@ -188,16 +199,10 @@ export default class SkillDepot {
   }
 
   export() {
-    const { manager, id, inherentProudSkills, talents } = this
-    const { avatar } = manager
-    const { props } = avatar
-    const promoteLevel = props.get(PlayerPropEnum.PROP_BREAK_LEVEL)
-
+    const { id, talents } = this
     return {
       skillDepotId: id,
-      inherentProudSkillList: inherentProudSkills
-        .filter(proudSkill => proudSkill.promoteLevel == null || promoteLevel >= proudSkill.promoteLevel)
-        .map(s => s.id),
+      inherentProudSkillList: this.exportInherentProudSkillList(),
       skillLevelMap: this.exportSkillLevelMap(),
       proudSkillExtraLevelMap: this.exportProudSkillExtraLevelMap(),
       talentIdList: talents.map(talent => talent.id)

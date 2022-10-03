@@ -1,9 +1,10 @@
+import AbilityChange from '#/packets/AbilityChange'
+import AvatarSkillDepotChange from '#/packets/AvatarSkillDepotChange'
 import Avatar from '$/entity/avatar'
 import Skill from '$/entity/avatar/skill/skill'
 import SkillDepot from '$/entity/avatar/skill/skillDepot'
 import AvatarData from '$/gameData/data/AvatarData'
 import { ElemTypeEnum } from '@/types/enum'
-import { SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
 import SkillManagerUserData from '@/types/user/SkillManagerUserData'
 
 export default class SkillManager {
@@ -84,7 +85,7 @@ export default class SkillManager {
 
   async setCandSkillId(id: number): Promise<boolean> {
     const { avatar, depotList } = this
-    const { player, isOnScene } = avatar
+    const { player, fightProps } = avatar
 
     id = parseInt(id?.toString())
     if (isNaN(id) || depotList[id] == null) return false
@@ -93,9 +94,14 @@ export default class SkillManager {
     this.candSkillId = id
     this.currentDepot?.addEmbryos()
 
-    if (isOnScene) {
-      const { context, currentScene, pos, rot } = player
-      await currentScene.join(context, pos.clone(), rot.clone(), SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
+    // TODO: Trigger quest cond
+
+    const { currentScene } = player
+    if (currentScene != null) {
+      const { broadcastContextList } = currentScene
+      await AvatarSkillDepotChange.broadcastNotify(broadcastContextList, avatar)
+      await AbilityChange.broadcastNotify(broadcastContextList, avatar)
+      await fightProps.update(true)
     }
 
     return true
