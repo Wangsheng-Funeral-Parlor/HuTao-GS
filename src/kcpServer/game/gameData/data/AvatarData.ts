@@ -13,16 +13,26 @@ class AvatarDataLoader extends Loader {
     return super.getData()
   }
 
+  async getAvatar(id: number, silent: boolean = false): Promise<AvatarData> {
+    const data = (await this.getAvatarList())?.find(avatar => avatar.Id === id)
+    if (!silent) {
+      if (data == null) this.warn('message.loader.avatarData.warn.noData', id)
+      else if (data.Config == null) this.warn('message.loader.avatarData.warn.noConfig', id)
+    }
+    return data
+  }
+
+  async getAvatarByName(name: string, silent: boolean = false): Promise<AvatarData> {
+    const data = (await this.getAvatarList())?.find(avatar => avatar.Name === name)
+    if (!silent) {
+      if (data == null) this.warn('message.loader.avatarData.warn.noData', name)
+      else if (data.Config == null) this.warn('message.loader.avatarData.warn.noConfig', name)
+    }
+    return data
+  }
+
   async getAvatarList(): Promise<AvatarData[]> {
     return (await this.getData())?.Avatar || []
-  }
-
-  async getAvatar(id: number): Promise<AvatarData> {
-    return (await this.getAvatarList())?.find(avatar => avatar.Id === id)
-  }
-
-  async getAvatarByName(name: string): Promise<AvatarData> {
-    return (await this.getAvatarList())?.find(avatar => avatar.Name === name)
   }
 
   async getCostume(avatarId: number, id: number): Promise<CostumeData> {
@@ -44,6 +54,8 @@ class AvatarDataLoader extends Loader {
   async getFightPropConfig(id: number): Promise<EntityFightPropConfig> {
     const data = await this.getAvatar(id)
     if (!data) {
+      this.warn('message.loader.avatarData.warn.noFightPropConfig', id)
+
       return {
         HpBase: 0,
         AttackBase: 0,

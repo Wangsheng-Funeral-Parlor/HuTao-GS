@@ -13,8 +13,13 @@ class MonsterDataLoader extends Loader {
     return super.getData()
   }
 
-  async getMonster(id: number): Promise<MonsterData> {
-    return (await this.getMonsterList()).find(data => data.Id === id)
+  async getMonster(id: number, silent: boolean = false): Promise<MonsterData> {
+    const data = (await this.getMonsterList()).find(data => data.Id === id)
+    if (!silent) {
+      if (data == null) this.warn('message.loader.monsterData.warn.noData', id)
+      else if (data.Config == null) this.warn('message.loader.monsterData.warn.noConfig', id)
+    }
+    return data
   }
 
   async getMonsterList(): Promise<MonsterData[]> {
@@ -46,8 +51,10 @@ class MonsterDataLoader extends Loader {
   }
 
   async getFightPropConfig(id: number): Promise<EntityFightPropConfig> {
-    const data = await this.getMonster(id)
+    const data = await this.getMonster(id, true)
     if (!data) {
+      this.warn('message.loader.monsterData.warn.noFightPropConfig', id)
+
       return {
         HpBase: 0,
         AttackBase: 0,
