@@ -11,7 +11,7 @@ function suggestValue(): (string | number)[] {
   const key = input.split(' ')[2]
   if (input.indexOf('gs set') !== 0 || DEFAULT_GSTATE[key] == null) return
 
-  const targetType = typeof key
+  const targetType = typeof DEFAULT_GSTATE[key]
   switch (targetType) {
     case 'string':
       if (key === 'Language') values.push(...Object.keys(LanguageData))
