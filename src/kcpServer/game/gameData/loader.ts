@@ -11,12 +11,44 @@ export default class Loader {
   path: string
   defaultData: any
 
+  loggedMessagesMap: { [key: string]: number }
+
   busy: boolean
   data: any
 
   constructor(path: string, defaultData: any = {}) {
     this.path = path
     this.defaultData = defaultData
+
+    this.loggedMessagesMap = {}
+  }
+
+  private canLog(key: string): boolean {
+    const { loggedMessagesMap } = this
+    if (loggedMessagesMap[key] == null) loggedMessagesMap[key] = 0
+    if (loggedMessagesMap[key] >= 10) return false
+    loggedMessagesMap[key]++
+    return true
+  }
+
+  error(key: string, ...params: any[]) {
+    if (!this.canLog(key)) return
+    logger.error(key, ...params)
+  }
+
+  warn(key: string, ...params: any[]) {
+    if (!this.canLog(key)) return
+    logger.warn(key, ...params)
+  }
+
+  info(key: string, ...params: any[]) {
+    if (!this.canLog(key)) return
+    logger.info(key, ...params)
+  }
+
+  debug(key: string, ...params: any[]) {
+    if (!this.canLog(key)) return
+    logger.debug(key, ...params)
   }
 
   async load() {

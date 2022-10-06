@@ -7,13 +7,16 @@ import SceneTime from '#/packets/SceneTime'
 import uidPrefix from '#/utils/uidPrefix'
 import Entity from '$/entity'
 import Gadget from '$/entity/gadget'
+import TrifleItem from '$/entity/gadget/trifleItem'
 import Vehicle from '$/entity/gadget/vehicle'
 import DungeonData from '$/gameData/data/DungeonData'
 import SceneData from '$/gameData/data/SceneData'
 import CombatManager from '$/manager/combatManager'
 import EntityManager from '$/manager/entityManager'
 import VehicleManager from '$/manager/vehicleManager'
+import Material from '$/material'
 import Player from '$/player'
+import Item from '$/player/inventory/item'
 import Vector from '$/utils/vector'
 import World from '$/world'
 import GlobalState from '@/globalState'
@@ -28,6 +31,8 @@ import { getTimeSeconds } from '@/utils/time'
 import SceneBlock from './sceneBlock'
 import SceneTag from './sceneTag'
 
+const HIT_TREE_CD = 86400e3 // 1 day
+
 const logger = new TLogger('GSCENE', 0xefa8ec)
 
 export default class Scene extends BaseClass {
@@ -37,6 +42,7 @@ export default class Scene extends BaseClass {
   type: string
   enterSceneToken: number
 
+  hitTreeMap: { [hash: number]: number[] }
   unlockedPointList: number[]
 
   sceneTagList: SceneTag[]
@@ -72,6 +78,7 @@ export default class Scene extends BaseClass {
     this.id = sceneId
     this.enterSceneToken = Math.floor(Math.random() * 1e4)
 
+    this.hitTreeMap = {}
     this.unlockedPointList = []
 
     this.sceneTagList = []
@@ -124,7 +131,7 @@ export default class Scene extends BaseClass {
 
   async init(userData: SceneUserData, fullInit: boolean) {
     const { entityManager, enterSceneToken } = this
-    const { unlockedPointList, sceneTime } = userData
+    const { hitTreeMap, unlockedPointList, sceneTime } = userData
     const scenePerfMark = `SceneInit-${enterSceneToken}`
 
     Logger.mark(scenePerfMark)
@@ -132,6 +139,8 @@ export default class Scene extends BaseClass {
     await this.loadSceneData()
 
     entityManager.init()
+
+    if (hitTreeMap != null && typeof hitTreeMap === 'object') Object.assign(this.hitTreeMap, hitTreeMap)
 
     if (Array.isArray(unlockedPointList)) {
       for (const pointId of unlockedPointList) this.unlockPoint(pointId)
@@ -192,6 +201,33 @@ export default class Scene extends BaseClass {
 
     if (!GlobalState.get('WorldSpawn')) return
     for (const block of sceneBlockList) await block.initNew()
+  }
+
+  updateHitTreeMap() {
+    const { hitTreeMap } = this
+    const now = Date.now()
+    for (const hash in hitTreeMap) {
+      hitTreeMap[hash] = hitTreeMap[hash].filter(t => now - t <= HIT_TREE_CD)
+      if (hitTreeMap[hash].length <= 0) delete hitTreeMap[hash]
+    }
+  }
+
+  async hitTree(player: Player, treeType: number, treePos: Vector, dropPos: Vector, seqId?: number): Promise<void> {
+    this.updateHitTreeMap()
+
+    const { hitTreeMap, entityManager } = this
+    const { pos } = player
+    const { hash } = treePos
+
+    if (hitTreeMap[hash] && hitTreeMap[hash].length >= 3) return
+    hitTreeMap[hash] = hitTreeMap[hash] || []
+    hitTreeMap[hash].push(Date.now())
+
+    const entity = new TrifleItem(new Item(await Material.create(player, 101300 + treeType))) // Don't have excel for this yet :(
+    await entity.initNew()
+    entity.motion.pos.setData(dropPos || pos)
+
+    await entityManager.add(entity, undefined, undefined, seqId)
   }
 
   unlockPoint(pointId: number): boolean {
@@ -410,9 +446,10 @@ export default class Scene extends BaseClass {
   }
 
   exportUserData(): SceneUserData {
-    const { unlockedPointList, sceneTime } = this
+    const { hitTreeMap, unlockedPointList, sceneTime } = this
 
     return {
+      hitTreeMap,
       unlockedPointList,
       sceneTime
     }

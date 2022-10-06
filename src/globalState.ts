@@ -50,7 +50,7 @@ export default class GlobalState {
   }
 
   private castValue(key: string, val: GStateValue): GStateValue | null {
-    const targetType = typeof key
+    const targetType = typeof DEFAULT_GSTATE[key]
     switch (targetType) {
       case 'string': {
         return val?.toString()

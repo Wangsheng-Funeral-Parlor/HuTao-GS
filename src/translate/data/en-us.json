@@ -261,6 +261,20 @@
       }
     },
     "loader": {
+      "avatarData": {
+        "warn": {
+          "noData": "No data for avatar: %0",
+          "noConfig": "Missing config for avatar: %0",
+          "noFightPropConfig": "Unable to get fight prop config for avatar: %0"
+        }
+      },
+      "monsterData": {
+        "warn": {
+          "noData": "No data for monster: %0",
+          "noConfig": "Missing config for monster: %0",
+          "noFightPropConfig": "Unable to get fight prop config for monster: %0"
+        }
+      },
       "warn": {
         "noData": "Missing data: %0"
       }

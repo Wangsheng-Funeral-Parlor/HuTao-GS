@@ -1,7 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import TrifleItem from '$/entity/gadget/trifleItem'
-import Material from '$/material'
-import Item from '$/player/inventory/item'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
+import Vector from '$/utils/vector'
 import { VectorInfo } from '@/types/proto'
 
 export interface HitTreeNotify {
@@ -17,17 +15,18 @@ class HitTreePacket extends Packet implements PacketInterface {
 
   async recvNotify(context: PacketContext, data: HitTreeNotify): Promise<void> {
     const { player, seqId } = context
-    const { currentScene, pos } = player
-    const { treeType, dropPos } = data
+    const { currentScene } = player
+    const { treeType, treePos, dropPos } = data
 
-    if (currentScene == null || treeType == null) return
-    const { entityManager } = currentScene
+    if (currentScene == null || treeType == null || treePos == null) return
 
-    const entity = new TrifleItem(new Item(await Material.create(player, 101300 + treeType))) // Don't have excel for this yet :(
-    await entity.initNew()
-    entity.motion.pos.setData(dropPos || pos)
+    const tree = new Vector()
+    const drop = new Vector()
 
-    await entityManager.add(entity, undefined, undefined, seqId)
+    tree.setData(treePos)
+    drop.setData(dropPos)
+
+    await currentScene.hitTree(player, treeType, tree, drop, seqId)
   }
 }
 

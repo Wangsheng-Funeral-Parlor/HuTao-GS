@@ -17,7 +17,8 @@ export function getCommandInfo(command: CommandDefinition, prefix: string = '', 
   const { name, args } = command
   const cmdName = cRGB(0xffffff, prefix + name)
   const cmdArgs = cRGB(0xffb71c, (args != null && args.length > 0) ? (' ' + args.map(getArgumentInfo).join(' ')) : '')
-  return `${cmdName}${cmdArgs}${showDesc ? (' - ' + translate(`cli.commands.${name}.desc`)) : ''}`
+  const cmdDesc = showDesc ? (' - ' + translate(`cli.commands.${name}.desc`)) : ''
+  return `${cmdName}${cmdArgs}${cmdDesc}`
 }
 
 function consoleHelpPage(cli: CLILike) {
