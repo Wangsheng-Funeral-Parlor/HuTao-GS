@@ -3,7 +3,7 @@
 ![pc-fork](./pc-forkk.jpg)
 <!-- Source: https://raw.githubusercontent.com/crowity/HuTao-GS/master/pc-forkk.jpg -->
 
-[EN](README.md) | [简中](README_zh-CN.md)
+[EN](README.md) | 简中
 
 ## 使用指南
 
