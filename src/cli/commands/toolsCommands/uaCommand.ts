@@ -18,10 +18,10 @@ const uaCommand: CommandDefinition = {
     try {
       switch (mode) {
         case 'patch':
-          (await UAList(input)).forEach((k, i) => print(`Key ${i}: ${k}`))
+          await UAPatch(input, output)
           break
         case 'dump':
-          await UAPatch(input, output)
+          (await UAList(input)).forEach((k, i) => print(`Key ${i}: ${k}`))
           break
       }
       print(translate('cli.commands.ua.info.success'))
