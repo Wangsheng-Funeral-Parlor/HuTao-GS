@@ -1,5 +1,6 @@
 import { getNameByCmdId } from '#/cmdIds'
 import config from '@/config'
+import GlobalState from '@/globalState'
 import TLogger from '@/translate/tlogger'
 import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
 import { join } from 'path'
@@ -18,6 +19,8 @@ function canLogProto(name: string | number): boolean {
 }
 
 async function dumpProto(name: string | number, data: Buffer) {
+  if (!GlobalState.get('PacketDump')) return
+
   try {
     const dumpPath = join(cwd(), 'data/log/dump', `proto-${name}.bin`)
     if (data.length <= 0 || (await fileExists(dumpPath) && (await readFile(dumpPath)).length >= data.length)) return
