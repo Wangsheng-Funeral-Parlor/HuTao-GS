@@ -1,4 +1,4 @@
-import Predicated from './Child/Predicated'
+import { Predicated } from './Child'
 
 type UtilityAction =
   Predicated
