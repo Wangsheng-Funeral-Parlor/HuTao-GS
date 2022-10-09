@@ -337,7 +337,8 @@
       },
       "debug": {
         "register": "Register: %0 -> %1[%2]",
-        "unregister": "Unregister: %0 -> %1[%2]"
+        "unregister": "Unregister: %0 -> %1[%2]",
+        "indexWrong": "%0 %1 index wrong"
       }
     }
   },
@@ -582,7 +583,7 @@
       "monster": {
         "desc": "Spawn monster",
         "usage": {
-          "0": "monster <id> <lv> <uid> - Spawn monster at player\\'s current avatar position",
+          "0": "monster <id> <lv> <uid> - Spawn monster at player's current avatar position",
           "1": "monster <id> <lv>       - (In game) Spawn monster at current avatar position"
         },
         "info": {
@@ -592,7 +593,7 @@
       "gadget": {
         "desc": "Spawn gadget",
         "usage": {
-          "0": "gadget <id> <lv> <uid> - Spawn gadget at player\\'s current avatar position",
+          "0": "gadget <id> <lv> <uid> - Spawn gadget at player's current avatar position",
           "1": "gadget <id> <lv>       - (In game) Spawn gadget at current avatar position"
         },
         "info": {
@@ -602,7 +603,7 @@
       "vehicle": {
         "desc": "Spawn vehicle",
         "usage": {
-          "0": "vehicle <uid> - Spawn vehicle at player\\'s current avatar position",
+          "0": "vehicle <uid> - Spawn vehicle at player's current avatar position",
           "1": "vehicle       - (In game) Spawn vehicle at current avatar position"
         },
         "info": {
@@ -619,6 +620,12 @@
           "killMonsters": "Killing monsters..."
         }
       },
+      "ability": {
+        "desc": "Ability debug",
+        "error": {
+          "entityNotFound": "Entity not found."
+        }
+      },
       "god": {
         "desc": "Toggle god mode",
         "usage": {
@@ -633,7 +640,7 @@
       "heal": {
         "desc": "Heal all avatar in current team",
         "usage": {
-          "0": "heal <uid> - Heal all avatar in player\\'s current team",
+          "0": "heal <uid> - Heal all avatar in player's current team",
           "1": "heal       - (In game) Heal all avatar in current team"
         },
         "info": {
@@ -643,7 +650,7 @@
       "recharge": {
         "desc": "Recharge all avatar in current team",
         "usage": {
-          "0": "recharge <uid> - Recharge all avatar in player\\'s current team",
+          "0": "recharge <uid> - Recharge all avatar in player's current team",
           "1": "recharge       - (In game) Recharge all avatar in current team"
         },
         "info": {
@@ -653,14 +660,14 @@
       "guid": {
         "desc": "Show current avatar guid & equips guid",
         "usage": {
-          "0": "guid <uid> - Show player\\'s current avatar guid & equips guid",
+          "0": "guid <uid> - Show player's current avatar guid & equips guid",
           "1": "guid       - (In game) Show current avatar guid & equips guid"
         }
       },
       "equip": {
         "desc": "Equip weapon or artifact",
         "usage": {
-          "0": "equip <guid> <uid> - Equip weapon or artifact to player\\'s current avatar",
+          "0": "equip <guid> <uid> - Equip weapon or artifact to player's current avatar",
           "1": "equip <guid>       - (In game) Equip weapon or artifact to current avatar"
         },
         "info": {
@@ -673,7 +680,7 @@
       "setcs": {
         "desc": "Set candidate skill for current avatar",
         "usage": {
-          "0": "setcs <id> <uid> - Set candidate skill for player\\'s current avatar",
+          "0": "setcs <id> <uid> - Set candidate skill for player's current avatar",
           "1": "setcs <id>       - (In game) Set candidate skill for current avatar"
         },
         "info": {
@@ -686,7 +693,7 @@
       "setfp": {
         "desc": "Set fight prop for current avatar",
         "usage": {
-          "0": "setfp <prop> <value> <uid> - Set fight prop for player\\'s current avatar",
+          "0": "setfp <prop> <value> <uid> - Set fight prop for player's current avatar",
           "1": "setfp <prop> <value>       - (In game) Set fight prop for current avatar"
         },
         "info": {
@@ -694,6 +701,24 @@
         },
         "error": {
           "invalidFightProp": "Invalid fight prop."
+        }
+      },
+      "talent": {
+        "desc": "Edit/List current avatar talents",
+        "usage": {
+          "0": "talent unlock <uid> - Unlock talent for player's current avatar",
+          "1": "talent unlock       - (In game) Unlock talent for current avatar",
+          "2": "talent lock <uid>   - Lock talent for player's current avatar",
+          "3": "talent lock         - (In game) Lock talent for current avatar",
+          "4": "talent list <uid>   - List unlocked talents of player's current avatar",
+          "5": "talent list         - (In game) List unlocked talents of current avatar"
+        },
+        "info": {
+          "unlocked": "Unlocked talent: %0",
+          "locked": "Locked talent: %0"
+        },
+        "error": {
+          "talentNotFound": "Talent not found."
         }
       },
       "ar": {

@@ -52,7 +52,7 @@ export default class AppliedModifier extends BaseClass {
   private async loadModifierData() {
     const { manager, abilityId, parentAbilityName, localId } = this
 
-    const abilityName = AbilityData.lookupString(parentAbilityName || manager.getAbility(abilityId)?.abilityName)
+    const abilityName = await AbilityData.lookupString(parentAbilityName || manager.getAbility(abilityId)?.abilityName)
     const abilityData = await AbilityData.getAbility(abilityName)
     if (!abilityData) return
 

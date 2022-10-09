@@ -8,21 +8,15 @@ import AbilityManager from '$/manager/abilityManager'
 import Vector from '$/utils/vector'
 import { DynamicFloat, DynamicInt } from '$DT/BinOutput/Common/DynamicNumber'
 import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
-import AvatarSkillStart from '$DT/BinOutput/Config/ConfigAbility/Action/Child/AvatarSkillStart'
-import ExecuteGadgetLua from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ExecuteGadgetLua'
-import GenerateElemBall from '$DT/BinOutput/Config/ConfigAbility/Action/Child/GenerateElemBall'
-import HealHP from '$DT/BinOutput/Config/ConfigAbility/Action/Child/HealHP'
-import LoseHP from '$DT/BinOutput/Config/ConfigAbility/Action/Child/LoseHP'
-import ReviveAvatar from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ReviveAvatar'
-import ReviveDeadAvatar from '$DT/BinOutput/Config/ConfigAbility/Action/Child/ReviveDeadAvatar'
+import { AvatarSkillStart, ExecuteGadgetLua, GenerateElemBall, HealHP, LoseHP, ReviveAvatar, ReviveDeadAvatar } from '$DT/BinOutput/Config/ConfigAbility/Action/Child'
 import ConfigAbilityMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin'
-import CostStaminaMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin/Child/CostStaminaMixin'
+import { CostStaminaMixin } from '$DT/BinOutput/Config/ConfigAbility/Mixin/Child'
 import SelectTargets from '$DT/BinOutput/Config/SelectTargets'
 import SelectTargetsByShape from '$DT/BinOutput/Config/SelectTargets/Child/SelectTargetsByShape'
 import Logger from '@/logger'
 import { AbilityTargettingEnum, EntityTypeEnum, FightPropEnum, GadgetStateEnum, TargetTypeEnum } from '@/types/enum'
 import { AbilityActionGenerateElemBall } from '@/types/proto'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
+import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
 import AppliedAbility from './appliedAbility'
 
@@ -91,6 +85,10 @@ export default class AbilityAction extends BaseClass {
     val = val.toString()
     if (!isNaN(parseFloat(val))) return parseFloat(val)
 
+    // fight prop
+    if (val.indexOf('FIGHT_PROP_') === 0) return ability.manager.entity.getProp(FightPropEnum[val])
+
+    // override map
     return Number(ability?.overrideMapContainer?.getValue({ hash: getStringHash(val), str: val })?.val || 0)
   }
 
@@ -291,15 +289,11 @@ export default class AbilityAction extends BaseClass {
   async handleAvatarSkillStart(_context: PacketContext, ability: AppliedAbility, config: AvatarSkillStart) {
     const { manager } = this
     const { entity } = manager
-    const { staminaManager, skillManager } = (<Avatar>entity)
+    const { skillManager } = (<Avatar>entity)
     const { currentDepot } = skillManager
     const { SkillID, CostStaminaRatio } = config
 
-    const skill = currentDepot?.getSkill(SkillID)
-    if (skill == null) return
-
-    if (currentDepot.energySkill === skill) await entity.drainEnergy(true, ChangeEnergyReasonEnum.CHANGE_ENERGY_SKILL_START)
-    if (staminaManager != null && CostStaminaRatio) staminaManager.immediate(this.eval(ability, CostStaminaRatio) * skill.costStamina * 100)
+    currentDepot?.getSkill(SkillID)?.start(CostStaminaRatio ? this.eval(ability, CostStaminaRatio) : null)
   }
 
   // CostStaminaMixin

@@ -148,7 +148,7 @@ export default class AbilityManager extends BaseClass {
     const ability = this.getAbility(instancedAbilityId)
     if (ability == null) return logger.debug('generic.param4', entity.entityId, type, 'ability == null', head)
 
-    const abilityName = AbilityData.lookupString(ability.abilityName)
+    const abilityName = await AbilityData.lookupString(ability.abilityName)
     const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
     if (actionConfig == null) return logger.debug('generic.param5', entity.entityId, type, 'action == null', head, abilityName)
 
@@ -220,7 +220,10 @@ export default class AbilityManager extends BaseClass {
 
   applyModifier(id: number): AppliedModifier {
     let modifier = this.getModifier(id)
-    if (modifier) return modifier
+    if (modifier) {
+      logger.debug('message.ability.debug.indexWrong', this.entity.entityId, modifier.name)
+      return modifier
+    }
 
     modifier = new AppliedModifier(this, id)
     this.modifierList.push(modifier)
