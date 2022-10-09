@@ -1,5 +1,5 @@
 import Loader from '$/gameData/loader'
-import SkillDataGroup, { SkillDepotData, SkillData, ProudSkillData, TalentData } from '@/types/gameData/SkillData'
+import SkillDataGroup, { ProudSkillData, SkillData, SkillDepotData } from '@/types/gameData/SkillData'
 
 class SkillDataLoader extends Loader {
   declare data: SkillDataGroup
@@ -26,10 +26,6 @@ class SkillDataLoader extends Loader {
 
   async getProudSkillByGroup(groupId: number, level?: number): Promise<ProudSkillData> {
     return (await this.getData())?.ProudSkill?.find(data => data.GroupId === groupId && (level == null || data.Level === level))
-  }
-
-  async getTalent(id: number): Promise<TalentData> {
-    return (await this.getData())?.Talent?.find(data => data.Id === id)
   }
 }
 

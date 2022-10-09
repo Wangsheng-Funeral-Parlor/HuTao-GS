@@ -1,4 +1,4 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketContext, PacketInterface } from '#/packet'
 import Avatar from '$/entity/avatar'
 
 export interface AvatarSkillDepotChangeNotify {
@@ -18,14 +18,14 @@ class AvatarSkillDepotChangePacket extends Packet implements PacketInterface {
   }
 
   async sendNotify(context: PacketContext, avatar: Avatar): Promise<void> {
-    const { guid, entityId, skillManager } = avatar
-    const { inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap, talentIdList } = skillManager.export()
+    const { guid, entityId, skillManager, talentManager } = avatar
+    const { inherentProudSkillList, skillLevelMap, proudSkillExtraLevelMap } = skillManager.export()
 
     const notifyData: AvatarSkillDepotChangeNotify = {
       avatarGuid: guid.toString(),
       entityId,
       skillDepotId: skillManager.currentDepot?.id || 0,
-      talentIdList,
+      talentIdList: talentManager.exportIdList(),
       proudSkillList: inherentProudSkillList,
       coreProudSkillLevel: 1,
       skillLevelMap,

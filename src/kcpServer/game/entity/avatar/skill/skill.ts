@@ -1,6 +1,7 @@
 import Embryo from '$/ability/embryo'
 import SkillData from '$/gameData/data/SkillData'
 import { ElemTypeEnum } from '@/types/enum'
+import { ChangeEnergyReasonEnum } from '@/types/proto/enum'
 import SkillUserData from '@/types/user/SkillUserData'
 import ProudSkill from './proudSkill'
 import SkillDepot from './skillDepot'
@@ -27,6 +28,10 @@ export default class Skill {
     this.costElemVal = 0
 
     this.abilityName = null
+  }
+
+  get isEnergySkill() {
+    return this.depot.energySkill === this
   }
 
   async init(userData: SkillUserData) {
@@ -69,6 +74,16 @@ export default class Skill {
     this.proudSkill = new ProudSkill(this, ProudSkillGroupId)
 
     await this.proudSkill.initNew()
+  }
+
+  async start(costStaminaRatio?: number) {
+    const { depot, costStamina, isEnergySkill } = this
+    const { manager } = depot
+    const { avatar } = manager
+    const { staminaManager } = avatar
+
+    if (isEnergySkill) await avatar.drainEnergy(true, ChangeEnergyReasonEnum.CHANGE_ENERGY_SKILL_START)
+    if (costStaminaRatio) staminaManager.immediate(costStaminaRatio * costStamina * 100)
   }
 
   exportUserData(): SkillUserData {

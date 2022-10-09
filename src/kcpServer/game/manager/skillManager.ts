@@ -85,14 +85,20 @@ export default class SkillManager {
 
   async setCandSkillId(id: number): Promise<boolean> {
     const { avatar, depotList } = this
-    const { player, fightProps } = avatar
+    const { player, fightProps, talentManager } = avatar
 
     id = parseInt(id?.toString())
     if (isNaN(id) || depotList[id] == null) return false
 
+    talentManager.removeEmbryos()
+    talentManager.removeAllTalents()
     this.currentDepot?.removeEmbryos()
+
     this.candSkillId = id
+
     this.currentDepot?.addEmbryos()
+    await talentManager.addFromSkillDepot()
+    talentManager.addEmbryos()
 
     // TODO: Trigger quest cond
 
