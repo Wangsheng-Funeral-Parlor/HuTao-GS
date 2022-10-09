@@ -128,7 +128,7 @@ export function splitArgs(str: string): string[] {
       const end = str.slice(i + 1).indexOf(char) + (i + 1)
       if (end <= 0) throw new TError('cli.error.missing', char)
       chunk += str.slice(i + 1, end)
-      i += end // NOSONAR
+      i = end // NOSONAR
       continue
     }
 
