@@ -70,7 +70,7 @@ export default class Avatar extends Entity {
     super.initHandlers(this)
   }
 
-  async loadAvatarData() {
+  private async loadAvatarData() {
     const { avatarId, abilityManager } = this
 
     this.config = await AvatarData.getFightPropConfig(avatarId)
