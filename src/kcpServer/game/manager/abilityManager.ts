@@ -221,7 +221,7 @@ export default class AbilityManager extends BaseClass {
   }
 
   getAbilityByName(name: AbilityString): AppliedAbility {
-    return this.abilityList.find(a => a.abilityName.hash === name.hash || (name.str && a.abilityName.str === name.str)) || null
+    return this.abilityList.find(a => a.abilityName?.hash === name.hash || (name.str && a.abilityName?.str === name.str)) || null
   }
 
   applyModifier(id: number): AppliedModifier {

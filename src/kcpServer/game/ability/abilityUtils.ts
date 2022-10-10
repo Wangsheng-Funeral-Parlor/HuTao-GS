@@ -45,7 +45,8 @@ export default class AbilityUtils {
       return
     }
 
-    const args: number[] = input.splice(op.i - 2, 3).slice(0, -1).map(this.eval.bind(this, state.ability))
+    const index = op.i - 2
+    const args: number[] = input.splice(index, 3).slice(0, -1).map(this.eval.bind(this, state.ability))
     if (args.find(a => typeof a !== 'number')) return
 
     switch (op.name) {
@@ -56,6 +57,8 @@ export default class AbilityUtils {
         state.val = args[0] + args[1]
         break
     }
+
+    input.splice(index, 0, state.val)
   }
 
   private calc(ability: AppliedAbility, input: (string | number)[]): number {
@@ -257,6 +260,6 @@ export default class AbilityUtils {
     }
 
     if (OtherTargets) targetList.push(...this.getOtherTargets(ability, OtherTargets))
-    return targetList
+    return targetList.filter((t, i, arr) => arr.indexOf(t) === i)
   }
 }
