@@ -96,7 +96,10 @@ import {
   ByUnlockTalentParam,
   ByWetHitCollider
 } from '$DT/BinOutput/Config/ConfigAbility/Predicate/Child'
-import { EntityTypeEnum } from '@/types/enum'
+import { EntityTypeEnum, RelationTypeEnum } from '@/types/enum'
+import { AbilityString } from '@/types/proto'
+import { getStringHash } from '@/utils/hash'
+import AbilityScalarValueContainer from './abilityScalarValueContainer'
 import AppliedAbility from './appliedAbility'
 
 export default class AbilityPredicate {
@@ -106,17 +109,45 @@ export default class AbilityPredicate {
     this.manager = manager
   }
 
+  private getCaster(ability: AppliedAbility): Entity | null {
+    const { manager } = ability
+    const { utils } = manager
+    return utils.getCaster()
+  }
+
   private getTargetEntity(ability: AppliedAbility, predicate: ConfigAbilityPredicate, target: Entity): Entity | null {
     const { manager } = ability
     const { utils } = manager
     return utils.getTargetList(ability, predicate, target)[0]
   }
 
+  private compare(type: RelationTypeEnum, container: AbilityScalarValueContainer, key: AbilityString, val: number, maxVal: number = 0): boolean {
+    const entry = container.getValue(key)
+    const entryVal = entry?.val || 0
+
+    switch (type || RelationTypeEnum.Equal) {
+      case RelationTypeEnum.Equal:
+        return entryVal === val
+      case RelationTypeEnum.MoreThan:
+        return entryVal > val
+      case RelationTypeEnum.LessAndEqual:
+        return entryVal <= val
+      case RelationTypeEnum.Between:
+        return entryVal >= val && entryVal <= maxVal
+      case RelationTypeEnum.MoreThanAndEqual:
+        return entryVal >= val
+      case RelationTypeEnum.NoneOrEqual:
+        return entry == null || entryVal === val
+      default:
+        return false
+    }
+  }
+
   check(ability: AppliedAbility, predicate: ConfigAbilityPredicate, target: Entity): boolean {
     const { $type } = predicate
     const checkFunc = <(ability: AppliedAbility, predicate: ConfigAbilityPredicate, target: Entity) => boolean>this[`check${$type}`]
     if (typeof checkFunc !== 'function') return true
-    return checkFunc(ability, predicate, target)
+    return checkFunc.call(this, ability, predicate, target)
   }
 
   checkAll(ability: AppliedAbility, predicates: ConfigAbilityPredicate[], target: Entity): boolean {
@@ -542,8 +573,22 @@ export default class AbilityPredicate {
   }
 
   // ByTargetGlobalValue
-  private checkByTargetGlobalValue(_ability: AppliedAbility, _predicate: ByTargetGlobalValue, _target: Entity): boolean {
-    return false
+  private checkByTargetGlobalValue(ability: AppliedAbility, predicate: ByTargetGlobalValue, target: Entity): boolean {
+    const { Key, Value, MaxValue, ForceByCaster, CompareType } = predicate
+
+    const targetEntity = ForceByCaster ? this.getCaster(ability) : this.getTargetEntity(ability, predicate, target)
+    if (targetEntity == null) return false
+
+    const { abilityManager } = targetEntity
+    if (abilityManager == null) return
+
+    const { utils, dynamicValueMapContainer } = abilityManager
+
+    const key = { hash: getStringHash(Key) }
+    const val = utils.eval(ability, Value, 0)
+    const maxVal = utils.eval(ability, MaxValue, 0)
+
+    return this.compare(RelationTypeEnum[CompareType], dynamicValueMapContainer, key, val, maxVal)
   }
 
   // ByTargetHPRatio
@@ -558,9 +603,7 @@ export default class AbilityPredicate {
 
   // ByTargetIsCaster
   private checkByTargetIsCaster(ability: AppliedAbility, predicate: ByTargetIsCaster, target: Entity): boolean {
-    const { manager } = this
-    const { utils } = manager
-    return this.getTargetEntity(ability, predicate, target) === utils.getCaster()
+    return this.getTargetEntity(ability, predicate, target) === this.getCaster(ability)
   }
 
   // ByTargetIsGhostToEnemy
@@ -570,7 +613,7 @@ export default class AbilityPredicate {
 
   // ByTargetIsSelf
   private checkByTargetIsSelf(ability: AppliedAbility, predicate: ByTargetIsSelf, target: Entity): boolean {
-    const { manager } = this
+    const { manager } = ability
     const { entity } = manager
     return this.getTargetEntity(ability, predicate, target) === entity
   }

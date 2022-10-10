@@ -1,6 +1,16 @@
+import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
 import AbilityData from '$/gameData/data/AbilityData'
 import translate from '@/translate'
-import { CommandDefinition } from '..'
+import { CLILike, CommandDefinition } from '..'
+
+async function printScalarValueContainer(print: CLILike['print'], container: AbilityScalarValueContainer, title: string, spaces: number = 0) {
+  const { valList } = container
+  print(`${' '.repeat(spaces)}${title}:`)
+  for (const entry of valList) {
+    const { key, val } = entry
+    print(`${' '.repeat(spaces + 1)}${await AbilityData.lookupString(key)}: ${val}`)
+  }
+}
 
 const abilityCommand: CommandDefinition = {
   name: 'ability',
@@ -24,9 +34,12 @@ const abilityCommand: CommandDefinition = {
     if (!entity) return printError(translate('cli.commands.ability.error.entityNotFound'))
 
     const { abilityManager } = entity
-    const { embryoList, abilityList, modifierList } = abilityManager
+    const { dynamicValueMapContainer, sgvDynamicValueMapContainer, embryoList, abilityList, modifierList } = abilityManager
 
     print(`Ability debug info (${entityId}):`)
+
+    await printScalarValueContainer(print, dynamicValueMapContainer, 'Dynamic', 1)
+    await printScalarValueContainer(print, sgvDynamicValueMapContainer, 'SVGDynamic', 1)
 
     print(' Embryo:')
     for (const embryo of embryoList) {
@@ -36,8 +49,9 @@ const abilityCommand: CommandDefinition = {
 
     print(' Applied ability:')
     for (const ability of abilityList) {
-      const { id, abilityName, abilityOverride } = ability
+      const { id, abilityName, abilityOverride, overrideMapContainer } = ability
       print(`  ${id}: ${await AbilityData.lookupString(abilityName) || abilityName?.hash}(${await AbilityData.lookupString(abilityOverride) || abilityOverride?.hash})`)
+      await printScalarValueContainer(print, overrideMapContainer, 'Override map', 3)
     }
 
     print(' Applied modifier:')
