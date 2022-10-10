@@ -6,6 +6,7 @@ export default class Talent {
   manager: TalentManager
 
   id: number
+  name: string
   prevTalentId: number
 
   abilityList: string[]
@@ -14,6 +15,7 @@ export default class Talent {
     this.manager = manager
 
     this.id = talentId
+    this.name = null
     this.prevTalentId = null
 
     this.abilityList = []
@@ -28,8 +30,9 @@ export default class Talent {
     const talentData = await TalentData.getAvatarTalent(id)
     if (!talentData) return
 
-    const { PrevTalent, Config } = talentData
+    const { Name, PrevTalent, Config } = talentData
 
+    this.name = Name || null
     this.prevTalentId = PrevTalent || null
 
     if (!Array.isArray(Config)) return

@@ -2,6 +2,7 @@ import ConfigTalent from './BinOutput/Config/ConfigTalent'
 
 export interface AvatarTalentData {
   Id: number
+  Name: string
   MainCostItemId: number
   MainCostItemCount: number
   AddProps: {
@@ -17,6 +18,7 @@ export interface AvatarTalentData {
 export interface EquipTalentData {
   AffixId: number
   Id: number
+  Name: string
   NameTextMapHash: number
   DescTextMapHash: number
   AddProps: {
@@ -32,6 +34,7 @@ export interface EquipTalentData {
 export interface TeamTalentData {
   TeamResonanceId: number
   TeamResonanceGroupId: number
+  Name: string
   Level: number
   NameTextMapHash: number
   DescTextMapHash: number

@@ -4,7 +4,9 @@ import AbilityInvocations from '#/packets/AbilityInvocations'
 import ClientAbilityChange from '#/packets/ClientAbilityChange'
 import ClientAbilityInitFinish from '#/packets/ClientAbilityInitFinish'
 import AbilityAction from '$/ability/abilityAction'
+import AbilityPredicate from '$/ability/abilityPredicate'
 import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
+import AbilityUtils from '$/ability/abilityUtils'
 import AppliedAbility from '$/ability/appliedAbility'
 import AppliedModifier from '$/ability/appliedModifier'
 import Embryo from '$/ability/embryo'
@@ -79,7 +81,9 @@ const logger = new TLogger('ABILIT', 0x10ff10)
 export default class AbilityManager extends BaseClass {
   entity: Entity
 
+  utils: AbilityUtils
   action: AbilityAction
+  predicate: AbilityPredicate
 
   dynamicValueMapContainer: AbilityScalarValueContainer
   sgvDynamicValueMapContainer: AbilityScalarValueContainer
@@ -95,7 +99,9 @@ export default class AbilityManager extends BaseClass {
 
     this.entity = entity
 
+    this.utils = new AbilityUtils(this)
     this.action = new AbilityAction(this)
+    this.predicate = new AbilityPredicate(this)
 
     this.dynamicValueMapContainer = new AbilityScalarValueContainer()
     this.sgvDynamicValueMapContainer = new AbilityScalarValueContainer()
@@ -262,6 +268,21 @@ export default class AbilityManager extends BaseClass {
       ability.setAbilityName({ hash: getStringHash(name) })
       ability.setAbilityOverride({ hash: getStringHash(overrideName) })
     }
+  }
+
+  async triggerAbility(context: PacketContext, abilityName: AbilityString) {
+    const { entity, action } = this
+
+    const ability = this.getAbilityByName(abilityName)
+    if (ability == null) return
+
+    const abilityConfig = await AbilityData.getAbility(await AbilityData.lookupString(abilityName))
+    if (abilityConfig == null) return
+
+    const { OnAbilityStart } = abilityConfig
+    if (!Array.isArray(OnAbilityStart)) return
+
+    for (const actionConfig of OnAbilityStart) await action.runActionConfig(context, ability, actionConfig, null, entity)
   }
 
   exportAbilitySyncStateInfo(): AbilitySyncStateInfo {
