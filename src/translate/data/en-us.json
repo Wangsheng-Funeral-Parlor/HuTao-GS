@@ -480,7 +480,7 @@
         "desc": "Game patching tools",
         "usage": {
           "0": "gpatch patch <gameDir>   - Patch metadata & ua in game directory & create backup ，For example,'E:\\Genshin Impact\\Genshin Impact Game'",
-          "1": "gpatch patch             - Same except gameDir is set to config.gameDir11",
+          "1": "gpatch patch             - Same except gameDir is set to config.gameDir",
           "2": "gpatch unpatch <gameDir> - Unpatch metadata & ua from backup in game directory The game directory is the same as above",
           "3": "gpatch unpatch           - Same except gameDir is set to config.gameDir"
         },
