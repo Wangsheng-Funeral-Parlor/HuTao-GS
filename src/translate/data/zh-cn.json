@@ -464,9 +464,9 @@
       "gpatch": {
         "desc": "游戏Patch工具",
         "usage": {
-          "0": "gpatch patch <gameDir>   - Patch游戏目录中的metadata & ua并创建备份",
+          "0": "gpatch patch <gameDir>   - Patch游戏目录中的metadata & ua并创建备份，比如'E:\\Genshin Impact\\Genshin Impact Game'",
           "1": "gpatch patch             - Same except gameDir is set to config.gameDir",
-          "2": "gpatch unpatch <gameDir> - 使用游戏目录中的备份取消patch metadata & ua",
+          "2": "gpatch unpatch <gameDir> - 使用游戏目录中的备份取消patch metadata & ua 游戏目录同上",
           "3": "gpatch unpatch           - Same except gameDir is set to config.gameDir"
         },
         "info": {
