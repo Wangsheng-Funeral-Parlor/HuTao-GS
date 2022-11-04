@@ -6,6 +6,7 @@ import healCommand from './healCommand'
 import rechargeCommand from './rechargeCommand'
 import setcsCommand from './setcsCommand'
 import setfpCommand from './setfpCommand'
+import talentCommand from './talentCommand'
 
 const avatarCommands: CommandDefinition[] = [
   godCommand,
@@ -14,7 +15,8 @@ const avatarCommands: CommandDefinition[] = [
   guidCommand,
   equipCommand,
   setcsCommand,
-  setfpCommand
+  setfpCommand,
+  talentCommand
 ]
 
 export default avatarCommands

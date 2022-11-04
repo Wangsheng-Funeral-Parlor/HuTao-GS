@@ -1,5 +1,4 @@
-import BornRandomFromCenter from './Child/BornRandomFromCenter'
-import BornRandomInShape from './Child/BornRandomInShape'
+import { BornRandomFromCenter, BornRandomInShape } from './Child'
 
 type BornRandom =
   BornRandomFromCenter |

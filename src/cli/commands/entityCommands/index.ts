@@ -1,4 +1,5 @@
 import { CommandDefinition } from '..'
+import abilityCommand from './abilityCommand'
 import gadgetCommand from './gadgetCommand'
 import killallCommand from './killallCommand'
 import monsterCommand from './monsterCommand'
@@ -8,7 +9,8 @@ const entityCommands: CommandDefinition[] = [
   monsterCommand,
   gadgetCommand,
   vehicleCommand,
-  killallCommand
+  killallCommand,
+  abilityCommand
 ]
 
 export default entityCommands

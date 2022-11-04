@@ -26,7 +26,7 @@ export default class Vector {
 
   private updateHash() {
     const { x, y, z } = this
-    this.hash = 1 * x + 12 * y + 123 * z
+    this.hash = Math.floor(1 * x + 12 * y + 123 * z)
   }
 
   private updateGrid() {

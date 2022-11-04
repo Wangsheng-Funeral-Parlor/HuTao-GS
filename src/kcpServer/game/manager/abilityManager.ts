@@ -4,7 +4,9 @@ import AbilityInvocations from '#/packets/AbilityInvocations'
 import ClientAbilityChange from '#/packets/ClientAbilityChange'
 import ClientAbilityInitFinish from '#/packets/ClientAbilityInitFinish'
 import AbilityAction from '$/ability/abilityAction'
+import AbilityPredicate from '$/ability/abilityPredicate'
 import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
+import AbilityUtils from '$/ability/abilityUtils'
 import AppliedAbility from '$/ability/appliedAbility'
 import AppliedModifier from '$/ability/appliedModifier'
 import Embryo from '$/ability/embryo'
@@ -79,7 +81,9 @@ const logger = new TLogger('ABILIT', 0x10ff10)
 export default class AbilityManager extends BaseClass {
   entity: Entity
 
+  utils: AbilityUtils
   action: AbilityAction
+  predicate: AbilityPredicate
 
   dynamicValueMapContainer: AbilityScalarValueContainer
   sgvDynamicValueMapContainer: AbilityScalarValueContainer
@@ -95,7 +99,9 @@ export default class AbilityManager extends BaseClass {
 
     this.entity = entity
 
+    this.utils = new AbilityUtils(this)
     this.action = new AbilityAction(this)
+    this.predicate = new AbilityPredicate(this)
 
     this.dynamicValueMapContainer = new AbilityScalarValueContainer()
     this.sgvDynamicValueMapContainer = new AbilityScalarValueContainer()
@@ -148,7 +154,7 @@ export default class AbilityManager extends BaseClass {
     const ability = this.getAbility(instancedAbilityId)
     if (ability == null) return logger.debug('generic.param4', entity.entityId, type, 'ability == null', head)
 
-    const abilityName = AbilityData.lookupString(ability.abilityName)
+    const abilityName = await AbilityData.lookupString(ability.abilityName)
     const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
     if (actionConfig == null) return logger.debug('generic.param5', entity.entityId, type, 'action == null', head, abilityName)
 
@@ -215,12 +221,15 @@ export default class AbilityManager extends BaseClass {
   }
 
   getAbilityByName(name: AbilityString): AppliedAbility {
-    return this.abilityList.find(a => a.abilityName.hash === name.hash || (name.str && a.abilityName.str === name.str)) || null
+    return this.abilityList.find(a => a.abilityName?.hash === name.hash || (name.str && a.abilityName?.str === name.str)) || null
   }
 
   applyModifier(id: number): AppliedModifier {
     let modifier = this.getModifier(id)
-    if (modifier) return modifier
+    if (modifier) {
+      logger.debug('message.ability.debug.indexWrong', this.entity.entityId, modifier.name)
+      return modifier
+    }
 
     modifier = new AppliedModifier(this, id)
     this.modifierList.push(modifier)
@@ -259,6 +268,21 @@ export default class AbilityManager extends BaseClass {
       ability.setAbilityName({ hash: getStringHash(name) })
       ability.setAbilityOverride({ hash: getStringHash(overrideName) })
     }
+  }
+
+  async triggerAbility(context: PacketContext, abilityName: AbilityString) {
+    const { entity, action } = this
+
+    const ability = this.getAbilityByName(abilityName)
+    if (ability == null) return
+
+    const abilityConfig = await AbilityData.getAbility(await AbilityData.lookupString(abilityName))
+    if (abilityConfig == null) return
+
+    const { OnAbilityStart } = abilityConfig
+    if (!Array.isArray(OnAbilityStart)) return
+
+    for (const actionConfig of OnAbilityStart) await action.runActionConfig(context, ability, actionConfig, null, entity)
   }
 
   exportAbilitySyncStateInfo(): AbilitySyncStateInfo {

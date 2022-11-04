@@ -64,23 +64,8 @@ export interface ProudSkillData {
   EffectiveForTeam?: number
 }
 
-export interface TalentData {
-  Id: number
-  MainCostItemId: number
-  MainCostItemCount: number
-  OpenConfig: string
-  AddProps: {
-    PropType?: string
-    Value?: number
-  }[]
-  ParamList: number[]
-
-  PrevTalent?: number
-}
-
 export default interface SkillDataGroup {
   Depot: SkillDepotData[]
   Skill: SkillData[]
   ProudSkill: ProudSkillData[]
-  Talent: TalentData[]
 }

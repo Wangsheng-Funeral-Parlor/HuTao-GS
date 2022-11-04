@@ -1,4 +1,3 @@
-import AbilityChange from '#/packets/AbilityChange'
 import AvatarEquipChange from '#/packets/AvatarEquipChange'
 import AvatarTeamUpdate from '#/packets/AvatarTeamUpdate'
 import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
@@ -28,10 +27,7 @@ export default class Team {
     const broadcastContextList = currentScene?.broadcastContextList || [context]
     for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
-    for (const avatar of avatarList) {
-      await AbilityChange.broadcastNotify(broadcastContextList, avatar)
-      await AvatarEquipChange.broadcastNotify(broadcastContextList, avatar)
-    }
+    for (const avatar of avatarList) await AvatarEquipChange.broadcastNotify(broadcastContextList, avatar)
 
     if (!player.isInMp()) await AvatarTeamUpdate.sendNotify(context, teamId)
     if (isCurTeam) await SceneTeamUpdate.broadcastNotify(broadcastContextList)

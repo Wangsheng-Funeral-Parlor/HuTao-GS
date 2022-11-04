@@ -6,7 +6,6 @@ import { PlayerPropEnum } from '@/types/enum'
 import SkillDepotUserData from '@/types/user/SkillDepotUserData'
 import InherentProudSkill from './inherentProudSkill'
 import Skill from './skill'
-import Talent from './talent'
 
 export default class SkillDepot {
   manager: SkillManager
@@ -16,7 +15,6 @@ export default class SkillDepot {
   inherentProudSkills: InherentProudSkill[]
   skills: Skill[]
   energySkill?: Skill
-  talents: Talent[]
 
   extraAbilities: string[]
   abilityEmbryos: Embryo[]
@@ -28,18 +26,16 @@ export default class SkillDepot {
 
     this.inherentProudSkills = []
     this.skills = []
-    this.talents = []
 
     this.extraAbilities = []
     this.abilityEmbryos = []
   }
 
   private async loadSkillsData() {
-    const { id, inherentProudSkills, skills, talents, extraAbilities } = this
+    const { id, inherentProudSkills, skills, extraAbilities } = this
 
     inherentProudSkills.splice(0)
     skills.splice(0)
-    talents.splice(0)
     extraAbilities.splice(0)
 
     const depotData = await SkillData.getSkillDepot(id)
@@ -64,9 +60,6 @@ export default class SkillDepot {
 
     // energy skill
     if (depotData.EnergySkill != null) this.energySkill = new Skill(this, depotData.EnergySkill)
-
-    // talents
-    talents.push(...depotData.Talents.map(talentId => new Talent(this, talentId)))
 
     extraAbilities.push(
       ...(depotData.ExtraAbilities || [])
@@ -111,7 +104,7 @@ export default class SkillDepot {
   async init(userData: SkillDepotUserData) {
     await this.loadSkillsData()
 
-    const { skills, talents, energySkill } = this
+    const { skills, energySkill } = this
     const { skillDataList, energySkillData } = userData || {}
 
     for (const skill of skills) {
@@ -120,8 +113,6 @@ export default class SkillDepot {
 
       await skill.init(skillData)
     }
-
-    for (const talent of talents) await talent.init()
 
     if (!energySkill) return
 
@@ -132,10 +123,9 @@ export default class SkillDepot {
   async initNew() {
     await this.loadSkillsData()
 
-    const { skills, talents, energySkill } = this
+    const { skills, energySkill } = this
 
     for (const skill of skills) await skill.initNew()
-    for (const talent of talents) await talent.init()
 
     await energySkill?.initNew()
   }
@@ -199,13 +189,12 @@ export default class SkillDepot {
   }
 
   export() {
-    const { id, talents } = this
+    const { id } = this
     return {
       skillDepotId: id,
       inherentProudSkillList: this.exportInherentProudSkillList(),
       skillLevelMap: this.exportSkillLevelMap(),
-      proudSkillExtraLevelMap: this.exportProudSkillExtraLevelMap(),
-      talentIdList: talents.map(talent => talent.id)
+      proudSkillExtraLevelMap: this.exportProudSkillExtraLevelMap()
     }
   }
 

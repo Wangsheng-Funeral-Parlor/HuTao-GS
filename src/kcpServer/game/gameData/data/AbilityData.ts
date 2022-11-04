@@ -176,11 +176,13 @@ class AbilityDataLoader extends Loader {
     }
   }
 
-  lookupString(abilityString: AbilityString) {
+  async lookupString(abilityString: AbilityString): Promise<string | null> {
+    await this.getData()
+
     const { str, hash } = abilityString || {}
     if (str) return str
 
-    return this.hashMap[hash] || null
+    return this.hashMap[hash] || hash?.toString() || null
   }
 }
 
