@@ -25,6 +25,7 @@ interface Config {
   dispatchRegion: string
   dispatchKeyId: number
   autoPatch: boolean
+  usePassword: boolean
 
   // RSA key
   passwordKeySize: number
@@ -64,6 +65,7 @@ export const DEFAULT_CONFIG: Config = {
   dispatchKeyId: 3,
   autoPatch: false,
 
+  usePassword: false,
   passwordKeySize: 4096,
   serverKeySize: 2048,
 
@@ -97,7 +99,8 @@ export const SUPPORT_VERSIONS = [
   '2.8.0',
   '2.8.50', '2.8.51', '2.8.52', '2.8.53', '2.8.54', '3.0.0',
   '3.0.50', '3.0.51', '3.0.52', '3.0.53',
-  '3.1.0'
+  '3.1.0',
+  '3.2.0'
 ]
 
 logger.info('Loading config...')
@@ -114,3 +117,5 @@ const config: Config = Object.assign({}, DEFAULT_CONFIG, curConfig || {})
 export const NO_CONFIG = curConfig == null
 export const AVAILABLE_CONFIGS = Object.keys(getJson('config.json', {})).filter(k => k !== 'current')
 export default config
+
+

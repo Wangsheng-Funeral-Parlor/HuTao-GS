@@ -102,15 +102,28 @@ export default class Authenticator {
     const account = accounts.find(acc => acc?.name === name)
     const { uid, passwordHash, tokens } = account || {}
 
-    if (
-      uid == null ||
-      passwordHash == null ||
-      tokens == null ||
-      !await compare(pass, passwordHash)
-    ) {
-      return {
-        success: false,
-        message: translate('message.authenticator.api.invalidCredentials')
+    if (config.usePassword) {
+      if (
+          uid == null ||
+          passwordHash == null ||
+          tokens == null ||
+          !await compare(pass, passwordHash)
+      ) {
+        return {
+          success: false,
+          message: translate('message.authenticator.api.invalidCredentials')
+        }
+      }
+    }else {
+      if (
+          uid == null ||
+          passwordHash == null ||
+          tokens == null
+      ) {
+        return {
+          success: false,
+          message: translate('message.authenticator.api.invalidCredentials')
+        }
       }
     }
 
