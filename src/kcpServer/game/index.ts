@@ -32,6 +32,7 @@ import hash from '../../utils/hash'
 import ActivityManager from './manager/activityManager'
 import { ChatManager } from './manager/chatManager'
 import ShopManager from './manager/shopManager'
+import {GameConstants} from "@/gameConstants";
 
 export default class Game {
   server: KcpServer
@@ -59,7 +60,7 @@ export default class Game {
       const { server } = this
 
       const client = new DummyClient(server)
-      client.setUid('1', 1)
+      client.setUid(String(GameConstants.SERVER_CONSOLE_UID), GameConstants.SERVER_CONSOLE_UID)
 
       // create new player
       const player = new Player(this, client)
@@ -69,7 +70,7 @@ export default class Game {
       client.player = player
 
       // set player data
-      await player.initNew(10000046, config.serverName)
+      await player.initNew(config.server_avatarId, config.serverName)
       await player.setLevel(60, false)
 
       player.noAuthority = true
@@ -77,23 +78,23 @@ export default class Game {
       // set born location
       player.hostWorld.hostLastState.init({
         sceneId: 3,
-        pos: { x: -657.9599609375, y: 219.54281616210938, z: 266.7440490722656 },
+        pos: GameConstants.START_POSITION,
         rot: { y: 180 }
       })
 
       // set avatar data
       const huTao = avatarList[0]
-      huTao.level = 90
+      huTao.level = config.server_level
 
       // set profile data
       props.set(PlayerPropEnum.PROP_PLAYER_MP_SETTING_TYPE, MpSettingTypeEnum.MP_SETTING_ENTER_FREELY)
 
-      profile.signature = 'QiQi?'
-      profile.birthday = { month: 7, day: 15 }
-      profile.unlockedNameCardIdList = [210059]
-      profile.nameCardId = 210059
+      profile.signature = config.server_signature
+      profile.birthday = config.server_birthday
+      profile.unlockedNameCardIdList = [config.server_nameCardId]
+      profile.nameCardId = config.server_nameCardId
       profile.showAvatarList.push(huTao)
-      profile.showNameCardIdList = [210059]
+      profile.showNameCardIdList = [config.server_nameCardId]
 
       // login
       await this.playerLogin(player.context)
