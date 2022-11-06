@@ -1,0 +1,36 @@
+name: "Build"
+on:
+  workflow_dispatch: ~
+  push:
+    paths:
+      - "**.ts"
+    branches:
+      - "master"
+      - "development"
+      - "add-github-feature"
+  pull_request:
+    paths:
+      - "**.ts"
+    types:
+      - opened
+      - synchronize
+      - reopened
+jobs:
+  Build-Server-dev:
+    name: Build-Server-dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set-Env
+        run: npm init -f&&npm install&&npm i typescript&&npm i tsc-alias
+
+      - name: Build-Dev
+        run: npm run build-dev
+
+      - name: Build-Rel
+        run: npm run build-rel
+
+      - name: Build-Rel-EXE
+        run: npm run build

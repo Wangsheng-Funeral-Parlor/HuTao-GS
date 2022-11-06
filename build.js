@@ -23,6 +23,7 @@ function execCommand(cmd, slient = false) {
 
 (async () => {
   const mode = process.argv.find(arg => arg.indexOf('-mode:') === 0)?.split(':')?.[1]?.toLowerCase() || null
+  console.log('Welcome to Wangsheng Funeral Parlor~')
 
   console.log('Building development...')
   await execCommand('tsc --incremental')
