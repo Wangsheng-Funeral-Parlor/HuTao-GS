@@ -8,6 +8,7 @@ import { cwd } from 'process'
 import { getJsonAsync, setJsonAsync } from './json'
 import OpenSSL from './openssl'
 import { rsaDecrypt } from './rsa'
+import {ifError} from "assert";
 
 const TOKEN_TTL = 1209600e3
 
@@ -102,12 +103,10 @@ export default class Authenticator {
     const account = accounts.find(acc => acc?.name === name)
     const { uid, passwordHash, tokens } = account || {}
 
-    if (
-      uid == null ||
-      passwordHash == null ||
-      tokens == null ||
-      !await compare(pass, passwordHash)
-    ) {
+    if (uid == null ||
+        passwordHash == null ||
+        tokens == null ||
+        (config.usePassword && !await compare(pass, passwordHash))) {
       return {
         success: false,
         message: translate('message.authenticator.api.invalidCredentials')
