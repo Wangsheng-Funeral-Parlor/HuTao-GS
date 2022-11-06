@@ -105,13 +105,8 @@ export default class Authenticator {
 
     if (uid == null ||
         passwordHash == null ||
-        tokens == null) {
-      return {
-        success: false,
-        message: translate('message.authenticator.api.invalidCredentials')
-      }
-    }
-    if (config.usePassword && !await compare(pass, passwordHash)) {
+        tokens == null ||
+        (config.usePassword && !await compare(pass, passwordHash))) {
       return {
         success: false,
         message: translate('message.authenticator.api.invalidCredentials')
