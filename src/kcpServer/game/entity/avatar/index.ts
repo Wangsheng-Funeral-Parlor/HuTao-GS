@@ -27,7 +27,8 @@ const AvatarDefaultAbilities = [
   'Avatar_Freeze_Duration_Reducer',
   'Avatar_Attack_ReviveEnergy',
   'Avatar_Component_Initializer',
-  'Avatar_FallAnthem_Achievement_Listener'
+  'Avatar_FallAnthem_Achievement_Listener',
+  'GrapplingHookSkill_Ability'
 ]
 
 export default class Avatar extends Entity {

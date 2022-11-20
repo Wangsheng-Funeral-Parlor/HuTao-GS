@@ -24,7 +24,9 @@ export async function patchGame(gameDir: string) {
   const dataDir = await getDataDir(gameDir)
   if (dataDir == null) throw new TError('message.tools.patcher.error.noDataDir')
 
-  try {
+  tryPatchMetadata: try { // NOSONAR
+    if (versionStrToNum(config.version) >= 0x030132) break tryPatchMetadata
+
     console.log(translate('message.tools.patcher.info.patchMeta'))
 
     await patchMetadata(join(dataDir, nativeMetadataPath), join(dataDir, managedMetadataPath))
@@ -32,9 +34,9 @@ export async function patchGame(gameDir: string) {
     console.log(err)
   }
 
-  if (versionStrToNum(config.version) < 0x030032) return
+  tryPatchUA: try { // NOSONAR
+    if (versionStrToNum(config.version) < 0x030032) break tryPatchUA
 
-  try {
     console.log(translate('message.tools.patcher.info.patchUA'))
 
     const UApath = join(dataDir, uaPath)
@@ -58,7 +60,9 @@ export async function unpatchGame(gameDir: string) {
   const dataDir = await getDataDir(gameDir)
   if (dataDir == null) throw new TError('message.tools.patcher.error.noDataDir')
 
-  try {
+  tryUnpatchMetadata: try { // NOSONAR
+    if (versionStrToNum(config.version) >= 0x030132) break tryUnpatchMetadata
+
     console.log(translate('message.tools.patcher.info.unpatchMeta'))
 
     await writeFile(join(dataDir, managedMetadataPath), await readFile(join(dataDir, nativeMetadataPath)))
@@ -66,9 +70,9 @@ export async function unpatchGame(gameDir: string) {
     console.log(err)
   }
 
-  if (versionStrToNum(config.version) < 0x030032) return
+  tryUnpatchUA: try { // NOSONAR
+    if (versionStrToNum(config.version) < 0x030032) break tryUnpatchUA
 
-  try {
     console.log(translate('message.tools.patcher.info.unpatchUA'))
 
     const UApath = join(dataDir, uaPath)

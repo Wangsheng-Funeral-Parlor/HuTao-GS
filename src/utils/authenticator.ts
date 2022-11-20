@@ -8,9 +8,13 @@ import { cwd } from 'process'
 import { getJsonAsync, setJsonAsync } from './json'
 import OpenSSL from './openssl'
 import { rsaDecrypt } from './rsa'
-import {ifError} from "assert";
 
 const TOKEN_TTL = 1209600e3
+
+const {
+  usePassword,
+  passwordKeySize
+} = config
 
 export interface AccountData {
   uid: number
@@ -86,9 +90,9 @@ export default class Authenticator {
   }
 
   async login(name: string, pass: string, isCrypto: boolean = false): Promise<AuthResponse> {
-    if (isCrypto) {
+    if (isCrypto && usePassword) {
       try {
-        const passwordKeyPair = await OpenSSL.getKeyPair(join(cwd(), 'data/key'), 'password', config.passwordKeySize)
+        const passwordKeyPair = await OpenSSL.getKeyPair(join(cwd(), 'data/key'), 'password', passwordKeySize)
         pass = rsaDecrypt(passwordKeyPair.private, Buffer.from(pass, 'base64')).toString('utf8')
       } catch (err) {
         return {
@@ -103,10 +107,12 @@ export default class Authenticator {
     const account = accounts.find(acc => acc?.name === name)
     const { uid, passwordHash, tokens } = account || {}
 
-    if (uid == null ||
-        passwordHash == null ||
-        tokens == null ||
-        (config.usePassword && !await compare(pass, passwordHash))) {
+    if (
+      uid == null ||
+      passwordHash == null ||
+      tokens == null ||
+      (usePassword && !await compare(pass, passwordHash))
+    ) {
       return {
         success: false,
         message: translate('message.authenticator.api.invalidCredentials')
