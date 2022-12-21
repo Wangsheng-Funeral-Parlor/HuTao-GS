@@ -50,7 +50,7 @@ export const DEFAULT_CONFIG: Config = {
   serverName: 'HuTao GS',
   hostIp: '127.0.0.1',
   sslDir: './ssl',
-  version: '3.0.0',
+  version: '3.3.0',
   packetsToDump: [],
 
   autoGamePatch: false,
@@ -99,7 +99,8 @@ export const SUPPORT_VERSIONS = [
   '2.8.0',
   '2.8.50', '2.8.51', '2.8.52', '2.8.53', '2.8.54', '3.0.0',
   '3.0.50', '3.0.51', '3.0.52', '3.0.53', '3.1.0',
-  '3.1.50', '3.2.0'
+  '3.1.50', '3.1.51', '3.1.52', '3.1.53', '3.2.0',
+  '3.3.0'
 ]
 
 logger.info('Loading config...')
