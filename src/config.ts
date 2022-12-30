@@ -93,7 +93,7 @@ export const SUPPORT_REGIONS = [
 
 export const SUPPORT_VERSIONS = [
   '1.4.50',
-  '1.6.51',
+  '1.6.51', '2.0.0',
   '2.6.0',
   '2.7.0',
   '2.8.0',

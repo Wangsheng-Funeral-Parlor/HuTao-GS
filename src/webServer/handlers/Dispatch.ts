@@ -136,7 +136,7 @@ class DispatchHandler extends Handler {
 
     for (const region of regionListData.regionList) {
       region.title = serverName
-      region.dispatchUrl = `${clientVersion < 0x020000 ? 'http' : 'https'}://${host}/query_cur_region`
+      region.dispatchUrl = `${clientVersion <= 0x020000 ? 'http' : 'https'}://${host}/query_cur_region`
     }
 
     return new HttpResponse((await objToProtobuffer(regionListData, 'QueryRegionListHttpRsp', true)).toString('base64'))
