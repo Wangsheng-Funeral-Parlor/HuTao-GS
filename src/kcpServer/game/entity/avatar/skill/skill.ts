@@ -66,7 +66,7 @@ export default class Skill {
 
     this.level = level || 1
 
-    const { AbilityName, ProudSkillGroupId, CdTime, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
+    const { AbilityName, ProudSkillGroupId, CdTime, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id) || {}
 
     this.cdTime = CdTime || 0
     this.costStamina = CostStamina || 0
@@ -88,7 +88,7 @@ export default class Skill {
 
     this.level = 1
 
-    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id)
+    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id) || {}
 
     this.costStamina = CostStamina || 0
     this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
