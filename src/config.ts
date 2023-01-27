@@ -50,7 +50,7 @@ export const DEFAULT_CONFIG: Config = {
   serverName: 'HuTao GS',
   hostIp: '127.0.0.1',
   sslDir: './ssl',
-  version: '3.3.0',
+  version: '3.4.0',
   packetsToDump: [],
 
   autoGamePatch: false,
