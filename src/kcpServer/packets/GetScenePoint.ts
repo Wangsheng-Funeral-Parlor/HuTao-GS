@@ -78,7 +78,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
       groupUnlimitPointList: [],
       notInteractDungeonEntryList: [],
       hidePointList: [],
-      unhidePointList: []
+      unhidePointList: pointList
     })
   }
 
