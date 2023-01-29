@@ -1830,7 +1830,6 @@ const ver3_4_0: CmdIds= {
     "SingleRestartBrickBreakerRsp": 22641,
     "SingleStartBrickBreakerReq": 23861,
     "SingleStartBrickBreakerRsp": 23349,
-    "SirinFixNotify": 11451,
     "SkyCrystalDetectorDataUpdateNotify": 4265,
     "SocialDataNotify": 4050,
     "SpiceActivityFinishMakeSpiceReq": 8744,
