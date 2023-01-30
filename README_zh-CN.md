@@ -1,6 +1,6 @@
 # HuTao-GS
 
-![pc-fork](./pc-forkk.jpg)
+![pc-fork](./pc-fork.jpg)
 <!-- Source: https://raw.githubusercontent.com/crowity/HuTao-GS/master/pc-forkk.jpg -->
 
 [EN](README.md) | 简中
