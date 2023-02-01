@@ -724,7 +724,6 @@ const ver3_4_0: CmdIds= {
     "GadgetPlayUidOpNotify": 829,
     "GadgetStateNotify": 887,
     "GadgetTalkChangeNotify": 846,
-    "GAJONMHAAEK": 6441,
     "GalleryBalloonScoreNotify": 5587,
     "GalleryBalloonShootNotify": 5555,
     "GalleryBounceConjuringHitNotify": 5569,
