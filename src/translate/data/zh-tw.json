@@ -261,6 +261,20 @@
       }
     },
     "loader": {
+      "avatarData": {
+        "warn": {
+          "noData": "沒有角色数据: %0",
+          "noConfig": "缺少角色的配置: %0",
+          "noFightPropConfig": "无法获取角色的fight prop配置: %0"
+        }
+      },
+      "monsterData": {
+        "warn": {
+          "noData": "沒有动物数据: %0",
+          "noConfig": "缺少动物配置: %0",
+          "noFightPropConfig": "无法获取动物的fight prop配置: %0"
+        }
+      },
       "warn": {
         "noData": "缺少數據: %0"
       }
@@ -605,6 +619,12 @@
           "killMonsters": "殺死怪物中..."
         }
       },
+      "ability": {
+        "desc": "Ability debug",
+        "error": {
+          "entityNotFound": "Entity not found."
+        }
+      },
       "god": {
         "desc": "切換上帝模式",
         "usage": {
@@ -680,6 +700,24 @@
         },
         "error": {
           "invalidFightProp": "無效的 fight prop."
+        }
+      },
+      "talent": {
+        "desc": "編輯/列出當前角色天賦",
+        "usage": {
+          "0": "talent unlock <uid> - 解鎖玩家当前角色的天賦",
+          "1": "talent unlock       - (遊戲中) 解锁当前角色天賦",
+          "2": "talent lock <uid>   - 鎖定玩家当前角色的天賦",
+          "3": "talent lock         - (遊戲中) 鎖定当前角色天賦",
+          "4": "talent list <uid>   - 列出玩家当前角色已解鎖的天賦",
+          "5": "talent list         - (遊戲中) 列出当前角色已解鎖的天賦"
+        },
+        "info": {
+          "unlocked": "已解鎖的天賦: %0",
+          "locked": "已鎖定的天賦: %0"
+        },
+        "error": {
+          "talentNotFound": "天賦未找到."
         }
       },
       "ar": {
