@@ -26,6 +26,7 @@ export interface GetScenePointRsp {
   groupUnlimitPointList?: number[]
   notInteractDungeonEntryList?: number[]
   hidePointList?: number[]
+  unhidePointList?: number[]
 }
 
 class GetScenePointPacket extends Packet implements PacketInterface {
@@ -76,7 +77,8 @@ class GetScenePointPacket extends Packet implements PacketInterface {
       notExploredDungeonEntryList: [],
       groupUnlimitPointList: [],
       notInteractDungeonEntryList: [],
-      hidePointList: []
+      hidePointList: [],
+      unhidePointList: pointList
     })
   }
 

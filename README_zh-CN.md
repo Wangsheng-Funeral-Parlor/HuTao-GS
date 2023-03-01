@@ -22,20 +22,20 @@
 * [Openssl](https://slproweb.com/products/Win32OpenSSL.html)
 * [HuTao-GD](https://github.com/NotArandomGUY/HuTao-GD)
 * HuTao-GS-Protos [Discord/#resources](https://discord.gg/4tZ96QMvHq)
-* 相应版本的Resources文件
+* 相应版本的Resources文件或者已经编译过的[HuTao-GS-Resources](https://github.com/Sycamore0/HuTao-GS-Resources)
 
 ## 步骤概述 ##
 * 1.安装所需软件
 * 2.下载所需文件至本地
 * 3.构建服务端
-* 4.使用Resources生成data
+* 4.使用Resources编译HuTao-GS专用Resources或者直接下载编译过的文件放入HuTao-GS
 * 5.将Proto放入HuTao-GS
 * 6.运行服务端
 * 7.安装自动生成的证书
 * 8.设置代理（GC代理不适用于HuTao-GS）
 * 9.开始游玩
 
-**详细步骤请下载HuTao-GS 打开 HuTao-GS/Docs/zh-cn/index.html 进行阅读**
+**详细步骤请下载HuTao-GS 并打开 HuTao-GS/Docs/zh-cn/index.html 进行阅读！**
 
 ## 快速问题排除 ##
 
