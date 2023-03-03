@@ -10,11 +10,33 @@ function getPropNames(proto: any): string[] {
 }
 
 export default class BaseClass extends EventEmitter {
-  constructor() {
+  public constructor() {
     super()
   }
 
-  initHandlers(eventTarget?: BaseClass) {
+  public registerHandlers(target?: BaseClass) {
+    if (!target) return
+
+    const ownPropNames = getPropNames(this.constructor.prototype)
+
+    for (const name of ownPropNames) {
+      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
+      target.on(name.slice(6), this[name])
+    }
+  }
+
+  public unregisterHandlers(target?: BaseClass) {
+    if (!target) return
+
+    const ownPropNames = getPropNames(this.constructor.prototype)
+
+    for (const name of ownPropNames) {
+      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
+      target.off(name.slice(6), this[name])
+    }
+  }
+
+  protected initHandlers(eventTarget?: BaseClass) {
     this.bindHandlers()
 
     if (eventTarget) {
@@ -28,34 +50,12 @@ export default class BaseClass extends EventEmitter {
     }
   }
 
-  bindHandlers() {
+  private bindHandlers() {
     const ownPropNames = getPropNames(this.constructor.prototype)
 
     for (const name of ownPropNames) {
       if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
       this[name] = this[name].bind(this)
-    }
-  }
-
-  registerHandlers(target?: BaseClass) {
-    if (!target) return
-
-    const ownPropNames = getPropNames(this.constructor.prototype)
-
-    for (const name of ownPropNames) {
-      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
-      target.on(name.slice(6), this[name])
-    }
-  }
-
-  unregisterHandlers(target?: BaseClass) {
-    if (!target) return
-
-    const ownPropNames = getPropNames(this.constructor.prototype)
-
-    for (const name of ownPropNames) {
-      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
-      target.off(name.slice(6), this[name])
     }
   }
 }

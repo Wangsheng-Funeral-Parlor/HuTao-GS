@@ -3,6 +3,7 @@ import { PacketContext } from '#/packet'
 import AbilityInvocations from '#/packets/AbilityInvocations'
 import ClientAbilityChange from '#/packets/ClientAbilityChange'
 import ClientAbilityInitFinish from '#/packets/ClientAbilityInitFinish'
+import ServerGlobalValueChange from '#/packets/ServerGlobalValueChange'
 import AbilityAction from '$/ability/abilityAction'
 import AbilityPredicate from '$/ability/abilityPredicate'
 import AbilityScalarValueContainer from '$/ability/abilityScalarValueContainer'
@@ -79,22 +80,22 @@ export interface AbilityInvokeEntryParsed {
 const logger = new TLogger('ABILIT', 0x10ff10)
 
 export default class AbilityManager extends BaseClass {
-  entity: Entity
+  public entity: Entity
 
-  utils: AbilityUtils
-  action: AbilityAction
-  predicate: AbilityPredicate
+  public utils: AbilityUtils
+  public action: AbilityAction
+  public predicate: AbilityPredicate
 
-  dynamicValueMapContainer: AbilityScalarValueContainer
-  sgvDynamicValueMapContainer: AbilityScalarValueContainer
+  public dynamicValueMapContainer: AbilityScalarValueContainer
+  public sgvDynamicValueMapContainer: AbilityScalarValueContainer
 
-  embryoList: Embryo[]
-  abilityList: AppliedAbility[]
-  modifierList: AppliedModifier[]
+  public embryoList: Embryo[]
+  public abilityList: AppliedAbility[]
+  public modifierList: AppliedModifier[]
 
-  initialized: boolean
+  public initialized: boolean
 
-  constructor(entity: Entity) {
+  public constructor(entity: Entity) {
     super()
 
     this.entity = entity
@@ -112,7 +113,148 @@ export default class AbilityManager extends BaseClass {
 
     this.initialized = false
 
-    super.initHandlers(this)
+    super.initHandlers()
+
+    this.registerHandlers(this)
+    this.registerHandlers(this.sgvDynamicValueMapContainer)
+  }
+
+  public addEmbryo(name: string = 'Default', overrideName: string = 'Default'): Embryo {
+    const id = this.getNewId()
+    const embryo = new Embryo(this, id, name, overrideName)
+
+    this.embryoList.push(embryo)
+    logger.verbose('message.ability.debug.register', id, name, overrideName)
+
+    return embryo
+  }
+
+  public removeEmbryo(embryo: Embryo) {
+    const { embryoList } = this
+    const { manager, id, name, overrideName } = embryo
+    if (manager !== this) return
+
+    embryoList.splice(embryoList.indexOf(embryo), 1)
+
+    logger.verbose('message.ability.debug.unregister', id, name, overrideName)
+  }
+
+  public clearEmbryo() {
+    const { embryoList } = this
+    for (const embryo of embryoList) this.removeEmbryo(embryo)
+  }
+
+  public getEmbryo(id: number): Embryo {
+    return this.embryoList.find(embryo => embryo.id === id) || null
+  }
+
+  public applyAbility(id: number): AppliedAbility {
+    let ability = this.getAbility(id)
+    if (ability) return ability
+
+    ability = new AppliedAbility(this, id)
+    this.abilityList.push(ability)
+
+    return ability
+  }
+
+  public removeAbility(id: number) {
+    const { abilityList } = this
+    const ability = this.getAbility(id)
+    if (ability == null) return
+
+    abilityList.splice(abilityList.indexOf(ability), 1)
+  }
+
+  public clearAbility() {
+    const { abilityList } = this
+    for (const ability of abilityList) this.removeAbility(ability.id)
+  }
+
+  public getAbility(id: number): AppliedAbility {
+    return this.abilityList.find(a => a.id === id) || null
+  }
+
+  public getAbilityByName(name: AbilityString): AppliedAbility {
+    return this.abilityList.find(a => a.abilityName?.hash === name.hash || (name.str && a.abilityName?.str === name.str)) || null
+  }
+
+  public applyModifier(id: number): AppliedModifier {
+    let modifier = this.getModifier(id)
+    if (modifier) {
+      logger.debug('message.ability.debug.indexWrong', this.entity.entityId, modifier.name)
+      return modifier
+    }
+
+    modifier = new AppliedModifier(this, id)
+    this.modifierList.push(modifier)
+
+    return modifier
+  }
+
+  public removeModifier(id: number) {
+    const { modifierList } = this
+    const modifier = this.getModifier(id)
+    if (modifier == null) return
+
+    modifierList.splice(modifierList.indexOf(modifier), 1)
+  }
+
+  public clearModifier() {
+    const { modifierList } = this
+    for (const modifier of modifierList) this.removeModifier(modifier.id)
+  }
+
+  public getModifier(id: number): AppliedModifier {
+    return this.modifierList.find(modifier => modifier.id === id) || null
+  }
+
+  public initFromEmbryos() {
+    const { embryoList, abilityList } = this
+    for (const embryo of embryoList) {
+      const { name, overrideName } = embryo
+      const usedIdList = abilityList.map(a => a.id)
+
+      let id = 1
+      while (usedIdList.includes(id)) id++
+
+      const ability = this.applyAbility(id)
+
+      ability.setAbilityName({ hash: getStringHash(name) })
+      ability.setAbilityOverride({ hash: getStringHash(overrideName) })
+    }
+  }
+
+  public async triggerAbility(context: PacketContext, abilityName: AbilityString) {
+    const { entity, action } = this
+
+    const ability = this.getAbilityByName(abilityName)
+    if (ability == null) return
+
+    const abilityConfig = await AbilityData.getAbility(await AbilityData.lookupString(abilityName))
+    if (abilityConfig == null) return
+
+    const { OnAbilityStart } = abilityConfig
+    if (!Array.isArray(OnAbilityStart)) return
+
+    for (const actionConfig of OnAbilityStart) await action.runActionConfig(context, ability, actionConfig, null, entity)
+  }
+
+  public exportAbilitySyncStateInfo(): AbilitySyncStateInfo {
+    const { dynamicValueMapContainer, sgvDynamicValueMapContainer, abilityList, modifierList, initialized } = this
+    if (!initialized) return {}
+
+    return {
+      isInited: true,
+      dynamicValueMap: dynamicValueMapContainer.export(),
+      appliedAbilities: abilityList.map(ability => ability.export()),
+      appliedModifiers: modifierList.map(modifier => modifier.export()),
+      sgvDynamicValueMap: sgvDynamicValueMapContainer.export()
+    }
+  }
+
+  public exportEmbryoList(): AbilityEmbryo[] {
+    return this.embryoList.map(embryo => embryo.export())
   }
 
   private getNewId(): number {
@@ -164,145 +306,20 @@ export default class AbilityManager extends BaseClass {
     await action.runActionConfig(context, ability, actionConfig, data, target)
   }
 
-  addEmbryo(name: string = 'Default', overrideName: string = 'Default'): Embryo {
-    const id = this.getNewId()
-    const embryo = new Embryo(this, id, name, overrideName)
-
-    this.embryoList.push(embryo)
-    logger.verbose('message.ability.debug.register', id, name, overrideName)
-
-    return embryo
-  }
-
-  removeEmbryo(embryo: Embryo) {
-    const { embryoList } = this
-    const { manager, id, name, overrideName } = embryo
-    if (manager !== this) return
-
-    embryoList.splice(embryoList.indexOf(embryo), 1)
-
-    logger.verbose('message.ability.debug.unregister', id, name, overrideName)
-  }
-
-  clearEmbryo() {
-    const { embryoList } = this
-    for (const embryo of embryoList) this.removeEmbryo(embryo)
-  }
-
-  getEmbryo(id: number): Embryo {
-    return this.embryoList.find(embryo => embryo.id === id) || null
-  }
-
-  applyAbility(id: number): AppliedAbility {
-    let ability = this.getAbility(id)
-    if (ability) return ability
-
-    ability = new AppliedAbility(this, id)
-    this.abilityList.push(ability)
-
-    return ability
-  }
-
-  removeAbility(id: number) {
-    const { abilityList } = this
-    const ability = this.getAbility(id)
-    if (ability == null) return
-
-    abilityList.splice(abilityList.indexOf(ability), 1)
-  }
-
-  clearAbility() {
-    const { abilityList } = this
-    for (const ability of abilityList) this.removeAbility(ability.id)
-  }
-
-  getAbility(id: number): AppliedAbility {
-    return this.abilityList.find(a => a.id === id) || null
-  }
-
-  getAbilityByName(name: AbilityString): AppliedAbility {
-    return this.abilityList.find(a => a.abilityName?.hash === name.hash || (name.str && a.abilityName?.str === name.str)) || null
-  }
-
-  applyModifier(id: number): AppliedModifier {
-    let modifier = this.getModifier(id)
-    if (modifier) {
-      logger.debug('message.ability.debug.indexWrong', this.entity.entityId, modifier.name)
-      return modifier
-    }
-
-    modifier = new AppliedModifier(this, id)
-    this.modifierList.push(modifier)
-
-    return modifier
-  }
-
-  removeModifier(id: number) {
-    const { modifierList } = this
-    const modifier = this.getModifier(id)
-    if (modifier == null) return
-
-    modifierList.splice(modifierList.indexOf(modifier), 1)
-  }
-
-  clearModifier() {
-    const { modifierList } = this
-    for (const modifier of modifierList) this.removeModifier(modifier.id)
-  }
-
-  getModifier(id: number): AppliedModifier {
-    return this.modifierList.find(modifier => modifier.id === id) || null
-  }
-
-  initFromEmbryos() {
-    const { embryoList, abilityList } = this
-    for (const embryo of embryoList) {
-      const { name, overrideName } = embryo
-      const usedIdList = abilityList.map(a => a.id)
-
-      let id = 1
-      while (usedIdList.includes(id)) id++
-
-      const ability = this.applyAbility(id)
-
-      ability.setAbilityName({ hash: getStringHash(name) })
-      ability.setAbilityOverride({ hash: getStringHash(overrideName) })
-    }
-  }
-
-  async triggerAbility(context: PacketContext, abilityName: AbilityString) {
-    const { entity, action } = this
-
-    const ability = this.getAbilityByName(abilityName)
-    if (ability == null) return
-
-    const abilityConfig = await AbilityData.getAbility(await AbilityData.lookupString(abilityName))
-    if (abilityConfig == null) return
-
-    const { OnAbilityStart } = abilityConfig
-    if (!Array.isArray(OnAbilityStart)) return
-
-    for (const actionConfig of OnAbilityStart) await action.runActionConfig(context, ability, actionConfig, null, entity)
-  }
-
-  exportAbilitySyncStateInfo(): AbilitySyncStateInfo {
-    const { dynamicValueMapContainer, sgvDynamicValueMapContainer, abilityList, modifierList, initialized } = this
-    if (!initialized) return {}
-
-    return {
-      isInited: true,
-      dynamicValueMap: dynamicValueMapContainer.export(),
-      appliedAbilities: abilityList.map(ability => ability.export()),
-      appliedModifiers: modifierList.map(modifier => modifier.export()),
-      sgvDynamicValueMap: sgvDynamicValueMapContainer.export()
-    }
-  }
-
-  exportEmbryoList(): AbilityEmbryo[] {
-    return this.embryoList.map(embryo => embryo.export())
-  }
-
   /**Events**/
+
+  // ChangeValue
+  async handleChangeValue(key: AbilityString) {
+    const { entity } = this
+    const { manager } = entity
+
+    if (manager == null || !entity.isAlive()) return
+
+    const { scene } = manager
+    const { broadcastContextList } = scene
+
+    await ServerGlobalValueChange.broadcastNotify(broadcastContextList, entity, key)
+  }
 
   // AbilityInvoke
   async handleAbilityInvoke(context: PacketContext, entry: AbilityInvokeEntry) {

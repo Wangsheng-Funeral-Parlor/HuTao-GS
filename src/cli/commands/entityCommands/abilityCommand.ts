@@ -39,7 +39,7 @@ const abilityCommand: CommandDefinition = {
     print(`Ability debug info (${entityId}):`)
 
     await printScalarValueContainer(print, dynamicValueMapContainer, 'Dynamic', 1)
-    await printScalarValueContainer(print, sgvDynamicValueMapContainer, 'SVGDynamic', 1)
+    await printScalarValueContainer(print, sgvDynamicValueMapContainer, 'SGVDynamic', 1)
 
     print(' Embryo:')
     for (const embryo of embryoList) {

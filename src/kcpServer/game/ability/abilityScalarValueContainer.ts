@@ -1,3 +1,4 @@
+import BaseClass from '#/baseClass'
 import { AbilityScalarValueEntry, AbilityString } from '@/types/proto'
 import { AbilityScalarTypeEnum } from '@/types/proto/enum'
 
@@ -7,11 +8,52 @@ interface ValueEntry {
   val: string | number | boolean
 }
 
-export default class AbilityScalarValueContainer {
-  valList: ValueEntry[]
+export default class AbilityScalarValueContainer extends BaseClass {
+  public valList: ValueEntry[]
 
-  constructor() {
+  public constructor() {
+    super()
+
     this.valList = []
+
+    super.initHandlers()
+  }
+
+  public getKeys(): AbilityString[] {
+    return this.valList.map(v => v.key)
+  }
+
+  public getValue(key: AbilityString) {
+    return this.valList.find(v => v.key.hash === key?.hash || (key?.str && v.key.str === key?.str)) || null
+  }
+
+  public setValue(sval: AbilityScalarValueEntry) {
+    const valEntry = this.toValueEntry(sval)
+    if (valEntry == null) return
+
+    const oldValEntry = this.getValue(valEntry.key)
+
+    if (oldValEntry) {
+      Object.assign(oldValEntry.key, valEntry.key)
+      oldValEntry.type = valEntry.type
+      oldValEntry.val = valEntry.val
+    } else {
+      this.valList.push(valEntry)
+    }
+
+    this.emit('ChangeValue', sval.key)
+  }
+
+  public setValues(valList: AbilityScalarValueEntry[]) {
+    for (const val of valList) this.setValue(val)
+  }
+
+  public clear() {
+    this.valList.splice(0)
+  }
+
+  public export(): AbilityScalarValueEntry[] {
+    return this.valList.map(this.toScalarValueEntry).filter(svalEntry => svalEntry != null)
   }
 
   private toValueEntry(svalEntry: AbilityScalarValueEntry): ValueEntry {
@@ -52,36 +94,5 @@ export default class AbilityScalarValueContainer {
       default:
         return null
     }
-  }
-
-  getValue(key: AbilityString) {
-    return this.valList.find(v => v.key.hash === key?.hash || (key?.str && v.key.str === key?.str)) || null
-  }
-
-  setValue(sval: AbilityScalarValueEntry) {
-    const valEntry = this.toValueEntry(sval)
-    if (valEntry == null) return
-
-    const oldValEntry = this.getValue(valEntry.key)
-    if (oldValEntry) {
-      Object.assign(oldValEntry.key, valEntry.key)
-      oldValEntry.type = valEntry.type
-      oldValEntry.val = valEntry.val
-      return
-    }
-
-    this.valList.push(valEntry)
-  }
-
-  setValues(valList: AbilityScalarValueEntry[]) {
-    for (const val of valList) this.setValue(val)
-  }
-
-  clear() {
-    this.valList.splice(0)
-  }
-
-  export(): AbilityScalarValueEntry[] {
-    return this.valList.map(this.toScalarValueEntry).filter(svalEntry => svalEntry != null)
   }
 }

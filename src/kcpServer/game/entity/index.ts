@@ -4,12 +4,14 @@ import AbilityManager from '$/manager/abilityManager'
 import EntityManager from '$/manager/entityManager'
 import Vector from '$/utils/vector'
 import ConfigEntityAbilityEntry from '$DT/BinOutput/Config/ConfigEntityAbilityEntry'
+import ConfigGlobalValue from '$DT/BinOutput/Config/ConfigGlobalValue'
 import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
 import { EntityFightPropConfig } from '@/types/game'
 import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
 import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
+import { AbilityScalarTypeEnum, ChangeEnergyReasonEnum, ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
+import { getStringHash } from '@/utils/hash'
 import EntityProps from './entityProps'
 import FightProp, { FightPropChangeReason } from './fightProps'
 import Motion from './motion'
@@ -84,6 +86,25 @@ export default class Entity extends BaseClass {
     }
 
     if (init) abilityManager.initFromEmbryos()
+  }
+
+  protected loadGlobalValue(globalValue: ConfigGlobalValue) {
+    const { abilityManager } = this
+    if (abilityManager == null) return
+
+    const { sgvDynamicValueMapContainer } = abilityManager
+    if (sgvDynamicValueMapContainer == null) return
+
+    const { ServerGlobalValues, InitServerGlobalValues } = globalValue || {}
+    if (!Array.isArray(ServerGlobalValues)) return
+
+    sgvDynamicValueMapContainer.setValues(
+      ServerGlobalValues.map(name => ({
+        key: { hash: getStringHash(name), str: name },
+        valueType: AbilityScalarTypeEnum.FLOAT,
+        floatValue: InitServerGlobalValues?.[name] || 0
+      }))
+    )
   }
 
   async init(userData: EntityUserData) {
