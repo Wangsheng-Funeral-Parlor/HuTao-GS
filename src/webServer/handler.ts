@@ -1,5 +1,6 @@
 import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'http'
 import WebServer from '.'
+import GlobalState from '@/globalState'
 
 export type MatchRule = string | RegExp | (string | RegExp)[]
 
@@ -102,7 +103,10 @@ export default class Handler {
     const { host, pathname } = url
 
     // Test host
-    if (domainList.find(domain => typeof domain === 'string' ? host === domain : host.match(domain) != null) == null) return false
+    if (
+      GlobalState.get('CheckHostHeader') &&
+      domainList.find(domain => typeof domain === 'string' ? host === domain : host.match(domain) != null) == null
+    ) return false
 
     // Test path
     if (pathList.find(path => typeof path === 'string' ? pathname === path : pathname.match(path) != null) == null) return false

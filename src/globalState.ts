@@ -16,6 +16,7 @@ export interface GlobalStateData {
   SaveLog: boolean
   SaveRecorder: boolean
   SaveReport: boolean
+  CheckHostHeader: boolean
   PacketDump: boolean
   ShowPacketId: boolean
   UseProtoMatch: boolean
@@ -27,6 +28,7 @@ export const DEFAULT_GSTATE: GlobalStateData = {
   SaveLog: false,
   SaveRecorder: false,
   SaveReport: false,
+  CheckHostHeader: false,
   PacketDump: false,
   ShowPacketId: false,
   UseProtoMatch: false,
