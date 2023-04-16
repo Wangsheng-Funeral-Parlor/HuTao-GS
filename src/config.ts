@@ -1,5 +1,6 @@
 import { getJson } from '@/utils/json'
 import Logger from './logger'
+import {Birthday} from "@/types/proto";
 
 const logger = new Logger('CONFIG', 0xcacaff)
 
@@ -44,6 +45,14 @@ interface Config {
 
   // host file
   hosts: string[] | null // host list
+
+  // console info
+
+  server_signature: string
+  server_birthday: Birthday
+  server_nameCardId: number
+  server_avatarId: number
+  server_level: number
 }
 
 export const DEFAULT_CONFIG: Config = {
@@ -82,7 +91,13 @@ export const DEFAULT_CONFIG: Config = {
   },
   nameservers: ['1.1.1.1', '1.0.0.1'],
 
-  hosts: null
+  hosts: null,
+
+  server_signature: "QiQi?",
+  server_birthday: { month: 7, day: 15 },
+  server_nameCardId: 210059,
+  server_avatarId: 10000046,
+  server_level:90,
 }
 
 export const SUPPORT_REGIONS = [

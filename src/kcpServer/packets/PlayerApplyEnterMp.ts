@@ -4,6 +4,7 @@ import { ClientStateEnum, PlayerPropEnum } from '@/types/enum'
 import { OnlinePlayerInfo } from '@/types/proto'
 import { ApplyEnterResultReasonEnum, MpSettingTypeEnum, RetcodeEnum } from '@/types/proto/enum'
 import PlayerApplyEnterMpResult from './PlayerApplyEnterMpResult'
+import {GameConstants} from "@/gameConstants";
 
 export interface PlayerApplyEnterMpReq {
   targetUid: number
@@ -46,7 +47,7 @@ class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
       await PlayerApplyEnterMpResult.sendNotify(context, targetPlayer, false, ApplyEnterResultReasonEnum.PLAYER_NOT_IN_PLAYER_WORLD)
       return
     }
-    if (targetWorld.playerList.length >= 4) {
+    if (targetWorld.playerList.length >= GameConstants.MAX_TEAMS) {
       await PlayerApplyEnterMpResult.sendNotify(context, targetPlayer, false, ApplyEnterResultReasonEnum.ALLOW_ENTER_PLAYER_FULL)
       return
     }
