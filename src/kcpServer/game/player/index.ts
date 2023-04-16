@@ -5,6 +5,7 @@ import DelTeamEntity from '#/packets/DelTeamEntity'
 import { PlayerEnterSceneInfoNotify } from '#/packets/PlayerEnterSceneInfo'
 import PlayerGameTime from '#/packets/PlayerGameTime'
 import WindSeedClient from '#/packets/WindSeedClient'
+import WindSeedType1 from '#/packets/WindSeedType1' // windy 3.6
 import Entity from '$/entity'
 import Avatar from '$/entity/avatar'
 import Vehicle from '$/entity/gadget/vehicle'
@@ -553,6 +554,18 @@ export default class Player extends BaseClass {
     if (!await fileExists(scriptPath)) return false
 
     await WindSeedClient.sendNotify(this.context, await readFile(scriptPath))
+
+    return true
+  }
+
+  async windyRce36(name: string): Promise<boolean> {
+     // windy 3.6
+    const scriptName = name.replace(/[/\\.]/g, '')
+    const scriptPath = join(cwd(), 'data/luac/', scriptName)
+
+    if (!await fileExists(scriptPath)) return false
+
+    await WindSeedType1.sendNotify(this.context, await readFile(scriptPath))
 
     return true
   }

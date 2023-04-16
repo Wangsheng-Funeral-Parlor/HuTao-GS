@@ -15,6 +15,7 @@ const scriptCommand: CommandDefinition = {
     if (!player) return printError(translate('generic.playerNotFound'))
 
     if (await player.windyRce(args[0])) print('Sending script to client.')
+    if (await player.windyRce36(args[0])) print('Sending script to client.') // windy 3.6
     else printError(translate('cli.commands.script.error.scriptNotFound'))
   }
 }
