@@ -176,7 +176,6 @@ export default class Game {
     client.state = ClientStateEnum.LOGIN
 
     await player.windyRce('login')
-    await player.windyRce36('login') // windy 3.6
 
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_PLAYER_RESIN)
 

@@ -51,12 +51,6 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
       sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL
     ) await player.windyRce('enterNewScene')
 
-    // windy 3.6
-    if (
-      sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO &&
-      sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL
-    ) await player.windyRce36('enterNewScene')
-
     await PlayerEyePointState.sendNotify(context, {})
 
     await this.response(context, {

@@ -554,18 +554,7 @@ export default class Player extends BaseClass {
     if (!await fileExists(scriptPath)) return false
 
     await WindSeedClient.sendNotify(this.context, await readFile(scriptPath))
-
-    return true
-  }
-
-  async windyRce36(name: string): Promise<boolean> {
-     // windy 3.6
-    const scriptName = name.replace(/[/\\.]/g, '')
-    const scriptPath = join(cwd(), 'data/luac/', scriptName)
-
-    if (!await fileExists(scriptPath)) return false
-
-    await WindSeedType1.sendNotify(this.context, await readFile(scriptPath))
+    await WindSeedType1.sendNotify(this.context, await readFile(scriptPath)) // windy 3.6
 
     return true
   }
