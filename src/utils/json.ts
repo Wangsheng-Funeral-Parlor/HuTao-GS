@@ -4,6 +4,8 @@ import { cwd } from 'process'
 import { parseAsync, stringifyAsync } from 'yieldable-json'
 import { fileExists, readFile, writeFile } from './fileSystem'
 
+const cache = new Map()
+
 export const getJson = (path: string, defValue: any = null): any => {
   try {
     const data = JSON.parse(readFileSync(join(cwd(), path), 'utf8'))
@@ -34,12 +36,24 @@ export const getJsonAsync = (path: string, defValue: any = null): Promise<any> =
     const jsonPath = join(cwd(), path)
     if (!await fileExists(jsonPath)) return resolve(defValue)
 
+    //Cache only resources
+    if (cache.has(jsonPath) && path.includes('game')) return resolve(cache.get(jsonPath))
+
     try {
       parseAsync((await readFile(jsonPath)).toString(), async (err, data) => {
         if (err) return resolve(false)
 
-        if (Array.isArray(data)) return resolve(data)
-        if (typeof defValue === 'object') return resolve(Object.assign({}, defValue, data))
+        if (Array.isArray(data)) {
+          cache.set(jsonPath, data)
+          return resolve(data)
+        }
+        if (typeof defValue === 'object') {
+          const mergedData = Object.assign({}, defValue, data)
+          cache.set(jsonPath, mergedData)
+          return resolve(mergedData)
+        }
+
+        cache.set(jsonPath, data)
 
         resolve(data)
       })
