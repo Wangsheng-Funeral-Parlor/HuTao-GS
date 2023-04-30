@@ -124,8 +124,8 @@ export default class WebServer extends EventEmitter {
       await request.waitBody()
 
       const { url } = request
-      const { host, pathname } = url
-      const fullUrl = host + pathname
+      const { host, pathname, search } = url
+      const fullUrl = host + pathname + search
 
       let response: HttpResponse
       let isVerbose = false
