@@ -9,7 +9,7 @@ import { appendFileSync } from 'fs'
 import { join } from 'path'
 import { cwd } from 'process'
 
-;(async (args: ParsedArgs) => {
+(async (args: ParsedArgs) => {
   // initialize tty
   getTTY().setIO()
 
