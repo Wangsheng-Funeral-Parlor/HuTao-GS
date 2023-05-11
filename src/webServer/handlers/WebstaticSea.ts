@@ -1,6 +1,7 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { join } from 'path'
+import { cwd } from 'process'
 
 class WebstaticSeaHandler extends Handler {
   constructor() {
@@ -10,12 +11,21 @@ class WebstaticSeaHandler extends Handler {
   async request(req: HttpRequest): Promise<HttpResponse> {
     const { host, pathname } = req.url
 
-    const isPkg = __filename.indexOf('index.js') !== -1
-    const dir = join(__dirname, `${isPkg ? '' : '../../'}../webstaticSea`)
+    const fsDir = join(cwd(), 'webstaticSea')
     const pathList = [
-      join(dir, pathname),
-      join(dir, pathname, 'index.html')
+      join(fsDir, pathname),
+      join(fsDir, pathname, 'index.html')
     ]
+
+    const isPkg = __filename.indexOf('index.js') !== -1
+
+    if (isPkg) {
+      const pkgDir = join(__dirname, '../webstaticSea')
+      pathList.unshift(
+        join(pkgDir, pathname),
+        join(pkgDir, pathname, 'index.html')
+      )
+    }
 
     let filePath: string
     for (const path of pathList) {
