@@ -59,7 +59,7 @@ export default class Loader {
     this.busy = true
 
     if (!await hasJsonAsync(filePath)) logger.warn('message.loader.warn.noData', path)
-    this.data = await getJsonAsync(filePath, defaultData)
+    this.data = await getJsonAsync(filePath, defaultData, true)
 
     this.busy = false
   }

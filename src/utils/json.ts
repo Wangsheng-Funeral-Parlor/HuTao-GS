@@ -4,6 +4,8 @@ import { cwd } from 'process'
 import { parseAsync, stringifyAsync } from 'yieldable-json'
 import { fileExists, readFile, writeFile } from './fileSystem'
 
+const cacheMap = new Map()
+
 export const getJson = (path: string, defValue: any = null): any => {
   try {
     const data = JSON.parse(readFileSync(join(cwd(), path), 'utf8'))
@@ -29,17 +31,28 @@ export const setJson = (path: string, value: any): boolean => {
 
 export const hasJson = (path: string): boolean => existsSync(join(cwd(), path))
 
-export const getJsonAsync = (path: string, defValue: any = null): Promise<any> => {
+export const getJsonAsync = (path: string, defValue: any = null, useCache = false): Promise<any> => {
   return new Promise(async resolve => {
     const jsonPath = join(cwd(), path)
     if (!await fileExists(jsonPath)) return resolve(defValue)
+
+    if (useCache && cacheMap.has(jsonPath)) return resolve(cacheMap.get(jsonPath))
 
     try {
       parseAsync((await readFile(jsonPath)).toString(), async (err, data) => {
         if (err) return resolve(false)
 
-        if (Array.isArray(data)) return resolve(data)
-        if (typeof defValue === 'object') return resolve(Object.assign({}, defValue, data))
+        if (Array.isArray(data)) {
+          cacheMap.set(jsonPath, data)
+          return resolve(data)
+        }
+        if (typeof defValue === 'object') {
+          const mergedData = Object.assign({}, defValue, data)
+          cacheMap.set(jsonPath, mergedData)
+          return resolve(mergedData)
+        }
+
+        cacheMap.set(jsonPath, data)
 
         resolve(data)
       })

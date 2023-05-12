@@ -340,6 +340,31 @@
         "unregister": "Unregister: %0 -> %1[%2]",
         "indexWrong": "%0 %1 index wrong"
       }
+    },
+    "cache": {
+      "debug": {
+        "ability": "Success caching abilityData",
+        "avatar": "Success caching avatarData",
+        "dungeon": "Success caching dungeonData",
+        "gadget": "Success caching gadgetData",
+        "growCurve": "Success caching growCurveData",
+        "mapArea": "Success caching mapAreaData",
+        "material": "Success caching materialData",
+        "monster": "Success caching monsterData",
+        "quest": "Success caching questData",
+        "reliquary": "Success caching reliquaryData",
+        "scene": "Success caching sceneData",
+        "shop": "Success caching shopData",
+        "skill": "Success caching skillData",
+        "talent": "Success caching talentData",
+        "weapon": "Success caching weaponData",
+        "weather": "Success caching weatherData",
+        "world": "Success caching worldData"
+      },
+      "info": {
+        "start": "Start caching resources",
+        "success": "Success caching resources"
+      }
     }
   },
   "cli": {
