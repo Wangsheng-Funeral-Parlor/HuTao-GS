@@ -11,10 +11,12 @@ class WebstaticSeaHandler extends Handler {
   async request(req: HttpRequest): Promise<HttpResponse> {
     const { host, pathname } = req.url
 
+    const reqPath = decodeURIComponent(pathname)
+
     const fsDir = join(cwd(), 'webstaticSea')
     const pathList = [
-      join(fsDir, pathname),
-      join(fsDir, pathname, 'index.html')
+      join(fsDir, reqPath),
+      join(fsDir, reqPath, 'index.html')
     ]
 
     const isPkg = __filename.indexOf('index.js') !== -1
@@ -22,8 +24,8 @@ class WebstaticSeaHandler extends Handler {
     if (isPkg) {
       const pkgDir = join(__dirname, '../webstaticSea')
       pathList.unshift(
-        join(pkgDir, pathname),
-        join(pkgDir, pathname, 'index.html')
+        join(pkgDir, reqPath),
+        join(pkgDir, reqPath, 'index.html')
       )
     }
 
@@ -33,13 +35,17 @@ class WebstaticSeaHandler extends Handler {
       filePath = path
     }
 
+    const header = {
+      'Access-Control-Allow-Origin': '*'
+    }
+
     let rsp: HttpResponse
     if (filePath == null) {
-      rsp = new HttpResponse(`<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchKey</Code><Message>The specified key does not exist.</Message><RequestId>000000000000000000000000</RequestId><HostId>${host}</HostId><Key>${pathname.slice(1)}</Key></Error>`, 404)
+      rsp = new HttpResponse(`<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchKey</Code><Message>The specified key does not exist.</Message><RequestId>000000000000000000000000</RequestId><HostId>${host}</HostId><Key>${pathname.slice(1)}</Key></Error>`, 404, header)
       rsp.type = 'application/xml'
       return rsp
     } else {
-      rsp = new HttpResponse(await readFile(filePath))
+      rsp = new HttpResponse(await readFile(filePath), 200, header)
       rsp.type = this.getMimeType(filePath.split('.').slice(-1)[0])
     }
 
