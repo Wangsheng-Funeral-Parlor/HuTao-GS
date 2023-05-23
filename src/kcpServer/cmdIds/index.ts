@@ -10,6 +10,7 @@ import ver3_3_0 from './ver3_3_0'
 import ver3_4_0 from './ver3_4_0'
 import ver3_5_0 from './ver3_5_0'
 import ver3_6_0 from './ver3_6_0'
+import ver3_7_0 from './ver3_7_0'
 
 const versionMap: { [version: string]: CmdIds } = {
   '1.4.50': ver1_4_50,
@@ -41,7 +42,8 @@ const versionMap: { [version: string]: CmdIds } = {
   '3.3.0': ver3_3_0,
   '3.4.0': ver3_4_0,
   '3.5.0': ver3_5_0,
-  '3.6.0': ver3_6_0
+  '3.6.0': ver3_6_0,
+  '3.7.0': ver3_7_0
 }
 
 export const cmdIds: CmdIds = versionMap[config.version] || versionMap[DEFAULT_CONFIG.version] || {}
