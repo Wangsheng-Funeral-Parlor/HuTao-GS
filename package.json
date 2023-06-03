@@ -27,7 +27,7 @@
       "node18-win"
     ]
   },
-  "author": "NotArandomGUY, kumadayo",
+  "author": "NotArandomGUY",
   "license": "AGPL-3.0",
   "lint-staged": {
     "*.ts": [

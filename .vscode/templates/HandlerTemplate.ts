@@ -1,8 +1,8 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
-class HandlerTemplateHandler extends Handler {
+class {{name}}eHandler extends Handler {
   constructor() {
-    super('HandlerTemplate.com', '/HandlerTemplate')
+    super('{{name}}.com', '/{{name}}')
   }
 
   async request(req: HttpRequest): Promise<HttpResponse> {
@@ -10,5 +10,5 @@ class HandlerTemplateHandler extends Handler {
   }
 }
 
-let handler: HandlerTemplateHandler
-export default (() => handler = handler || new HandlerTemplateHandler())()
+let handler: {{name}}Handler
+export default (() => handler = handler || new {{name}}Handler())()

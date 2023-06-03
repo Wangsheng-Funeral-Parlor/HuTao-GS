@@ -1,7 +1,7 @@
 import { CommandDefinition } from '..'
 
-const templateCommand: CommandDefinition = {
-  name: 'template',
+const {{name}}Command: CommandDefinition = {
+  name: '{{name}}',
   //usage: 1,
   //args: [],
   //allowPlayer: false,
@@ -10,9 +10,9 @@ const templateCommand: CommandDefinition = {
     const { args, sender, cli, tty, server, kcpServer } = cmdInfo
     const { print, printError } = cli
 
-    print('Template', args, sender, cli, tty, server, kcpServer)
-    printError('Template')
+    print('{{name}}', args, sender, cli, tty, server, kcpServer)
+    printError('{{name}}')
   }
 }
 
-export default templateCommand
+export default {{name}}Command

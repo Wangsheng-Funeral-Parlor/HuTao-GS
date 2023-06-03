@@ -1,33 +1,33 @@
 import Packet, { PacketInterface, PacketContext } from '#/packet'
 import { RetcodeEnum } from '@/types/proto/enum'
 
-export interface PacketTemplateReq { }
+export interface {{name}}Req { }
 
-export interface PacketTemplateRsp {
+export interface {{name}}Rsp {
   retcode: RetcodeEnum
 }
 
-export interface PacketTemplateNotify { }
+export interface {{name}}Notify { }
 
-class PacketTemplatePacket extends Packet implements PacketInterface {
+class {{name}}Packet extends Packet implements PacketInterface {
   constructor() {
-    super('PacketTemplate')
+    super('{{name}}')
   }
 
-  async request(context: PacketContext, data: PacketTemplateReq): Promise<void> {
+  async request(context: PacketContext, data: {{name}}Req): Promise<void> {
     return
   }
 
-  async response(context: PacketContext, data: PacketTemplateRsp): Promise<void> {
+  async response(context: PacketContext, data: {{name}}Rsp): Promise<void> {
     await super.response(context, data)
   }
 
-  async recvNotify(context: PacketContext, data: PacketTemplateNotify): Promise<void> {
+  async recvNotify(context: PacketContext, data: {{name}}Notify): Promise<void> {
     return
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    const notifyData: PacketTemplateNotify = {}
+    const notifyData: {{name}}Notify = {}
 
     await super.sendNotify(context, notifyData)
   }
@@ -37,5 +37,5 @@ class PacketTemplatePacket extends Packet implements PacketInterface {
   }
 }
 
-let packet: PacketTemplatePacket
-export default (() => packet = packet || new PacketTemplatePacket())()
+let packet: {{name}}Packet
+export default (() => packet = packet || new {{name}}Packet())()
