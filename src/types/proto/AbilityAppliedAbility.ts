@@ -1,4 +1,4 @@
-import { AbilityScalarValueEntry, AbilityString } from '.'
+import { AbilityScalarValueEntry, AbilityString } from "."
 
 export interface AbilityAppliedAbility {
   abilityName?: AbilityString

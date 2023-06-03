@@ -1,10 +1,11 @@
-import { CommandDefinition } from '..'
-import autopatchCommand from './autopatchCommand'
-import ec2bCommand from './ec2bCommand'
-import gpatchCommand from './gpatchCommand'
-import keygenCommand from './keygenCommand'
-import metaCommand from './metaCommands'
-import uaCommand from './uaCommand'
+import { CommandDefinition } from ".."
+
+import autopatchCommand from "./autopatchCommand"
+import ec2bCommand from "./ec2bCommand"
+import gpatchCommand from "./gpatchCommand"
+import keygenCommand from "./keygenCommand"
+import metaCommand from "./metaCommands"
+import uaCommand from "./uaCommand"
 
 const toolsCommands: CommandDefinition[] = [
   gpatchCommand,
@@ -12,7 +13,7 @@ const toolsCommands: CommandDefinition[] = [
   uaCommand,
   autopatchCommand,
   ec2bCommand,
-  keygenCommand
+  keygenCommand,
 ]
 
 export default toolsCommands

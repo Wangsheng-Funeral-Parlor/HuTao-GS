@@ -1,5 +1,6 @@
-import { ForceUpdateInfo, RegionInfo, StopServerInfo } from '.'
-import { RetcodeEnum } from './enum'
+import { RetcodeEnum } from "./enum"
+
+import { ForceUpdateInfo, RegionInfo, StopServerInfo } from "."
 
 export interface QueryCurrRegionHttpRsp {
   forceUdpate?: ForceUpdateInfo

@@ -2,16 +2,16 @@ export enum ClientStateEnum {
   NONE = 0,
 
   /*== Main state ==*/
-  DEADLINK = (0x1 << 12),
-  CONNECTION = (0x2 << 12),
-  LOGIN = (0x3 << 12),
-  PRE_ENTER_SCENE = (0x4 << 12),
-  ENTER_SCENE = (0x5 << 12),
-  IN_GAME = (0x6 << 12),
+  DEADLINK = 0x1 << 12,
+  CONNECTION = 0x2 << 12,
+  LOGIN = 0x3 << 12,
+  PRE_ENTER_SCENE = 0x4 << 12,
+  ENTER_SCENE = 0x5 << 12,
+  IN_GAME = 0x6 << 12,
 
   /*== Scene type state ==*/
-  SCENE_WORLD = (0x1 << 8),
-  SCENE_DUNGEON = (0x2 << 8),
+  SCENE_WORLD = 0x1 << 8,
+  SCENE_DUNGEON = 0x2 << 8,
 
   /*== Sub state ==*/
   // Connection state
@@ -34,5 +34,5 @@ export enum ClientStateEnum {
   POST_ENTER_SCENE = 0x00,
   CHANGE_AVATAR = 0x01,
   CHANGE_TEAM = 0x02,
-  SETUP_TEAM = 0x03
+  SETUP_TEAM = 0x03,
 }

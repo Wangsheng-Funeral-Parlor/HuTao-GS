@@ -1,14 +1,14 @@
-const { exec } = require('child_process')
-const { join } = require('path')
-const { cwd } = require('process')
+const { exec } = require("child_process")
+const { join } = require("path")
+const { cwd } = require("process")
 
-process.env['PKG_CACHE_PATH'] = join(cwd(), 'cache')
-process.env['MAKE_JOB_COUNT'] = 8
+process.env["PKG_CACHE_PATH"] = join(cwd(), "cache")
+process.env["MAKE_JOB_COUNT"] = 8
 
 /**
  * Execute command
- * @param {string} cmd 
- * @param {boolean} slient 
+ * @param {string} cmd
+ * @param {boolean} slient
  * @returns {Promise<string>}
  */
 function execCommand(cmd, slient = false) {
@@ -16,33 +16,32 @@ function execCommand(cmd, slient = false) {
     const cp = exec(cmd, { env: process.env, cwd: cwd() })
 
     if (!slient) cp.stdout.pipe(process.stdout)
-    cp.on('exit', () => res())
-    cp.on('error', (err) => rej(err))
+    cp.on("exit", () => res())
+    cp.on("error", (err) => rej(err))
   })
 }
 
-(async () => {
-  const mode = process.argv.find(arg => arg.indexOf('-mode:') === 0)?.split(':')?.[1]?.toLowerCase() || null
-  console.log('Welcome to Wangsheng Funeral Parlor~')
+;(async () => {
+  const mode =
+    process.argv
+      .find((arg) => arg.indexOf("-mode:") === 0)
+      ?.split(":")?.[1]
+      ?.toLowerCase() || null
+  console.log("Welcome to Wangsheng Funeral Parlor~")
 
-  console.log('Building development...')
-  await execCommand('tsc --incremental')
+  console.log("Building development...")
+  await execCommand("tsc --incremental")
 
-  console.log('Resolving alias...')
-  await execCommand('tsc-alias')
+  console.log("Resolving alias...")
+  await execCommand("tsc-alias")
 
-  if (mode === 'dev') return console.log('Build complete.')
+  if (mode === "dev") return console.log("Build complete.")
 
-  console.log('Building release...')
-  await execCommand('webpack --config webpack.config.js')
+  console.log("Preparing node binary...")
+  await require("./prepNodeBin")()
 
-  if (mode === 'rel') return console.log('Build complete.')
-
-  console.log('Preparing node binary...')
-  await require('./prepNodeBin')()
-
-  console.log('Packing executable...')
+  console.log("Packing executable...")
   await execCommand('pkg . --compress Brotli -o "dist/HuTao-GS.exe" --build', true)
 
-  console.log('Build complete.')
+  console.log("Build complete.")
 })()

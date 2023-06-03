@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { EvtAnimatorStateChangedInfo } from '@/types/proto'
-import { ForwardTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { EvtAnimatorStateChangedInfo } from "@/types/proto"
+import { ForwardTypeEnum } from "@/types/proto/enum"
 
 export interface EvtAnimatorStateChangedNotify {
   forwardType: ForwardTypeEnum
@@ -9,7 +9,7 @@ export interface EvtAnimatorStateChangedNotify {
 
 class EvtAnimatorStateChangedPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtAnimatorStateChanged')
+    super("EvtAnimatorStateChanged")
   }
 
   async recvNotify(context: PacketContext, data: EvtAnimatorStateChangedNotify): Promise<void> {
@@ -30,4 +30,4 @@ class EvtAnimatorStateChangedPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtAnimatorStateChangedPacket
-export default (() => packet = packet || new EvtAnimatorStateChangedPacket())()
+export default (() => (packet = packet || new EvtAnimatorStateChangedPacket()))()

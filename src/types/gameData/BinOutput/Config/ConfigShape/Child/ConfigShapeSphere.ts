@@ -1,6 +1,6 @@
-import ConfigBaseShape from '.'
+import ConfigBaseShape from "."
 
 export default interface ConfigShapeSphere extends ConfigBaseShape {
-  $type: 'ConfigShapeSphere'
+  $type: "ConfigShapeSphere"
   Radius: number
 }

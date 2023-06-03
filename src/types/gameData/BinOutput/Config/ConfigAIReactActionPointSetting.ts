@@ -1,8 +1,8 @@
-import ConfigAIReactActionPointData from './ConfigAIReactActionPointData'
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
+import ConfigAIReactActionPointData from "./ConfigAIReactActionPointData"
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
 
 export default interface ConfigAIReactActionPointSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAIReactActionPointSetting'
+  $type: "ConfigAIReactActionPointSetting"
   DefaultSetting: ConfigAIReactActionPointData
   Specification: { [id: number]: ConfigAIReactActionPointData }
 }

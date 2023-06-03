@@ -1,4 +1,4 @@
-import ConfigAISnakelikeMove from './ConfigAISnakelikeMove'
+import ConfigAISnakelikeMove from "./ConfigAISnakelikeMove"
 
 export default interface ConfigAIMove {
   Enable: boolean

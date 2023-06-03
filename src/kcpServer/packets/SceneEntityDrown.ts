@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayerDieTypeEnum, RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayerDieTypeEnum, RetcodeEnum } from "@/types/proto/enum"
 
 export interface SceneEntityDrownReq {
   entityId: number
@@ -13,9 +13,9 @@ export interface SceneEntityDrownRsp {
 
 class SceneEntityDrownPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneEntityDrown', {
+    super("SceneEntityDrown", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -34,7 +34,7 @@ class SceneEntityDrownPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      entityId
+      entityId,
     })
   }
 
@@ -44,4 +44,4 @@ class SceneEntityDrownPacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneEntityDrownPacket
-export default (() => packet = packet || new SceneEntityDrownPacket())()
+export default (() => (packet = packet || new SceneEntityDrownPacket()))()

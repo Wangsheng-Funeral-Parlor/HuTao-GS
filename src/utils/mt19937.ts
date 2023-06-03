@@ -1,8 +1,8 @@
 const NN = 312
 const MM = 156
-const MATRIX_A = 0xB5026F5AA96619E9n
-const UM = 0xFFFFFFFF80000000n // Most significant 33 bits
-const LM = 0x7FFFFFFFn // Least significant 31 bits
+const MATRIX_A = 0xb5026f5aa96619e9n
+const UM = 0xffffffff80000000n // Most significant 33 bits
+const LM = 0x7fffffffn // Least significant 31 bits
 
 export default class MT19937 {
   mt: bigint[]
@@ -33,12 +33,12 @@ export default class MT19937 {
     if (mti < NN) return
 
     // if seed() has not been called, a default initial seed is used
-    if (mti == (NN + 1)) this.seed(5489n)
+    if (mti == NN + 1) this.seed(5489n)
 
-    for (let k = 0; k < (NN - 1); k++) {
+    for (let k = 0; k < NN - 1; k++) {
       x = (mt[k] & UM) | (mt[k + 1] & LM)
 
-      if (k < (NN - MM)) {
+      if (k < NN - MM) {
         mt[k] = mt[k + MM] ^ (x >> 1n) ^ ((x & 1n) == 0n ? 0n : MATRIX_A)
       } else {
         mt[k] = mt[k + (MM - NN)] ^ (x >> 1n) ^ ((x & 1n) == 0n ? 0n : MATRIX_A)
@@ -58,9 +58,9 @@ export default class MT19937 {
     let x = this.mt[this.mti++]
 
     x ^= (x >> 29n) & 0x5555555555555555n
-    x ^= (x << 17n) & 0x71D67FFFEDA60000n
-    x ^= (x << 37n) & 0xFFF7EEE000000000n
-    x ^= (x >> 43n)
+    x ^= (x << 17n) & 0x71d67fffeda60000n
+    x ^= (x << 37n) & 0xfff7eee000000000n
+    x ^= x >> 43n
 
     return x
   }

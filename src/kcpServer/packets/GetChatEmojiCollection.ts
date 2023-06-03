@@ -1,9 +1,9 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ChatEmojiCollectionData } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { ChatEmojiCollectionData } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetChatEmojiCollectionReq { }
+export interface GetChatEmojiCollectionReq {}
 
 export interface GetChatEmojiCollectionRsp {
   retcode: RetcodeEnum
@@ -12,9 +12,9 @@ export interface GetChatEmojiCollectionRsp {
 
 class GetChatEmojiCollectionPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetChatEmojiCollection', {
+    super("GetChatEmojiCollection", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -22,8 +22,8 @@ class GetChatEmojiCollectionPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       chatEmojiCollectionData: {
-        emojiIdList: context.player.emojiCollection
-      }
+        emojiIdList: context.player.emojiCollection,
+      },
     })
   }
 
@@ -33,4 +33,4 @@ class GetChatEmojiCollectionPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetChatEmojiCollectionPacket
-export default (() => packet = packet || new GetChatEmojiCollectionPacket())()
+export default (() => (packet = packet || new GetChatEmojiCollectionPacket()))()

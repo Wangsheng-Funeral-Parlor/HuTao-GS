@@ -1,21 +1,30 @@
-const ResEdit = require('resedit')
+const ResEdit = require("resedit")
 const { join } = require("path")
-const { access, createWriteStream, constants, existsSync, mkdirSync, readFileSync, unlink, writeFileSync } = require('fs')
-const { get } = require('https')
+const {
+  access,
+  createWriteStream,
+  constants,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  unlink,
+  writeFileSync,
+} = require("fs")
+const { get } = require("https")
 
 function download(url, dest) {
   return new Promise((resolve, reject) => {
     access(dest, constants.F_OK, (accessErr) => {
-      if (accessErr === null) return reject('File already exists')
+      if (accessErr === null) return reject("File already exists")
 
-      const request = get(url, response => {
+      const request = get(url, (response) => {
         if (response.statusCode === 200) {
-          const file = createWriteStream(dest, { flags: 'wx' })
+          const file = createWriteStream(dest, { flags: "wx" })
 
-          file.on('finish', () => resolve())
-          file.on('error', err => {
+          file.on("finish", () => resolve())
+          file.on("error", (err) => {
             file.close()
-            if (err.code === 'EEXIST') reject('File already exists')
+            if (err.code === "EEXIST") reject("File already exists")
             else unlink(dest, () => reject(err.message)) // Delete temp file
           })
 
@@ -27,25 +36,25 @@ function download(url, dest) {
         }
       })
 
-      request.on('error', err => reject(err.message))
+      request.on("error", (err) => reject(err.message))
     })
   })
 }
 
-const packageConfig = require('./package.json')
-const supportedNodeVersions = Object.keys(require('pkg-fetch/patches/patches.json')).map(v => v.slice(1))
-const pkgFetchVersion = `v${require('pkg-fetch/package').version.split('.').slice(0, 2).join('.')}`
-const cachePath = join(process.env['PKG_CACHE_PATH'], pkgFetchVersion)
+const packageConfig = require("./package.json")
+const supportedNodeVersions = Object.keys(require("pkg-fetch/patches/patches.json")).map((v) => v.slice(1))
+const pkgFetchVersion = `v${require("pkg-fetch/package").version.split(".").slice(0, 2).join(".")}`
+const cachePath = join(process.env["PKG_CACHE_PATH"], pkgFetchVersion)
 
 function getTargetInfo(target) {
   const targetVersion = target.match(/node(.*?)-/)[1]
-  const nodeVersion = supportedNodeVersions.find(v => v.split('.')[0] === targetVersion)
+  const nodeVersion = supportedNodeVersions.find((v) => v.split(".")[0] === targetVersion)
 
   return {
     nodeVersion,
     fetchedPath: join(cachePath, `fetched-v${nodeVersion}-win-x64`),
     builtPath: join(cachePath, `built-v${nodeVersion}-win-x64`),
-    url: `https://github.com/vercel/pkg-fetch/releases/download/${pkgFetchVersion}/node-v${nodeVersion}-win-x64`
+    url: `https://github.com/vercel/pkg-fetch/releases/download/${pkgFetchVersion}/node-v${nodeVersion}-win-x64`,
   }
 }
 
@@ -58,14 +67,14 @@ function checkExistingBuild(builtPath, versionSegments) {
   const builtRes = ResEdit.NtExecutableResource.from(builtExe)
 
   const builtViList = ResEdit.Resource.VersionInfo.fromEntries(builtRes.entries)
-  const builtVersion = builtViList[0].getStringValues({ lang: 1033, codepage: 1200 })?.['FileVersion']
+  const builtVersion = builtViList[0].getStringValues({ lang: 1033, codepage: 1200 })?.["FileVersion"]
 
   if (buildVersion === builtVersion) {
-    console.log('Using existing build')
+    console.log("Using existing build")
     return true
   }
 
-  console.log('Version changed, rebuilding...')
+  console.log("Version changed, rebuilding...")
   return false
 }
 
@@ -75,18 +84,22 @@ module.exports = async () => {
   for (let target of targets) {
     const { nodeVersion, fetchedPath, builtPath, url } = target
 
-    const versionSegments = `${packageConfig.version.replace('-', '.')}`.split('.').map(v => parseInt(v))
+    const versionSegments = `${packageConfig.version.replace("-", ".")}`.split(".").map((v) => parseInt(v))
     while (versionSegments.length < 4) versionSegments.push(0)
 
-    console.log('Target:', nodeVersion)
+    console.log("Target:", nodeVersion)
 
     if (checkExistingBuild(builtPath, versionSegments)) continue
 
     if (!existsSync(fetchedPath)) {
-      console.log('Downloading file...')
+      console.log("Downloading file...")
 
       // attemp to create directory
-      try { mkdirSync(cachePath, { recursive: true }) } catch (e) { console.error(e) }
+      try {
+        mkdirSync(cachePath, { recursive: true })
+      } catch (e) {
+        console.error(e)
+      }
 
       // attemp to download file
       try {
@@ -95,12 +108,12 @@ module.exports = async () => {
         console.error(e)
         process.exit(1)
       }
-      console.log('Downloaded file.')
+      console.log("Downloaded file.")
     } else {
-      console.log('Using existing file')
+      console.log("Using existing file")
     }
 
-    console.log('Reading EXE')
+    console.log("Reading EXE")
 
     const exe = ResEdit.NtExecutable.from(readFileSync(fetchedPath))
     const res = ResEdit.NtExecutableResource.from(exe)
@@ -110,31 +123,31 @@ module.exports = async () => {
 
     console.log(vi.data.strings)
 
-    console.log('Removing OriginalFilename')
-    vi.removeStringValue({ lang: 1033, codepage: 1200 }, 'OriginalFilename')
-    console.log('Removing InternalName')
-    vi.removeStringValue({ lang: 1033, codepage: 1200 }, 'InternalName')
+    console.log("Removing OriginalFilename")
+    vi.removeStringValue({ lang: 1033, codepage: 1200 }, "OriginalFilename")
+    console.log("Removing InternalName")
+    vi.removeStringValue({ lang: 1033, codepage: 1200 }, "InternalName")
 
-    console.log('Setting Product Version')
+    console.log("Setting Product Version")
     vi.setProductVersion(versionSegments[0], versionSegments[1], versionSegments[2], versionSegments[3], 1033)
-    console.log('Setting File Version')
+    console.log("Setting File Version")
     vi.setFileVersion(versionSegments[0], versionSegments[1], versionSegments[2], versionSegments[3], 1033)
 
-    console.log('Setting File Info')
+    console.log("Setting File Info")
     vi.setStringValues(
       { lang: 1033, codepage: 1200 },
       {
         FileDescription: packageConfig.description,
         ProductName: packageConfig.name,
-        CompanyName: '',
-        LegalCopyright: packageConfig.author
+        CompanyName: "",
+        LegalCopyright: packageConfig.author,
       }
     )
     console.log(vi.data.strings)
     vi.outputToResourceEntries(res.entries)
 
-    console.log('Replacing Icon')
-    const iconFile = ResEdit.Data.IconFile.from(readFileSync(join(__dirname, 'appIcon.ico')))
+    console.log("Replacing Icon")
+    const iconFile = ResEdit.Data.IconFile.from(readFileSync(join(__dirname, "appIcon.ico")))
     ResEdit.Resource.IconGroupEntry.replaceIconsForResource(
       res.entries,
       1,
@@ -143,10 +156,10 @@ module.exports = async () => {
     )
     res.outputResource(exe)
 
-    console.log('Generating EXE')
+    console.log("Generating EXE")
     const newBinary = exe.generate()
 
-    console.log('Saving EXE')
+    console.log("Saving EXE")
     writeFileSync(builtPath, Buffer.from(newBinary))
   }
 }

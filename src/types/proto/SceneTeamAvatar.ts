@@ -1,4 +1,4 @@
-import { AbilityControlBlock, AbilitySyncStateInfo, AvatarInfo, SceneAvatarInfo, SceneEntityInfo, ServerBuff } from '.'
+import { AbilityControlBlock, AbilitySyncStateInfo, AvatarInfo, SceneAvatarInfo, SceneEntityInfo, ServerBuff } from "."
 
 export interface SceneTeamAvatar {
   playerUid: number

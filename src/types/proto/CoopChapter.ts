@@ -1,5 +1,6 @@
-import { CoopCg, CoopPoint, CoopReward } from '.'
-import { CoopChapterStateEnum } from './enum'
+import { CoopChapterStateEnum } from "./enum"
+
+import { CoopCg, CoopPoint, CoopReward } from "."
 
 export interface CoopChapter {
   id?: number

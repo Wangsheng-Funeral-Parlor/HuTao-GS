@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Vector from '$/utils/vector'
-import { VectorInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Vector from "$/utils/vector"
+import { VectorInfo } from "@/types/proto"
 
 export interface HitTreeNotify {
   treeType: number
@@ -10,7 +10,7 @@ export interface HitTreeNotify {
 
 class HitTreePacket extends Packet implements PacketInterface {
   constructor() {
-    super('HitTree')
+    super("HitTree")
   }
 
   async recvNotify(context: PacketContext, data: HitTreeNotify): Promise<void> {
@@ -31,4 +31,4 @@ class HitTreePacket extends Packet implements PacketInterface {
 }
 
 let packet: HitTreePacket
-export default (() => packet = packet || new HitTreePacket())()
+export default (() => (packet = packet || new HitTreePacket()))()

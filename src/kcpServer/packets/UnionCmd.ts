@@ -1,11 +1,11 @@
-import { getNameByCmdId } from '#/cmdIds'
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import GlobalState from '@/globalState'
-import Logger from '@/logger'
-import { ClientStateEnum } from '@/types/enum'
-import { waitTick } from '@/utils/asyncWait'
+import { getNameByCmdId } from "#/cmdIds"
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import GlobalState from "@/globalState"
+import Logger from "@/logger"
+import { ClientStateEnum } from "@/types/enum"
+import { waitTick } from "@/utils/asyncWait"
 
-const logger = new Logger('UNICMD', 0x80a0ff)
+const logger = new Logger("UNICMD", 0x80a0ff)
 
 export interface UnionCmdNotify {
   cmdList: [
@@ -18,9 +18,9 @@ export interface UnionCmdNotify {
 
 class UnionCmdPacket extends Packet implements PacketInterface {
   constructor() {
-    super('UnionCmd', {
+    super("UnionCmd", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -37,9 +37,9 @@ class UnionCmdPacket extends Packet implements PacketInterface {
       const { messageId, body } = cmd
       const packetName = getNameByCmdId(messageId).toString()
 
-      logger.verbose(GlobalState.get('ShowPacketId') ? messageId : '-', packetName)
+      logger.verbose(GlobalState.get("ShowPacketId") ? messageId : "-", packetName)
 
-      await server.packetHandler.handle(messageId, packetName, Buffer.from(body, 'base64'), context)
+      await server.packetHandler.handle(messageId, packetName, Buffer.from(body, "base64"), context)
     }
 
     await forwardBuffer.sendAll()
@@ -48,4 +48,4 @@ class UnionCmdPacket extends Packet implements PacketInterface {
 }
 
 let packet: UnionCmdPacket
-export default (() => packet = packet || new UnionCmdPacket())()
+export default (() => (packet = packet || new UnionCmdPacket()))()

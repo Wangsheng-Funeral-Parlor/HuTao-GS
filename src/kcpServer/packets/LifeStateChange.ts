@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Entity from '$/entity'
-import { ClientStateEnum } from '@/types/enum'
-import { ServerBuff } from '@/types/proto'
-import { LifeStateEnum, PlayerDieTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Entity from "$/entity"
+import { ClientStateEnum } from "@/types/enum"
+import { ServerBuff } from "@/types/proto"
+import { LifeStateEnum, PlayerDieTypeEnum } from "@/types/proto/enum"
 
 export interface LifeStateChangeNotify {
   entityId: number
@@ -16,21 +16,21 @@ export interface LifeStateChangeNotify {
 
 class LifeStateChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('LifeStateChange')
+    super("LifeStateChange")
   }
 
-  async sendNotify(context: PacketContext, targetEntity: Entity): Promise<void> {
-    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE, true, 0xF0FF)) return
+  async sendNotify(context: PacketContext, targetEntity: Entity, lifestate?: LifeStateEnum): Promise<void> {
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE, true, 0xf0ff)) return
 
     const { entityId, lifeState, dieType, attackerId, motion } = targetEntity
 
     const notifyData: LifeStateChangeNotify = {
       entityId,
-      lifeState,
+      lifeState: lifestate ? lifestate : lifeState,
       sourceEntityId: attackerId,
       dieType,
       moveReliableSeq: motion.reliableSeq,
-      serverBuffList: []
+      serverBuffList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -42,4 +42,4 @@ class LifeStateChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: LifeStateChangePacket
-export default (() => packet = packet || new LifeStateChangePacket())()
+export default (() => (packet = packet || new LifeStateChangePacket()))()

@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface PlayerGameTimeNotify {
   gameTime: number
@@ -9,7 +9,7 @@ export interface PlayerGameTimeNotify {
 
 class PlayerGameTimePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerGameTime')
+    super("PlayerGameTime")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -20,7 +20,7 @@ class PlayerGameTimePacket extends Packet implements PacketInterface {
 
     const notifyData: PlayerGameTimeNotify = {
       gameTime,
-      uid
+      uid,
     }
 
     await super.sendNotify(context, notifyData)
@@ -32,4 +32,4 @@ class PlayerGameTimePacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerGameTimePacket
-export default (() => packet = packet || new PlayerGameTimePacket())()
+export default (() => (packet = packet || new PlayerGameTimePacket()))()

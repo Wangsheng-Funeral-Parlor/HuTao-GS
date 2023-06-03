@@ -1,5 +1,6 @@
-import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigCameraShakeExt from './ConfigCameraShakeExt'
+import ConfigCameraShakeExt from "./ConfigCameraShakeExt"
+
+import { DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigCameraShake {
   ShakeType: string

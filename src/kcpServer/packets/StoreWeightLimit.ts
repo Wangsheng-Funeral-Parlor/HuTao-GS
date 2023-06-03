@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { STORE_LIMIT } from '$/player/inventory'
-import { StoreTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { STORE_LIMIT } from "$/player/inventory"
+import { StoreTypeEnum } from "@/types/proto/enum"
 
 export interface StoreWeightLimitNotify {
   storeType: StoreTypeEnum
@@ -13,7 +13,7 @@ export interface StoreWeightLimitNotify {
 
 class StoreWeightLimitPacket extends Packet implements PacketInterface {
   constructor() {
-    super('StoreWeightLimit')
+    super("StoreWeightLimit")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -25,7 +25,7 @@ class StoreWeightLimitPacket extends Packet implements PacketInterface {
       materialCountLimit: MATERIAL,
       weaponCountLimit: WEAPON,
       reliquaryCountLimit: RELIQUARY,
-      furnitureCountLimit: FURNITURE
+      furnitureCountLimit: FURNITURE,
     }
 
     await super.sendNotify(context, notifyData)
@@ -33,4 +33,4 @@ class StoreWeightLimitPacket extends Packet implements PacketInterface {
 }
 
 let packet: StoreWeightLimitPacket
-export default (() => packet = packet || new StoreWeightLimitPacket())()
+export default (() => (packet = packet || new StoreWeightLimitPacket()))()

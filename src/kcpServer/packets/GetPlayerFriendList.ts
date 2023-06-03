@@ -1,9 +1,9 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { FriendBrief } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { FriendBrief } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetPlayerFriendListReq { }
+export interface GetPlayerFriendListReq {}
 
 export interface GetPlayerFriendListRsp {
   retcode: RetcodeEnum
@@ -13,18 +13,16 @@ export interface GetPlayerFriendListRsp {
 
 class GetPlayerFriendListPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetPlayerFriendList', {
+    super("GetPlayerFriendList", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
   async request(context: PacketContext, _data: GetPlayerFriendListReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      friendList: [
-        context.game.playerMap['1'].exportFriendBrief()
-      ]
+      friendList: [context.game.playerMap["1"].exportFriendBrief()],
     })
   }
 
@@ -34,4 +32,4 @@ class GetPlayerFriendListPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetPlayerFriendListPacket
-export default (() => packet = packet || new GetPlayerFriendListPacket())()
+export default (() => (packet = packet || new GetPlayerFriendListPacket()))()

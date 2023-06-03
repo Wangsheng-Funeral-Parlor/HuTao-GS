@@ -1,1 +1,1 @@
-export default interface ConfigBaseBulletMoveAngle { }
+export default interface ConfigBaseBulletMoveAngle {}

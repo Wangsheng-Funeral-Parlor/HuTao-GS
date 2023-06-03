@@ -1,7 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { WidgetCreateLocationInfo, WidgetCreatorInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { WidgetCreateLocationInfo, WidgetCreatorInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface WidgetDoBagReq {
   locationInfo?: WidgetCreateLocationInfo
@@ -16,19 +17,41 @@ export interface WidgetDoBagRsp {
 
 class WidgetDoBagPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WidgetDoBag', {
+    super("WidgetDoBag", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
   async request(context: PacketContext, data: WidgetDoBagReq): Promise<void> {
-    const { materialId } = data
+    const { materialId, widgetCreatorInfo } = data
 
-    console.log(data)
+    switch (materialId) {
+      case 220026: {
+        context.player.currentScene.vehicleManager.createVehicle(
+          context.player,
+          70500025,
+          0,
+          new Vector().setData(widgetCreatorInfo.locationInfo.pos),
+          new Vector().setData(widgetCreatorInfo.locationInfo.rot)
+        )
+      }
+      case 220047: {
+        context.player.currentScene.vehicleManager.createVehicle(
+          context.player,
+          70800058,
+          0,
+          new Vector().setData(widgetCreatorInfo.locationInfo.pos),
+          new Vector().setData(widgetCreatorInfo.locationInfo.rot)
+        )
+      }
+      default: {
+      }
+    }
+
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      materialId
+      materialId,
     })
   }
 
@@ -38,4 +61,4 @@ class WidgetDoBagPacket extends Packet implements PacketInterface {
 }
 
 let packet: WidgetDoBagPacket
-export default (() => packet = packet || new WidgetDoBagPacket())()
+export default (() => (packet = packet || new WidgetDoBagPacket()))()

@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface EnterScenePeerNotify {
   destSceneId: number
@@ -10,7 +10,7 @@ export interface EnterScenePeerNotify {
 
 class EnterScenePeerPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EnterScenePeer')
+    super("EnterScenePeer")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -23,7 +23,7 @@ class EnterScenePeerPacket extends Packet implements PacketInterface {
       destSceneId: currentScene.id,
       peerId,
       hostPeerId: currentWorld.host.peerId,
-      enterSceneToken: currentScene.enterSceneToken
+      enterSceneToken: currentScene.enterSceneToken,
     }
 
     await super.sendNotify(context, notifyData)
@@ -31,4 +31,4 @@ class EnterScenePeerPacket extends Packet implements PacketInterface {
 }
 
 let packet: EnterScenePeerPacket
-export default (() => packet = packet || new EnterScenePeerPacket())()
+export default (() => (packet = packet || new EnterScenePeerPacket()))()

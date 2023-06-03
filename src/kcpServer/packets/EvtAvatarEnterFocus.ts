@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
-import { ForwardTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { ForwardTypeEnum } from "@/types/proto/enum"
 
 export interface EvtAvatarEnterFocusNotify {
   forwardType: ForwardTypeEnum
@@ -20,9 +20,9 @@ export interface EvtAvatarEnterFocusNotify {
 
 class EvtAvatarEnterFocusPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtAvatarEnterFocus', {
+    super("EvtAvatarEnterFocus", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -44,4 +44,4 @@ class EvtAvatarEnterFocusPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtAvatarEnterFocusPacket
-export default (() => packet = packet || new EvtAvatarEnterFocusPacket())()
+export default (() => (packet = packet || new EvtAvatarEnterFocusPacket()))()

@@ -1,4 +1,4 @@
-import { VectorInfo } from '.'
+import { VectorInfo } from "."
 
 export interface PlayerLocationInfo {
   uid: number

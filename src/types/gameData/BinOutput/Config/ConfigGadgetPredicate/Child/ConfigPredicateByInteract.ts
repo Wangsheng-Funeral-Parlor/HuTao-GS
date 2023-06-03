@@ -1,6 +1,6 @@
-import ConfigBaseGadgetPredicate from '.'
+import ConfigBaseGadgetPredicate from "."
 
 export default interface ConfigPredicateByInteract extends ConfigBaseGadgetPredicate {
-  $type: 'ConfigPredicateByInteract'
+  $type: "ConfigPredicateByInteract"
   IsEnableInteract: boolean
 }

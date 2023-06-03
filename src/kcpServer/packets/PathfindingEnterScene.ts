@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ObstacleInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ObstacleInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PathfindingEnterSceneReq {
   sceneId?: number
@@ -16,7 +16,7 @@ export interface PathfindingEnterSceneRsp {
 
 class PathfindingEnterScenePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PathfindingEnterScene')
+    super("PathfindingEnterScene")
   }
 
   async request(context: PacketContext, _data: PathfindingEnterSceneReq): Promise<void> {
@@ -29,4 +29,4 @@ class PathfindingEnterScenePacket extends Packet implements PacketInterface {
 }
 
 let packet: PathfindingEnterScenePacket
-export default (() => packet = packet || new PathfindingEnterScenePacket())()
+export default (() => (packet = packet || new PathfindingEnterScenePacket()))()

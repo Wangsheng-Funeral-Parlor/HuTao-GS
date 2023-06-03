@@ -1,6 +1,7 @@
-import TTYModule from '.'
-import { TTY } from '..'
-import { escSeqSplitString, noColor } from '../utils'
+import { TTY } from ".."
+import { escSeqSplitString, noColor } from "../utils"
+
+import TTYModule from "."
 
 const MAX_LINES = 10000
 
@@ -23,13 +24,13 @@ export default class TTYLog extends TTYModule {
     const chars: string[] = escSeqSplitString(str)
     const lines: string[] = []
 
-    let line = ''
+    let line = ""
     for (const char of chars) {
       line += char
       if (noColor(line).length < width) continue
 
       lines.push(line)
-      line = ''
+      line = ""
     }
 
     if (line.length > 0) lines.push(line)
@@ -48,7 +49,7 @@ export default class TTYLog extends TTYModule {
     const { lines, scrollIndex, width, height } = this
     const visibleLines: string[] = []
 
-    const startIndex = scrollIndex == null ? (lines.length - 1) : scrollIndex
+    const startIndex = scrollIndex == null ? lines.length - 1 : scrollIndex
 
     let totalHeight = 0
     for (let i = startIndex; i >= 0; i--) {
@@ -92,9 +93,9 @@ export default class TTYLog extends TTYModule {
     if (str == null || str.length <= 0) return
 
     const { lines, scrollIndex, height } = this
-    const newLines = str.split('\n')
+    const newLines = str.split("\n")
 
-    this.updated = scrollIndex == null || Math.abs((lines.length - 1) - scrollIndex) <= height
+    this.updated = scrollIndex == null || Math.abs(lines.length - 1 - scrollIndex) <= height
 
     lines.push(...newLines)
     while (lines.length > MAX_LINES) {

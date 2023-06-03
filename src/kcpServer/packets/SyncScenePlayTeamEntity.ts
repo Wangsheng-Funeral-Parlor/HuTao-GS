@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayTeamEntityInfo } from '@/types/proto'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayTeamEntityInfo } from "@/types/proto"
 
 export interface SyncScenePlayTeamEntityNotify {
   sceneId: number
@@ -9,7 +9,7 @@ export interface SyncScenePlayTeamEntityNotify {
 
 class SyncScenePlayTeamEntityPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SyncScenePlayTeamEntity')
+    super("SyncScenePlayTeamEntity")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -19,7 +19,7 @@ class SyncScenePlayTeamEntityPacket extends Packet implements PacketInterface {
 
     const notifyData: SyncScenePlayTeamEntityNotify = {
       sceneId: currentScene.id,
-      entityInfoList: []
+      entityInfoList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -31,4 +31,4 @@ class SyncScenePlayTeamEntityPacket extends Packet implements PacketInterface {
 }
 
 let packet: SyncScenePlayTeamEntityPacket
-export default (() => packet = packet || new SyncScenePlayTeamEntityPacket())()
+export default (() => (packet = packet || new SyncScenePlayTeamEntityPacket()))()

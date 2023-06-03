@@ -1,4 +1,4 @@
-import { ServantInfo, VectorInfo } from '.'
+import { ServantInfo, VectorInfo } from "."
 
 export interface SceneEntityAiInfo {
   isAiOpen?: boolean

@@ -1,4 +1,4 @@
-import { EquipInfo, FurnitureInfo, MaterialInfo } from '.'
+import { EquipInfo, FurnitureInfo, MaterialInfo } from "."
 
 export interface ItemInfo {
   material?: MaterialInfo

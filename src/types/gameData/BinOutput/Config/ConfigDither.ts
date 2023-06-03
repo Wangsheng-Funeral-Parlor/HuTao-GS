@@ -1,6 +1,6 @@
-import ConfigDitherByBetweenCameraAndAvatar from './ConfigDitherByBetweenCameraAndAvatar'
-import ConfigDitherByNormalBetweenCamera from './ConfigDitherByNormalBetweenCamera'
-import ConfigDitherByStartDitherAction from './ConfigDitherByStartDitherAction'
+import ConfigDitherByBetweenCameraAndAvatar from "./ConfigDitherByBetweenCameraAndAvatar"
+import ConfigDitherByNormalBetweenCamera from "./ConfigDitherByNormalBetweenCamera"
+import ConfigDitherByStartDitherAction from "./ConfigDitherByStartDitherAction"
 
 export default interface ConfigDither {
   ShowDitherDuration: number

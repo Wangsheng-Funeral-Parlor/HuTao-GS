@@ -1,8 +1,8 @@
-import ConfigAIFollowServerRouteData from './ConfigAIFollowServerRouteData'
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
+import ConfigAIFollowServerRouteData from "./ConfigAIFollowServerRouteData"
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
 
 export default interface ConfigAIFollowServerRouteSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAIFollowServerRouteSetting'
+  $type: "ConfigAIFollowServerRouteSetting"
   DefaultSetting: ConfigAIFollowServerRouteData
   Specification: { [id: number]: ConfigAIFollowServerRouteData }
 }

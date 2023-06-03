@@ -1,4 +1,4 @@
-import { EntityAuthorityInfo } from '.'
+import { EntityAuthorityInfo } from "."
 
 export interface AuthorityChange {
   entityId: number

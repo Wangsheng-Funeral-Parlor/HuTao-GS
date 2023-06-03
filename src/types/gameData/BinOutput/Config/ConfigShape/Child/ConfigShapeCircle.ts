@@ -1,6 +1,6 @@
-import ConfigBaseShape from '.'
+import ConfigBaseShape from "."
 
 export default interface ConfigShapeCircle extends ConfigBaseShape {
-  $type: 'ConfigShapeCircle'
+  $type: "ConfigShapeCircle"
   Radius: number
 }

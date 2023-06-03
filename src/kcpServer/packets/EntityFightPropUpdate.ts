@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface EntityFightPropUpdateNotify {
   entityId: number
@@ -8,7 +8,7 @@ export interface EntityFightPropUpdateNotify {
 
 class EntityFightPropUpdatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('EntityFightPropUpdate')
+    super("EntityFightPropUpdate")
   }
 
   async sendNotify(context: PacketContext, data: EntityFightPropUpdateNotify): Promise<void> {
@@ -23,4 +23,4 @@ class EntityFightPropUpdatePacket extends Packet implements PacketInterface {
 }
 
 let packet: EntityFightPropUpdatePacket
-export default (() => packet = packet || new EntityFightPropUpdatePacket())()
+export default (() => (packet = packet || new EntityFightPropUpdatePacket()))()

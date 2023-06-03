@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { SceneTeamAvatar } from '@/types/proto'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { SceneTeamAvatar } from "@/types/proto"
 
 export interface SceneTeamUpdateNotify {
   sceneTeamAvatarList: SceneTeamAvatar[]
@@ -9,7 +9,7 @@ export interface SceneTeamUpdateNotify {
 
 class SceneTeamUpdatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneTeamUpdate')
+    super("SceneTeamUpdate")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -17,7 +17,7 @@ class SceneTeamUpdatePacket extends Packet implements PacketInterface {
 
     const notifyData: SceneTeamUpdateNotify = {
       sceneTeamAvatarList: context.player.currentScene.exportSceneTeamAvatarList(),
-      isInMp: context.player.isInMp()
+      isInMp: context.player.isInMp(),
     }
 
     await super.sendNotify(context, notifyData)
@@ -29,4 +29,4 @@ class SceneTeamUpdatePacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneTeamUpdatePacket
-export default (() => packet = packet || new SceneTeamUpdatePacket())()
+export default (() => (packet = packet || new SceneTeamUpdatePacket()))()

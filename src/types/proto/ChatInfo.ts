@@ -1,4 +1,4 @@
-import { SystemHint } from '.'
+import { SystemHint } from "."
 
 export interface ChatInfo {
   text?: string

@@ -1,7 +1,7 @@
-import ConfigBaseMove from '.'
+import ConfigBaseMove from "."
 
 export default interface ConfigRigidbodyMove extends ConfigBaseMove {
-  $type: 'ConfigRigidbodyMove'
+  $type: "ConfigRigidbodyMove"
   ConstSpeedRatio: number
   StartCloseToGround: boolean
   EnableCloseToGroundWhenTick: boolean

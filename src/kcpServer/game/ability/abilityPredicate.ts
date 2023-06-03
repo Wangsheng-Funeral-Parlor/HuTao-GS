@@ -1,7 +1,10 @@
-import Entity from '$/entity'
-import Avatar from '$/entity/avatar'
-import AbilityManager from '$/manager/abilityManager'
-import ConfigAbilityPredicate from '$DT/BinOutput/Config/ConfigAbility/Predicate'
+import AbilityScalarValueContainer from "./abilityScalarValueContainer"
+import AppliedAbility from "./appliedAbility"
+
+import Entity from "$/entity"
+import Avatar from "$/entity/avatar"
+import AbilityManager from "$/manager/abilityManager"
+import ConfigAbilityPredicate from "$DT/BinOutput/Config/ConfigAbility/Predicate"
 import {
   ByAnimatorBool,
   ByAnimatorFloat,
@@ -94,13 +97,11 @@ import {
   ByTargetType,
   ByTargetWeight,
   ByUnlockTalentParam,
-  ByWetHitCollider
-} from '$DT/BinOutput/Config/ConfigAbility/Predicate/Child'
-import { EntityTypeEnum, RelationTypeEnum } from '@/types/enum'
-import { AbilityString } from '@/types/proto'
-import { getStringHash } from '@/utils/hash'
-import AbilityScalarValueContainer from './abilityScalarValueContainer'
-import AppliedAbility from './appliedAbility'
+  ByWetHitCollider,
+} from "$DT/BinOutput/Config/ConfigAbility/Predicate/Child"
+import { EntityTypeEnum, RelationTypeEnum } from "@/types/enum"
+import { AbilityString } from "@/types/proto"
+import { getStringHash } from "@/utils/hash"
 
 export default class AbilityPredicate {
   manager: AbilityManager
@@ -121,32 +122,42 @@ export default class AbilityPredicate {
     return utils.getTargetList(ability, predicate, target)[0]
   }
 
-  private compare(type: RelationTypeEnum, container: AbilityScalarValueContainer, key: AbilityString, val: number, maxVal: number = 0): boolean {
+  private compare(
+    type: RelationTypeEnum,
+    container: AbilityScalarValueContainer,
+    key: AbilityString,
+    val: number,
+    maxVal = 0
+  ): boolean {
     const entry = container.getValue(key)
     const entryVal = entry?.val || 0
 
-    switch (type || RelationTypeEnum.Equal) {
-      case RelationTypeEnum.Equal:
-        return entryVal === val
-      case RelationTypeEnum.MoreThan:
-        return entryVal > val
-      case RelationTypeEnum.LessAndEqual:
-        return entryVal <= val
-      case RelationTypeEnum.Between:
-        return entryVal >= val && entryVal <= maxVal
-      case RelationTypeEnum.MoreThanAndEqual:
-        return entryVal >= val
-      case RelationTypeEnum.NoneOrEqual:
-        return entry == null || entryVal === val
-      default:
-        return false
-    }
+    if (typeof entryVal == "number") {
+      switch (type || RelationTypeEnum.Equal) {
+        case RelationTypeEnum.Equal:
+          return entryVal === val
+        case RelationTypeEnum.MoreThan:
+          return entryVal > val
+        case RelationTypeEnum.LessAndEqual:
+          return entryVal <= val
+        case RelationTypeEnum.Between:
+          return entryVal >= val && entryVal <= maxVal
+        case RelationTypeEnum.MoreThanAndEqual:
+          return entryVal >= val
+        case RelationTypeEnum.NoneOrEqual:
+          return entry == null || entryVal === val
+        default:
+          return false
+      }
+    } else return false
   }
 
   check(ability: AppliedAbility, predicate: ConfigAbilityPredicate, target: Entity): boolean {
     const { $type } = predicate
-    const checkFunc = <(ability: AppliedAbility, predicate: ConfigAbilityPredicate, target: Entity) => boolean>this[`check${$type}`]
-    if (typeof checkFunc !== 'function') return true
+    const checkFunc = <(ability: AppliedAbility, predicate: ConfigAbilityPredicate, target: Entity) => boolean>(
+      this[`check${$type}`]
+    )
+    if (typeof checkFunc !== "function") return true
     return checkFunc.call(this, ability, predicate, target)
   }
 
@@ -190,7 +201,11 @@ export default class AbilityPredicate {
   }
 
   // ByAttackNotHitScene
-  private checkByAttackNotHitScene(_ability: AppliedAbility, _predicate: ByAttackNotHitScene, _target: Entity): boolean {
+  private checkByAttackNotHitScene(
+    _ability: AppliedAbility,
+    _predicate: ByAttackNotHitScene,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -210,12 +225,20 @@ export default class AbilityPredicate {
   }
 
   // ByAvatarElementType
-  private checkByAvatarElementType(_ability: AppliedAbility, _predicate: ByAvatarElementType, _target: Entity): boolean {
+  private checkByAvatarElementType(
+    _ability: AppliedAbility,
+    _predicate: ByAvatarElementType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByAvatarInWaterDepth
-  private checkByAvatarInWaterDepth(_ability: AppliedAbility, _predicate: ByAvatarInWaterDepth, _target: Entity): boolean {
+  private checkByAvatarInWaterDepth(
+    _ability: AppliedAbility,
+    _predicate: ByAvatarInWaterDepth,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -225,42 +248,74 @@ export default class AbilityPredicate {
   }
 
   // ByBigTeamBodyTypeSort
-  private checkByBigTeamBodyTypeSort(_ability: AppliedAbility, _predicate: ByBigTeamBodyTypeSort, _target: Entity): boolean {
+  private checkByBigTeamBodyTypeSort(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamBodyTypeSort,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByBigTeamElementTypeSort
-  private checkByBigTeamElementTypeSort(_ability: AppliedAbility, _predicate: ByBigTeamElementTypeSort, _target: Entity): boolean {
+  private checkByBigTeamElementTypeSort(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamElementTypeSort,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByBigTeamHasBodyType
-  private checkByBigTeamHasBodyType(_ability: AppliedAbility, _predicate: ByBigTeamHasBodyType, _target: Entity): boolean {
+  private checkByBigTeamHasBodyType(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamHasBodyType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByBigTeamHasElementType
-  private checkByBigTeamHasElementType(_ability: AppliedAbility, _predicate: ByBigTeamHasElementType, _target: Entity): boolean {
+  private checkByBigTeamHasElementType(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamHasElementType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByBigTeamHasFeatureTag
-  private checkByBigTeamHasFeatureTag(_ability: AppliedAbility, _predicate: ByBigTeamHasFeatureTag, _target: Entity): boolean {
+  private checkByBigTeamHasFeatureTag(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamHasFeatureTag,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByBigTeamHasWeaponType
-  private checkByBigTeamHasWeaponType(_ability: AppliedAbility, _predicate: ByBigTeamHasWeaponType, _target: Entity): boolean {
+  private checkByBigTeamHasWeaponType(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamHasWeaponType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByBigTeamWeaponTypeSort
-  private checkByBigTeamWeaponTypeSort(_ability: AppliedAbility, _predicate: ByBigTeamWeaponTypeSort, _target: Entity): boolean {
+  private checkByBigTeamWeaponTypeSort(
+    _ability: AppliedAbility,
+    _predicate: ByBigTeamWeaponTypeSort,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCompareWithTarget
-  private checkByCompareWithTarget(_ability: AppliedAbility, _predicate: ByCompareWithTarget, _target: Entity): boolean {
+  private checkByCompareWithTarget(
+    _ability: AppliedAbility,
+    _predicate: ByCompareWithTarget,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -275,42 +330,74 @@ export default class AbilityPredicate {
   }
 
   // ByCurrentSceneTypes
-  private checkByCurrentSceneTypes(_ability: AppliedAbility, _predicate: ByCurrentSceneTypes, _target: Entity): boolean {
+  private checkByCurrentSceneTypes(
+    _ability: AppliedAbility,
+    _predicate: ByCurrentSceneTypes,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamBodyTypeSort
-  private checkByCurTeamBodyTypeSort(_ability: AppliedAbility, _predicate: ByCurTeamBodyTypeSort, _target: Entity): boolean {
+  private checkByCurTeamBodyTypeSort(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamBodyTypeSort,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamElementTypeSort
-  private checkByCurTeamElementTypeSort(_ability: AppliedAbility, _predicate: ByCurTeamElementTypeSort, _target: Entity): boolean {
+  private checkByCurTeamElementTypeSort(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamElementTypeSort,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamHasBodyType
-  private checkByCurTeamHasBodyType(_ability: AppliedAbility, _predicate: ByCurTeamHasBodyType, _target: Entity): boolean {
+  private checkByCurTeamHasBodyType(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamHasBodyType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamHasElementType
-  private checkByCurTeamHasElementType(_ability: AppliedAbility, _predicate: ByCurTeamHasElementType, _target: Entity): boolean {
+  private checkByCurTeamHasElementType(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamHasElementType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamHasFeatureTag
-  private checkByCurTeamHasFeatureTag(_ability: AppliedAbility, _predicate: ByCurTeamHasFeatureTag, _target: Entity): boolean {
+  private checkByCurTeamHasFeatureTag(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamHasFeatureTag,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamHasWeaponType
-  private checkByCurTeamHasWeaponType(_ability: AppliedAbility, _predicate: ByCurTeamHasWeaponType, _target: Entity): boolean {
+  private checkByCurTeamHasWeaponType(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamHasWeaponType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByCurTeamWeaponTypeSort
-  private checkByCurTeamWeaponTypeSort(_ability: AppliedAbility, _predicate: ByCurTeamWeaponTypeSort, _target: Entity): boolean {
+  private checkByCurTeamWeaponTypeSort(
+    _ability: AppliedAbility,
+    _predicate: ByCurTeamWeaponTypeSort,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -320,17 +407,29 @@ export default class AbilityPredicate {
   }
 
   // ByElementReactionSourceType
-  private checkByElementReactionSourceType(_ability: AppliedAbility, _predicate: ByElementReactionSourceType, _target: Entity): boolean {
+  private checkByElementReactionSourceType(
+    _ability: AppliedAbility,
+    _predicate: ByElementReactionSourceType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByElementReactionType
-  private checkByElementReactionType(_ability: AppliedAbility, _predicate: ByElementReactionType, _target: Entity): boolean {
+  private checkByElementReactionType(
+    _ability: AppliedAbility,
+    _predicate: ByElementReactionType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByElementTriggerEntityType
-  private checkByElementTriggerEntityType(_ability: AppliedAbility, _predicate: ByElementTriggerEntityType, _target: Entity): boolean {
+  private checkByElementTriggerEntityType(
+    _ability: AppliedAbility,
+    _predicate: ByElementTriggerEntityType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -340,7 +439,11 @@ export default class AbilityPredicate {
   }
 
   // ByEntityAppearVisionType
-  private checkByEntityAppearVisionType(_ability: AppliedAbility, _predicate: ByEntityAppearVisionType, _target: Entity): boolean {
+  private checkByEntityAppearVisionType(
+    _ability: AppliedAbility,
+    _predicate: ByEntityAppearVisionType,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -371,7 +474,11 @@ export default class AbilityPredicate {
   }
 
   // ByGlobalPosToGround
-  private checkByGlobalPosToGround(_ability: AppliedAbility, _predicate: ByGlobalPosToGround, _target: Entity): boolean {
+  private checkByGlobalPosToGround(
+    _ability: AppliedAbility,
+    _predicate: ByGlobalPosToGround,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -441,7 +548,11 @@ export default class AbilityPredicate {
   }
 
   // ByHitElementDurability
-  private checkByHitElementDurability(_ability: AppliedAbility, _predicate: ByHitElementDurability, _target: Entity): boolean {
+  private checkByHitElementDurability(
+    _ability: AppliedAbility,
+    _predicate: ByHitElementDurability,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -466,7 +577,11 @@ export default class AbilityPredicate {
   }
 
   // ByIsGadgetExistAround
-  private checkByIsGadgetExistAround(_ability: AppliedAbility, _predicate: ByIsGadgetExistAround, _target: Entity): boolean {
+  private checkByIsGadgetExistAround(
+    _ability: AppliedAbility,
+    _predicate: ByIsGadgetExistAround,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -491,12 +606,20 @@ export default class AbilityPredicate {
   }
 
   // ByLocalAvatarStamina
-  private checkByLocalAvatarStamina(_ability: AppliedAbility, _predicate: ByLocalAvatarStamina, _target: Entity): boolean {
+  private checkByLocalAvatarStamina(
+    _ability: AppliedAbility,
+    _predicate: ByLocalAvatarStamina,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByLocalAvatarStaminaRatio
-  private checkByLocalAvatarStaminaRatio(_ability: AppliedAbility, _predicate: ByLocalAvatarStaminaRatio, _target: Entity): boolean {
+  private checkByLocalAvatarStaminaRatio(
+    _ability: AppliedAbility,
+    _predicate: ByLocalAvatarStaminaRatio,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -507,7 +630,7 @@ export default class AbilityPredicate {
 
   // ByNot
   private checkByNot(ability: AppliedAbility, predicate: ByNot, target: Entity): boolean {
-    return !this.checkByAny(ability, { $type: 'ByAny', Predicates: predicate.Predicates }, target)
+    return !this.checkByAny(ability, { $type: "ByAny", Predicates: predicate.Predicates }, target)
   }
 
   // ByScenePropState
@@ -521,7 +644,11 @@ export default class AbilityPredicate {
   }
 
   // BySelfForwardAndTargetPosition
-  private checkBySelfForwardAndTargetPosition(_ability: AppliedAbility, _predicate: BySelfForwardAndTargetPosition, _target: Entity): boolean {
+  private checkBySelfForwardAndTargetPosition(
+    _ability: AppliedAbility,
+    _predicate: BySelfForwardAndTargetPosition,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -563,12 +690,20 @@ export default class AbilityPredicate {
   }
 
   // ByTargetForwardAndSelfPosition
-  private checkByTargetForwardAndSelfPosition(_ability: AppliedAbility, _predicate: ByTargetForwardAndSelfPosition, _target: Entity): boolean {
+  private checkByTargetForwardAndSelfPosition(
+    _ability: AppliedAbility,
+    _predicate: ByTargetForwardAndSelfPosition,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByTargetGadgetState
-  private checkByTargetGadgetState(_ability: AppliedAbility, _predicate: ByTargetGadgetState, _target: Entity): boolean {
+  private checkByTargetGadgetState(
+    _ability: AppliedAbility,
+    _predicate: ByTargetGadgetState,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -607,7 +742,11 @@ export default class AbilityPredicate {
   }
 
   // ByTargetIsGhostToEnemy
-  private checkByTargetIsGhostToEnemy(_ability: AppliedAbility, _predicate: ByTargetIsGhostToEnemy, _target: Entity): boolean {
+  private checkByTargetIsGhostToEnemy(
+    _ability: AppliedAbility,
+    _predicate: ByTargetIsGhostToEnemy,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -624,17 +763,29 @@ export default class AbilityPredicate {
   }
 
   // ByTargetOverrideMapValue
-  private checkByTargetOverrideMapValue(_ability: AppliedAbility, _predicate: ByTargetOverrideMapValue, _target: Entity): boolean {
+  private checkByTargetOverrideMapValue(
+    _ability: AppliedAbility,
+    _predicate: ByTargetOverrideMapValue,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByTargetPositionToSelfPosition
-  private checkByTargetPositionToSelfPosition(_ability: AppliedAbility, _predicate: ByTargetPositionToSelfPosition, _target: Entity): boolean {
+  private checkByTargetPositionToSelfPosition(
+    _ability: AppliedAbility,
+    _predicate: ByTargetPositionToSelfPosition,
+    _target: Entity
+  ): boolean {
     return false
   }
 
   // ByTargetRaycastVisiable
-  private checkByTargetRaycastVisiable(_ability: AppliedAbility, _predicate: ByTargetRaycastVisiable, _target: Entity): boolean {
+  private checkByTargetRaycastVisiable(
+    _ability: AppliedAbility,
+    _predicate: ByTargetRaycastVisiable,
+    _target: Entity
+  ): boolean {
     return false
   }
 
@@ -656,7 +807,7 @@ export default class AbilityPredicate {
     const targetEntity = <Avatar>this.getTargetEntity(ability, predicate, target)
     if (targetEntity?.entityType !== EntityTypeEnum.Avatar) return false
 
-    return targetEntity.talentManager.unlockedTalents.find(t => t.name === TalentParam) != null
+    return targetEntity.talentManager.unlockedTalents.find((t) => t.name === TalentParam) != null
   }
 
   // ByWetHitCollider

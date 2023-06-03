@@ -1,1 +1,1 @@
-export default interface ConfigBaseTalent { }
+export default interface ConfigBaseTalent {}

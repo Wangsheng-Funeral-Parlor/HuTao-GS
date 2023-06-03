@@ -1,4 +1,4 @@
-import { GadgetCrucibleInfo } from '.'
+import { GadgetCrucibleInfo } from "."
 
 export interface GadgetPlayInfo {
   crucibleInfo: GadgetCrucibleInfo

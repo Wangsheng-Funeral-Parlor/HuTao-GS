@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PingReq {
   seq?: number
@@ -17,7 +17,7 @@ export interface PingRsp {
 
 class PingPacket extends Packet implements PacketInterface {
   constructor() {
-    super('Ping')
+    super("Ping")
   }
 
   async request(context: PacketContext, data: PingReq): Promise<void> {
@@ -25,7 +25,7 @@ class PingPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      clientTime
+      clientTime,
     })
   }
 
@@ -35,4 +35,4 @@ class PingPacket extends Packet implements PacketInterface {
 }
 
 let packet: PingPacket
-export default (() => packet = packet || new PingPacket())()
+export default (() => (packet = packet || new PingPacket()))()

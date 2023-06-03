@@ -1,4 +1,4 @@
-import { CombatTypeArgumentEnum, ForwardTypeEnum } from './enum'
+import { CombatTypeArgumentEnum, ForwardTypeEnum } from "./enum"
 
 export interface CombatInvokeEntry {
   argumentType: CombatTypeArgumentEnum

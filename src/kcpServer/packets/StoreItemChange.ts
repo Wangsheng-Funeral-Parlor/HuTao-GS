@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Item from '$/player/inventory/item'
-import { ItemInfo } from '@/types/proto'
-import { StoreTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Item from "$/player/inventory/item"
+import { ItemInfo } from "@/types/proto"
+import { StoreTypeEnum } from "@/types/proto/enum"
 
 export interface StoreItemChangeNotify {
   storeType: StoreTypeEnum
@@ -10,13 +10,13 @@ export interface StoreItemChangeNotify {
 
 class StoreItemChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('StoreItemChange')
+    super("StoreItemChange")
   }
 
   async sendNotify(context: PacketContext, itemList: Item[]): Promise<void> {
     const notifyData: StoreItemChangeNotify = {
       storeType: StoreTypeEnum.STORE_PACK,
-      itemList: itemList.map(item => item.export())
+      itemList: itemList.map((item) => item.export()),
     }
 
     await super.sendNotify(context, notifyData)
@@ -24,4 +24,4 @@ class StoreItemChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: StoreItemChangePacket
-export default (() => packet = packet || new StoreItemChangePacket())()
+export default (() => (packet = packet || new StoreItemChangePacket()))()

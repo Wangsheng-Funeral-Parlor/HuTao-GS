@@ -1,8 +1,8 @@
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
-import ConfigAIWanderData from './ConfigAIWanderData'
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
+import ConfigAIWanderData from "./ConfigAIWanderData"
 
 export default interface ConfigAIWanderSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAIWanderSetting'
+  $type: "ConfigAIWanderSetting"
   ThreatLevelLimit: number[]
   DefaultSetting: ConfigAIWanderData
   Specification: { [id: number]: ConfigAIWanderData }

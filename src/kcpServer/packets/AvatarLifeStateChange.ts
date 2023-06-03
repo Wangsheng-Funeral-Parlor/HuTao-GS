@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Avatar from '$/entity/avatar'
-import { ClientStateEnum } from '@/types/enum'
-import { ServerBuff } from '@/types/proto'
-import { LifeStateEnum, PlayerDieTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Avatar from "$/entity/avatar"
+import { ClientStateEnum } from "@/types/enum"
+import { ServerBuff } from "@/types/proto"
+import { LifeStateEnum, PlayerDieTypeEnum } from "@/types/proto/enum"
 
 export interface AvatarLifeStateChangeNotify {
   avatarGuid: string
@@ -16,7 +16,7 @@ export interface AvatarLifeStateChangeNotify {
 
 class AvatarLifeStateChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarLifeStateChange')
+    super("AvatarLifeStateChange")
   }
 
   async sendNotify(context: PacketContext, avatar: Avatar): Promise<void> {
@@ -29,7 +29,7 @@ class AvatarLifeStateChangePacket extends Packet implements PacketInterface {
       lifeState,
       sourceEntityId: attackerId,
       dieType,
-      serverBuffList: []
+      serverBuffList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -37,4 +37,4 @@ class AvatarLifeStateChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarLifeStateChangePacket
-export default (() => packet = packet || new AvatarLifeStateChangePacket())()
+export default (() => (packet = packet || new AvatarLifeStateChangePacket()))()

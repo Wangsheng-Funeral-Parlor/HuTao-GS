@@ -1,4 +1,4 @@
-import ConfigWwiseString from './ConfigWwiseString'
+import ConfigWwiseString from "./ConfigWwiseString"
 
 export default interface ConfigStateAudioEvent {
   CurrentStateName: string

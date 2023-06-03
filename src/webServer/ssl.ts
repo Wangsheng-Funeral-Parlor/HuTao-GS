@@ -1,55 +1,56 @@
-import config from '@/config'
-import TLogger from '@/translate/tlogger'
-import { dirExists, fileExists, mkdir, readFile, writeFile } from '@/utils/fileSystem'
-import OpenSSL from '@/utils/openssl'
-import { join, resolve } from 'path'
+import { join, resolve } from "path"
 
-const logger = new TLogger('SSLGEN', 0xa0ff00)
+import config from "@/config"
+import TLogger from "@/translate/tlogger"
+import { dirExists, fileExists, mkdir, readFile, writeFile } from "@/utils/fileSystem"
+import OpenSSL from "@/utils/openssl"
 
-const domains = Object.keys(config.domains)
+const logger = new TLogger("SSLGEN", 0xa0ff00)
+
+const domains = Object.keys(config.dns.domains)
 
 const caCnfData = [
-  '[req]',
-  'distinguished_name = req_distinguished_name',
-  'prompt = no',
-  '[req_distinguished_name]',
-  'C  = CN',
-  'ST = Liyue',
-  'L  = Liyue harbor',
-  'O  = Wangsheng Funeral Parlor',
-  'CN = HuTao CA'
-].join('\n')
+  "[req]",
+  "distinguished_name = req_distinguished_name",
+  "prompt = no",
+  "[req_distinguished_name]",
+  "C  = CN",
+  "ST = Liyue",
+  "L  = Liyue harbor",
+  "O  = Wangsheng Funeral Parlor",
+  "CN = HuTao CA",
+].join("\n")
 
 const srvCnfData = [
-  '[req]',
-  'distinguished_name = req_distinguished_name',
-  'req_extensions     = req_ext',
-  'prompt = no',
-  '[req_distinguished_name]',
-  'C   = CN',
-  'ST  = 上海市',
-  'O   = 上海米哈游网络科技股份有限公司',
-  'CN  = mihoyo',
-  '[req_ext]',
-  'subjectAltName = @alt_names',
-  'extendedKeyUsage = 1.3.6.1.5.5.7.3.1',
-  '[alt_names]',
-  'IP.1=' + config.hostIp,
+  "[req]",
+  "distinguished_name = req_distinguished_name",
+  "req_extensions     = req_ext",
+  "prompt = no",
+  "[req_distinguished_name]",
+  "C   = CN",
+  "ST  = 上海市",
+  "O   = 上海米哈游网络科技股份有限公司",
+  "CN  = mihoyo",
+  "[req_ext]",
+  "subjectAltName = @alt_names",
+  "extendedKeyUsage = 1.3.6.1.5.5.7.3.1",
+  "[alt_names]",
+  "IP.1=" + config.game.hostIp,
   ...domains.map((d, i) => `DNS.${i + 1}=${d}`),
-  ...domains.map((d, i) => `DNS.${domains.length + i + 1}=*.${d}`)
-].join('\n')
+  ...domains.map((d, i) => `DNS.${domains.length + i + 1}=*.${d}`),
+].join("\n")
 
 const caFiles = {
-  caCnf: 'ca.cnf',
-  caCrt: 'ca.crt',
-  caKey: 'ca.key'
+  caCnf: "ca.cnf",
+  caCrt: "ca.crt",
+  caKey: "ca.key",
 }
 
 const srvFiles = {
-  srvCnf: 'srv.cnf',
-  srvCrt: 'srv.crt',
-  srvCsr: 'srv.csr',
-  srvKey: 'srv.key'
+  srvCnf: "srv.cnf",
+  srvCrt: "srv.crt",
+  srvCsr: "srv.csr",
+  srvKey: "srv.key",
 }
 
 export default class SSL {
@@ -59,7 +60,7 @@ export default class SSL {
   keyPath: string
 
   constructor() {
-    this.workDir = resolve(config.sslDir)
+    this.workDir = resolve(config.game.sslDir)
     this.caPath = join(this.workDir, caFiles.caCrt)
     this.certPath = join(this.workDir, srvFiles.srvCrt)
     this.keyPath = join(this.workDir, srvFiles.srvKey)
@@ -68,16 +69,16 @@ export default class SSL {
   async validateCaFiles() {
     const { workDir } = this
 
-    logger.info('message.ssl.info.checkCA')
+    logger.info("message.ssl.info.checkCA")
 
     for (const key in caFiles) {
-      if (!await fileExists(join(workDir, caFiles[key]))) {
-        logger.warn('message.ssl.warn.checkCAFail')
+      if (!(await fileExists(join(workDir, caFiles[key])))) {
+        logger.warn("message.ssl.warn.checkCAFail")
         return false
       }
     }
 
-    logger.info('message.ssl.info.checkSuccess')
+    logger.info("message.ssl.info.checkSuccess")
 
     return true
   }
@@ -85,16 +86,16 @@ export default class SSL {
   async validateSrvFiles() {
     const { workDir } = this
 
-    logger.info('message.ssl.info.checkSRV')
+    logger.info("message.ssl.info.checkSRV")
 
     for (const key in srvFiles) {
-      if (!await fileExists(join(workDir, srvFiles[key]))) {
-        logger.warn('message.ssl.warn.checkSRVFail')
+      if (!(await fileExists(join(workDir, srvFiles[key])))) {
+        logger.warn("message.ssl.warn.checkSRVFail")
         return false
       }
     }
 
-    logger.info('message.ssl.info.checkSuccess')
+    logger.info("message.ssl.info.checkSuccess")
 
     return true
   }
@@ -103,12 +104,12 @@ export default class SSL {
     const { workDir } = this
     if (await dirExists(workDir)) return
 
-    logger.info('message.ssl.info.mkdir')
+    logger.info("message.ssl.info.mkdir")
     await mkdir(workDir, { recursive: true })
   }
 
   async generateCaFiles() {
-    if (!await OpenSSL.isInstalled()) return false
+    if (!(await OpenSSL.isInstalled())) return false
 
     try {
       const { workDir } = this
@@ -119,25 +120,25 @@ export default class SSL {
 
       await this.mkdir()
 
-      logger.info('message.ssl.info.generateCA')
+      logger.info("message.ssl.info.generateCA")
 
       // create config if not exists
-      if (!await fileExists(caCnfPath)) {
-        logger.info('message.ssl.info.create', caCnf)
+      if (!(await fileExists(caCnfPath))) {
+        logger.info("message.ssl.info.create", caCnf)
         await writeFile(caCnfPath, caCnfData)
       } else {
-        logger.info('message.ssl.info.found', caCnf)
+        logger.info("message.ssl.info.found", caCnf)
       }
 
-      logger.info('message.ssl.info.generate', caKey)
+      logger.info("message.ssl.info.generate", caKey)
       await OpenSSL.generateRsaPrivateKey(caKeyPath, 4096)
 
-      logger.info('message.ssl.info.generate', caCrt)
+      logger.info("message.ssl.info.generate", caCrt)
       await OpenSSL.generateRootCaCert(caKeyPath, caCnfPath, caCrtPath)
 
-      if (!await this.generateSrvFiles()) return false
+      if (!(await this.generateSrvFiles())) return false
     } catch (err) {
-      logger.error('generic.param1', err)
+      logger.error("generic.param1", err)
       return false
     }
 
@@ -145,8 +146,8 @@ export default class SSL {
   }
 
   async generateSrvFiles() {
-    if (!await this.validateCaFiles()) return this.generateCaFiles()
-    if (!await OpenSSL.isInstalled()) return false
+    if (!(await this.validateCaFiles())) return this.generateCaFiles()
+    if (!(await OpenSSL.isInstalled())) return false
 
     try {
       const { workDir } = this
@@ -159,26 +160,26 @@ export default class SSL {
       const srvCsrPath = join(workDir, srvCsr)
       const srvKeyPath = join(workDir, srvKey)
 
-      logger.info('message.ssl.info.generateSRV')
+      logger.info("message.ssl.info.generateSRV")
 
       // create config if not exists
-      if (!await fileExists(srvCnfPath)) {
-        logger.info('message.ssl.info.create', srvCnf)
+      if (!(await fileExists(srvCnfPath))) {
+        logger.info("message.ssl.info.create", srvCnf)
         await writeFile(srvCnfPath, srvCnfData)
       } else {
-        logger.info('message.ssl.info.found', srvCnf)
+        logger.info("message.ssl.info.found", srvCnf)
       }
 
-      logger.info('message.ssl.info.generate', srvKey)
+      logger.info("message.ssl.info.generate", srvKey)
       await OpenSSL.generateRsaPrivateKey(srvKeyPath, 4096)
 
-      logger.info('message.ssl.info.generate', srvCsr)
+      logger.info("message.ssl.info.generate", srvCsr)
       await OpenSSL.generateCsr(srvKeyPath, srvCnfPath, srvCsrPath)
 
-      logger.info('message.ssl.info.generate', srvCrt)
+      logger.info("message.ssl.info.generate", srvCrt)
       await OpenSSL.generateCert(srvCsrPath, caCrtPath, caKeyPath, srvCnfPath, srvCrtPath)
     } catch (err) {
-      logger.error('generic.param1', err)
+      logger.error("generic.param1", err)
       return false
     }
 
@@ -188,18 +189,18 @@ export default class SSL {
   async exportHttpsConfig() {
     const { caPath, certPath, keyPath } = this
 
-    if (!await this.validateCaFiles()) {
+    if (!(await this.validateCaFiles())) {
       // missing ca files, regenerate ca & server files
-      if (!await this.generateCaFiles()) return null
-    } else if (!await this.validateSrvFiles()) {
+      if (!(await this.generateCaFiles())) return null
+    } else if (!(await this.validateSrvFiles())) {
       // missing server files, regenerate server files only
-      if (!await this.generateSrvFiles()) return null
+      if (!(await this.generateSrvFiles())) return null
     }
 
     return {
       ca: await readFile(caPath),
       cert: await readFile(certPath),
-      key: await readFile(keyPath)
+      key: await readFile(keyPath),
     }
   }
 }

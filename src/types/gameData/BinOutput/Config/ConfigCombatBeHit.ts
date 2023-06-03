@@ -1,4 +1,4 @@
-import ConfigBeHitBlendShake from './ConfigBeHitBlendShake'
+import ConfigBeHitBlendShake from "./ConfigBeHitBlendShake"
 
 export default interface ConfigCombatBeHit {
   HitBloodEffect: string

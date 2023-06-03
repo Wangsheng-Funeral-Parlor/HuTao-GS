@@ -1,5 +1,5 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyLunchBox extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyLunchBox'
+  $type: "ConfigWidgetToyLunchBox"
 }

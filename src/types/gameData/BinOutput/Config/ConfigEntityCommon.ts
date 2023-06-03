@@ -1,4 +1,4 @@
-import ConfigEffectAttachShape from './ConfigEffectAttachShape'
+import ConfigEffectAttachShape from "./ConfigEffectAttachShape"
 
 export default interface ConfigEntityCommon {
   EffectAttachShape: ConfigEffectAttachShape

@@ -1,4 +1,4 @@
-import { CountDownDelete, DateTimeDelete, DelayWeekCountDownDelete } from '.'
+import { CountDownDelete, DateTimeDelete, DelayWeekCountDownDelete } from "."
 
 export interface MaterialDeleteInfo {
   countDownDelete?: CountDownDelete

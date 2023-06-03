@@ -1,10 +1,12 @@
-import { LogLevel } from '@/logger'
-import { cRGB } from '@/tty/utils'
-import { waitUntil } from '@/utils/asyncWait'
-import * as dgram from 'dgram'
-import Worker, { WorkerOpcode } from '../'
-import { AcceptTypes, decodeDataList } from '../utils/data'
-import handshake from '../utils/handshake'
+import * as dgram from "dgram"
+
+import Worker, { WorkerOpcode } from "../"
+import { AcceptTypes, decodeDataList } from "../utils/data"
+import handshake from "../utils/handshake"
+
+import { LogLevel } from "@/logger"
+import { cRGB } from "@/tty/utils"
+import { waitUntil } from "@/utils/asyncWait"
 
 export interface ConnectionInfo {
   token: number
@@ -23,8 +25,8 @@ export default class RecvWorker extends Worker {
   constructor() {
     super()
 
-    this.socket = dgram.createSocket('udp4')
-    this.socket.on('message', (msg, rinfo) => this.emit('UDPMessage', msg, rinfo))
+    this.socket = dgram.createSocket("udp4")
+    this.socket.on("message", (msg, rinfo) => this.emit("UDPMessage", msg, rinfo))
 
     this.connInfoMap = {}
     this.blockedAddressList = []
@@ -42,14 +44,14 @@ export default class RecvWorker extends Worker {
 
   init(port: number) {
     if (isNaN(port)) {
-      this.log(LogLevel.ERROR, 'message.worker.error.invalidPort', port)
+      this.log(LogLevel.ERROR, "message.worker.error.invalidPort", port)
       this.sendToInterface(WorkerOpcode.InitRecvRsp, false)
       return
     }
 
     const { socket } = this
     socket.bind(port, () => {
-      this.log(LogLevel.INFO, 'message.worker.info.listen', cRGB(0xffffff, socket.address().port.toString()))
+      this.log(LogLevel.INFO, "message.worker.info.listen", cRGB(0xffffff, socket.address().port.toString()))
       this.sendToInterface(WorkerOpcode.InitRecvRsp, true)
     })
   }
@@ -59,7 +61,12 @@ export default class RecvWorker extends Worker {
     const connInfo = connInfoMap[conv]
     if (!connInfo) return this.sendToInterface(WorkerOpcode.SetInternalPortRsp, false)
     connInfo.iPort = port
-    this.log(LogLevel.DEBUG, 'message.worker.debug.setISocketPort', conv.toString(16).padStart(8, '0').toUpperCase(), port)
+    this.log(
+      LogLevel.DEBUG,
+      "message.worker.debug.setISocketPort",
+      conv.toString(16).padStart(8, "0").toUpperCase(),
+      port
+    )
     this.sendToInterface(WorkerOpcode.SetInternalPortRsp, true)
   }
 
@@ -67,7 +74,7 @@ export default class RecvWorker extends Worker {
     const { connInfoMap } = this
     if (connInfoMap[conv] == null) return this.sendToInterface(WorkerOpcode.RemoveConvRsp, false)
     delete connInfoMap[conv]
-    this.log(LogLevel.DEBUG, 'message.worker.debug.removeConv', conv.toString(16).padStart(8, '0').toUpperCase())
+    this.log(LogLevel.DEBUG, "message.worker.debug.removeConv", conv.toString(16).padStart(8, "0").toUpperCase())
     this.sendToInterface(WorkerOpcode.RemoveConvRsp, true)
   }
 
@@ -78,7 +85,7 @@ export default class RecvWorker extends Worker {
 
     if (!blockedAddressList.includes(connInfo.address)) {
       blockedAddressList.push(connInfo.address)
-      this.log(LogLevel.INFO, 'message.worker.info.blockAddr', connInfo.address)
+      this.log(LogLevel.INFO, "message.worker.info.blockAddr", connInfo.address)
     }
 
     this.sendToInterface(WorkerOpcode.BlacklistRsp, true)
@@ -136,7 +143,7 @@ export default class RecvWorker extends Worker {
         connInfoMap[Conv] = {
           token: Token,
           address,
-          port
+          port,
         }
 
         socket.send(buffer, 0, buffer.length, port, address)
@@ -164,7 +171,7 @@ export default class RecvWorker extends Worker {
     if (data.length < 20) return blockedAddressList.push(address)
 
     // Handshake
-    if (data.length === 20) return this.emit('UDPHandshake', data, rinfo)
+    if (data.length === 20) return this.emit("UDPHandshake", data, rinfo)
 
     const conv: number = data.readUInt32LE()
     const token: number = data.readUInt32LE(4)

@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { FriendBrief } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { FriendBrief } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetPlayerBlacklistReq { }
+export interface GetPlayerBlacklistReq {}
 
 export interface GetPlayerBlacklistRsp {
   retcode: RetcodeEnum
@@ -11,13 +11,13 @@ export interface GetPlayerBlacklistRsp {
 
 class GetPlayerBlacklistPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetPlayerBlacklist')
+    super("GetPlayerBlacklist")
   }
 
   async request(context: PacketContext, _data: GetPlayerBlacklistReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      blacklist: []
+      blacklist: [],
     })
   }
 
@@ -27,4 +27,4 @@ class GetPlayerBlacklistPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetPlayerBlacklistPacket
-export default (() => packet = packet || new GetPlayerBlacklistPacket())()
+export default (() => (packet = packet || new GetPlayerBlacklistPacket()))()

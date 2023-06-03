@@ -1,4 +1,4 @@
-import { MusicBriefInfo, MusicGameRecord } from '.'
+import { MusicBriefInfo, MusicGameRecord } from "."
 
 export interface MusicGameActivityDetailInfo {
   musicGameRecordMap?: { [id: number]: MusicGameRecord }

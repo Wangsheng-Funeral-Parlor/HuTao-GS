@@ -1,4 +1,4 @@
 export default interface ConfigEffectAttachSkinnedMesh {
-  $type: 'ConfigEffectAttachSkinnedMesh'
+  $type: "ConfigEffectAttachSkinnedMesh"
   Mesh: string
 }

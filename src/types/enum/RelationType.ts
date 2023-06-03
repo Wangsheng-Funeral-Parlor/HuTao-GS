@@ -4,5 +4,5 @@ export enum RelationTypeEnum {
   LessAndEqual = 2,
   Between = 3,
   MoreThanAndEqual = 4,
-  NoneOrEqual = 5
+  NoneOrEqual = 5,
 }

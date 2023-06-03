@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ForwardTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { ForwardTypeEnum } from "@/types/proto/enum"
 
 export interface EvtDestroyGadgetNotify {
   forwardType: ForwardTypeEnum
@@ -9,9 +9,9 @@ export interface EvtDestroyGadgetNotify {
 
 class EvtDestroyGadgetPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtDestroyGadget', {
+    super("EvtDestroyGadget", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -44,4 +44,4 @@ class EvtDestroyGadgetPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtDestroyGadgetPacket
-export default (() => packet = packet || new EvtDestroyGadgetPacket())()
+export default (() => (packet = packet || new EvtDestroyGadgetPacket()))()

@@ -1,4 +1,4 @@
-export interface WidgetDataUserData { }
+export interface WidgetDataUserData {}
 
 export default interface WidgetUserData {
   data: WidgetDataUserData

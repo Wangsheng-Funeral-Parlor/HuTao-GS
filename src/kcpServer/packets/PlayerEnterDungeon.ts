@@ -1,9 +1,9 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import DungeonData from '$/gameData/data/DungeonData'
-import SceneData from '$/gameData/data/SceneData'
-import Vector from '$/utils/vector'
-import { ClientStateEnum } from '@/types/enum'
-import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import DungeonData from "$/gameData/data/DungeonData"
+import SceneData from "$/gameData/data/SceneData"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
 
 export interface PlayerEnterDungeonReq {
   pointId: number
@@ -18,9 +18,9 @@ export interface PlayerEnterDungeonRsp {
 
 class PlayerEnterDungeonPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerEnterDungeon', {
+    super("PlayerEnterDungeon", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -55,7 +55,7 @@ class PlayerEnterDungeonPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       pointId,
-      dungeonId
+      dungeonId,
     })
   }
 
@@ -65,4 +65,4 @@ class PlayerEnterDungeonPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerEnterDungeonPacket
-export default (() => packet = packet || new PlayerEnterDungeonPacket())()
+export default (() => (packet = packet || new PlayerEnterDungeonPacket()))()

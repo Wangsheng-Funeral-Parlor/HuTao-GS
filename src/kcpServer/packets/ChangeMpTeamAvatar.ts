@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface ChangeMpTeamAvatarReq {
   avatarGuidList: string[]
@@ -15,9 +15,9 @@ export interface ChangeMpTeamAvatarRsp {
 
 class ChangeMpTeamAvatarPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ChangeMpTeamAvatar', {
+    super("ChangeMpTeamAvatar", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStateMask: 0xF0FF
+      reqStateMask: 0xf0ff,
     })
   }
 
@@ -28,26 +28,30 @@ class ChangeMpTeamAvatarPacket extends Packet implements PacketInterface {
     const team = teamManager.getTeam()
 
     // Set client state
-    player.state = (state & 0xFF00) | ClientStateEnum.SETUP_TEAM
+    player.state = (state & 0xff00) | ClientStateEnum.SETUP_TEAM
 
     try {
-      const retcode = await team.setUpAvatarTeam({
-        teamId: 0,
-        avatarTeamGuidList: avatarGuidList,
-        curAvatarGuid
-      }, undefined, seqId)
+      const retcode = await team.setUpAvatarTeam(
+        {
+          teamId: 0,
+          avatarTeamGuidList: avatarGuidList,
+          curAvatarGuid,
+        },
+        undefined,
+        seqId
+      )
 
       await this.response(context, {
         retcode,
         avatarGuidList,
-        curAvatarGuid
+        curAvatarGuid,
       })
     } catch (err) {
       await this.response(context, { retcode: RetcodeEnum.RET_UNKNOWN_ERROR })
     }
 
     // Set client state
-    player.state = (state & 0xFF00)
+    player.state = state & 0xff00
   }
 
   async response(context: PacketContext, data: ChangeMpTeamAvatarRsp): Promise<void> {
@@ -56,4 +60,4 @@ class ChangeMpTeamAvatarPacket extends Packet implements PacketInterface {
 }
 
 let packet: ChangeMpTeamAvatarPacket
-export default (() => packet = packet || new ChangeMpTeamAvatarPacket())()
+export default (() => (packet = packet || new ChangeMpTeamAvatarPacket()))()

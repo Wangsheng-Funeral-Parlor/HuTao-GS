@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Entity from '$/entity'
-import { AbilityControlBlock } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Entity from "$/entity"
+import { AbilityControlBlock } from "@/types/proto"
 
 export interface AbilityChangeNotify {
   entityId: number
@@ -9,7 +9,7 @@ export interface AbilityChangeNotify {
 
 class AbilityChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AbilityChange')
+    super("AbilityChange")
   }
 
   async sendNotify(context: PacketContext, entity: Entity): Promise<void> {
@@ -18,8 +18,8 @@ class AbilityChangePacket extends Packet implements PacketInterface {
     const notifyData: AbilityChangeNotify = {
       entityId,
       abilityControlBlock: {
-        abilityEmbryoList: abilityManager.exportEmbryoList()
-      }
+        abilityEmbryoList: abilityManager.exportEmbryoList(),
+      },
     }
 
     await super.sendNotify(context, notifyData)
@@ -31,4 +31,4 @@ class AbilityChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: AbilityChangePacket
-export default (() => packet = packet || new AbilityChangePacket())()
+export default (() => (packet = packet || new AbilityChangePacket()))()

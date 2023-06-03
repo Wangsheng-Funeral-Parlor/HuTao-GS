@@ -1,5 +1,5 @@
-import ConfigBornType from '../../ConfigBornType'
-import ConfigHitScene from '../../ConfigHitScene'
+import ConfigBornType from "../../ConfigBornType"
+import ConfigHitScene from "../../ConfigHitScene"
 
 export default interface ConfigBaseAttackPattern {
   TriggerType: string

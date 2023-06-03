@@ -1,6 +1,7 @@
-import TTYModule from '.'
-import { TTY } from '..'
-import { cRGB } from '../utils'
+import { TTY } from ".."
+import { cRGB } from "../utils"
+
+import TTYModule from "."
 
 export default class TTYPrompt extends TTYModule {
   prompt: string
@@ -15,7 +16,7 @@ export default class TTYPrompt extends TTYModule {
   historyCursor: number
   historyIndex: number
 
-  constructor(tty: TTY, prompt: string = '', secret: boolean = false) {
+  constructor(tty: TTY, prompt = "", secret = false) {
     super(tty)
 
     this.prompt = prompt
@@ -30,7 +31,7 @@ export default class TTYPrompt extends TTYModule {
     this.historyCursor = null
     this.historyIndex = null
 
-    this.on('input', this.clearAutocomplete.bind(this))
+    this.on("input", this.clearAutocomplete.bind(this))
   }
 
   get y(): number {
@@ -46,7 +47,7 @@ export default class TTYPrompt extends TTYModule {
   }
 
   get inputLen(): number {
-    return this.buffer.join('').length
+    return this.buffer.join("").length
   }
 
   get visibleInputLen(): number {
@@ -66,21 +67,22 @@ export default class TTYPrompt extends TTYModule {
 
   get suggestion(): string {
     const { buffer, autocomplete } = this
-    if (autocomplete == null) return ''
+    if (autocomplete == null) return ""
 
-    const filled = buffer.join('').split(' ').slice(-1)[0] || ''
-    if (autocomplete.indexOf(filled) !== 0) return ''
+    const filled = buffer.join("").split(" ").slice(-1)[0] || ""
+    if (autocomplete.indexOf(filled) !== 0) return ""
 
     return autocomplete.slice(filled.length)
   }
 
   render() {
-    const { tty, prompt, secret, cursor, buffer, y, promptLen, inputLen, overflowLeft, overflowRight, suggestion } = this
+    const { tty, prompt, secret, cursor, buffer, y, promptLen, inputLen, overflowLeft, overflowRight, suggestion } =
+      this
 
     this.clear(true)
 
-    let input = buffer.join('').slice(overflowLeft, inputLen - overflowRight)
-    if (secret) input = input.replace(/./g, '*')
+    let input = buffer.join("").slice(overflowLeft, inputLen - overflowRight)
+    if (secret) input = input.replace(/./g, "*")
 
     tty.write(`\x1b[97m${prompt}>${input}${cRGB(0xa0a0a0, suggestion)}\x1b[m`)
     tty.setCursor(promptLen + (cursor - overflowLeft), y, false)
@@ -109,11 +111,11 @@ export default class TTYPrompt extends TTYModule {
   fillAutocomplete() {
     const { buffer, suggestion } = this
 
-    buffer.push(...suggestion.split(''))
+    buffer.push(...suggestion.split(""))
     this.cursor += suggestion.length
 
     this.clearAutocomplete()
-    this.emit('change')
+    this.emit("change")
   }
 
   nextInput(): Promise<string> {
@@ -122,17 +124,17 @@ export default class TTYPrompt extends TTYModule {
       let cancelCallback: () => Promise<void>
 
       inputCallback = async (input: string) => {
-        this.off('cancel', cancelCallback)
+        this.off("cancel", cancelCallback)
         resolve(input)
       }
       cancelCallback = async () => {
-        this.off('input', inputCallback)
+        this.off("input", inputCallback)
         this.tty.removePrompt(this)
-        reject('Input cancelled')
+        reject("Input cancelled")
       }
 
-      this.once('input', inputCallback)
-      this.once('cancel', cancelCallback)
+      this.once("input", inputCallback)
+      this.once("cancel", cancelCallback)
     })
   }
 }

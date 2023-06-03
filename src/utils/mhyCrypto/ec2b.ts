@@ -1,13 +1,14 @@
-import { mhy128Enc } from './aes'
-import { aesXorpad, keyXorpad } from './magic'
-import MT19937 from '../mt19937'
+import MT19937 from "../mt19937"
+
+import { mhy128Enc } from "./aes"
+import { aesXorpad, keyXorpad } from "./magic"
 
 export function keyScramble(key: Buffer): void {
   const roundKeys = Buffer.alloc(11 * 16)
   for (let round = 0; round <= 10; round++) {
     for (let i = 0; i < 16; i++) {
       for (let j = 0; j < 16; j++) {
-        const idx = (round << 8) + (i * 16) + j
+        const idx = (round << 8) + i * 16 + j
         roundKeys[round * 16 + i] ^= aesXorpad[1][idx] ^ aesXorpad[0][idx]
       }
     }
@@ -19,13 +20,13 @@ export function keyScramble(key: Buffer): void {
 }
 
 export function getDecryptVector(key: Buffer, crypt: Buffer, output: Buffer): void {
-  let val = 0xFFFFFFFFFFFFFFFFn
+  let val = 0xffffffffffffffffn
   for (let i = 0; i < crypt.length >> 3; i++) {
     val = crypt.readBigInt64LE(i << 3) ^ val
   }
 
   const mt = new MT19937()
-  mt.seed(key.readBigUInt64LE(8) ^ 0xCEAC3B5A867837ACn ^ val ^ key.readBigInt64LE())
+  mt.seed(key.readBigUInt64LE(8) ^ 0xceac3b5a867837acn ^ val ^ key.readBigInt64LE())
 
   for (let i = 0; i < output.length >> 3; i++) {
     output.writeBigUInt64LE(mt.int64(), i << 3)
@@ -53,7 +54,7 @@ export function getEc2bKey(buf: Buffer): Buffer {
   return xorpad
 }
 
-export function genEc2b(keySize: number = 16, dataSize: number = 2048): Buffer {
+export function genEc2b(keySize = 16, dataSize = 2048): Buffer {
   const key = Buffer.alloc(keySize)
   const data = Buffer.alloc(dataSize)
 

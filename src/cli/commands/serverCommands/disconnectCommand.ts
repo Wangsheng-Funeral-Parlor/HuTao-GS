@@ -1,19 +1,18 @@
-import translate from '@/translate'
-import { CommandDefinition } from '..'
+import { CommandDefinition } from ".."
+
+import translate from "@/translate"
 
 const disconnectCommand: CommandDefinition = {
-  name: 'disconnect',
+  name: "disconnect",
   usage: 2,
-  args: [
-    { name: 'UID|ID' },
-    { name: 'reason', type: 'int', optional: true }
-  ],
+  args: [{ name: "UID" }, { name: "reason", type: "int", optional: true }],
   allowPlayer: true,
   exec: async (cmdInfo) => {
     const { args, cli, kcpServer } = cmdInfo
-    cli.print(translate('cli.commands.disconnect.info.disconnect', args[0]))
-    if (!await kcpServer.disconnect(parseInt(args[0], 16), args[1])) await kcpServer.disconnectUid(parseInt(args[0]), args[1])
-  }
+    const [uid, reason] = args
+    cli.print(translate("cli.commands.disconnect.info.disconnect", uid))
+    if (!(await kcpServer.disconnect(parseInt(uid, 16), reason))) await kcpServer.disconnectUid(parseInt(uid, reason))
+  },
 }
 
 export default disconnectCommand

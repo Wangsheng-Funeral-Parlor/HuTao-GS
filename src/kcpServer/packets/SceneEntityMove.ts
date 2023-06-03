@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Entity from '$/entity'
-import { ClientStateEnum } from '@/types/enum'
-import { MotionInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Entity from "$/entity"
+import { ClientStateEnum } from "@/types/enum"
+import { MotionInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SceneEntityMoveReq {
   entityId: number
@@ -28,9 +28,9 @@ export interface SceneEntityMoveNotify {
 
 class SceneEntityMovePacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneEntityMove', {
+    super("SceneEntityMove", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -52,7 +52,7 @@ class SceneEntityMovePacket extends Packet implements PacketInterface {
       entityId,
       failMotion: motionInfo,
       sceneTime,
-      reliableSeq
+      reliableSeq,
     })
 
     this.broadcastNotify(currentScene.broadcastContextList, entity)
@@ -70,7 +70,7 @@ class SceneEntityMovePacket extends Packet implements PacketInterface {
       entityId: entityId,
       motionInfo: motion.export(),
       sceneTime,
-      reliableSeq
+      reliableSeq,
     }
 
     await super.sendNotify(context, notifyData)
@@ -82,4 +82,4 @@ class SceneEntityMovePacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneEntityMovePacket
-export default (() => packet = packet || new SceneEntityMovePacket())()
+export default (() => (packet = packet || new SceneEntityMovePacket()))()

@@ -1,4 +1,4 @@
-import { WidgetSlotTagEnum } from './enum'
+import { WidgetSlotTagEnum } from "./enum"
 
 export interface WidgetSlotData {
   tag: WidgetSlotTagEnum

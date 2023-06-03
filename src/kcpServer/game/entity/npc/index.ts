@@ -1,7 +1,7 @@
-import Entity from '$/entity'
-import { EntityTypeEnum } from '@/types/enum'
-import { SceneNpcInfo } from '@/types/proto'
-import { ProtEntityTypeEnum } from '@/types/proto/enum'
+import Entity from "$/entity"
+import { EntityTypeEnum } from "@/types/enum"
+import { SceneNpcInfo } from "@/types/proto"
+import { ProtEntityTypeEnum } from "@/types/proto/enum"
 
 export default class Npc extends Entity {
   npcId: number
@@ -25,6 +25,8 @@ export default class Npc extends Entity {
     this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_NPC
     this.entityType = EntityTypeEnum.NPC
 
+    this.npc = this
+
     super.initHandlers(this)
   }
 
@@ -35,7 +37,7 @@ export default class Npc extends Entity {
       npcId,
       blockId,
       parentQuestId,
-      roomId
+      roomId,
     }
 
     return info

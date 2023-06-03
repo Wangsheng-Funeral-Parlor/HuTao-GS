@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Avatar from '$/entity/avatar'
-import { ClientStateEnum } from '@/types/enum'
-import { SceneEntityInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Avatar from "$/entity/avatar"
+import { ClientStateEnum } from "@/types/enum"
+import { SceneEntityInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface AvatarChangeCostumeReq {
   avatarGuid: string
@@ -21,9 +21,9 @@ export interface AvatarChangeCostumeNotify {
 
 class AvatarChangeCostumePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarChangeCostume', {
+    super("AvatarChangeCostume", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -36,7 +36,7 @@ class AvatarChangeCostumePacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode,
       avatarGuid,
-      costumeId
+      costumeId,
     })
   }
 
@@ -46,7 +46,7 @@ class AvatarChangeCostumePacket extends Packet implements PacketInterface {
 
   async sendNotify(context: PacketContext, avatar: Avatar): Promise<void> {
     const notifyData: AvatarChangeCostumeNotify = {
-      entityInfo: avatar.exportSceneEntityInfo()
+      entityInfo: avatar.exportSceneEntityInfo(),
     }
 
     await super.sendNotify(context, notifyData)
@@ -58,4 +58,4 @@ class AvatarChangeCostumePacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarChangeCostumePacket
-export default (() => packet = packet || new AvatarChangeCostumePacket())()
+export default (() => (packet = packet || new AvatarChangeCostumePacket()))()

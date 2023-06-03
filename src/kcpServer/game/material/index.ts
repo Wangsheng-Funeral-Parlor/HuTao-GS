@@ -1,8 +1,8 @@
-import MaterialData from '$/gameData/data/MaterialData'
-import Player from '$/player'
-import { ItemTypeEnum, ItemUseOpEnum, MaterialTypeEnum } from '@/types/enum'
-import { MaterialInfo } from '@/types/proto'
-import MaterialUserData from '@/types/user/MaterialUserData'
+import MaterialData from "$/gameData/data/MaterialData"
+import Player from "$/player"
+import { ItemTypeEnum, ItemUseOpEnum, MaterialTypeEnum } from "@/types/enum"
+import { MaterialInfo } from "@/types/proto"
+import MaterialUserData from "@/types/user/MaterialUserData"
 
 export default class Material {
   player: Player
@@ -15,7 +15,7 @@ export default class Material {
   materialType: MaterialTypeEnum
   count: number
   stackLimit: number
-  useList: { op: ItemUseOpEnum, param: number[] }[]
+  useList: { op: ItemUseOpEnum; param: number[] }[]
   useOnGain: boolean
 
   constructor(player: Player, itemId: number) {
@@ -35,16 +35,18 @@ export default class Material {
 
     this.stackLimit = materialData?.StackLimit || 1
 
-    this.useList = (materialData?.ItemUse || []).filter(u => u.UseOp).map(u => ({
-      op: ItemUseOpEnum[u.UseOp],
-      param: u.UseParam.filter(p => p).map(p => parseInt(p))
-    }))
+    this.useList = (materialData?.ItemUse || [])
+      .filter((u) => u.UseOp)
+      .map((u) => ({
+        op: ItemUseOpEnum[u.UseOp],
+        param: u.UseParam.filter((p) => p).map((p) => parseInt(p)),
+      }))
     this.useOnGain = !!materialData?.UseOnGain
   }
 
-  static async create(player: Player, itemId: number, count: number = 1): Promise<Material> {
+  static async create(player: Player, itemId: number, count = 1, forceAdd = false): Promise<Material> {
     const material = new Material(player, itemId)
-    await material.initNew(count)
+    await material.initNew(count, forceAdd)
     return material
   }
 
@@ -60,13 +62,13 @@ export default class Material {
     this.count = Math.min(stackLimit, count || 1)
   }
 
-  async initNew(count: number = 1) {
+  async initNew(count = 1, forceAdd = false) {
     await this.loadMaterialData()
 
     const { player, stackLimit } = this
 
     this.guid = player.guidManager.getGuid()
-    this.count = Math.min(stackLimit, count)
+    this.count = forceAdd ? count : Math.min(stackLimit, count)
   }
 
   stack(material: Material): boolean {
@@ -81,7 +83,7 @@ export default class Material {
     return stacked > 0
   }
 
-  unstack(amount: number, commit: boolean = true): false | number {
+  unstack(amount: number, commit = true): false | number {
     const { count } = this
 
     const removed = Math.min(count, amount)
@@ -121,7 +123,7 @@ export default class Material {
 
   export(): MaterialInfo {
     return {
-      count: this.count
+      count: this.count,
     }
   }
 
@@ -132,7 +134,7 @@ export default class Material {
       guid: guid.toString(),
       itemId,
       count,
-      stackLimit
+      stackLimit,
     }
   }
 }

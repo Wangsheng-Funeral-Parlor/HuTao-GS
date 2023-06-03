@@ -1,26 +1,38 @@
-import BaseClass from '#/baseClass'
-import { PacketContext } from '#/packet'
-import Entity from '$/entity'
-import Avatar from '$/entity/avatar'
-import Gadget from '$/entity/gadget'
-import AbilityData from '$/gameData/data/AbilityData'
-import AbilityManager from '$/manager/abilityManager'
-import Vector from '$/utils/vector'
-import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
-import { AvatarSkillStart, DebugLog, ExecuteGadgetLua, GenerateElemBall, HealHP, LoseHP, ReviveAvatar, ReviveDeadAvatar, TriggerAbility } from '$DT/BinOutput/Config/ConfigAbility/Action/Child'
-import ConfigAbilityMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin'
-import { CostStaminaMixin } from '$DT/BinOutput/Config/ConfigAbility/Mixin/Child'
-import Logger from '@/logger'
-import { EntityTypeEnum, FightPropEnum, GadgetStateEnum } from '@/types/enum'
-import { AbilityActionGenerateElemBall } from '@/types/proto'
-import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
-import { getStringHash } from '@/utils/hash'
-import AppliedAbility from './appliedAbility'
+import AppliedAbility from "./appliedAbility"
 
-const MathOp = ['MUL', 'ADD']
+import BaseClass from "#/baseClass"
+import { PacketContext } from "#/packet"
+import Entity from "$/entity"
+import Avatar from "$/entity/avatar"
+import Gadget from "$/entity/gadget"
+import AbilityData from "$/gameData/data/AbilityData"
+import AbilityManager from "$/manager/abilityManager"
+import Vector from "$/utils/vector"
+import ConfigAbilityAction from "$DT/BinOutput/Config/ConfigAbility/Action"
+import {
+  AvatarSkillStart,
+  ChangeGadgetState,
+  DebugLog,
+  ExecuteGadgetLua,
+  GenerateElemBall,
+  HealHP,
+  LoseHP,
+  ReviveAvatar,
+  ReviveDeadAvatar,
+  TriggerAbility,
+} from "$DT/BinOutput/Config/ConfigAbility/Action/Child"
+import ConfigAbilityMixin from "$DT/BinOutput/Config/ConfigAbility/Mixin"
+import { CostStaminaMixin } from "$DT/BinOutput/Config/ConfigAbility/Mixin/Child"
+import Logger from "@/logger"
+import { EntityTypeEnum, FightPropEnum, GadgetStateEnum } from "@/types/enum"
+import { AbilityActionGenerateElemBall } from "@/types/proto"
+import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum } from "@/types/proto/enum"
+import { getStringHash } from "@/utils/hash"
+
+const MathOp = ["MUL", "ADD"]
 const creatureTypes = [EntityTypeEnum.Avatar, EntityTypeEnum.Monster]
 
-const logger = new Logger('ABIACT', 0xcbf542)
+const logger = new Logger("ABIACT", 0xcbf542)
 
 export default class AbilityAction extends BaseClass {
   manager: AbilityManager
@@ -33,10 +45,16 @@ export default class AbilityAction extends BaseClass {
     super.initHandlers(this)
   }
 
-  async runActionConfig(context: PacketContext, ability: AppliedAbility, config: ConfigAbilityAction | ConfigAbilityMixin, param: object, target: Entity) {
+  async runActionConfig(
+    context: PacketContext,
+    ability: AppliedAbility,
+    config: ConfigAbilityAction | ConfigAbilityMixin,
+    param: object,
+    target: Entity
+  ) {
     if (ability == null || config == null) return
 
-    logger.debug('RunAction:', config?.$type, config, param, target.entityId)
+    logger.debug("RunAction:", config?.$type, config, param, target.entityId)
     await this.emit(config?.$type, context, ability, config, param, target)
   }
 
@@ -96,11 +114,13 @@ export default class AbilityAction extends BaseClass {
   async handleAvatarSkillStart(context: PacketContext, ability: AppliedAbility, config: AvatarSkillStart) {
     const { manager } = this
     const { entity, utils } = manager
-    const { skillManager } = (<Avatar>entity)
+    const { skillManager } = <Avatar>entity
     const { currentDepot } = skillManager
     const { SkillID, CostStaminaRatio, CdRatio } = config
 
-    await currentDepot?.getSkill(SkillID)?.start(context, utils.eval(ability, CdRatio, 1), utils.eval(ability, CostStaminaRatio, 1))
+    await currentDepot
+      ?.getSkill(SkillID)
+      ?.start(context, utils.eval(ability, CdRatio, 1), utils.eval(ability, CostStaminaRatio, 1))
   }
 
   // BanEntityMark
@@ -116,6 +136,14 @@ export default class AbilityAction extends BaseClass {
   // ChangeFollowDampTime
 
   // ChangeGadgetUIInteractHint
+
+  // ChangeGadgetState
+  async handleChangeGadgetState(_context: PacketContext, _ability: AppliedAbility, config: ChangeGadgetState) {
+    const { manager } = this
+    const { entity } = manager
+
+    await (<Gadget>entity).setGadgetState(config.State || GadgetStateEnum.Default)
+  }
 
   // ChangePlayMode
 
@@ -247,10 +275,15 @@ export default class AbilityAction extends BaseClass {
   // ForceUseSkillSuccess
 
   // GenerateElemBall
-  async handleGenerateElemBall(context: PacketContext, ability: AppliedAbility, config: GenerateElemBall, param: AbilityActionGenerateElemBall) {
+  async handleGenerateElemBall(
+    context: PacketContext,
+    ability: AppliedAbility,
+    config: GenerateElemBall,
+    param: AbilityActionGenerateElemBall
+  ) {
     const { manager } = this
     const { entity, utils } = manager
-    const { player } = (<Avatar>entity)
+    const { player } = <Avatar>entity
     if (!player) return
 
     const { energyManager } = player
@@ -260,7 +293,12 @@ export default class AbilityAction extends BaseClass {
 
     if (ConfigID == null) return
 
-    await energyManager.spawnDrop((new Vector()).setData(pos), ConfigID, Math.floor(BaseEnergy * utils.eval(ability, Ratio || 1)), seqId)
+    await energyManager.spawnDrop(
+      new Vector().setData(pos),
+      ConfigID,
+      Math.floor(BaseEnergy * utils.eval(ability, Ratio || 1)),
+      seqId
+    )
   }
 
   // GetPos
@@ -367,7 +405,13 @@ export default class AbilityAction extends BaseClass {
   // ReTriggerAISkillInitialCD
 
   // ReviveAvatar
-  async handleReviveAvatar(_context: PacketContext, ability: AppliedAbility, config: ReviveAvatar, _param: object, target: Entity) {
+  async handleReviveAvatar(
+    _context: PacketContext,
+    ability: AppliedAbility,
+    config: ReviveAvatar,
+    _param: object,
+    target: Entity
+  ) {
     const { manager } = this
     const { utils } = manager
 
@@ -381,7 +425,12 @@ export default class AbilityAction extends BaseClass {
   }
 
   // ReviveDeadAvatar
-  async handleReviveDeadAvatar(context: PacketContext, ability: AppliedAbility, config: ReviveDeadAvatar, _param: object) {
+  async handleReviveDeadAvatar(
+    context: PacketContext,
+    ability: AppliedAbility,
+    config: ReviveDeadAvatar,
+    _param: object
+  ) {
     const { manager } = this
     const { entity, utils } = manager
     const { player, skillManager } = <Avatar>entity
@@ -545,7 +594,13 @@ export default class AbilityAction extends BaseClass {
   // ToNearstAnchorPoint
 
   // TriggerAbility
-  async handleTriggerAbility(context: PacketContext, ability: AppliedAbility, config: TriggerAbility, _param: object, target: Entity) {
+  async handleTriggerAbility(
+    context: PacketContext,
+    ability: AppliedAbility,
+    config: TriggerAbility,
+    _param: object,
+    target: Entity
+  ) {
     const { manager } = this
     const { predicate } = manager
     const { Predicates, AbilityName } = config
@@ -701,7 +756,7 @@ export default class AbilityAction extends BaseClass {
   async handleCostStaminaMixin(_context: PacketContext, ability: AppliedAbility, config: CostStaminaMixin) {
     const { manager } = this
     const { entity, utils } = manager
-    const { staminaManager } = (<Avatar>entity)
+    const { staminaManager } = <Avatar>entity
     const { CostStaminaDelta } = config
 
     if (staminaManager == null) return

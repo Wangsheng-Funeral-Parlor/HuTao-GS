@@ -1,4 +1,4 @@
-import { AbilityControlBlock, AbilitySyncStateInfo } from '.'
+import { AbilityControlBlock, AbilitySyncStateInfo } from "."
 
 export interface TeamEnterSceneInfo {
   teamEntityId: number

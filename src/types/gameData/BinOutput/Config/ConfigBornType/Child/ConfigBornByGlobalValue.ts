@@ -1,7 +1,7 @@
-import ConfigBaseBornType from '.'
+import ConfigBaseBornType from "."
 
 export default interface ConfigBornByGlobalValue extends ConfigBaseBornType {
-  $type: 'ConfigBornByGlobalValue'
+  $type: "ConfigBornByGlobalValue"
   PositionKey: string
   DirectionKey: string
 }

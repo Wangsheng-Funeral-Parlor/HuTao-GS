@@ -1,9 +1,10 @@
-import BaseClass from '#/baseClass'
-import Avatar from '$/entity/avatar'
-import MaterialData from '$/gameData/data/MaterialData'
-import { Birthday, ProfilePicture, SocialShowAvatarInfo } from '@/types/proto'
-import ProfileUserData from '@/types/user/ProfileUserData'
-import Player from '.'
+import Player from "."
+
+import BaseClass from "#/baseClass"
+import Avatar from "$/entity/avatar"
+import MaterialData from "$/gameData/data/MaterialData"
+import { Birthday, ProfilePicture, SocialShowAvatarInfo } from "@/types/proto"
+import ProfileUserData from "@/types/user/ProfileUserData"
 
 export default class Profile extends BaseClass {
   player: Player
@@ -41,18 +42,18 @@ export default class Profile extends BaseClass {
       showNameCardIdList,
       unlockedNameCardIdList,
       profilePicture,
-      isShowAvatar
+      isShowAvatar,
     } = userData
 
-    this.nickname = nickname || 'Player'
-    this.signature = signature || ''
+    this.nickname = nickname || "Player"
+    this.signature = signature || ""
     this.birthday = birthday || { month: 0, day: 0 }
     this.nameCardId = nameCardId || 210001
     this.showAvatarList = (Array.isArray(showAvatarList) ? showAvatarList : [])
-      .map(id => avatarList.find(avatar => avatar.avatarId === id))
-      .filter(avatar => avatar != null)
-    this.showNameCardIdList = (Array.isArray(showNameCardIdList) ? showNameCardIdList : [])
-    this.unlockedNameCardIdList = (Array.isArray(unlockedNameCardIdList) ? unlockedNameCardIdList : [])
+      .map((id) => avatarList.find((avatar) => avatar.avatarId === id))
+      .filter((avatar) => avatar != null)
+    this.showNameCardIdList = Array.isArray(showNameCardIdList) ? showNameCardIdList : []
+    this.unlockedNameCardIdList = Array.isArray(unlockedNameCardIdList) ? unlockedNameCardIdList : []
     this.profilePicture = profilePicture || { avatarId: null }
     this.isShowAvatar = !!isShowAvatar
 
@@ -62,7 +63,7 @@ export default class Profile extends BaseClass {
 
   async initNew(avatarId: number, nickName: string) {
     this.nickname = nickName
-    this.signature = ''
+    this.signature = ""
     this.nameCardId = 210001
 
     this.profilePicture = { avatarId }
@@ -95,11 +96,8 @@ export default class Profile extends BaseClass {
   async unlockAllNamecards() {
     const { unlockedNameCardIdList } = this
     const newNamecards = (await MaterialData.getMaterialList())
-      .filter(data => (
-        data.MaterialType === 'MATERIAL_NAMECARD' &&
-        !unlockedNameCardIdList.includes(data.Id)
-      ))
-      .map(data => data.Id)
+      .filter((data) => data.MaterialType === "MATERIAL_NAMECARD" && !unlockedNameCardIdList.includes(data.Id))
+      .map((data) => data.Id)
 
     if (newNamecards.length === 0) return
 
@@ -107,14 +105,14 @@ export default class Profile extends BaseClass {
     unlockedNameCardIdList.push(...newNamecards)
   }
 
-  setShowAvatarInfo(avatarIdList: number[], isShowAvatar: boolean = false) {
+  setShowAvatarInfo(avatarIdList: number[], isShowAvatar = false) {
     const { player, showAvatarList } = this
     const { avatarList } = player
 
     while (showAvatarList.length > 0) showAvatarList.shift()
 
     for (const id of avatarIdList) {
-      const avatar = avatarList.find(a => a.avatarId === id)
+      const avatar = avatarList.find((a) => a.avatarId === id)
       if (!avatar) continue
 
       showAvatarList.push(avatar)
@@ -124,15 +122,17 @@ export default class Profile extends BaseClass {
   }
 
   exportShowAvatarInfoList(): SocialShowAvatarInfo[] {
-    return this.showAvatarList.map(avatar =>
-      avatar.costumeId == null ? {
-        avatarId: avatar.avatarId,
-        level: avatar.level
-      } : {
-        avatarId: avatar.avatarId,
-        level: avatar.level,
-        costumeId: avatar.costumeId
-      }
+    return this.showAvatarList.map((avatar) =>
+      avatar.costumeId == null
+        ? {
+            avatarId: avatar.avatarId,
+            level: avatar.level,
+          }
+        : {
+            avatarId: avatar.avatarId,
+            level: avatar.level,
+            costumeId: avatar.costumeId,
+          }
     )
   }
 
@@ -146,7 +146,7 @@ export default class Profile extends BaseClass {
       showNameCardIdList,
       unlockedNameCardIdList,
       profilePicture,
-      isShowAvatar
+      isShowAvatar,
     } = this
 
     return {
@@ -154,11 +154,11 @@ export default class Profile extends BaseClass {
       signature,
       birthday,
       nameCardId,
-      showAvatarList: showAvatarList.map(avatar => avatar.avatarId),
+      showAvatarList: showAvatarList.map((avatar) => avatar.avatarId),
       showNameCardIdList,
       unlockedNameCardIdList,
       profilePicture,
-      isShowAvatar
+      isShowAvatar,
     }
   }
 }

@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { CoopChapter } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { CoopChapter } from "@/types/proto"
 
 export interface CoopDataNotify {
   chapterList: CoopChapter[]
@@ -10,13 +10,13 @@ export interface CoopDataNotify {
 
 class CoopDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('CoopData')
+    super("CoopData")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
     const notifyData: CoopDataNotify = {
       chapterList: [],
-      viewedChapterList: []
+      viewedChapterList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -24,4 +24,4 @@ class CoopDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: CoopDataPacket
-export default (() => packet = packet || new CoopDataPacket())()
+export default (() => (packet = packet || new CoopDataPacket()))()

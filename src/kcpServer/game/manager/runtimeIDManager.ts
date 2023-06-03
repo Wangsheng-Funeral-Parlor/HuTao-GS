@@ -1,5 +1,5 @@
-import Player from '$/player'
-import { RuntimeIDCategoryEnum } from '@/types/enum'
+import Player from "$/player"
+import { RuntimeIDCategoryEnum } from "@/types/enum"
 
 export default class RuntimeIDManager {
   player: Player
@@ -12,10 +12,10 @@ export default class RuntimeIDManager {
   public static readonly CATEGORY_SHIFT = 24
   public static readonly IS_SYNCED_SHIFT = 23
   public static readonly SEQUENCE_SHIFT = 0
-  private static readonly PEER_MASK = 0xE0000000
-  private static readonly CATEGORY_MASK = 0x1F000000
+  private static readonly PEER_MASK = 0xe0000000
+  private static readonly CATEGORY_MASK = 0x1f000000
   private static readonly IS_SYNCED_MASK = 0x800000
-  private static readonly SEQUENCE_MASK = 0x7FFFFF
+  private static readonly SEQUENCE_MASK = 0x7fffff
   public static readonly INVALID_RUNTIMEID = 0
   public static readonly LEVEL_RUNTIMEID = 0x13800001
   private _networkedNextSeqID: number
@@ -53,7 +53,7 @@ export default class RuntimeIDManager {
     return ((peerId || 0) << PEER_SHIFT) | (category << CATEGORY_SHIFT) | IS_SYNCED_MASK | nextSeqId
   }
   public IsLocalEntity(Id: number): boolean {
-    return this.ParseCategoryName(Id).indexOf('Local') === 0
+    return this.ParseCategoryName(Id).indexOf("Local") === 0
   }
   public ParseCategory(runtimeID: number): RuntimeIDCategoryEnum {
     return RuntimeIDManager.ParseCategoryStatic(runtimeID)
@@ -75,7 +75,7 @@ export default class RuntimeIDManager {
   }
   public IsSyncedRuntimeID(runtimeID: number): boolean {
     const { IS_SYNCED_SHIFT, IS_SYNCED_MASK } = RuntimeIDManager
-    return ((runtimeID & IS_SYNCED_MASK) >> IS_SYNCED_SHIFT) !== 0
+    return (runtimeID & IS_SYNCED_MASK) >> IS_SYNCED_SHIFT !== 0
   }
   public IsServerEntity(runtimeID: number): boolean {
     return RuntimeIDManager.IsServerEntityStatic(runtimeID)

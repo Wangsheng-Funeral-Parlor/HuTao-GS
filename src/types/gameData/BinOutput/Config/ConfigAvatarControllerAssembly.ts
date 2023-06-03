@@ -1,4 +1,4 @@
-import ConfigAvatarControllerAssemblySkillSubs from './ConfigAvatarControllerAssemblySkillSubs'
+import ConfigAvatarControllerAssemblySkillSubs from "./ConfigAvatarControllerAssemblySkillSubs"
 
 export default interface ConfigAvatarControllerAssembly {
   ControllerPath: string

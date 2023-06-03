@@ -1,4 +1,4 @@
-import { MassivePropParam } from '.'
+import { MassivePropParam } from "."
 
 export interface MassivePropSyncInfo {
   id?: number

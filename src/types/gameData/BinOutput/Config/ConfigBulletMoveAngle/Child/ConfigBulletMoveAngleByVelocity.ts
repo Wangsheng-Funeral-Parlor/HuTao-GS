@@ -1,6 +1,6 @@
-import ConfigBaseBulletMoveAngle from '.'
+import ConfigBaseBulletMoveAngle from "."
 
 export default interface ConfigBulletMoveAngleByVelocity extends ConfigBaseBulletMoveAngle {
-  $type: 'ConfigBulletMoveAngleByVelocity'
+  $type: "ConfigBulletMoveAngleByVelocity"
   TraceLerpCoef: number
 }

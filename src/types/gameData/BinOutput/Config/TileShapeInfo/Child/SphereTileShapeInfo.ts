@@ -1,6 +1,6 @@
-import BaseTileShapeInfo from '.'
+import BaseTileShapeInfo from "."
 
 export default interface SphereTileShapeInfo extends BaseTileShapeInfo {
-  $type: 'SphereTileShapeInfo'
+  $type: "SphereTileShapeInfo"
   Radius: number
 }

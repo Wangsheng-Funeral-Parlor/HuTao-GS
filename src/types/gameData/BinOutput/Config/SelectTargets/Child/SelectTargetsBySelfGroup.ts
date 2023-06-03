@@ -1,7 +1,7 @@
-import ConfigBaseSelectTargets from '.'
+import ConfigBaseSelectTargets from "."
 
 export default interface SelectTargetsBySelfGroup extends ConfigBaseSelectTargets {
-  $type: 'SelectTargetsBySelfGroup'
+  $type: "SelectTargetsBySelfGroup"
   Operation: string
   Value: number
   UseBinary: boolean

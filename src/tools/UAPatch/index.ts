@@ -1,11 +1,10 @@
-import config from "@/config"
 import TError from "@/translate/terror"
 import DispatchKey from "@/utils/dispatchKey"
 import { fileExists, readFile, writeFile } from "@/utils/fileSystem"
 
-const KEY_START = Buffer.from([0x3C, 0x52, 0x53, 0x41, 0x4B, 0x65, 0x79, 0x56]) // "<RSAKeyV"
-const KEY_END = Buffer.from([0x79, 0x56, 0x61, 0x6C, 0x75, 0x65, 0x3E, 0x00]) // "yValue> "
-const RET_INS = Buffer.from([0x48, 0x8B, 0xC1, 0x48, 0x83, 0xC4])
+const KEY_START = Buffer.from([0x3c, 0x52, 0x53, 0x41, 0x4b, 0x65, 0x79, 0x56]) // "<RSAKeyV"
+const KEY_END = Buffer.from([0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x3e, 0x00]) // "yValue> "
+const RET_INS = Buffer.from([0x48, 0x8b, 0xc1, 0x48, 0x83, 0xc4])
 
 function addrToBuffer(addr: number): Buffer {
   if (addr <= 0) return Buffer.from([0x10])
@@ -31,7 +30,7 @@ export const readKey = (buf: Buffer, offset: number): Buffer => {
     offset += 2
 
     switch (inst) {
-      case 0x48BA:
+      case 0x48ba:
         buffers.push(buf.subarray(offset, offset + 8))
         offset += 8
         break
@@ -47,11 +46,11 @@ export const readKey = (buf: Buffer, offset: number): Buffer => {
             offset += 4
             break
           default:
-            throw new TError('message.tools.ua.error.unknownOperand', operand?.toString(16)?.toUpperCase())
+            throw new TError("message.tools.ua.error.unknownOperand", operand?.toString(16)?.toUpperCase())
         }
         break
       default:
-        throw new TError('message.tools.ua.error.unknownInstruction', inst?.toString(16)?.toUpperCase())
+        throw new TError("message.tools.ua.error.unknownInstruction", inst?.toString(16)?.toUpperCase())
     }
 
     if (Buffer.compare(buffers[buffers.length - 1], KEY_END) === 0) break
@@ -67,7 +66,7 @@ export const writeKey = (buf: Buffer, offset: number, key: Buffer) => {
   offset -= 2
 
   const retInsOffset = buf.subarray(offset).indexOf(RET_INS)
-  if (retInsOffset < 0) throw new TError('message.tools.ua.error.noReturn')
+  if (retInsOffset < 0) throw new TError("message.tools.ua.error.noReturn")
 
   const maxSize = buf.readUInt32LE(offset + retInsOffset - 4) + 8
   let addr = 0
@@ -79,7 +78,7 @@ export const writeKey = (buf: Buffer, offset: number, key: Buffer) => {
     key = key.length >= 8 ? key.subarray(8) : Buffer.alloc(0)
 
     if (chunk.length < 8) chunk = Buffer.concat([chunk, Buffer.alloc(8 - chunk.length)])
-    buffers.push(Buffer.from([0x48, 0xBA]), chunk, Buffer.from([0x48, 0x89]), addrToBuffer(addr))
+    buffers.push(Buffer.from([0x48, 0xba]), chunk, Buffer.from([0x48, 0x89]), addrToBuffer(addr))
 
     addr += 8
   }
@@ -101,25 +100,25 @@ export const findKeys = (buf: Buffer) => {
   return keyOffsets
 }
 
-export const listKeys = async (buf: Buffer): Promise<{ offset: number, data: string }[]> => {
+export const listKeys = async (buf: Buffer): Promise<{ offset: number; data: string }[]> => {
   return findKeys(buf)
-    .map(offset => ({ offset, data: readKey(buf, offset)?.toString() }))
-    .filter(k => k.data != null)
+    .map((offset) => ({ offset, data: readKey(buf, offset)?.toString() }))
+    .filter((k) => k.data != null)
 }
 
 export const UAList = async (path: string): Promise<string[]> => {
-  if (!await fileExists(path)) throw new TError('generic.fileNotFound', path)
-  return (await listKeys(await readFile(path))).map(k => k.data)
+  if (!(await fileExists(path))) throw new TError("generic.fileNotFound", path)
+  return (await listKeys(await readFile(path))).map((k) => k.data)
 }
 
 export const UAPatch = async (src: string, dst: string): Promise<void> => {
-  if (!await fileExists(src)) throw new TError('generic.fileNotFound', src)
+  if (!(await fileExists(src))) throw new TError("generic.fileNotFound", src)
 
   const buf = await readFile(src)
-  const key = (await listKeys(buf)).find(k => !k.data.includes('<P>'))
-  if (key == null) throw new TError('message.tools.ua.error.noServerPublicKey')
+  const key = (await listKeys(buf)).find((k) => !k.data.includes("<P>"))
+  if (key == null) throw new TError("message.tools.ua.error.noServerPublicKey")
 
-  const serverKey = await DispatchKey.getServerKeyPair(config.dispatchKeyId)
+  const serverKey = await DispatchKey.getServerKeyPair()
   writeKey(buf, key.offset, Buffer.from(serverKey.public.xml))
 
   await writeFile(dst, buf)

@@ -1,12 +1,12 @@
-import Entity from '$/entity'
-import Weapon from '$/equip/weapon'
-import GrowCurveData from '$/gameData/data/GrowCurveData'
-import MonsterData from '$/gameData/data/MonsterData'
-import Player from '$/player'
-import { EntityTypeEnum, FightPropEnum, MonsterTypeEnum } from '@/types/enum'
-import { SceneMonsterInfo } from '@/types/proto'
-import { AbilityScalarTypeEnum, ChangeHpReasonEnum, MonsterBornTypeEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
-import EntityUserData from '@/types/user/EntityUserData'
+import Entity from "$/entity"
+import Weapon from "$/equip/weapon"
+import GrowCurveData from "$/gameData/data/GrowCurveData"
+import MonsterData from "$/gameData/data/MonsterData"
+import Player from "$/player"
+import { EntityTypeEnum, EventTypeEnum, FightPropEnum, MonsterTypeEnum } from "@/types/enum"
+import { SceneMonsterInfo } from "@/types/proto"
+import { AbilityScalarTypeEnum, ChangeHpReasonEnum, MonsterBornTypeEnum, ProtEntityTypeEnum } from "@/types/proto/enum"
+import EntityUserData from "@/types/user/EntityUserData"
 
 export default class Monster extends Entity {
   player: Player
@@ -16,7 +16,7 @@ export default class Monster extends Entity {
   affixList: number[]
   weaponList: Weapon[]
 
-  hpDropList: { id: number, hp: number }[]
+  hpDropList: { id: number; hp: number }[]
   killDropId: number
 
   poseId: number
@@ -50,6 +50,8 @@ export default class Monster extends Entity {
     this.protEntityType = ProtEntityTypeEnum.PROT_ENTITY_MONSTER
     this.entityType = EntityTypeEnum.Monster
 
+    this.monster = this
+
     super.initHandlers(this)
   }
 
@@ -57,19 +59,19 @@ export default class Monster extends Entity {
     const { player, monsterId } = this
 
     this.config = await MonsterData.getFightPropConfig(monsterId)
-    this.growCurve = await GrowCurveData.getGrowCurve('Monster')
+    this.growCurve = await GrowCurveData.getGrowCurve("Monster")
 
     const monsterData = await MonsterData.getMonster(monsterId)
     if (!monsterData) return
 
     this.affixList = monsterData.Affix || []
-    this.weaponList = monsterData.Equips.map(id => Weapon.createByGadgetId(id, player, true))
+    this.weaponList = monsterData.Equips.map((id) => Weapon.createByGadgetId(id, player, true))
 
     for (const weapon of this.weaponList) await weapon.initNew()
 
     this.hpDropList = (monsterData.HpDrops || [])
-      .filter(d => d.DropId != null && d.HpPercent != null)
-      .map(d => ({ id: d.DropId || 0, hp: (d.HpPercent || 0) / 100 }))
+      .filter((d) => d.DropId != null && d.HpPercent != null)
+      .map((d) => ({ id: d.DropId || 0, hp: (d.HpPercent || 0) / 100 }))
     this.killDropId = monsterData.KillDropId || 0
 
     this.monsterType = MonsterTypeEnum[monsterData.Type] || MonsterTypeEnum.MONSTER_NONE
@@ -98,7 +100,13 @@ export default class Monster extends Entity {
     return this.monsterType === MonsterTypeEnum.MONSTER_BOSS
   }
 
-  async takeDamage(attackerId: number, val: number, notify?: boolean, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+  async takeDamage(
+    attackerId: number,
+    val: number,
+    notify?: boolean,
+    changeHpReason?: ChangeHpReasonEnum,
+    seqId?: number
+  ): Promise<void> {
     const { manager, motion, hpDropList } = this
 
     const maxHp = this.getProp(FightPropEnum.FIGHT_PROP_MAX_HP)
@@ -115,21 +123,34 @@ export default class Monster extends Entity {
   }
 
   exportSceneMonsterInfo(): SceneMonsterInfo {
-    const { authorityPeerId, monsterId, groupId, configId, affixList, weaponList, bornType, blockId, poseId, isElite, titleId, specialNameId } = this
+    const {
+      authorityPeerId,
+      monsterId,
+      groupId,
+      configId,
+      affixList,
+      weaponList,
+      bornType,
+      blockId,
+      poseId,
+      isElite,
+      titleId,
+      specialNameId,
+    } = this
 
     return {
       monsterId,
       groupId,
       configId,
       affixList,
-      weaponList: weaponList.map(weapon => weapon.exportSceneWeaponInfo()),
+      weaponList: weaponList.map((weapon) => weapon.exportSceneWeaponInfo()),
       authorityPeerId,
       bornType,
       blockId,
       poseId,
       isElite,
       titleId,
-      specialNameId
+      specialNameId,
     }
   }
 
@@ -154,7 +175,7 @@ export default class Monster extends Entity {
         sgvDynamicValueMapContainer.setValue({
           key,
           valueType: type,
-          floatValue: 1
+          floatValue: 1,
         })
       }
     }, 5e3)
@@ -172,8 +193,12 @@ export default class Monster extends Entity {
   }
 
   // Death
-  async handleDeath(seqId?: number, batch: boolean = false) {
+  async handleDeath(seqId?: number, batch = false) {
     const { manager, motion, killDropId } = this
+
+    if (manager.scene.activeChallenge != null) manager.scene.activeChallenge.onMonsterDeath(this)
+    if (manager.scene.EnableScript)
+      await this.sceneGroup?.scene.scriptManager.emit(EventTypeEnum.EVENT_ANY_MONSTER_DIE, this.groupId, this.configId)
 
     await manager?.scene?.spawnDropsById(motion.pos, killDropId, seqId)
     await super.handleDeath(seqId, batch)

@@ -1,8 +1,7 @@
-import { CommandDefinition } from '..'
-import registerCommand from './registerCommand'
+import { CommandDefinition } from ".."
 
-const accountCommands: CommandDefinition[] = [
-  registerCommand
-]
+import registerCommand from "./registerCommand"
+
+const accountCommands: CommandDefinition[] = [registerCommand]
 
 export default accountCommands

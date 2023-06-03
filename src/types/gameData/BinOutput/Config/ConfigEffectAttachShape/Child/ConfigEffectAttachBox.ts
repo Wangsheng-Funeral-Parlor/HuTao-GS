@@ -1,5 +1,5 @@
 export default interface ConfigEffectAttachBox {
-  $type: 'ConfigEffectAttachBox'
+  $type: "ConfigEffectAttachBox"
   EmitFrom: string
   ScaleX: number
   ScaleY: number

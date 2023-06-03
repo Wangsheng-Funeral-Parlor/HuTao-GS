@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SceneAvatarStaminaStepReq {
   useClientRot: boolean
@@ -16,9 +16,9 @@ export interface SceneAvatarStaminaStepRsp {
 
 class SceneAvatarStaminaStepPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneAvatarStaminaStep', {
+    super("SceneAvatarStaminaStep", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -38,7 +38,7 @@ class SceneAvatarStaminaStepPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       useClientRot,
-      rot
+      rot,
     })
   }
 
@@ -48,4 +48,4 @@ class SceneAvatarStaminaStepPacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneAvatarStaminaStepPacket
-export default (() => packet = packet || new SceneAvatarStaminaStepPacket())()
+export default (() => (packet = packet || new SceneAvatarStaminaStepPacket()))()

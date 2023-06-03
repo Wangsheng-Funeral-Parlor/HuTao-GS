@@ -1,10 +1,11 @@
-import PlayerProp from '#/packets/PlayerProp'
-import PlayerPropChange from '#/packets/PlayerPropChange'
-import { PlayerPropEnum } from '@/types/enum'
-import { PropPair, PropValue } from '@/types/proto'
-import { MpSettingTypeEnum } from '@/types/proto/enum'
-import PropsUserData from '@/types/user/PropsUserData'
-import Player from '.'
+import Player from "."
+
+import PlayerProp from "#/packets/PlayerProp"
+import PlayerPropChange from "#/packets/PlayerPropChange"
+import { PlayerPropEnum } from "@/types/enum"
+import { PropPair, PropValue } from "@/types/proto"
+import { MpSettingTypeEnum } from "@/types/proto/enum"
+import PropsUserData from "@/types/user/PropsUserData"
 
 export default class PlayerProps {
   player: Player
@@ -49,7 +50,7 @@ export default class PlayerProps {
     return this.propMap[id] || 0
   }
 
-  async set(type: number, val: number | boolean, notify: boolean = false): Promise<void> {
+  async set(type: number, val: number | boolean, notify = false): Promise<void> {
     const { player, propMap } = this
 
     val = Number(val) || 0
@@ -87,7 +88,7 @@ export default class PlayerProps {
     const propValue = this.exportPropValue(type)
     return {
       type: propValue.type,
-      propValue
+      propValue,
     }
   }
 
@@ -96,7 +97,7 @@ export default class PlayerProps {
     return {
       type,
       ival: value,
-      val: value
+      val: value,
     }
   }
 

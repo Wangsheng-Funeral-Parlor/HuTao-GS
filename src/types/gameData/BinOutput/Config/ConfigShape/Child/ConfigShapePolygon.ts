@@ -1,6 +1,6 @@
-import ConfigBaseShape from '.'
+import ConfigBaseShape from "."
 
 export default interface ConfigShapePolygon extends ConfigBaseShape {
-  $type: 'ConfigShapePolygon'
+  $type: "ConfigShapePolygon"
   PolygonConfigPath: string
 }

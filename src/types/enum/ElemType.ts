@@ -8,5 +8,5 @@ export enum ElemTypeEnum {
   FROZEN = 6,
   WIND = 7,
   ROCK = 8,
-  ANTIFIRE = 9
+  ANTIFIRE = 9,
 }

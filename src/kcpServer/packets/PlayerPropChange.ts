@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { PlayerPropEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { PlayerPropEnum } from "@/types/enum"
 
 export interface PlayerPropChangeNotify {
   propType: PlayerPropEnum
@@ -8,13 +8,13 @@ export interface PlayerPropChangeNotify {
 
 class PlayerPropChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerPropChange')
+    super("PlayerPropChange")
   }
 
   async sendNotify(context: PacketContext, type: PlayerPropEnum, delta: number): Promise<void> {
     const notifyData: PlayerPropChangeNotify = {
       propType: type,
-      propDelta: delta
+      propDelta: delta,
     }
 
     await super.sendNotify(context, notifyData)
@@ -22,4 +22,4 @@ class PlayerPropChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerPropChangePacket
-export default (() => packet = packet || new PlayerPropChangePacket())()
+export default (() => (packet = packet || new PlayerPropChangePacket()))()

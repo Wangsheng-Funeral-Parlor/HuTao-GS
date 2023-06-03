@@ -1,92 +1,72 @@
-import GlobalState from '@/globalState'
-import KcpServer from '@/kcpServer'
-import { waitMs } from '@/utils/asyncWait'
-import WebServer from '@/webServer'
-import { mkdirSync, statSync } from 'fs'
-import * as hostile from 'hostile'
-import { join } from 'path'
-import { PerformanceObserver } from 'perf_hooks'
-import { cwd, execPath, exit } from 'process'
-import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from './config'
-import DnsServer from './dnsServer'
-import Logger from './logger'
-import { patchGame, unpatchGame } from './tools/patcher'
-import TLogger from './translate/tlogger'
-import { cRGB } from './tty/utils'
-import { Announcement } from './types/announcement'
-import Update from './update'
-import Authenticator from './utils/authenticator'
-import { detachedSpawn, execCommand } from './utils/childProcess'
-import { dirExists } from './utils/fileSystem'
-import AbilityData from '$/gameData/data/AbilityData'
-import DungeonData from '$/gameData/data/DungeonData'
-import GadgetData from '$/gameData/data/GadgetData'
-import GrowCurveData from '$/gameData/data/GrowCurveData'
-import MonsterData from '$/gameData/data/MonsterData'
-import ReliquaryData from '$/gameData/data/ReliquaryData'
-import SkillData from '$/gameData/data/SkillData'
-import TalentData from '$/gameData/data/TalentData'
-import WeaponData from '$/gameData/data/WeaponData'
-import MapAreaData from '$/gameData/data/MapAreaData'
-import WeatherData from '$/gameData/data/WeatherData'
-import AvatarData from '$/gameData/data/AvatarData'
-import WorldData from '$/gameData/data/WorldData'
-import MaterialData from '$/gameData/data/MaterialData'
-import SceneData from '$/gameData/data/SceneData'
-import ShopData from '$/gameData/data/ShopData'
+import { mkdirSync, statSync } from "fs"
+import { join } from "path"
+import { PerformanceObserver } from "perf_hooks"
+import { cwd, execPath, exit } from "process"
 
-const {
-  serverName,
-  version,
-  autoGamePatch,
-  gameDir,
-  dispatchRegion,
-  dispatchSeed,
-  dispatchKeyId,
-  autoPatch,
-  httpPort,
-  httpsPort,
-  recorderPort,
-  hosts
-} = config
+import * as hostile from "hostile"
+
+import config, { SUPPORT_REGIONS, SUPPORT_VERSIONS } from "./config"
+import DnsServer from "./dnsServer"
+import Logger from "./logger"
+import { patchGame, unpatchGame } from "./tools/patcher"
+import TLogger from "./translate/tlogger"
+import { cRGB } from "./tty/utils"
+import { Announcement } from "./types/announcement"
+import Update from "./update"
+import Authenticator from "./utils/authenticator"
+import { detachedSpawn, execCommand } from "./utils/childProcess"
+import { dirExists, writeFile } from "./utils/fileSystem"
+
+import { cmdIds } from "#/cmdIds"
+import AvatarData from "$/gameData/data/AvatarData"
+import MonsterData from "$/gameData/data/MonsterData"
+import GlobalState from "@/globalState"
+import KcpServer from "@/kcpServer"
+import { waitMs } from "@/utils/asyncWait"
+import WebServer from "@/webServer"
+
+const { game, dispatch, httpPort, httpsPort, recorderPort } = config
+const { autoGamePatch, gameDir, version, serverName, hosts } = game
+const { dispatchKeyId, dispatchRegion, dispatchSeed, autoPatch } = dispatch
 
 const requiredDirs = [
   // game resource
-  'data/bin/' + version,
-  'data/proto/' + version,
-  'data/game/' + version,
+  "data/bin/" + version,
+  "data/proto/" + version,
+  "data/game/" + version,
 
   // RSA key
-  'data/key',
+  "data/key",
 
   // log
-  'data/log/server',
-  'data/log/client',
-  'data/log/dump',
+  "data/log/server",
+  "data/log/client",
+  "data/log/dump",
 
   // user data
-  'data/user',
+  "data/user",
 
   // windy
-  'data/luac'
+  "data/luac",
 ]
 
 // dispatch RSA key
-if (dispatchKeyId) requiredDirs.push('data/key/' + dispatchKeyId)
+if (dispatchKeyId) requiredDirs.push("data/key/" + dispatchKeyId)
 
 const welcomeAnnouncement: Announcement = {
   type: 2, // Game
-  subtitle: 'Welcome',
+  subtitle: "Welcome",
   title: `Welcome to ${serverName}!`,
-  banner: 'https://webstatic-sea.mihoyo.com/hk4e/announcement/img/banner/welcome.png',
-  content: '<p style="white-space: pre-wrap;">Hello, have fun~~</p><img src="https://webstatic-sea.mihoyo.com/hk4e/announcement/img/fallen.png"><p style="white-space: pre-wrap;">Powered by: HuTao GS</p>',
+  banner: "https://webstatic-sea.mihoyo.com/hk4e/announcement/img/banner/welcome.png",
+  content:
+    '<p style="white-space: pre-wrap;">Hello, have fun~~</p><img src="https://webstatic-sea.mihoyo.com/hk4e/announcement/img/fallen.png"><p style="white-space: pre-wrap;">Powered by: HuTao GS</p>',
   start: Date.now(),
-  end: Date.now() + (365 * 24 * 60 * 60e3),
+  end: Date.now() + 365 * 24 * 60 * 60e3,
   tag: 3,
-  loginAlert: true
+  loginAlert: true,
 }
 
-const logger = new TLogger('SERVER')
+const logger = new TLogger("SERVER")
 
 export default class Server {
   observer: PerformanceObserver
@@ -111,31 +91,32 @@ export default class Server {
     GlobalState.load()
 
     // Server build info
-    logger.info('message.server.info.name', cRGB(0xffffff, serverName))
-    logger.info('message.server.info.build', cRGB(0xffffff, process.env.BUILD_INFO || 'development'))
-    logger.info('message.server.info.gameVersion', cRGB(0xffffff, version))
-    logger.info('message.server.info.dispatchRegion', cRGB(0xffffff, dispatchRegion))
-    logger.info('message.server.info.dispatchSeed', cRGB(0xffffff, dispatchSeed))
-    logger.info('message.server.info.dispatchKey', cRGB(0xffffff, dispatchKeyId?.toString()))
-    logger.info('message.server.info.autoPatch', cRGB(0xffffff, autoPatch.toString()))
-    logger.info('message.server.info.logLevel', cRGB(0xffffff, logger.getLogLevel().toString()))
+    logger.info("message.server.info.name", cRGB(0xffffff, serverName))
+    logger.info("message.server.info.build", cRGB(0xffffff, process.env.BUILD_INFO || "development"))
+    logger.info("message.server.info.gameVersion", cRGB(0xffffff, version))
+    logger.info("message.server.info.protoVersion", cRGB(0xffffff, cmdIds.version))
+    logger.info("message.server.info.dispatchRegion", cRGB(0xffffff, dispatchRegion))
+    logger.info("message.server.info.dispatchSeed", cRGB(0xffffff, dispatchSeed))
+    logger.info("message.server.info.dispatchKey", cRGB(0xffffff, dispatchKeyId?.toString()))
+    logger.info("message.server.info.autoPatch", cRGB(0xffffff, autoPatch.toString()))
+    logger.info("message.server.info.logLevel", cRGB(0xffffff, logger.getLogLevel().toString()))
 
     if (!SUPPORT_REGIONS.includes(dispatchRegion)) {
-      logger.error('message.server.error.invalidRegion')
+      logger.error("message.server.error.invalidRegion")
       return
     }
 
     if (!SUPPORT_VERSIONS.includes(version)) {
-      logger.error('message.server.error.invalidVersion')
+      logger.error("message.server.error.invalidVersion")
       return
     }
 
     this.checkDirs()
 
-    this.observer = new PerformanceObserver(list => logger.performance(list))
+    this.observer = new PerformanceObserver((list) => logger.performance(list))
 
     this.update = new Update(this)
-    this.auth = new Authenticator('data/auth.json')
+    this.auth = new Authenticator("data/auth.json")
 
     this.dnsServer = new DnsServer(this)
     this.webServer = new WebServer(this)
@@ -151,41 +132,41 @@ export default class Server {
   }
 
   async tryPatchGame() {
-    if (!autoGamePatch || !await dirExists(gameDir)) return
+    if (!autoGamePatch || !(await dirExists(gameDir))) return
     try {
       await patchGame(gameDir)
     } catch (err) {
-      logger.error('message.server.error.patchGame', err)
+      logger.error("message.server.error.patchGame", err)
     }
   }
 
   async tryUnpatchGame() {
-    if (!autoGamePatch || !await dirExists(gameDir)) return
+    if (!autoGamePatch || !(await dirExists(gameDir))) return
     try {
       await unpatchGame(gameDir)
     } catch (err) {
-      logger.error('message.server.error.unpatchGame', err)
+      logger.error("message.server.error.unpatchGame", err)
     }
   }
 
   async flushDNS(): Promise<void> {
-    await execCommand('ipconfig /flushdns')
+    await execCommand("ipconfig /flushdns")
   }
 
   async setHosts(): Promise<void> {
     if (!hosts) return
 
-    logger.debug('message.server.debug.setHost')
+    logger.debug("message.server.debug.setHost")
 
     for (const host of hosts) {
       for (let i = 1; i <= 10; i++) {
         try {
-          hostile.set('127.0.0.1', host)
+          hostile.set("127.0.0.1", host)
           break
         } catch (err) {
           // only throw error if all attempts failed
           if (i >= 10) {
-            logger.error('message.server.error.setHost', err)
+            logger.error("message.server.error.setHost", err)
             this.restart(15e3)
             return
           }
@@ -193,14 +174,14 @@ export default class Server {
       }
     }
 
-    logger.debug('message.server.debug.setHostSuccess')
+    logger.debug("message.server.debug.setHostSuccess")
 
-    logger.debug('message.server.debug.flushDns')
+    logger.debug("message.server.debug.flushDns")
     try {
       await this.flushDNS()
-      logger.debug('message.server.debug.flushDnsSuccess')
+      logger.debug("message.server.debug.flushDnsSuccess")
     } catch (err) {
-      logger.error('message.server.error.flushDns', err)
+      logger.error("message.server.error.flushDns", err)
       this.restart(15e3)
     }
   }
@@ -208,17 +189,17 @@ export default class Server {
   async removeHosts(): Promise<void> {
     if (!hosts) return
 
-    logger.debug('message.server.debug.removeHost')
+    logger.debug("message.server.debug.removeHost")
 
     for (const host of hosts) {
       for (let i = 1; i <= 10; i++) {
         try {
-          hostile.remove('127.0.0.1', host)
+          hostile.remove("127.0.0.1", host)
           break
         } catch (err) {
           // only throw error if all attempts failed
           if (i >= 10) {
-            logger.error('message.server.error.removeHost', err)
+            logger.error("message.server.error.removeHost", err)
             this.restart(15e3)
             return
           }
@@ -226,14 +207,14 @@ export default class Server {
       }
     }
 
-    logger.debug('message.server.debug.removeHostSuccess')
+    logger.debug("message.server.debug.removeHostSuccess")
 
-    logger.debug('message.server.debug.flushDns')
+    logger.debug("message.server.debug.flushDns")
     try {
       await this.flushDNS()
-      logger.debug('message.server.debug.flushDnsSuccess')
+      logger.debug("message.server.debug.flushDnsSuccess")
     } catch (err) {
-      logger.error('message.server.error.flushDns', err)
+      logger.error("message.server.error.flushDns", err)
       this.restart(15e3)
     }
   }
@@ -242,10 +223,10 @@ export default class Server {
     const { observer, dnsServer, webServer, kcpServer, readyToStart } = this
     if (!readyToStart) return
 
-    observer.observe({ entryTypes: ['measure'], buffered: true })
+    observer.observe({ entryTypes: ["measure"], buffered: true })
 
-    Logger.mark('Start')
-    logger.info('message.server.info.starting')
+    Logger.mark("Start")
+    logger.info("message.server.info.starting")
 
     await this.setHosts()
 
@@ -254,33 +235,28 @@ export default class Server {
     async function onListening(): Promise<void> {
       if (++listening < 3) return
 
-      logger.info('message.server.info.started')
-      Logger.measure('Server start', 'Start')
+      logger.info("message.server.info.started")
+      Logger.measure("Server start", "Start")
     }
 
-    dnsServer.on('listening', onListening)
-    webServer.on('listening', onListening)
+    dnsServer.on("listening", onListening)
+    webServer.on("listening", onListening)
 
     try {
       dnsServer.start()
-      await webServer.start([
-        { port: httpPort },
-        { port: httpsPort, useHttps: true },
-        { port: recorderPort }
-      ])
+      await webServer.start([{ port: httpPort }, { port: httpsPort, useHttps: true }, { port: recorderPort }])
       await kcpServer.start()
       await onListening()
 
       await this.tryPatchGame()
-
-      await this.resourceCache()
+      await this.generateHandBook()
     } catch (err) {
-      logger.error('message.server.error.start', err)
+      logger.error("message.server.error.start", err)
     }
   }
 
-  async restart(delay: number = 1e3): Promise<void> {
-    logger.info('message.server.info.restart', delay)
+  async restart(delay = 1e3): Promise<void> {
+    logger.info("message.server.info.restart", delay)
 
     await this.runShutdownTasks()
     await waitMs(delay)
@@ -289,8 +265,8 @@ export default class Server {
     exit()
   }
 
-  async stop(delay: number = 1e3): Promise<void> {
-    logger.info('message.server.info.stop', delay)
+  async stop(delay = 1e3): Promise<void> {
+    logger.info("message.server.info.stop", delay)
 
     await this.runShutdownTasks(true)
     await waitMs(delay)
@@ -298,7 +274,7 @@ export default class Server {
     exit()
   }
 
-  async runShutdownTasks(fullShutdown: boolean = false) {
+  async runShutdownTasks(fullShutdown = false) {
     const { observer, dnsServer, webServer, kcpServer, readyToStart } = this
     if (!readyToStart) return // Can't shutdown if it never started in the first place...
 
@@ -316,78 +292,53 @@ export default class Server {
 
     observer.disconnect()
 
-    await Logger.stopCapture(!!GlobalState.get('SaveLog'))
+    await Logger.stopCapture(!!GlobalState.get("SaveLog"))
   }
+  async generateHandBook() {
+    let filedata = `//Game version ${config.game.version}\n\n\n[Avatar]\n`
 
+    const avatarData = AvatarData.data
+    for (const data of avatarData.Avatar) {
+      logger.verbose("generic.param2", data.Id, data.Name)
+      filedata += `ID:${data.Id} Name:${data.Name}\n`
+    }
+
+    filedata += `\n\n[Monster: boss]\n`
+
+    const monsterData = MonsterData.data
+    for (const data of monsterData.Monster) {
+      if (data.Type === "MONSTER_BOSS") {
+        logger.verbose("generic.param3", data.Id, data.Name, data.Type)
+        filedata += `ID:${data.Id} Name:${data.Name} Type:${data.Type}\n`
+      }
+    }
+
+    filedata += `\n\n[Monster: ordinary]\n`
+
+    for (const data of monsterData.Monster) {
+      if (data.Type === "MONSTER_ORDINARY") {
+        logger.verbose("generic.param3", data.Id, data.Name, data.Type)
+        filedata += `ID:${data.Id} Name:${data.Name} Type:${data.Type}\n`
+      }
+    }
+
+    writeFile("./handbook.txt", filedata)
+  }
   setLogLevel(level: number) {
     logger.setLogLevel(level)
   }
 
   checkDirs() {
     for (const path of requiredDirs) {
-      try { if (statSync(join(cwd(), path))) continue } catch (err) { }
       try {
-        logger.info('message.server.info.mkdir', path)
+        if (statSync(join(cwd(), path))) continue
+      } catch (err) {}
+      try {
+        logger.info("message.server.info.mkdir", path)
         mkdirSync(join(cwd(), path), { recursive: true })
       } catch (err) {
-        logger.error('message.server.error.mkdir', err)
+        logger.error("message.server.error.mkdir", err)
       }
     }
-  }
-
-  async resourceCache() {
-    const tLogger = new TLogger()
-
-    tLogger.info("message.cache.info.start")
-
-    await AbilityData.getData()
-    tLogger.debug("message.cache.debug.ability")
-  
-    await AvatarData.getData()
-    tLogger.debug("message.cache.debug.avatar")
-  
-    await DungeonData.getData()
-    tLogger.debug("message.cache.debug.dungeon")
-  
-    await GadgetData.getData()
-    tLogger.debug("message.cache.debug.gadget")
-  
-    await GrowCurveData.getData()
-    tLogger.debug("message.cache.debug.growCurve")
-  
-    await MapAreaData.getData()
-    tLogger.debug("message.cache.debug.mapArea")
-  
-    await MaterialData.getData()
-    tLogger.debug("message.cache.debug.material")
-  
-    await MonsterData.getData()
-    tLogger.debug("message.cache.debug.monster")
-  
-    await ReliquaryData.getData()
-    tLogger.debug("message.cache.debug.reliquary")
-  
-    await SceneData.getData()
-    tLogger.debug("message.cache.debug.scene")
-  
-    await ShopData.getData()
-    tLogger.debug("message.cache.debug.shop")
-  
-    await SkillData.getData()
-    tLogger.debug("message.cache.debug.skill")
-  
-    await TalentData.getData()
-    tLogger.debug("message.cache.debug.talent")
-  
-    await WeaponData.getData()
-    tLogger.debug("message.cache.debug.weapon")
-  
-    await WeatherData.getData()
-    tLogger.debug("message.cache.debug.weather")
-  
-    await WorldData.getData()
-    tLogger.debug("message.cache.debug.world")
-  
-    tLogger.info("message.cache.info.success")
   }
 }

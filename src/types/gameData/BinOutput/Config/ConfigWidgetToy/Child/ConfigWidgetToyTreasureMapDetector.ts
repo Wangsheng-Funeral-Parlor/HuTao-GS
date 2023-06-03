@@ -1,5 +1,5 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyTreasureMapDetector extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyTreasureMapDetector'
+  $type: "ConfigWidgetToyTreasureMapDetector"
 }

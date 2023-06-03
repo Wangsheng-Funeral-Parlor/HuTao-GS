@@ -1,4 +1,4 @@
-import { MassivePropSyncInfo } from '.'
+import { MassivePropSyncInfo } from "."
 
 export interface AbilityMixinRecoverInfo {
   instancedAbilityId?: number

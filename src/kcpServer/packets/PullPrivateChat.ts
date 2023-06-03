@@ -1,7 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ChatInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import config from "@/config"
+import { ClientStateEnum } from "@/types/enum"
+import { ChatInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PullPrivateChatReq {
   targetUid: number
@@ -16,19 +17,23 @@ export interface PullPrivateChatRsp {
 
 class PullPrivateChatPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PullPrivateChat', {
+    super("PullPrivateChat", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
   async request(context: PacketContext, data: PullPrivateChatReq): Promise<void> {
     const { game, player } = context
-    const { targetUid, fromSequence, pullNum } = data
+    const { targetUid, pullNum, fromSequence } = data
+
+    const chatinfo = game.chatManager.pullPrivate(player, targetUid, fromSequence || 0, pullNum || 0).length
+      ? game.chatManager.pullPrivate(player, targetUid, fromSequence || 0, pullNum || 0)
+      : [{ time: Date.now(), uid: 1, toUid: player.uid, text: `Game Version ${config.game.version}` }]
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      chatInfo: game.chatManager.pullPrivate(player, targetUid, fromSequence || 0, pullNum || 0)
+      chatInfo: chatinfo,
     })
   }
 
@@ -38,4 +43,4 @@ class PullPrivateChatPacket extends Packet implements PacketInterface {
 }
 
 let packet: PullPrivateChatPacket
-export default (() => packet = packet || new PullPrivateChatPacket())()
+export default (() => (packet = packet || new PullPrivateChatPacket()))()

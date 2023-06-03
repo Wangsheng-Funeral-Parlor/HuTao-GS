@@ -1,9 +1,9 @@
-import BaseClass from '#/baseClass'
-import VehicleStamina from '#/packets/VehicleStamina'
-import Avatar from '$/entity/avatar'
-import Vehicle from '$/entity/gadget/vehicle'
-import { PlayerPropEnum } from '@/types/enum'
-import { ChangeHpReasonEnum, MotionStateEnum } from '@/types/proto/enum'
+import BaseClass from "#/baseClass"
+import VehicleStamina from "#/packets/VehicleStamina"
+import Avatar from "$/entity/avatar"
+import Vehicle from "$/entity/gadget/vehicle"
+import { PlayerPropEnum } from "@/types/enum"
+import { ChangeHpReasonEnum, MotionStateEnum } from "@/types/proto/enum"
 
 const UPDATE_INTERVAL = 200
 const RECOVER_AMOUNT = 500
@@ -61,8 +61,8 @@ export default class StaminaManager extends BaseClass {
     if (immediateQueue.length > 0 && startRecoverTime != null) this.startRecoverTime = sceneTime + 1e3
 
     // Update stamina
-    const amount = (this.calcRecoverAmount() - this.calcConsumeAmount()) +
-      immediateQueue.splice(0).reduce((p, v) => p + v, 0)
+    const amount =
+      this.calcRecoverAmount() - this.calcConsumeAmount() + immediateQueue.splice(0).reduce((p, v) => p + v, 0)
     if (amount === 0) return
 
     await this.setRelativeStamina(amount)
@@ -71,7 +71,7 @@ export default class StaminaManager extends BaseClass {
     const { entity, maxStamina, curStamina } = this
     if (!entity.isAlive() || curStamina > 0) return
 
-    if (entity instanceof Avatar && MotionStateEnum[entity.motion.state].includes('SWIM')) {
+    if (entity instanceof Avatar && MotionStateEnum[entity.motion.state].includes("SWIM")) {
       this.startConsumeTime = null
       await this.setStamina(maxStamina)
       await entity.player.returnToSafePos(ChangeHpReasonEnum.CHANGE_HP_SUB_DRAWN)
@@ -97,7 +97,7 @@ export default class StaminaManager extends BaseClass {
     this.startConsumeTime = null
   }
 
-  private async startRecover(delayed: boolean = false) {
+  private async startRecover(delayed = false) {
     await this.stopConsume()
 
     const { startRecoverTime, sceneTime } = this
@@ -139,11 +139,7 @@ export default class StaminaManager extends BaseClass {
   private async setRelativeStamina(value: number) {
     const { maxStamina, curStamina } = this
 
-    if (
-      value === 0 ||
-      (curStamina <= 0 && value < 0) ||
-      (curStamina >= maxStamina && value > 0)
-    ) return
+    if (value === 0 || (curStamina <= 0 && value < 0) || (curStamina >= maxStamina && value > 0)) return
 
     await this.setStamina(curStamina + value)
   }
@@ -192,7 +188,9 @@ export default class StaminaManager extends BaseClass {
     const { motion } = entity
     const { state } = motion
 
-    switch (state) { // NOSONAR
+    switch (
+      state // NOSONAR
+    ) {
       case MotionStateEnum.MOTION_CLIMB:
         await this.setRelativeStamina(-150)
         break

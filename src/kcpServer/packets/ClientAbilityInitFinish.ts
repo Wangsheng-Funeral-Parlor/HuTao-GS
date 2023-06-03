@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AbilityInvokeEntry } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { AbilityInvokeEntry } from "@/types/proto"
 
 export interface ClientAbilityInitFinishNotify {
   entityId: number
@@ -9,10 +9,10 @@ export interface ClientAbilityInitFinishNotify {
 
 class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ClientAbilityInitFinish', {
+    super("ClientAbilityInitFinish", {
       notifyWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
-      notifyWaitStateMask: 0xF0FF,
-      notifyWaitStatePass: true
+      notifyWaitStateMask: 0xf0ff,
+      notifyWaitStatePass: true,
     })
   }
 
@@ -25,7 +25,11 @@ class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
       const { broadcastContextList } = currentScene
       for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
-      await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), [], entityId)
+      await this.broadcastNotify(
+        broadcastContextList.filter((ctx) => ctx.player !== player),
+        [],
+        entityId
+      )
       return
     }
 
@@ -40,7 +44,7 @@ class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
   async broadcastNotify(contextList: PacketContext[], invokes: AbilityInvokeEntry[], entityId: number): Promise<void> {
     const notifyData: ClientAbilityInitFinishNotify = {
       entityId,
-      invokes
+      invokes,
     }
 
     await super.broadcastNotify(contextList, notifyData)
@@ -48,4 +52,4 @@ class ClientAbilityInitFinishPacket extends Packet implements PacketInterface {
 }
 
 let packet: ClientAbilityInitFinishPacket
-export default (() => packet = packet || new ClientAbilityInitFinishPacket())()
+export default (() => (packet = packet || new ClientAbilityInitFinishPacket()))()

@@ -1,7 +1,7 @@
-import ConfigBaseBulletMove from '.'
+import ConfigBaseBulletMove from "."
 
 export default interface ConfigTrackBulletMove extends ConfigBaseBulletMove {
-  $type: 'ConfigTrackBulletMove'
+  $type: "ConfigTrackBulletMove"
   DestroyWhenTargetDie: boolean
   TraceOnYAxis: boolean
 }

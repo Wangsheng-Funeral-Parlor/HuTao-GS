@@ -1,11 +1,13 @@
-import WeaponData from '$/gameData/data/WeaponData'
-import Player from '$/player'
-import { EquipTypeEnum, ItemTypeEnum } from '@/types/enum'
-import { EquipInfo, SceneWeaponInfo } from '@/types/proto'
-import WeaponUserData from '@/types/user/WeaponUserData'
-import Equip from '..'
-import Affix from './affix'
-import WeaponEntity from './weaponEntity'
+import Equip from ".."
+
+import Affix from "./affix"
+import WeaponEntity from "./weaponEntity"
+
+import WeaponData from "$/gameData/data/WeaponData"
+import Player from "$/player"
+import { EquipTypeEnum, ItemTypeEnum } from "@/types/enum"
+import { EquipInfo, SceneWeaponInfo } from "@/types/proto"
+import WeaponUserData from "@/types/user/WeaponUserData"
 
 export default class Weapon extends Equip {
   entity: WeaponEntity
@@ -13,7 +15,7 @@ export default class Weapon extends Equip {
   monsterEquip: boolean
   affixList: Affix[]
 
-  constructor(itemId: number, player: Player, monsterEquip: boolean = false) {
+  constructor(itemId: number, player: Player, monsterEquip = false) {
     super(itemId, player, ItemTypeEnum.ITEM_WEAPON, EquipTypeEnum.EQUIP_WEAPON)
 
     this.monsterEquip = monsterEquip
@@ -22,7 +24,7 @@ export default class Weapon extends Equip {
     this.affixList = []
   }
 
-  static createByGadgetId(gadgetId: number, player: Player, monsterEquip: boolean = false): Weapon {
+  static createByGadgetId(gadgetId: number, player: Player, monsterEquip = false): Weapon {
     const weapon = new Weapon(0, player, monsterEquip)
     weapon.gadgetId = gadgetId
     return weapon
@@ -30,7 +32,8 @@ export default class Weapon extends Equip {
 
   private async loadWeaponData() {
     const { itemId, gadgetId, affixList } = this
-    const weaponData = itemId === 0 ? await WeaponData.getWeaponByGadgetId(gadgetId) : await WeaponData.getWeapon(itemId)
+    const weaponData =
+      itemId === 0 ? await WeaponData.getWeaponByGadgetId(gadgetId) : await WeaponData.getWeapon(itemId)
 
     this.itemId = weaponData?.Id || itemId
     this.gadgetId = weaponData?.GadgetId || gadgetId
@@ -74,14 +77,14 @@ export default class Weapon extends Equip {
 
     await this.loadWeaponData()
     for (const affixData of affixDataList) {
-      const affix = affixList.find(a => a.id === affixData.id)
+      const affix = affixList.find((a) => a.id === affixData.id)
       affix?.init(affixData)
     }
 
     await entity.init(entityData)
   }
 
-  async initNew() {
+  async initNew(level?: number) {
     const { entity, affixList } = this
 
     await super.initNew()
@@ -89,11 +92,11 @@ export default class Weapon extends Equip {
     await this.loadWeaponData()
     for (const affix of affixList) affix.initNew()
 
-    await entity.initNew()
+    await entity.initNew(level)
   }
 
   exportAffixMap() {
-    return Object.fromEntries(this.affixList.map(a => [a.id, a.level]))
+    return Object.fromEntries(this.affixList.map((a) => [a.id, a.level]))
   }
 
   exportSceneWeaponInfo(): SceneWeaponInfo {
@@ -106,7 +109,7 @@ export default class Weapon extends Equip {
       level,
       promoteLevel,
       abilityInfo: {},
-      affixMap: this.exportAffixMap()
+      affixMap: this.exportAffixMap(),
     }
   }
 
@@ -117,18 +120,21 @@ export default class Weapon extends Equip {
         level,
         exp,
         promoteLevel,
-        affixMap: this.exportAffixMap()
+        affixMap: this.exportAffixMap(),
       },
-      isLocked
+      isLocked,
     }
   }
 
   exportUserData(): WeaponUserData {
     const { entity, affixList } = this
 
-    return Object.assign({
-      affixDataList: affixList.map(affix => affix.exportUserData()),
-      entityData: entity.exportUserData()
-    }, super.exportUserData())
+    return Object.assign(
+      {
+        affixDataList: affixList.map((affix) => affix.exportUserData()),
+        entityData: entity.exportUserData(),
+      },
+      super.exportUserData()
+    )
   }
 }

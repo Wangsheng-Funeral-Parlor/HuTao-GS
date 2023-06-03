@@ -1,4 +1,4 @@
-import ConfigAbilitySystem from './ConfigAbilitySystem'
+import ConfigAbilitySystem from "./ConfigAbilitySystem"
 
 export default interface ConfigEntityAbilitySystem {
   OnBeingHit: ConfigAbilitySystem[]

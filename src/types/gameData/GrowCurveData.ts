@@ -1,4 +1,4 @@
-import { CurveExcelConfig } from './ExcelBinOutput/Common/CurveExcelConfig'
+import { CurveExcelConfig } from "./ExcelBinOutput/Common/CurveExcelConfig"
 
 export default interface GrowCurveDataGroup {
   Avatar: CurveExcelConfig[]

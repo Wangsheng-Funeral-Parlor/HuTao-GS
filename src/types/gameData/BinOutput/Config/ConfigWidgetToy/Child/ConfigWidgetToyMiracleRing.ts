@@ -1,5 +1,5 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyMiracleRing extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyMiracleRing'
+  $type: "ConfigWidgetToyMiracleRing"
 }

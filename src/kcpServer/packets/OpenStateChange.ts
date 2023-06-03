@@ -1,4 +1,4 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
 
 export interface OpenStateChangeNotify {
   openStateMap: { [key: number]: number }
@@ -6,12 +6,12 @@ export interface OpenStateChangeNotify {
 
 class OpenStateChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('OpenStateChange')
+    super("OpenStateChange")
   }
 
   async sendNotify(context: PacketContext, openStateMap: { [key: number]: number }): Promise<void> {
     const notifyData: OpenStateChangeNotify = {
-      openStateMap
+      openStateMap,
     }
 
     await super.sendNotify(context, notifyData)
@@ -19,4 +19,4 @@ class OpenStateChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: OpenStateChangePacket
-export default (() => packet = packet || new OpenStateChangePacket())()
+export default (() => (packet = packet || new OpenStateChangePacket()))()

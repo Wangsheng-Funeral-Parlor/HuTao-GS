@@ -1,5 +1,6 @@
-import { WidgetCreateLocationInfo } from '.'
-import { WidgetCreatorOpTypeEnum } from './enum'
+import { WidgetCreatorOpTypeEnum } from "./enum"
+
+import { WidgetCreateLocationInfo } from "."
 
 export interface WidgetCreatorInfo {
   opType: WidgetCreatorOpTypeEnum

@@ -1,5 +1,5 @@
-import EntityUserData from './EntityUserData'
-import EquipUserData from './EquipUserData'
+import EntityUserData from "./EntityUserData"
+import EquipUserData from "./EquipUserData"
 
 export interface WeaponAffixUserData {
   id: number

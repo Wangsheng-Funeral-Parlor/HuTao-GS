@@ -1,4 +1,4 @@
-import ConfigTalent from './BinOutput/Config/ConfigTalent'
+import ConfigTalent from "./BinOutput/Config/ConfigTalent"
 
 export interface AvatarTalentData {
   Id: number

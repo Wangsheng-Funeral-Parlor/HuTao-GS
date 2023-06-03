@@ -1,18 +1,24 @@
-import { Readable } from 'stream'
-import DnsPacket, { PacketResource, ResA, ResAAAA, ResCNAME, ResSVCB } from './packet'
-import { NAME_TO_QTYPE, QTYPE_TO_NAME } from './packet/consts'
+import { Readable } from "stream"
+
+import DnsPacket, { PacketResource, ResA, ResAAAA, ResCNAME, ResSVCB } from "./packet"
+import { NAME_TO_QTYPE, QTYPE_TO_NAME } from "./packet/consts"
 
 function getAnsValue(res: PacketResource) {
   switch (res.type) {
     case NAME_TO_QTYPE.A:
-      return (res as ResA).address
+      return (<ResA>res).address
     case NAME_TO_QTYPE.AAAA:
-      return (res as ResAAAA).address
+      return (<ResAAAA>res).address
     case NAME_TO_QTYPE.CNAME:
-      return (res as ResCNAME).domain
+      return (<ResCNAME>res).domain
     case NAME_TO_QTYPE.SVCB:
     case NAME_TO_QTYPE.HTTPS:
-      return (res as ResSVCB).priority + JSON.stringify(Object.fromEntries(Object.entries((res as ResSVCB).fields).map(e => [e[0], e[1].toString('utf8')])))
+      return (
+        (<ResSVCB>res).priority +
+        JSON.stringify(
+          Object.fromEntries(Object.entries((<ResSVCB>res).fields).map((e) => [e[0], e[1].toString("utf8")]))
+        )
+      )
     default:
       return res.data?.toString()
   }
@@ -26,7 +32,7 @@ export const listAnswer = (response: Buffer): string => {
     results.push(`${QTYPE_TO_NAME[r.type] || r.type}:${getAnsValue(r)}`)
   }
 
-  return results.join(',') || 'nxdomain'
+  return results.join(",") || "nxdomain"
 }
 
 export const readStream = (stream: Readable): Promise<Buffer> => {
@@ -42,11 +48,11 @@ export const readStream = (stream: Readable): Promise<Buffer> => {
       resolve(Buffer.concat(chunks, chunkLen).subarray(2))
     }
 
-    stream.on('error', reject)
-    stream.on('end', processMessage)
-    stream.on('readable', () => {
+    stream.on("error", reject)
+    stream.on("end", processMessage)
+    stream.on("readable", () => {
       let chunk: Buffer
-      while (chunk = stream.read()) {
+      while ((chunk = stream.read())) {
         chunks.push(chunk)
         chunkLen += chunk.length
       }

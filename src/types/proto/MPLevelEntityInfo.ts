@@ -1,4 +1,4 @@
-import { AbilitySyncStateInfo } from '.'
+import { AbilitySyncStateInfo } from "."
 
 export interface MPLevelEntityInfo {
   entityId: number

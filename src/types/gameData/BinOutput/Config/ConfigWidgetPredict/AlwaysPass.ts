@@ -1,1 +1,1 @@
-export default interface AlwaysPass { }
+export default interface AlwaysPass {}

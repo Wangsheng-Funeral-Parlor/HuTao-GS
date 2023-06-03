@@ -1,4 +1,4 @@
-import ConfigAIMixinActions from './ConfigAIMixinActions'
+import ConfigAIMixinActions from "./ConfigAIMixinActions"
 
 export default interface ConfigAIMixinSetControllerParameter {
   EntityTypes: string[]

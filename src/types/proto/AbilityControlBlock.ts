@@ -1,4 +1,4 @@
-import { AbilityEmbryo } from '.'
+import { AbilityEmbryo } from "."
 
 export interface AbilityControlBlock {
   abilityEmbryoList?: AbilityEmbryo[]

@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface PlayerGetForceQuitBanInfoReq { }
+export interface PlayerGetForceQuitBanInfoReq {}
 
 export interface PlayerGetForceQuitBanInfoRsp {
   retcode: RetcodeEnum
@@ -11,7 +11,7 @@ export interface PlayerGetForceQuitBanInfoRsp {
 
 class PlayerGetForceQuitBanInfoPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerGetForceQuitBanInfo')
+    super("PlayerGetForceQuitBanInfo")
   }
 
   async request(context: PacketContext, _data: PlayerGetForceQuitBanInfoReq): Promise<void> {
@@ -24,4 +24,4 @@ class PlayerGetForceQuitBanInfoPacket extends Packet implements PacketInterface 
 }
 
 let packet: PlayerGetForceQuitBanInfoPacket
-export default (() => packet = packet || new PlayerGetForceQuitBanInfoPacket())()
+export default (() => (packet = packet || new PlayerGetForceQuitBanInfoPacket()))()

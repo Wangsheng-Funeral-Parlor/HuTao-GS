@@ -1,4 +1,4 @@
-import ConfigAIMixinSetControllerParameter from './ConfigAIMixinSetControllerParameter'
+import ConfigAIMixinSetControllerParameter from "./ConfigAIMixinSetControllerParameter"
 
 export default interface ConfigAIMixinSetControllerCondition {
   PoseIDs: number[]

@@ -1,4 +1,4 @@
-import { ReliquaryInfo, WeaponInfo } from '.'
+import { ReliquaryInfo, WeaponInfo } from "."
 
 export interface EquipInfo {
   reliquary?: ReliquaryInfo

@@ -1,7 +1,5 @@
-import { BornRandomFromCenter, BornRandomInShape } from './Child'
+import { BornRandomFromCenter, BornRandomInShape } from "./Child"
 
-type BornRandom =
-  BornRandomFromCenter |
-  BornRandomInShape
+type BornRandom = BornRandomFromCenter | BornRandomInShape
 
 export default BornRandom

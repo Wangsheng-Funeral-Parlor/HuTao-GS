@@ -1,7 +1,7 @@
-import ConfigBaseScenePoint from '.'
+import ConfigBaseScenePoint from "."
 
 export default interface VirtualTransPoint extends ConfigBaseScenePoint {
-  $type: 'VirtualTransPoint'
+  $type: "VirtualTransPoint"
   IsForbidAvatarRevive?: boolean
   IsForbidAvatarAutoUseSpring?: boolean
   MapVisibility?: string

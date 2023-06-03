@@ -1,8 +1,8 @@
-import Avatar from '$/entity/avatar'
-import Player from '$/player'
-import { EquipTypeEnum, ItemTypeEnum } from '@/types/enum'
-import { EquipInfo } from '@/types/proto'
-import EquipUserData from '@/types/user/EquipUserData'
+import Avatar from "$/entity/avatar"
+import Player from "$/player"
+import { EquipTypeEnum, ItemTypeEnum } from "@/types/enum"
+import { EquipInfo } from "@/types/proto"
+import EquipUserData from "@/types/user/EquipUserData"
 
 export default class Equip {
   player: Player
@@ -45,7 +45,9 @@ export default class Equip {
   }
 
   // placeholder
-  export(): EquipInfo { return null }
+  export(): EquipInfo {
+    return null
+  }
 
   exportUserData(): EquipUserData {
     const { guid, itemId, gadgetId, type, isLocked } = this
@@ -55,7 +57,7 @@ export default class Equip {
       itemId,
       gadgetId,
       type,
-      isLocked
+      isLocked,
     }
   }
 }

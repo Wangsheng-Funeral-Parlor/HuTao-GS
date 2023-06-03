@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
 
-export interface WorldPlayerReviveReq { }
+export interface WorldPlayerReviveReq {}
 
 export interface WorldPlayerReviveRsp {
   retcode: RetcodeEnum
@@ -10,9 +10,9 @@ export interface WorldPlayerReviveRsp {
 
 class WorldPlayerRevivePacket extends Packet implements PacketInterface {
   constructor() {
-    super('WorldPlayerRevive', {
+    super("WorldPlayerRevive", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -25,7 +25,13 @@ class WorldPlayerRevivePacket extends Packet implements PacketInterface {
     await team.reviveAllAvatar()
 
     // Teleport player
-    await currentScene.join(context, lastSafePos.clone(), lastSafeRot.clone(), SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.REVIVAL)
+    await currentScene.join(
+      context,
+      lastSafePos.clone(),
+      lastSafeRot.clone(),
+      SceneEnterTypeEnum.ENTER_JUMP,
+      SceneEnterReasonEnum.REVIVAL
+    )
 
     await this.response(context, { retcode: RetcodeEnum.RET_SUCC })
   }
@@ -36,4 +42,4 @@ class WorldPlayerRevivePacket extends Packet implements PacketInterface {
 }
 
 let packet: WorldPlayerRevivePacket
-export default (() => packet = packet || new WorldPlayerRevivePacket())()
+export default (() => (packet = packet || new WorldPlayerRevivePacket()))()

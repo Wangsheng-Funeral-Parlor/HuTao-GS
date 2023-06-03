@@ -1,4 +1,4 @@
-import SkillDepot from './skillDepot'
+import SkillDepot from "./skillDepot"
 
 export default class InherentProudSkill {
   depot: SkillDepot

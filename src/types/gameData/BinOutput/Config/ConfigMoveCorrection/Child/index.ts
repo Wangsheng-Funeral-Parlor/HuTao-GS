@@ -1,1 +1,1 @@
-export default interface ConfigBaseMoveCorrection { }
+export default interface ConfigBaseMoveCorrection {}

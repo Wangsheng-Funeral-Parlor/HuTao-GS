@@ -36,20 +36,7 @@ export interface DungeonData {
   StatueCostCount?: number
   StatueDrop?: number
 
-  Challenge?: {
-    ChallengeType: string
-    NoSuccessHint: boolean
-    NoFailHint: boolean
-    IsBlockTopTimer: boolean
-    IsSuccessWhenNotSettled: boolean
-
-    InterruptButtonType?: string
-    SubChallengeFadeOutRule?: string
-    SubChallengeFadeOutDelayTime?: number
-    SubChallengeBannerRule?: string
-    RecordType?: string
-    ActivitySkillID?: number
-  }
+  Challenge?: DungeonChallengeData
 
   ElementChallenge?: {
     TrialAvatarId: number[]
@@ -78,6 +65,21 @@ export interface DungeonData {
   }
 }
 
+export interface DungeonChallengeData {
+  Id: number
+  ChallengeType: string
+  NoSuccessHint: boolean
+  NoFailHint: boolean
+  IsBlockTopTimer: boolean
+  IsSuccessWhenNotSettled: boolean
+
+  InterruptButtonType?: string
+  SubChallengeFadeOutRule?: string
+  SubChallengeFadeOutDelayTime?: number
+  SubChallengeBannerRule?: string
+  RecordType?: string
+  ActivitySkillID?: number
+}
 export interface DungeonEntryData {
   Id: number
   SceneId: number
@@ -118,4 +120,5 @@ export default interface DungeonDataGroup {
   Entry: DungeonEntryData[]
   MapArea: DungeonMapAreaData[]
   Roster: DungeonRosterData[]
+  Challenge: DungeonChallengeData[]
 }

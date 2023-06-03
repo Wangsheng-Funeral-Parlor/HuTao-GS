@@ -1,7 +1,7 @@
-import AIPoint from './AIPoint'
-import ConfigAITSAbilityGlobalValueSetting from './ConfigAITSAbilityGlobalValueSetting'
-import ConfigAITSTargetBearingSetting from './ConfigAITSTargetBearingSetting'
-import ConfigAITSTargetDistanceSetting from './ConfigAITSTargetDistanceSetting'
+import AIPoint from "./AIPoint"
+import ConfigAITSAbilityGlobalValueSetting from "./ConfigAITSAbilityGlobalValueSetting"
+import ConfigAITSTargetBearingSetting from "./ConfigAITSTargetBearingSetting"
+import ConfigAITSTargetDistanceSetting from "./ConfigAITSTargetDistanceSetting"
 
 export default interface ConfigAIThreatSetting {
   Enable: boolean

@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Vehicle from '$/entity/gadget/vehicle'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Vehicle from "$/entity/gadget/vehicle"
 
 export interface VehicleStaminaNotify {
   entityId: number
@@ -8,7 +8,7 @@ export interface VehicleStaminaNotify {
 
 class VehicleStaminaPacket extends Packet implements PacketInterface {
   constructor() {
-    super('VehicleStamina')
+    super("VehicleStamina")
   }
 
   async sendNotify(context: PacketContext, vehicle: Vehicle): Promise<void> {
@@ -16,7 +16,7 @@ class VehicleStaminaPacket extends Packet implements PacketInterface {
     const { curStamina } = staminaManager
     const notifyData: VehicleStaminaNotify = {
       entityId,
-      curStamina: curStamina / 100
+      curStamina: curStamina / 100,
     }
 
     await super.sendNotify(context, notifyData)
@@ -28,4 +28,4 @@ class VehicleStaminaPacket extends Packet implements PacketInterface {
 }
 
 let packet: VehicleStaminaPacket
-export default (() => packet = packet || new VehicleStaminaPacket())()
+export default (() => (packet = packet || new VehicleStaminaPacket()))()

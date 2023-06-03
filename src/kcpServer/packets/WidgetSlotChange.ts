@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { WidgetSlotData } from '@/types/proto'
-import { WidgetSlotOpEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { WidgetSlotData } from "@/types/proto"
+import { WidgetSlotOpEnum } from "@/types/proto/enum"
 
 export interface WidgetSlotChangeNotify {
   op: WidgetSlotOpEnum
@@ -9,7 +9,7 @@ export interface WidgetSlotChangeNotify {
 
 class WidgetSlotChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('WidgetSlotChange')
+    super("WidgetSlotChange")
   }
 
   async sendNotify(context: PacketContext, data: WidgetSlotChangeNotify): Promise<void> {
@@ -18,4 +18,4 @@ class WidgetSlotChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: WidgetSlotChangePacket
-export default (() => packet = packet || new WidgetSlotChangePacket())()
+export default (() => (packet = packet || new WidgetSlotChangePacket()))()

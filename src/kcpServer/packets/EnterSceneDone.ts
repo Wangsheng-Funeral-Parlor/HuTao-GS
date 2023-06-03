@@ -1,7 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { RetcodeEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
-import PlayerEyePointState from './PlayerEyePointState'
+import PlayerEyePointState from "./PlayerEyePointState"
+
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
 
 export interface EnterSceneDoneReq {
   enterSceneToken: number
@@ -14,10 +15,10 @@ export interface EnterSceneDoneRsp {
 
 class EnterSceneDonePacket extends Packet implements PacketInterface {
   constructor() {
-    super('EnterSceneDone', {
+    super("EnterSceneDone", {
       reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.SCENE_INIT_FINISH,
-      reqWaitStateMask: 0xF0FF,
-      reqWaitStatePass: true
+      reqWaitStateMask: 0xf0ff,
+      reqWaitStatePass: true,
     })
   }
 
@@ -27,10 +28,12 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
     const { enterSceneToken } = currentScene
     const { enterSceneToken: token } = data
 
-    if (this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE, true, 0xF0FF, false)) {
+    if (
+      this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE, true, 0xf0ff, false)
+    ) {
       await this.response(context, {
         retcode: RetcodeEnum.RET_SUCC,
-        enterSceneToken
+        enterSceneToken,
       })
       return
     }
@@ -41,25 +44,23 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
     }
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_ENTER_SCENE_DONE
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.PRE_ENTER_SCENE_DONE
 
     // Emit player join event
-    await currentScene.emit('PlayerJoin', player, sceneEnterType, seqId)
+    await currentScene.emit("PlayerJoin", player, sceneEnterType, seqId)
 
-    if (
-      sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO &&
-      sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL
-    ) await player.windyRce('enterNewScene')
+    if (sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO && sceneEnterType !== SceneEnterTypeEnum.ENTER_GOTO_BY_PORTAL)
+      await player.windyFileRce("enterNewScene")
 
     await PlayerEyePointState.sendNotify(context, {})
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      enterSceneToken
+      enterSceneToken,
     })
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.ENTER_SCENE_DONE
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.ENTER_SCENE_DONE
   }
 
   async response(context: PacketContext, data: EnterSceneDoneRsp): Promise<void> {
@@ -68,4 +69,4 @@ class EnterSceneDonePacket extends Packet implements PacketInterface {
 }
 
 let packet: EnterSceneDonePacket
-export default (() => packet = packet || new EnterSceneDonePacket())()
+export default (() => (packet = packet || new EnterSceneDonePacket()))()

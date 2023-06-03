@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ActivityScheduleInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ActivityScheduleInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetActivityScheduleReq { }
+export interface GetActivityScheduleReq {}
 
 export interface GetActivityScheduleRsp {
   retcode: RetcodeEnum
@@ -12,7 +12,7 @@ export interface GetActivityScheduleRsp {
 
 class GetActivitySchedulePacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetActivitySchedule')
+    super("GetActivitySchedule")
   }
 
   async request(context: PacketContext, _data: GetActivityScheduleReq): Promise<void> {
@@ -20,7 +20,7 @@ class GetActivitySchedulePacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      activityScheduleList: game.activityManager.exportActivityScheduleInfoList()
+      activityScheduleList: game.activityManager.exportActivityScheduleInfoList(),
     })
   }
 
@@ -30,4 +30,4 @@ class GetActivitySchedulePacket extends Packet implements PacketInterface {
 }
 
 let packet: GetActivitySchedulePacket
-export default (() => packet = packet || new GetActivitySchedulePacket())()
+export default (() => (packet = packet || new GetActivitySchedulePacket()))()

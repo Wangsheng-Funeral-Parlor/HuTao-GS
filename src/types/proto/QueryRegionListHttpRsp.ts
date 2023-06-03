@@ -1,5 +1,6 @@
-import { RegionSimpleInfo } from '.'
-import { RetcodeEnum } from './enum'
+import { RetcodeEnum } from "./enum"
+
+import { RegionSimpleInfo } from "."
 
 export interface QueryRegionListHttpRsp {
   retcode?: RetcodeEnum

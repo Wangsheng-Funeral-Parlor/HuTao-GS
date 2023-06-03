@@ -1,4 +1,4 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
 
 export interface AvatarFightPropUpdateNotify {
   avatarGuid: string
@@ -7,7 +7,7 @@ export interface AvatarFightPropUpdateNotify {
 
 class AvatarFightPropUpdatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarFightPropUpdate')
+    super("AvatarFightPropUpdate")
   }
 
   async sendNotify(context: PacketContext, data: AvatarFightPropUpdateNotify): Promise<void> {
@@ -16,4 +16,4 @@ class AvatarFightPropUpdatePacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarFightPropUpdatePacket
-export default (() => packet = packet || new AvatarFightPropUpdatePacket())()
+export default (() => (packet = packet || new AvatarFightPropUpdatePacket()))()

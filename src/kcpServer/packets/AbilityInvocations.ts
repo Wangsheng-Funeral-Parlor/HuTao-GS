@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AbilityInvokeEntry } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { AbilityInvokeEntry } from "@/types/proto"
 
 export interface AbilityInvocationsNotify {
   invokes: AbilityInvokeEntry[]
@@ -8,9 +8,9 @@ export interface AbilityInvocationsNotify {
 
 class AbilityInvocationsPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AbilityInvocations', {
+    super("AbilityInvocations", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -34,4 +34,4 @@ class AbilityInvocationsPacket extends Packet implements PacketInterface {
 }
 
 let packet: AbilityInvocationsPacket
-export default (() => packet = packet || new AbilityInvocationsPacket())()
+export default (() => (packet = packet || new AbilityInvocationsPacket()))()

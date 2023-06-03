@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { OnlinePlayerInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { OnlinePlayerInfo } from "@/types/proto"
 
 export interface WorldPlayerInfoNotify {
   playerInfoList: OnlinePlayerInfo[]
@@ -9,7 +9,7 @@ export interface WorldPlayerInfoNotify {
 
 class WorldPlayerInfoPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WorldPlayerInfo')
+    super("WorldPlayerInfo")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -19,7 +19,7 @@ class WorldPlayerInfoPacket extends Packet implements PacketInterface {
 
     const notifyData: WorldPlayerInfoNotify = {
       playerInfoList: currentWorld.exportWorldPlayerInfoList(),
-      playerUidList: currentWorld.playerList.map(p => p.uid)
+      playerUidList: currentWorld.playerList.map((p) => p.uid),
     }
 
     await super.sendNotify(context, notifyData)
@@ -31,4 +31,4 @@ class WorldPlayerInfoPacket extends Packet implements PacketInterface {
 }
 
 let packet: WorldPlayerInfoPacket
-export default (() => packet = packet || new WorldPlayerInfoPacket())()
+export default (() => (packet = packet || new WorldPlayerInfoPacket()))()

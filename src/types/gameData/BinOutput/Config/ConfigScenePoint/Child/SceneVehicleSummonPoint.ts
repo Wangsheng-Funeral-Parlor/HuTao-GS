@@ -1,8 +1,9 @@
-import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigBaseScenePoint from '.'
+import ConfigBaseScenePoint from "."
+
+import { DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface SceneVehicleSummonPoint extends ConfigBaseScenePoint {
-  $type: 'SceneVehicleSummonPoint'
+  $type: "SceneVehicleSummonPoint"
   GLOFNHHDOME?: boolean
   VehicleType: string
   VehicleGadgetId: number

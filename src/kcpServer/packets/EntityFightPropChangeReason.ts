@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum, FightPropEnum } from '@/types/enum'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PropChangeReasonEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum, FightPropEnum } from "@/types/enum"
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, PropChangeReasonEnum } from "@/types/proto/enum"
 
 export interface EntityFightPropChangeReasonNotify {
   entityId: number
@@ -14,7 +14,7 @@ export interface EntityFightPropChangeReasonNotify {
 
 class EntityFightPropChangeReasonPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EntityFightPropChangeReason')
+    super("EntityFightPropChangeReason")
   }
 
   async sendNotify(context: PacketContext, data: EntityFightPropChangeReasonNotify): Promise<void> {
@@ -29,4 +29,4 @@ class EntityFightPropChangeReasonPacket extends Packet implements PacketInterfac
 }
 
 let packet: EntityFightPropChangeReasonPacket
-export default (() => packet = packet || new EntityFightPropChangeReasonPacket())()
+export default (() => (packet = packet || new EntityFightPropChangeReasonPacket()))()

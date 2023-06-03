@@ -1,13 +1,14 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-import { cwd } from 'process'
-import Logger from './logger'
-import { DEFAULT_LANG } from './translate/data'
-import { cRGB } from './tty/utils'
+import { existsSync, readFileSync, writeFileSync } from "fs"
+import { join } from "path"
+import { cwd } from "process"
 
-const stateFilePath = join(cwd(), 'data/state.json')
+import Logger from "./logger"
+import { DEFAULT_LANG } from "./translate/data"
+import { cRGB } from "./tty/utils"
 
-const logger = new Logger('GSTATE', 0x5794ff)
+const stateFilePath = join(cwd(), "data/state.json")
+
+const logger = new Logger("GSTATE", 0x5794ff)
 
 type GStateValue = string | number | boolean
 
@@ -16,11 +17,11 @@ export interface GlobalStateData {
   SaveLog: boolean
   SaveRecorder: boolean
   SaveReport: boolean
-  CheckHostHeader: boolean
   PacketDump: boolean
   ShowPacketId: boolean
   UseProtoMatch: boolean
-  WorldSpawn: boolean
+  EnableScript: boolean
+  KickMismatchVersion: boolean
 }
 
 export const DEFAULT_GSTATE: GlobalStateData = {
@@ -28,11 +29,11 @@ export const DEFAULT_GSTATE: GlobalStateData = {
   SaveLog: false,
   SaveRecorder: false,
   SaveReport: false,
-  CheckHostHeader: false,
   PacketDump: false,
   ShowPacketId: false,
   UseProtoMatch: false,
-  WorldSpawn: true
+  EnableScript: true,
+  KickMismatchVersion: false,
 }
 
 export default class GlobalState {
@@ -54,18 +55,18 @@ export default class GlobalState {
   private castValue(key: string, val: GStateValue): GStateValue | null {
     const targetType = typeof DEFAULT_GSTATE[key]
     switch (targetType) {
-      case 'string': {
+      case "string": {
         return val?.toString()
       }
-      case 'number': {
+      case "number": {
         const v = Number(val)
         if (isNaN(v)) return null
         return v
       }
-      case 'boolean': {
+      case "boolean": {
         const v = val?.toString()?.toLowerCase()
-        if (['true', 't', 'yes', 'y', '1'].includes(v)) return true
-        if (['false', 'f', 'no', 'n', '0'].includes(v)) return false
+        if (["true", "t", "yes", "y", "1"].includes(v)) return true
+        if (["false", "f", "no", "n", "0"].includes(v)) return false
         return null
       }
       default: {
@@ -90,10 +91,10 @@ export default class GlobalState {
   set(key: string, val: GStateValue) {
     const { state } = this
 
-    if (state[key] == null) return logger.warn('Unknown global state:', key)
+    if (state[key] == null) return logger.warn("Unknown global state:", key)
 
     val = this.castValue(key, val)
-    if (val == null) return logger.warn('Invalid type, value must be a ', typeof state[key])
+    if (val == null) return logger.warn("Invalid type, value must be a ", typeof state[key])
 
     if (state[key] !== val) {
       state[key] = val
@@ -119,9 +120,9 @@ export default class GlobalState {
     const val = this.get(key)
     if (val == null) return
 
-    let msg = `${cRGB(0xffffff, key)}${cRGB(0x57ff65, ' -> ')}`
+    let msg = `${cRGB(0xffffff, key)}${cRGB(0x57ff65, " -> ")}`
 
-    if (typeof val === 'boolean') msg += cRGB(0xffffff, val ? 'Yes' : 'No')
+    if (typeof val === "boolean") msg += cRGB(0xffffff, val ? "Yes" : "No")
     else msg += cRGB(0xffffff, val?.toString())
 
     logger.info(msg)
@@ -144,18 +145,18 @@ export default class GlobalState {
     const { state } = this
 
     try {
-      if (!existsSync(stateFilePath)) return logger.info('No saved state, using default.')
+      if (!existsSync(stateFilePath)) return logger.info("No saved state, using default.")
 
-      logger.info('Loading...')
+      logger.info("Loading...")
 
-      const saved = JSON.parse(readFileSync(stateFilePath, 'utf8'))
+      const saved = JSON.parse(readFileSync(stateFilePath, "utf8"))
       for (const key in state) {
         if (saved[key] != null) state[key] = saved[key]
       }
 
-      logger.info('Loaded.')
+      logger.info("Loaded.")
     } catch (err) {
-      logger.error('Failed to load state file:', err)
+      logger.error("Failed to load state file:", err)
     }
   }
 
@@ -166,18 +167,18 @@ export default class GlobalState {
   save() {
     try {
       if (!this.modified) {
-        logger.info('No changes detected.')
+        logger.info("No changes detected.")
         return
       }
 
-      logger.info('Saving...')
+      logger.info("Saving...")
 
       writeFileSync(stateFilePath, JSON.stringify(this.state))
       this.modified = false
 
-      logger.info('Saved.')
+      logger.info("Saved.")
     } catch (err) {
-      logger.error('Failed to save state file:', err)
+      logger.error("Failed to save state file:", err)
     }
   }
 }

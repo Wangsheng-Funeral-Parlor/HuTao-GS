@@ -1,11 +1,13 @@
-import BaseClass from '#/baseClass'
-import CLI from '@/cli'
-import { noColor } from '@/tty/utils'
-import { ChatInfo } from '@/types/proto'
-import { waitMs } from '@/utils/asyncWait'
-import { getTimeSeconds } from '@/utils/time'
-import util from 'util'
-import ChatChannel from './chatChannel'
+import util from "util"
+
+import ChatChannel from "./chatChannel"
+
+import BaseClass from "#/baseClass"
+import CLI from "@/cli"
+import { noColor } from "@/tty/utils"
+import { ChatInfo } from "@/types/proto"
+import { waitMs } from "@/utils/asyncWait"
+import { getTimeSeconds } from "@/utils/time"
 
 export default class CommandHandler extends BaseClass {
   channel: ChatChannel
@@ -25,7 +27,7 @@ export default class CommandHandler extends BaseClass {
   }
 
   printError(...args: any[]) {
-    args.unshift('Error:')
+    args.unshift("Error:")
     this.print(...args)
   }
 
@@ -40,10 +42,10 @@ export default class CommandHandler extends BaseClass {
     const err = await CLI.execCommand(text.slice(1), {
       cli: {
         print: this.print.bind(this),
-        printError: this.printError.bind(this)
+        printError: this.printError.bind(this),
       },
       kcpServer: game.server,
-      sender: player
+      sender: player,
     })
     if (err) this.printError(err)
 
@@ -53,7 +55,7 @@ export default class CommandHandler extends BaseClass {
       time: getTimeSeconds(),
       uid: 1,
       sequence: sequence + 1,
-      text: noColor(printBuffer.splice(0).join('\n'))
+      text: noColor(printBuffer.splice(0).join("\n")),
     })
   }
 }

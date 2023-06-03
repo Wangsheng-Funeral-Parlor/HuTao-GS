@@ -1,9 +1,9 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { WidgetSlotData } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { WidgetSlotData } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetWidgetSlotReq { }
+export interface GetWidgetSlotReq {}
 
 export interface GetWidgetSlotRsp {
   retcode: RetcodeEnum
@@ -12,9 +12,9 @@ export interface GetWidgetSlotRsp {
 
 class GetWidgetSlotPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetWidgetSlot', {
+    super("GetWidgetSlot", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -23,7 +23,7 @@ class GetWidgetSlotPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      slotList: widget.exportSlotList()
+      slotList: widget.exportSlotList(),
     })
   }
 
@@ -33,4 +33,4 @@ class GetWidgetSlotPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetWidgetSlotPacket
-export default (() => packet = packet || new GetWidgetSlotPacket())()
+export default (() => (packet = packet || new GetWidgetSlotPacket()))()

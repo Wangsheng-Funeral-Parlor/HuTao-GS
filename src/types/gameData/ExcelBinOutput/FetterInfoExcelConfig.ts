@@ -1,4 +1,4 @@
-import FetterConfig from './Common/FetterConfig'
+import FetterConfig from "./Common/FetterConfig"
 
 export interface FetterInfoExcelConfig extends FetterConfig {
   InfoBirthMonth: number

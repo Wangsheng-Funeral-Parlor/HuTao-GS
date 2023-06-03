@@ -1,7 +1,8 @@
-import { EvtCreateGadgetNotify } from '#/packets/EvtCreateGadget'
-import Player from '$/player'
-import { SceneGadgetInfo } from '@/types/proto'
-import Gadget from '.'
+import Gadget from "."
+
+import { EvtCreateGadgetNotify } from "#/packets/EvtCreateGadget"
+import Player from "$/player"
+import { SceneGadgetInfo } from "@/types/proto"
 
 export default class ClientGadget extends Gadget {
   player: Player
@@ -41,7 +42,7 @@ export default class ClientGadget extends Gadget {
       guid: guid.toString(),
       ownerEntityId,
       targetEntityId,
-      asyncLoad
+      asyncLoad,
     }
 
     return info

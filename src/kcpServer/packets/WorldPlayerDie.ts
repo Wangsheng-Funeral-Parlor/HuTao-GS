@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Entity from '$/entity'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayerDieTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Entity from "$/entity"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayerDieTypeEnum } from "@/types/proto/enum"
 
 export interface WorldPlayerDieNotify {
   monsterId?: number
@@ -13,7 +13,7 @@ export interface WorldPlayerDieNotify {
 
 class WorldPlayerDiePacket extends Packet implements PacketInterface {
   constructor() {
-    super('WorldPlayerDie')
+    super("WorldPlayerDie")
   }
 
   async sendNotify(context: PacketContext, targetEntity: Entity): Promise<void> {
@@ -23,7 +23,7 @@ class WorldPlayerDiePacket extends Packet implements PacketInterface {
 
     const notifyData: WorldPlayerDieNotify = {
       dieType,
-      murdererEntityId: attackerId
+      murdererEntityId: attackerId,
     }
 
     await super.sendNotify(context, notifyData)
@@ -31,4 +31,4 @@ class WorldPlayerDiePacket extends Packet implements PacketInterface {
 }
 
 let packet: WorldPlayerDiePacket
-export default (() => packet = packet || new WorldPlayerDiePacket())()
+export default (() => (packet = packet || new WorldPlayerDiePacket()))()

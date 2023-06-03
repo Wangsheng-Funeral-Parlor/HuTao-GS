@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PropValue } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PropValue } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SetPlayerPropReq {
   propList: PropValue[]
@@ -13,9 +13,9 @@ export interface SetPlayerPropRsp {
 
 class SetPlayerPropPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetPlayerProp', {
+    super("SetPlayerProp", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -35,4 +35,4 @@ class SetPlayerPropPacket extends Packet implements PacketInterface {
 }
 
 let packet: SetPlayerPropPacket
-export default (() => packet = packet || new SetPlayerPropPacket())()
+export default (() => (packet = packet || new SetPlayerPropPacket()))()

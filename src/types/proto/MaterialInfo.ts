@@ -1,4 +1,4 @@
-import { MaterialDeleteInfo } from '.'
+import { MaterialDeleteInfo } from "."
 
 export interface MaterialInfo {
   count: number

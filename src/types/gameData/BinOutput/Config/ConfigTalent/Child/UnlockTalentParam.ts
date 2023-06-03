@@ -1,7 +1,7 @@
-import ConfigBaseTalentMixin from '.'
+import ConfigBaseTalentMixin from "."
 
 export default interface UnlockTalentParam extends ConfigBaseTalentMixin {
-  $type: 'UnlockTalentParam'
+  $type: "UnlockTalentParam"
   AbilityName: string
   TalentParam: string
 }

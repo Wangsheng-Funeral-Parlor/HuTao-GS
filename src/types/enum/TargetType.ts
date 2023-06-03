@@ -5,5 +5,5 @@ export enum TargetTypeEnum {
   Self = 3,
   SelfCamp = 4,
   All = 5,
-  AllExceptSelf = 6
+  AllExceptSelf = 6,
 }

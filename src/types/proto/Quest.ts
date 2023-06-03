@@ -1,5 +1,5 @@
 export interface Quest {
-  questId?: number
+  questId: number
   state?: number
   startTime?: number
   isRandom?: boolean

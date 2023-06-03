@@ -1,23 +1,26 @@
-import BaseClass from '#/baseClass'
-import { getCmdIdByName, getNameByCmdId, PACKET_HEAD } from '#/cmdIds'
-import { PacketContext, verbosePackets } from '#/packet'
-import uidPrefix from '#/utils/uidPrefix'
-import config from '@/config'
-import GlobalState from '@/globalState'
-import Logger from '@/logger'
-import { cRGB } from '@/tty/utils'
-import { PacketHead } from '@/types/kcp'
-import { ENetReasonEnum } from '@/types/proto/enum'
-import { objToProtobuffer } from '@/utils/proto'
-import KcpServer from '../'
-import KcpWorkerInterface from './worker/kcpWorker/kcpWorkerInterface'
-import { ConnectionInfo } from './worker/recvWorker'
-import RecvWorkerInterface from './worker/recvWorker/recvWorkerInterface'
-import WorkerInterface from './worker/workerInterface'
+import KcpServer from "../"
 
-const { kcpPort, packetsToDump } = config
+import KcpWorkerInterface from "./worker/kcpWorker/kcpWorkerInterface"
+import { ConnectionInfo } from "./worker/recvWorker"
+import RecvWorkerInterface from "./worker/recvWorker/recvWorkerInterface"
+import WorkerInterface from "./worker/workerInterface"
 
-const logger = new Logger('SOCKET', 0x3449eb)
+import BaseClass from "#/baseClass"
+import { getCmdIdByName, getNameByCmdId, PACKET_HEAD } from "#/cmdIds"
+import { PacketContext, verbosePackets } from "#/packet"
+import uidPrefix from "#/utils/uidPrefix"
+import config from "@/config"
+import GlobalState from "@/globalState"
+import Logger from "@/logger"
+import { cRGB } from "@/tty/utils"
+import { PacketHead } from "@/types/kcp"
+import { ENetReasonEnum } from "@/types/proto/enum"
+import { objToProtobuffer } from "@/utils/proto"
+
+const { kcpPort } = config
+const { packetsToDump } = config.game
+
+const logger = new Logger("SOCKET", 0x3449eb)
 
 export default class Socket extends BaseClass {
   server: KcpServer
@@ -36,7 +39,9 @@ export default class Socket extends BaseClass {
     super.initHandlers()
   }
 
-  private async createWorker<T extends WorkerInterface>(workerInterface: new (socket: Socket, id: number) => T): Promise<T> {
+  private async createWorker<T extends WorkerInterface>(
+    workerInterface: new (socket: Socket, id: number) => T
+  ): Promise<T> {
     const worker = new workerInterface(this, ++this.workerId)
 
     this.registerHandlers(worker)
@@ -46,7 +51,12 @@ export default class Socket extends BaseClass {
     return worker
   }
 
-  private async createKcpWorker(recvWorkerId: number, iPort: number, conv: number, connInfo: ConnectionInfo): Promise<KcpWorkerInterface> {
+  private async createKcpWorker(
+    recvWorkerId: number,
+    iPort: number,
+    conv: number,
+    connInfo: ConnectionInfo
+  ): Promise<KcpWorkerInterface> {
     const worker = await this.createWorker<KcpWorkerInterface>(KcpWorkerInterface)
     if (await worker.init(recvWorkerId, iPort, conv, connInfo)) return worker
     await this.destroyWorker(worker.id)
@@ -55,7 +65,7 @@ export default class Socket extends BaseClass {
 
   async destroyWorker(id: number) {
     const { workerList } = this
-    const worker = workerList.find(w => w.id === id)
+    const worker = workerList.find((w) => w.id === id)
     if (worker == null) return
 
     await worker.stop()
@@ -65,7 +75,7 @@ export default class Socket extends BaseClass {
   }
 
   getWorker<T extends WorkerInterface>(id: number): T {
-    return <T>this.workerList.find(worker => worker.id === id)
+    return <T>this.workerList.find((worker) => worker.id === id)
   }
 
   async start() {
@@ -97,19 +107,19 @@ export default class Socket extends BaseClass {
     try {
       const { server } = this
       const client = server.getClient(conv)
-      if (!client) throw new Error('client == null')
+      if (!client) throw new Error("client == null")
       const worker = this.getWorker<KcpWorkerInterface>(client.workerId)
-      if (!worker) throw new Error('worker == null')
+      if (!worker) throw new Error("worker == null")
 
       const packetID = <number>getCmdIdByName(packetName)
       const packetHead = await objToProtobuffer(head, PACKET_HEAD, true)
       const packetData = await objToProtobuffer(obj, packetID)
 
       const log = [
-        uidPrefix('SEND', client, 0x7000ff),
-        GlobalState.get('ShowPacketId') ? packetID : '-',
-        cRGB(0x00e5ff, head?.clientSequenceId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
-        packetName
+        uidPrefix("SEND", client, 0x7000ff),
+        GlobalState.get("ShowPacketId") ? packetID : "-",
+        cRGB(0x00e5ff, head?.clientSequenceId?.toString()?.slice(-6)?.padStart(6, "0") || "------"),
+        packetName,
       ]
 
       if (verbosePackets.includes(packetName)) logger.verbose(...log)
@@ -117,7 +127,7 @@ export default class Socket extends BaseClass {
 
       await worker.sendPacket(packetID, packetHead, packetData)
     } catch (err) {
-      logger.error('Error sending packet:', err)
+      logger.error("Error sending packet:", err)
     }
   }
 
@@ -156,10 +166,10 @@ export default class Socket extends BaseClass {
     const context = new PacketContext(client, seqId)
 
     const log = [
-      uidPrefix('RECV', client, 0x00d5ff),
-      GlobalState.get('ShowPacketId') ? packetID : '-',
-      cRGB(0xc5ff00, seqId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
-      packetName
+      uidPrefix("RECV", client, 0x00d5ff),
+      GlobalState.get("ShowPacketId") ? packetID : "-",
+      cRGB(0xc5ff00, seqId?.toString()?.slice(-6)?.padStart(6, "0") || "------"),
+      packetName,
     ]
 
     if (verbosePackets.includes(packetName)) logger.verbose(...log)

@@ -1,4 +1,4 @@
-import Denque from 'denque'
+import Denque from "denque"
 
 type u8 = number
 type u16 = number
@@ -22,12 +22,16 @@ const KCP_ASK_SEND: u32 = 1
 const KCP_ASK_TELL: u32 = 2
 
 const KCP_WND_SND: u16 = 32
+//const KCP_WND_RCV: u16 = 128;
 const KCP_WND_RCV: u16 = 256
 
 const KCP_MTU_DEF: usize = 1400
+// const KCP_ACK_FAST: u32 = 3;
 
 const KCP_INTERVAL: u32 = 100
+//pub const KCP_OVERHEAD: usize = 24;
 const KCP_OVERHEAD: usize = 28
+// const KCP_DEADLINK: u32 = 20;
 
 const KCP_THRESH_INIT: u16 = 2
 const KCP_THRESH_MIN: u16 = 2
@@ -92,7 +96,7 @@ function createSegment(data: Buffer): KcpSegment {
 function encodeSegment(buf: Buffer, seg: KcpSegment) {
   const size = segmentSize(seg)
   if (buf.length < size) {
-    throw new Error(`buffer too small to encode kcp segment of size ${size}`)
+    throw Error(`buffer too small to encode kcp segment of size ${size}`)
   }
 
   buf.writeUInt32LE(seg.conv)
@@ -201,9 +205,11 @@ export class Kcp {
   /// Enable stream mode
   private stream: boolean
 
-  private outputCallback: OutputCallback
+  private output: OutputCallback
 
-  constructor(conv: u32, token: u32, output: OutputCallback, stream = false) {
+  private zeroMsShowcase: boolean
+
+  constructor(conv: u32, token: u32, output: OutputCallback, stream = false, zeroMsShowcase = false) {
     this.conv = conv >>> 0
     this.token = token >>> 0
     this.sndUna = 0
@@ -241,11 +247,8 @@ export class Kcp {
     this.interval = KCP_INTERVAL
     this.tsFlush = KCP_INTERVAL
     this.ssThresh = KCP_THRESH_INIT
-    this.outputCallback = output
-  }
-
-  get rtt() {
-    return this.rxsRtt
+    this.zeroMsShowcase = zeroMsShowcase
+    this.output = output
   }
 
   /// Check buffer size without actually consuming it
@@ -264,9 +267,11 @@ export class Kcp {
     let len = 0
 
     for (let i = 0; i < this.rcvQueue.length; i++) {
-      const seg = this.rcvQueue.peekAt(i)!
-      len += seg.data.length
-      if (seg.frg === 0) break
+      const segment = this.rcvQueue.peekAt(i)!
+      len += segment.data.length
+      if (segment.frg === 0) {
+        break
+      }
     }
 
     return len
@@ -304,13 +309,15 @@ export class Kcp {
     const recover = this.rcvQueue.length >= this.rcvWnd
 
     // Merge fragment
-    let seg: KcpSegment
-    while (seg = this.rcvQueue.shift()) {
+    let seg
+    while ((seg = this.rcvQueue.shift())) {
       seg.data.copy(buf, offset)
       offset += seg.data.length
-
-      if (seg.frg === 0) break
+      if (seg.frg === 0) {
+        break
+      }
     }
+    //assert(offset === peekSize);
 
     this.moveBuf()
 
@@ -324,10 +331,12 @@ export class Kcp {
 
   /// Send bytes into buffer
   send(buf: Buffer) {
-    if (!Buffer.isBuffer(buf)) return -1
+    if (!Buffer.isBuffer(buf)) {
+      return -1
+    }
 
     let sentSize = 0
-    //assert(this.mss > 0)
+    // assert(this.mss > 0)
 
     // append to previous segment in streaming mode (if possible)
     if (this.stream) {
@@ -338,8 +347,8 @@ export class Kcp {
           const capacity = (this.mss - l) >>> 0
           const extend = Math.min(buf.length, capacity)
 
-          const lf = buf.subarray(0, extend)
-          const rt = buf.subarray(extend)
+          const lf = buf.slice(0, extend)
+          const rt = buf.slice(extend)
           old.data = Buffer.concat([old.data, lf])
           buf = rt
 
@@ -347,34 +356,43 @@ export class Kcp {
           sentSize += extend
         }
 
-        if (buf.length === 0) return sentSize
+        if (buf.length === 0) {
+          return sentSize
+        }
       }
     }
 
-    const count = buf.length <= this.mss ? 1 : (((buf.length + this.mss - 1) / this.mss) >>> 0)
+    let count: number
+    if (buf.length <= this.mss) {
+      count = 1
+    } else {
+      count = ((buf.length + this.mss - 1) / this.mss) >>> 0
+    }
 
-    if (count >= KCP_WND_RCV) return -2
+    if (count >= KCP_WND_RCV) {
+      return -2
+    }
+    // assert(count > 0)
 
     for (let i = 0; i < count; i++) {
       const size = Math.min(this.mss, buf.length)
-      const lf = buf.subarray(0, size)
-      const rt = buf.subarray(size)
+      const lf = buf.slice(0, size)
+      const rt = buf.slice(size)
 
-      const newSegment = createSegment(lf)
+      let newSegment = createSegment(lf)
       buf = rt
 
-      newSegment.frg = this.stream ? 0 : (((count - i - 1) << 24) >>> 24)
+      if (this.stream) {
+        newSegment.frg = 0
+      } else {
+        newSegment.frg = ((count - i - 1) << 24) >>> 24
+      }
 
       this.sndQueue.push(newSegment)
       sentSize += size
     }
 
     return sentSize
-  }
-
-  private output(buf: Buffer) {
-    if (buf.length <= 0) return
-    this.outputCallback(buf)
   }
 
   private updateAck(rtt: u32) {
@@ -384,8 +402,7 @@ export class Kcp {
       this.rxsRtt = rtt
       this.rxRttVal = (rtt / 2) >>> 0
     } else {
-      let delta: number
-
+      let delta
       if (rtt > this.rxsRtt) {
         delta = rtt - this.rxsRtt
       } else {
@@ -416,9 +433,12 @@ export class Kcp {
   private parseAck(sn: u32) {
     sn >>>= 0
 
-    if (sn - this.sndUna < 0 || sn - this.sndNxt >= 0) return
+    if (sn - this.sndUna < 0 || sn - this.sndNxt >= 0) {
+      return
+    }
 
-    for (let i = 0; i < this.sndBuf.length; i++) {
+    const bufSize = this.sndBuf.length
+    for (let i = 0; i < bufSize; i++) {
       const seg = this.sndBuf.peekAt(i)!
       if (sn === seg.sn) {
         this.sndBuf.removeOne(i)
@@ -464,7 +484,9 @@ export class Kcp {
   private parseData(newSegment: KcpSegment) {
     const sn = newSegment.sn
 
-    if (sn - (this.rcvNxt + this.rcvWnd) >= 0 || sn - this.rcvNxt < 0) return
+    if (sn - (this.rcvNxt + this.rcvWnd) >= 0 || sn - this.rcvNxt < 0) {
+      return
+    }
 
     let repeat = false
     let newIndex = this.rcvBuf.length
@@ -490,92 +512,44 @@ export class Kcp {
     this.moveBuf()
   }
 
-  inputCmd(cmd: number, buf: Buffer, data: {
-    conv: number
-    token: number
-    frg: number
-    wnd: number
-    ts: number
-    sn: number
-    una: number
-    len: number
-  }, flag: boolean, maxAck: number) {
-    const { conv, token, frg, wnd, ts, sn, una, len } = data
-
-    switch (cmd) {
-      case KCP_CMD_ACK: {
-        const rtt = this.current - ts
-        if (rtt >= 0) this.updateAck(rtt)
-
-        this.parseAck(sn)
-        this.shrinkBuf()
-
-        if (!flag) {
-          maxAck = sn
-          flag = true
-        } else if (sn - maxAck > 0) {
-          maxAck = sn
-        }
-        break
-      }
-
-      case KCP_CMD_PUSH: {
-        if (sn - (this.rcvNxt + this.rcvWnd) >= 0) break
-
-        this.ackPush(sn, ts)
-
-        if (sn - this.rcvNxt < 0) break
-
-        const sbuf = buf.subarray(KCP_OVERHEAD, KCP_OVERHEAD + len)
-        const segment = createSegment(sbuf)
-
-        segment.conv = conv
-        segment.token = token
-        segment.cmd = cmd
-        segment.frg = frg
-        segment.wnd = wnd
-        segment.ts = ts
-        segment.sn = sn
-        segment.una = una
-
-        this.parseData(segment)
-        break
-      }
-
-      case KCP_CMD_WASK: {
-        this.probe |= KCP_ASK_TELL
-        break
-      }
-
-      case KCP_CMD_WINS: {
-        // Do nothing
-        break
-      }
+  /// Call this when you received a packet from raw connection
+  input(buf: Buffer) {
+    if (!Buffer.isBuffer(buf) || buf.length < KCP_OVERHEAD) {
+      return -1
     }
 
-    return { flag, maxAck }
-  }
-
-  readInputBuffer(buf: Buffer) {
     let totalRead = 0
     let flag = false
     let maxAck = 0
+    const oldUna = this.sndUna
 
     while (buf.length >= KCP_OVERHEAD) {
       const conv = buf.readUInt32LE()
       const token = buf.readUInt32LE(4)
-
-      if (conv !== this.conv || token !== this.token) return -1
-
       const cmd = buf.readUInt8(8)
       const frg = buf.readUInt8(9)
       const wnd = buf.readUInt16LE(10)
-      const ts = buf.readUInt32LE(12)
+      //Im actually interested how this causes the game to be 0ms KEK
+      //TODO: figure out what the fuck is this cause this is fucking weird LMAO
+      let ts = buf.readUInt32LE(12)
+      if (this.zeroMsShowcase) {
+        ts = ts + 100000
+      }
       const sn = buf.readUInt32LE(16)
       const una = buf.readUInt32LE(20)
       const len = buf.readUInt32LE(24)
 
-      if (buf.length - KCP_OVERHEAD < len) return -2
+      if (conv !== this.conv) {
+        return -1
+      }
+
+      if (token !== this.token) {
+        return -1
+      }
+
+      if (buf.length - KCP_OVERHEAD < len) {
+        return -2
+      }
 
       switch (cmd) {
         case KCP_CMD_PUSH:
@@ -593,45 +567,86 @@ export class Kcp {
       this.parseUna(una)
       this.shrinkBuf()
 
-      const cmdResult = this.inputCmd(cmd, buf, { conv, token, frg, wnd, ts, sn, una, len }, flag, maxAck)
-      flag = cmdResult.flag
-      maxAck = cmdResult.maxAck
+      switch (cmd) {
+        case KCP_CMD_ACK: {
+          const rtt = this.current - ts
+          if (rtt >= 0) {
+            this.updateAck(rtt)
+          }
+
+          this.parseAck(sn)
+          this.shrinkBuf()
+
+          if (!flag) {
+            maxAck = sn
+            flag = true
+          } else if (sn - maxAck > 0) {
+            maxAck = sn
+          }
+
+          break
+        }
+
+        case KCP_CMD_PUSH: {
+          if (sn - (this.rcvNxt + this.rcvWnd) < 0) {
+            this.ackPush(sn, ts)
+            if (sn - this.rcvNxt >= 0) {
+              const sbuf = buf.slice(KCP_OVERHEAD, KCP_OVERHEAD + len)
+              const segment = createSegment(sbuf)
+
+              segment.conv = conv
+              segment.token = token
+              segment.cmd = cmd
+              segment.frg = frg
+              segment.wnd = wnd
+              segment.ts = ts
+              segment.sn = sn
+              segment.una = una
+
+              this.parseData(segment)
+            }
+          }
+
+          break
+        }
+
+        case KCP_CMD_WASK: {
+          this.probe |= KCP_ASK_TELL
+          break
+        }
+
+        case KCP_CMD_WINS: {
+          // Do nothing
+          break
+        }
+      }
 
       totalRead += KCP_OVERHEAD + len
-      buf = buf.subarray(KCP_OVERHEAD + len)
+      buf = buf.slice(KCP_OVERHEAD + len)
     }
 
-    return { totalRead, flag, maxAck }
-  }
-
-  /// Call this when you received a packet from raw connection
-  input(buf: Buffer) {
-    if (!Buffer.isBuffer(buf) || buf.length < KCP_OVERHEAD) return -1
-
-    const oldUna = this.sndUna
-    const readResult = this.readInputBuffer(buf)
-    if (!isNaN(readResult as number)) return readResult
-
-    const { totalRead, flag, maxAck } = readResult as { totalRead: number, flag: boolean, maxAck: number }
-
-    if (flag) this.parseFastAck(maxAck)
-
-    if (this.sndUna <= oldUna || this.cWnd >= this.rmtWnd) return totalRead
-
-    const mss = this.mss
-
-    if (this.cWnd < this.ssThresh) {
-      this.cWnd += 1
-      this.incr += mss
-    } else {
-      this.incr = Math.max(this.incr, mss)
-      this.incr += (((mss * mss) / this.incr) >>> 0) + ((mss / 16) >>> 0)
-      this.cWnd += Number((this.cWnd + 1) * mss <= this.incr)
+    if (flag) {
+      this.parseFastAck(maxAck)
     }
 
-    if (this.cWnd > this.rmtWnd) {
-      this.cWnd = this.rmtWnd
-      this.incr = this.rmtWnd * mss
+    if (this.sndUna > oldUna && this.cWnd < this.rmtWnd) {
+      const mss = this.mss
+      if (this.cWnd < this.ssThresh) {
+        this.cWnd += 1
+        this.incr += mss
+      } else {
+        if (this.incr < mss) {
+          this.incr = mss
+        }
+        this.incr += (((mss * mss) / this.incr) >>> 0) + ((mss / 16) >>> 0)
+        if ((this.cWnd + 1) * mss <= this.incr) {
+          this.cWnd += 1
+        }
+      }
+      if (this.cWnd > this.rmtWnd) {
+        this.cWnd = this.rmtWnd
+        this.incr = this.rmtWnd * mss
+      }
     }
 
     return totalRead
@@ -650,14 +665,14 @@ export class Kcp {
     for (let i = 0; i < this.acklist.length; i++) {
       const [sn, ts] = this.acklist.peekAt(i)!
       if (this.bufOffset + KCP_OVERHEAD > this.mtu) {
-        this.output(this.buf.subarray(0, this.bufOffset))
+        this.output(this.buf.slice(0, this.bufOffset))
         this.bufOffset = 0
       }
 
       segment.sn = sn
       segment.ts = ts
 
-      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment)
+      this.bufOffset += encodeSegment(this.buf.slice(this.bufOffset), segment)
     }
 
     this.acklist.clear()
@@ -670,10 +685,7 @@ export class Kcp {
         this.probeWait = KCP_PROBE_INIT
         this.tsProbe = this.current + this.probeWait
       } else {
-        if (
-          this.current - this.tsProbe >= 0 &&
-          this.probeWait < KCP_PROBE_INIT
-        ) {
+        if (this.current - this.tsProbe >= 0 && this.probeWait < KCP_PROBE_INIT) {
           this.probeWait = KCP_PROBE_INIT
         }
         this.probeWait += (this.probeWait / 2) >>> 0
@@ -694,11 +706,11 @@ export class Kcp {
     segment.cmd = cmd
 
     if (this.bufOffset + KCP_OVERHEAD > this.mtu) {
-      this.output(this.buf.subarray(0, this.bufOffset))
+      this.output(this.buf.slice(0, this.bufOffset))
       this.bufOffset = 0
     }
 
-    this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment)
+    this.bufOffset += encodeSegment(this.buf.slice(this.bufOffset), segment)
   }
 
   private flushProbeCommands(segment: KcpSegment) {
@@ -717,7 +729,9 @@ export class Kcp {
 
   /// Flush pending ACKs
   flushAck() {
-    if (!this.updated) return
+    if (!this.updated) {
+      return
+    }
 
     const segment = createSegment(EMPTY_BUFFER)
     segment.conv = this.conv
@@ -728,7 +742,29 @@ export class Kcp {
     this._flushAck(segment)
   }
 
-  transferSnd(cWnd: number, segment: KcpSegment) {
+  /// Flush pending data in buffer.
+  flush() {
+    if (!this.updated) {
+      return
+    }
+
+    const segment = createSegment(EMPTY_BUFFER)
+    segment.conv = this.conv
+    segment.token = this.token
+    segment.cmd = KCP_CMD_ACK
+    segment.wnd = this.wndUnused()
+    segment.una = this.rcvNxt
+
+    this._flushAck(segment)
+    this.probeWndSize()
+    this.flushProbeCommands(segment)
+
+    // calculate window size
+    let cWnd = Math.min(this.sndWnd, this.rmtWnd)
+    if (!this.nocwnd) {
+      cWnd = Math.min(this.cWnd, cWnd)
+    }
+
     // move data from snd_queue to snd_buf
     while (this.sndNxt - (this.sndUna + cWnd) < 0) {
       const newSegment = this.sndQueue.shift()
@@ -748,96 +784,83 @@ export class Kcp {
       newSegment.xmit = 0
       this.sndBuf.push(newSegment)
     }
-  }
-
-  /// Flush pending data in buffer.
-  flush() {
-    if (!this.updated) return
-
-    const segment = createSegment(EMPTY_BUFFER)
-    segment.conv = this.conv
-    segment.token = this.token
-    segment.cmd = KCP_CMD_ACK
-    segment.wnd = this.wndUnused()
-    segment.una = this.rcvNxt
-
-    this._flushAck(segment)
-    this.probeWndSize()
-    this.flushProbeCommands(segment)
-
-    // calculate window size
-    let cWnd = Math.min(this.sndWnd, this.rmtWnd)
-    if (!this.nocwnd) cWnd = Math.min(this.cWnd, cWnd)
-
-    this.transferSnd(cWnd, segment)
 
     // calculate resent
-    const resent = (Number(this.fastResend <= 0) * 0xffffffff) | this.fastResend
-    const rtoMin = Number(!this.nodelay) * (this.rxRto >>> 3)
+    const resent = this.fastResend > 0 ? this.fastResend : 0xffffffff
+    const rtoMin = !this.nodelay ? this.rxRto >>> 3 : 0
 
     let lost = false
     let change = 0
 
-    for (let i = 0; i < Math.min(this.sndBuf.length, 1024); i++) {
+    for (let i = 0; i < this.sndBuf.length; i++) {
       const sndSegment = this.sndBuf.peekAt(i)!
+      let needSend = false
 
-      switch (true) {
-        case (sndSegment.xmit === 0): {
-          sndSegment.xmit += 1
-          sndSegment.rto = this.rxRto
-          sndSegment.resendTs = this.current + sndSegment.rto + rtoMin
-          break
+      if (sndSegment.xmit === 0) {
+        needSend = true
+        sndSegment.xmit += 1
+        sndSegment.rto = this.rxRto
+        sndSegment.resendTs = this.current + sndSegment.rto + rtoMin
+      } else if (this.current - sndSegment.resendTs >= 0) {
+        needSend = true
+        sndSegment.xmit += 1
+        if (!this.nodelay) {
+          sndSegment.rto += this.rxRto
+        } else {
+          sndSegment.rto += (this.rxRto / 2) >>> 0
         }
-        case (this.current - sndSegment.resendTs >= 0): {
-          sndSegment.xmit += 1
-          sndSegment.rto += this.nodelay ? ((this.rxRto / 2) >>> 0) : this.rxRto
-          sndSegment.resendTs = this.current + sndSegment.rto
-          lost = true
-          break
-        }
-        case (sndSegment.fastAck >= resent): {
-          sndSegment.xmit += 1
-          sndSegment.fastAck = 0
-          sndSegment.resendTs = this.current + sndSegment.rto
-          change += 1
-          break
-        }
-        default:
-          continue
+        sndSegment.resendTs = this.current + sndSegment.rto
+        lost = true
+      } else if (sndSegment.fastAck >= resent) {
+        needSend = true
+        sndSegment.xmit += 1
+        sndSegment.fastAck = 0
+        sndSegment.resendTs = this.current + sndSegment.rto
+        change += 1
       }
 
-      sndSegment.ts = this.current
-      sndSegment.wnd = segment.wnd
-      sndSegment.una = this.rcvNxt
+      if (needSend) {
+        sndSegment.ts = this.current
+        sndSegment.wnd = segment.wnd
+        sndSegment.una = this.rcvNxt
 
-      const need = KCP_OVERHEAD + sndSegment.data.length
+        const need = KCP_OVERHEAD + sndSegment.data.length
 
-      if (this.bufOffset + need > this.mtu) {
-        this.output(this.buf.subarray(0, this.bufOffset))
-        this.bufOffset = 0
+        if (this.bufOffset + need > this.mtu) {
+          this.output(this.buf.slice(0, this.bufOffset))
+          this.bufOffset = 0
+        }
+
+        this.bufOffset += encodeSegment(this.buf.slice(this.bufOffset), sndSegment)
+
+        if (sndSegment.xmit >= this.deadLink) {
+          this.state = -1
+        }
       }
-
-      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), sndSegment)
-
-      if (sndSegment.xmit >= this.deadLink) this.state = -1
     }
 
     // Flush all data in buffer
-    this.output(this.buf.subarray(0, this.bufOffset))
-    this.bufOffset = 0
+    if (this.bufOffset > 0) {
+      this.output(this.buf.slice(0, this.bufOffset))
+      this.bufOffset = 0
+    }
 
     // update ssthresh
     if (change > 0) {
       const inflight = (this.sndNxt - this.sndUna) >>> 0
       this.ssThresh = (((inflight << 16) >>> 16) / 2) >>> 0
-      this.ssThresh = Math.max(this.ssThresh, KCP_THRESH_MIN)
+      if (this.ssThresh < KCP_THRESH_MIN) {
+        this.ssThresh = KCP_THRESH_MIN
+      }
       this.cWnd = this.ssThresh + ((resent << 16) >>> 16)
       this.incr = this.cWnd * this.mss
     }
 
     if (lost) {
       this.ssThresh = (cWnd / 2) >>> 0
-      this.ssThresh = Math.max(this.ssThresh, KCP_THRESH_MIN)
+      if (this.ssThresh < KCP_THRESH_MIN) {
+        this.ssThresh = KCP_THRESH_MIN
+      }
       this.cWnd = 1
       this.incr = this.mss
     }
@@ -894,14 +917,16 @@ export class Kcp {
     }
 
     if (current - tsFlush >= 0) {
+      // return this.interval;
       return 0
     }
 
-    const tmFlush = (tsFlush - current) >>> 0
+    let tmFlush = (tsFlush - current) >>> 0
     for (let i = 0; i < this.sndBuf.length; i++) {
       const seg = this.sndBuf.peekAt(i)!
       const diff = seg.resendTs - current
       if (diff <= 0) {
+        // return this.interval;
         return 0
       }
       if (diff < tmPacket) {

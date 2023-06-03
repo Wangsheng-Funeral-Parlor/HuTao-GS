@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { CylinderRegionSize, PolygonRegionSize, VectorInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { CylinderRegionSize, PolygonRegionSize, VectorInfo } from "@/types/proto"
 
 export interface PlayerEyePointStateNotify {
   isUseEyePoint?: boolean
@@ -19,7 +19,7 @@ export interface PlayerEyePointStateNotify {
 
 class PlayerEyePointStatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerEyePointState')
+    super("PlayerEyePointState")
   }
 
   async sendNotify(context: PacketContext, data: PlayerEyePointStateNotify): Promise<void> {
@@ -28,4 +28,4 @@ class PlayerEyePointStatePacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerEyePointStatePacket
-export default (() => packet = packet || new PlayerEyePointStatePacket())()
+export default (() => (packet = packet || new PlayerEyePointStatePacket()))()

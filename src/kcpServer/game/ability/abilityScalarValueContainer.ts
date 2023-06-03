@@ -1,6 +1,6 @@
-import BaseClass from '#/baseClass'
-import { AbilityScalarValueEntry, AbilityString } from '@/types/proto'
-import { AbilityScalarTypeEnum } from '@/types/proto/enum'
+import BaseClass from "#/baseClass"
+import { AbilityScalarValueEntry, AbilityString } from "@/types/proto"
+import { AbilityScalarTypeEnum } from "@/types/proto/enum"
 
 interface ValueEntry {
   key: AbilityString
@@ -20,11 +20,11 @@ export default class AbilityScalarValueContainer extends BaseClass {
   }
 
   public getKeys(): AbilityString[] {
-    return this.valList.map(v => v.key)
+    return this.valList.map((v) => v.key)
   }
 
   public getValue(key: AbilityString) {
-    return this.valList.find(v => v.key.hash === key?.hash || (key?.str && v.key.str === key?.str)) || null
+    return this.valList.find((v) => v.key.hash === key?.hash || (key?.str && v.key.str === key?.str)) || null
   }
 
   public setValue(sval: AbilityScalarValueEntry) {
@@ -41,7 +41,7 @@ export default class AbilityScalarValueContainer extends BaseClass {
       this.valList.push(valEntry)
     }
 
-    this.emit('ChangeValue', sval.key)
+    this.emit("ChangeValue", sval.key)
   }
 
   public setValues(valList: AbilityScalarValueEntry[]) {
@@ -53,7 +53,7 @@ export default class AbilityScalarValueContainer extends BaseClass {
   }
 
   public export(): AbilityScalarValueEntry[] {
-    return this.valList.map(this.toScalarValueEntry).filter(svalEntry => svalEntry != null)
+    return this.valList.map(this.toScalarValueEntry).filter((svalEntry) => svalEntry != null)
   }
 
   private toValueEntry(svalEntry: AbilityScalarValueEntry): ValueEntry {
@@ -68,7 +68,7 @@ export default class AbilityScalarValueContainer extends BaseClass {
       case AbilityScalarTypeEnum.UINT:
         return { key, type, val: uintValue }
       case AbilityScalarTypeEnum.BOOL:
-        return { key, type, val: (intValue === 1 || uintValue === 1) } // too lazy to check, it's probably one of this :D
+        return { key, type, val: intValue === 1 || uintValue === 1 } // too lazy to check, it's probably one of this :D
       case AbilityScalarTypeEnum.TRIGGER:
         return null // now i really can't guess what this could be...
       default:

@@ -1,10 +1,11 @@
-import BaseClass from '#/baseClass'
-import PrivateChatChannel from '$/chat/privateChatChannel'
-import PublicChatChannel from '$/chat/publicChatChannel'
-import Player from '$/player'
-import World from '$/world'
-import { ChatInfo } from '@/types/proto'
-import Game from '..'
+import Game from ".."
+
+import BaseClass from "#/baseClass"
+import PrivateChatChannel from "$/chat/privateChatChannel"
+import PublicChatChannel from "$/chat/publicChatChannel"
+import Player from "$/player"
+import World from "$/world"
+import { ChatInfo } from "@/types/proto"
 
 export class ChatManager extends BaseClass {
   game: Game
@@ -30,7 +31,7 @@ export class ChatManager extends BaseClass {
   getPublicChat(world: World, channelId: number): PublicChatChannel {
     const { publicChatList } = this
 
-    let publicChatChannel = publicChatList.find(channel => channel.world === world && channel.channelId === channelId)
+    let publicChatChannel = publicChatList.find((channel) => channel.world === world && channel.channelId === channelId)
     if (!publicChatChannel) {
       publicChatChannel = new PublicChatChannel(this, world, channelId)
       publicChatList.push(publicChatChannel)
@@ -43,7 +44,7 @@ export class ChatManager extends BaseClass {
     const { game, privateChatList } = this
     const id = PrivateChatChannel.getId(sender, targetUid)
 
-    let privateChatChannel = privateChatList.find(channel => channel.privateChatId === id)
+    let privateChatChannel = privateChatList.find((channel) => channel.privateChatId === id)
     if (!privateChatChannel) {
       const target = game.getPlayerByUid(targetUid)
       if (!target) return null
@@ -56,7 +57,7 @@ export class ChatManager extends BaseClass {
   }
 
   removePublicChat(world: World) {
-    this.publicChatList = this.publicChatList.filter(channel => channel.world !== world)
+    this.publicChatList = this.publicChatList.filter((channel) => channel.world !== world)
   }
 
   async sendPublic(world: World, channelId: number, chatInfo: ChatInfo, seqId?: number): Promise<boolean> {
@@ -81,7 +82,7 @@ export class ChatManager extends BaseClass {
     return channel.send(sender, chatInfo, seqId)
   }
 
-  pullRecent(player: Player, seq: number = 0, num: number = 0): ChatInfo[] {
+  pullRecent(player: Player, seq = 0, num = 0): ChatInfo[] {
     const { privateChatList } = this
     const chatHistory: ChatInfo[] = []
 
@@ -98,7 +99,7 @@ export class ChatManager extends BaseClass {
     return chatHistory.slice(seq).slice(-num)
   }
 
-  pullPrivate(player: Player, targetUid: number, seq: number = 0, num: number = 0): ChatInfo[] {
+  pullPrivate(player: Player, targetUid: number, seq = 0, num = 0): ChatInfo[] {
     const channel = this.getPrivateChat(player, targetUid)
     if (!channel) return []
 

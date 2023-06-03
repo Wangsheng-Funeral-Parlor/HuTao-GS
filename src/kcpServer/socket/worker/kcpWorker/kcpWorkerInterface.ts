@@ -1,10 +1,11 @@
-import Socket from '#/socket'
-import { ENetReasonEnum } from '@/types/proto/enum'
-import { WorkerOpcode } from '../'
-import { ConnectionInfo } from '../recvWorker'
-import RecvWorkerInterface from '../recvWorker/recvWorkerInterface'
-import { decodeDataList } from '../utils/data'
-import WorkerInterface from '../workerInterface'
+import { WorkerOpcode } from "../"
+import { ConnectionInfo } from "../recvWorker"
+import RecvWorkerInterface from "../recvWorker/recvWorkerInterface"
+import { decodeDataList } from "../utils/data"
+import WorkerInterface from "../workerInterface"
+
+import Socket from "#/socket"
+import { ENetReasonEnum } from "@/types/proto/enum"
 
 export default class KcpWorkerInterface extends WorkerInterface {
   recvWId: number
@@ -13,7 +14,7 @@ export default class KcpWorkerInterface extends WorkerInterface {
   connInfo: ConnectionInfo
 
   constructor(socket: Socket, id: number) {
-    super(socket, id, 'kcp')
+    super(socket, id, "kcp")
 
     this.conv = null
 
@@ -58,10 +59,10 @@ export default class KcpWorkerInterface extends WorkerInterface {
 
     switch (opcode) {
       case WorkerOpcode.KcpStateNotify:
-        await this.emit('KcpState', this.conv, <boolean>args[0], <number>args[1])
+        await this.emit("KcpState", this.conv, <boolean>args[0], <number>args[1])
         break
       case WorkerOpcode.RecvPacketReq:
-        await this.emit('RecvPacket', this.conv, <number>args[0], <Buffer>args[1], <number>args[2])
+        await this.emit("RecvPacket", this.conv, <number>args[0], <Buffer>args[1], <number>args[2])
         this.sendToWorker(WorkerOpcode.RecvPacketRsp, args[2])
         break
       default:

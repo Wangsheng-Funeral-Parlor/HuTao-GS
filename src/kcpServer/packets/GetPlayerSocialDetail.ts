@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { SocialDetail } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { SocialDetail } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface GetPlayerSocialDetailReq {
   uid: number
@@ -14,9 +14,9 @@ export interface GetPlayerSocialDetailRsp {
 
 class GetPlayerSocialDetailPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetPlayerSocialDetail', {
+    super("GetPlayerSocialDetail", {
       reqWaitState: ClientStateEnum.POST_LOGIN,
-      reqWaitStatePass: true
+      reqWaitStatePass: true,
     })
   }
 
@@ -35,7 +35,7 @@ class GetPlayerSocialDetailPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      detailData
+      detailData,
     })
   }
 
@@ -45,4 +45,4 @@ class GetPlayerSocialDetailPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetPlayerSocialDetailPacket
-export default (() => packet = packet || new GetPlayerSocialDetailPacket())()
+export default (() => (packet = packet || new GetPlayerSocialDetailPacket()))()

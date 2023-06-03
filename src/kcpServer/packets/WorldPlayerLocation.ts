@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayerLocationInfo, PlayerWorldLocationInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayerLocationInfo, PlayerWorldLocationInfo } from "@/types/proto"
 
 export interface WorldPlayerLocationNotify {
   playerLocList?: PlayerLocationInfo[]
@@ -9,7 +9,7 @@ export interface WorldPlayerLocationNotify {
 
 class WorldPlayerLocationPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WorldPlayerLocation')
+    super("WorldPlayerLocation")
   }
 
   async sendNotify(context: PacketContext, data: WorldPlayerLocationNotify): Promise<void> {
@@ -24,4 +24,4 @@ class WorldPlayerLocationPacket extends Packet implements PacketInterface {
 }
 
 let packet: WorldPlayerLocationPacket
-export default (() => packet = packet || new WorldPlayerLocationPacket())()
+export default (() => (packet = packet || new WorldPlayerLocationPacket()))()

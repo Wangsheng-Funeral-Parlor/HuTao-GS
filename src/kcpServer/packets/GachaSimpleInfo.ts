@@ -1,4 +1,4 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
 
 export interface GachaSimpleInfoNotify {
   isNew?: boolean
@@ -6,7 +6,7 @@ export interface GachaSimpleInfoNotify {
 
 class GachaSimpleInfoPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GachaSimpleInfo')
+    super("GachaSimpleInfo")
   }
 
   async sendNotify(context: PacketContext, isNew?: boolean): Promise<void> {
@@ -17,4 +17,4 @@ class GachaSimpleInfoPacket extends Packet implements PacketInterface {
 }
 
 let packet: GachaSimpleInfoPacket
-export default (() => packet = packet || new GachaSimpleInfoPacket())()
+export default (() => (packet = packet || new GachaSimpleInfoPacket()))()

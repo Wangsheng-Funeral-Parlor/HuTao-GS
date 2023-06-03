@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { VectorInfo } from '@/types/proto'
-import { QueryPathOptionTypeEnum, QueryPathStatusTypeEnum, RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { VectorInfo } from "@/types/proto"
+import { QueryPathOptionTypeEnum, QueryPathStatusTypeEnum, RetcodeEnum } from "@/types/proto/enum"
 
 export interface QueryPathReq {
   queryType: QueryPathOptionTypeEnum
@@ -25,7 +25,7 @@ export interface QueryPathRsp {
 
 class QueryPathPacket extends Packet implements PacketInterface {
   constructor() {
-    super('QueryPath')
+    super("QueryPath")
   }
 
   async request(context: PacketContext, data: QueryPathReq): Promise<void> {
@@ -35,10 +35,7 @@ class QueryPathPacket extends Packet implements PacketInterface {
       retcode: RetcodeEnum.RET_SUCC,
       queryId,
       queryStatus: QueryPathStatusTypeEnum.STATUS_SUCC,
-      corners: [
-        sourcePos,
-        destinationPos[0] || sourcePos
-      ]
+      corners: [sourcePos, destinationPos[0] || sourcePos],
     })
   }
 
@@ -48,4 +45,4 @@ class QueryPathPacket extends Packet implements PacketInterface {
 }
 
 let packet: QueryPathPacket
-export default (() => packet = packet || new QueryPathPacket())()
+export default (() => (packet = packet || new QueryPathPacket()))()

@@ -1,4 +1,4 @@
-import { mhy128Dec, mhy128Enc } from './aes'
+import { mhy128Dec, mhy128Enc } from "./aes"
 
 export const dexor16 = (c: Buffer): number => {
   let ret = 0
@@ -7,7 +7,7 @@ export const dexor16 = (c: Buffer): number => {
 }
 
 export const memecryptoPrepareKey = (inp: Buffer, out: Buffer): void => {
-  for (let i = 0; i < 0xB0; i++) out[i] = dexor16(inp.subarray(0x10 * i, 0x10 * (i + 1)))
+  for (let i = 0; i < 0xb0; i++) out[i] = dexor16(inp.subarray(0x10 * i, 0x10 * (i + 1)))
 }
 
 export const memecryptoDecrypt = (key: Buffer, data: Buffer): void => {

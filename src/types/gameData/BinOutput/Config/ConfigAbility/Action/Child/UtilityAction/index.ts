@@ -1,6 +1,5 @@
-import { Predicated } from './Child'
+import { Predicated } from "./Child"
 
-type UtilityAction =
-  Predicated
+type UtilityAction = Predicated
 
 export default UtilityAction

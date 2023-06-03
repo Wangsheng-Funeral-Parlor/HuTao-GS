@@ -1,7 +1,7 @@
-import ConfigBaseBornType from '.'
+import ConfigBaseBornType from "."
 
 export default interface ConfigBornByActionPoint extends ConfigBaseBornType {
-  $type: 'ConfigBornByActionPoint'
+  $type: "ConfigBornByActionPoint"
   ActionPointType: string
   SelectType: string
 }

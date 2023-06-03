@@ -1,11 +1,11 @@
-import AbilityChange from '#/packets/AbilityChange'
-import AvatarSkillDepotChange from '#/packets/AvatarSkillDepotChange'
-import Avatar from '$/entity/avatar'
-import Skill from '$/entity/avatar/skill/skill'
-import SkillDepot from '$/entity/avatar/skill/skillDepot'
-import AvatarData from '$/gameData/data/AvatarData'
-import { ElemTypeEnum } from '@/types/enum'
-import SkillManagerUserData from '@/types/user/SkillManagerUserData'
+import AbilityChange from "#/packets/AbilityChange"
+import AvatarSkillDepotChange from "#/packets/AvatarSkillDepotChange"
+import Avatar from "$/entity/avatar"
+import Skill from "$/entity/avatar/skill/skill"
+import SkillDepot from "$/entity/avatar/skill/skillDepot"
+import AvatarData from "$/gameData/data/AvatarData"
+import { ElemTypeEnum } from "@/types/enum"
+import SkillManagerUserData from "@/types/user/SkillManagerUserData"
 
 export default class SkillManager {
   avatar: Avatar
@@ -29,8 +29,9 @@ export default class SkillManager {
     const avatarData = await AvatarData.getAvatar(avatarId)
     if (!avatarData) return
 
-    const skillIds = [avatarData.SkillDepotId, ...(avatarData.CandSkillDepotIds || [])]
-      .filter((depotId, i, arr) => depotId != null && arr.indexOf(depotId) === i)
+    const skillIds = [avatarData.SkillDepotId, ...(avatarData.CandSkillDepotIds || [])].filter(
+      (depotId, i, arr) => depotId != null && arr.indexOf(depotId) === i
+    )
 
     for (const skillId of skillIds) depotList.push(new SkillDepot(this, skillId))
   }
@@ -38,14 +39,11 @@ export default class SkillManager {
   async init(userData: SkillManagerUserData) {
     await this.loadSkillDepotData()
 
-    const {
-      candSkillId,
-      depotDataList
-    } = userData || {}
+    const { candSkillId, depotDataList } = userData || {}
     const { depotList } = this
 
     for (const depot of depotList) {
-      const depotData = depotDataList?.find(data => data?.id === depot.id)
+      const depotData = depotDataList?.find((data) => data?.id === depot.id)
       if (depotData) await depot.init(depotData)
       else await depot.initNew()
     }
@@ -80,7 +78,7 @@ export default class SkillManager {
   }
 
   getDepotById(id: number): SkillDepot | null {
-    return this.depotList.find(depot => depot.id === id) || null
+    return this.depotList.find((depot) => depot.id === id) || null
   }
 
   async setCandSkillId(id: number): Promise<boolean> {
@@ -122,7 +120,7 @@ export default class SkillManager {
 
     return {
       candSkillId,
-      depotDataList: depotList.map(depot => depot.exportUserData())
+      depotDataList: depotList.map((depot) => depot.exportUserData()),
     }
   }
 }

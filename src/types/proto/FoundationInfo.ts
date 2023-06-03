@@ -1,5 +1,6 @@
-import { BuildingInfo } from '.'
-import { FoundationStatusEnum } from './enum'
+import { FoundationStatusEnum } from "./enum"
+
+import { BuildingInfo } from "."
 
 export interface FoundationInfo {
   status: FoundationStatusEnum

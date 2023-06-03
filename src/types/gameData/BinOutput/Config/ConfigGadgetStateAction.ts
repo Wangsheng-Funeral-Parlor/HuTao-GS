@@ -1,4 +1,4 @@
-import ConfigGadgetPredicate from './ConfigGadgetPredicate'
+import ConfigGadgetPredicate from "./ConfigGadgetPredicate"
 
 export default interface ConfigGadgetStateAction {
   GadgetState: string

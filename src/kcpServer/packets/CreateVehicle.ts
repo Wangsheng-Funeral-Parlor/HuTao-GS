@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Vector from '$/utils/vector'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface CreateVehicleReq {
   vehicleId: number
@@ -19,9 +19,9 @@ export interface CreateVehicleRsp {
 
 class CreateVehiclePacket extends Packet implements PacketInterface {
   constructor() {
-    super('CreateVehicle', {
+    super("CreateVehicle", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -31,12 +31,18 @@ class CreateVehiclePacket extends Packet implements PacketInterface {
     const { vehicleManager } = currentScene
     const { vehicleId, scenePointId, pos, rot } = data
 
-    const entity = await vehicleManager.createVehicle(player, vehicleId, scenePointId, new Vector().setData(pos), new Vector().setData(rot))
+    const entity = await vehicleManager.createVehicle(
+      player,
+      vehicleId,
+      scenePointId,
+      new Vector().setData(pos),
+      new Vector().setData(rot)
+    )
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       vehicleId,
-      entityId: entity.entityId
+      entityId: entity.entityId,
     })
   }
 
@@ -46,4 +52,4 @@ class CreateVehiclePacket extends Packet implements PacketInterface {
 }
 
 let packet: CreateVehiclePacket
-export default (() => packet = packet || new CreateVehiclePacket())()
+export default (() => (packet = packet || new CreateVehiclePacket()))()

@@ -1,5 +1,6 @@
-import { ProfilePicture } from '.'
-import { MpSettingTypeEnum } from './enum'
+import { MpSettingTypeEnum } from "./enum"
+
+import { ProfilePicture } from "."
 
 export interface OnlinePlayerInfo {
   uid: number

@@ -1,5 +1,6 @@
-import { ProfilePicture, SocialShowAvatarInfo } from '.'
-import { FriendEnterHomeOptionEnum, FriendOnlineStateEnum, PlatformTypeEnum } from './enum'
+import { FriendEnterHomeOptionEnum, FriendOnlineStateEnum, PlatformTypeEnum } from "./enum"
+
+import { ProfilePicture, SocialShowAvatarInfo } from "."
 
 export interface FriendBrief {
   uid: number

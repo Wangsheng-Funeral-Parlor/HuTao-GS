@@ -1,8 +1,9 @@
-import { constants as CryptoConsts, createSign, createVerify, privateDecrypt, publicEncrypt } from 'crypto'
-import { RSAKey } from './openssl'
+import { constants as CryptoConsts, createSign, createVerify, privateDecrypt, publicEncrypt } from "crypto"
+
+import { RSAKey } from "./openssl"
 
 export const rsaEncrypt = (publicKey: RSAKey, plaintext: Buffer): Buffer => {
-  const chunkSize = (publicKey.size / 8) - 11
+  const chunkSize = publicKey.size / 8 - 11
   const chunkCount = Math.ceil(plaintext.length / chunkSize)
   const chunks: Buffer[] = []
 
@@ -28,18 +29,15 @@ export const rsaDecrypt = (privateKey: RSAKey, ciphertext: Buffer): Buffer => {
 }
 
 export const rsaSign = (privateKey: RSAKey, data: Buffer): Buffer => {
-  const signer = createSign('RSA-SHA256')
+  const signer = createSign("RSA-SHA256")
   signer.update(data)
   return signer.sign({ key: privateKey.pem, padding: CryptoConsts.RSA_PKCS1_PADDING })
 }
 
 export const rsaVerify = (publicKey: RSAKey, data: Buffer, signature: Buffer): boolean => {
-  if (
-    publicKey == null || data == null || signature == null ||
-    data.length <= 0 || signature.length <= 0
-  ) return false
+  if (publicKey == null || data == null || signature == null || data.length <= 0 || signature.length <= 0) return false
 
-  const verifier = createVerify('RSA-SHA256')
+  const verifier = createVerify("RSA-SHA256")
   verifier.update(data)
   return verifier.verify({ key: publicKey.pem, padding: CryptoConsts.RSA_PKCS1_PADDING }, signature)
 }

@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AvatarTeam } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { AvatarTeam } from "@/types/proto"
 
 export interface AvatarTeamUpdateNotify {
   avatarTeamMap: { [id: number]: AvatarTeam }
@@ -9,7 +9,7 @@ export interface AvatarTeamUpdateNotify {
 
 class AvatarTeamUpdatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarTeamUpdate')
+    super("AvatarTeamUpdate")
   }
 
   async sendNotify(context: PacketContext, teamId?: number): Promise<void> {
@@ -17,7 +17,7 @@ class AvatarTeamUpdatePacket extends Packet implements PacketInterface {
 
     const notifyData: AvatarTeamUpdateNotify = {
       avatarTeamMap: context.player.teamManager.exportAvatarTeamMap(teamId),
-      teamAvatarGuidList: []
+      teamAvatarGuidList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -29,4 +29,4 @@ class AvatarTeamUpdatePacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarTeamUpdatePacket
-export default (() => packet = packet || new AvatarTeamUpdatePacket())()
+export default (() => (packet = packet || new AvatarTeamUpdatePacket()))()

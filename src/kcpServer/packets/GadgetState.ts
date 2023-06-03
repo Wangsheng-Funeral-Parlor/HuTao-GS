@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Gadget from '$/entity/gadget'
-import { GadgetStateEnum } from '@/types/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Gadget from "$/entity/gadget"
+import { GadgetStateEnum } from "@/types/enum"
 
 export interface GadgetStateNotify {
   gadgetEntityId: number
@@ -10,17 +10,16 @@ export interface GadgetStateNotify {
 
 class GadgetStatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('GadgetState')
+    super("GadgetState")
   }
 
-  async sendNotify(context: PacketContext, gadget: Gadget): Promise<void> {
+  async sendNotify(context: PacketContext, gadget: Gadget, gadgetstate?: GadgetStateEnum): Promise<void> {
     const { entityId, gadgetState, interactId } = gadget
     const notifyData: GadgetStateNotify = {
       gadgetEntityId: entityId,
-      gadgetState,
-      isEnableInteract: interactId != null
+      gadgetState: gadgetstate ? gadgetstate : gadgetState,
+      isEnableInteract: interactId != null,
     }
-
     await super.sendNotify(context, notifyData)
   }
 
@@ -30,4 +29,4 @@ class GadgetStatePacket extends Packet implements PacketInterface {
 }
 
 let packet: GadgetStatePacket
-export default (() => packet = packet || new GadgetStatePacket())()
+export default (() => (packet = packet || new GadgetStatePacket()))()

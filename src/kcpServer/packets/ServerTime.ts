@@ -1,4 +1,4 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
 
 export interface ServerTimeNotify {
   serverTime: string
@@ -6,12 +6,12 @@ export interface ServerTimeNotify {
 
 class ServerTimePacket extends Packet implements PacketInterface {
   constructor() {
-    super('ServerTime')
+    super("ServerTime")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
     const notifyData: ServerTimeNotify = {
-      serverTime: Date.now().toString()
+      serverTime: Date.now().toString(),
     }
 
     await super.sendNotify(context, notifyData)
@@ -23,4 +23,4 @@ class ServerTimePacket extends Packet implements PacketInterface {
 }
 
 let packet: ServerTimePacket
-export default (() => packet = packet || new ServerTimePacket())()
+export default (() => (packet = packet || new ServerTimePacket()))()

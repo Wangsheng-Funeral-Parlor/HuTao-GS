@@ -1,8 +1,8 @@
-import Entity from '$/entity'
-import TeamManager from '$/manager/teamManager'
-import { EntityTypeEnum } from '@/types/enum'
-import { ProtEntityTypeEnum } from '@/types/proto/enum'
-import EntityUserData from '@/types/user/EntityUserData'
+import Entity from "$/entity"
+import TeamManager from "$/manager/teamManager"
+import { EntityTypeEnum } from "@/types/enum"
+import { ProtEntityTypeEnum } from "@/types/proto/enum"
+import EntityUserData from "@/types/user/EntityUserData"
 
 export default class TeamEntity extends Entity {
   teamManager: TeamManager

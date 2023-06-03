@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { H5ActivityInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { H5ActivityInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetAllH5ActivityInfoReq { }
+export interface GetAllH5ActivityInfoReq {}
 
 export interface GetAllH5ActivityInfoRsp {
   retcode: RetcodeEnum
@@ -12,13 +12,13 @@ export interface GetAllH5ActivityInfoRsp {
 
 class GetAllH5ActivityInfoPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetAllH5ActivityInfo')
+    super("GetAllH5ActivityInfo")
   }
 
   async request(context: PacketContext, _data: GetAllH5ActivityInfoReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      h5ActivityInfoList: []
+      h5ActivityInfoList: [],
     })
   }
 
@@ -28,4 +28,4 @@ class GetAllH5ActivityInfoPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetAllH5ActivityInfoPacket
-export default (() => packet = packet || new GetAllH5ActivityInfoPacket())()
+export default (() => (packet = packet || new GetAllH5ActivityInfoPacket()))()

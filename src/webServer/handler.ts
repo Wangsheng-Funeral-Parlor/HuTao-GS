@@ -1,6 +1,6 @@
-import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'http'
-import WebServer from '.'
-import GlobalState from '@/globalState'
+import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from "http"
+
+import WebServer from "."
 
 export type MatchRule = string | RegExp | (string | RegExp)[]
 
@@ -21,7 +21,7 @@ export class HttpRequest {
     const { url, headers } = req
     const { host } = headers
 
-    this.url = new URL(url, `https://${host ? host.replace(/:.*/g, '') : 'unknown'}`)
+    this.url = new URL(url, `https://${host ? host.replace(/:.*/g, "") : "unknown"}`)
     this.headers = headers
   }
 
@@ -33,16 +33,18 @@ export class HttpRequest {
     return new Promise<void>((resolve, reject) => {
       const { req } = this
 
-      this.body = ''
+      this.body = ""
 
-      if (req.method !== 'POST') return resolve()
+      if (req.method !== "POST") return resolve()
 
-      req.on('error', reject)
-      req.on('end', () => {
-        try { this.body = JSON.parse(this.body) } catch (err) { }
+      req.on("error", reject)
+      req.on("end", () => {
+        try {
+          this.body = JSON.parse(this.body)
+        } catch (err) {}
         resolve()
       })
-      req.on('data', (chunk: string) => this.body += chunk)
+      req.on("data", (chunk: string) => (this.body += chunk))
     })
   }
 }
@@ -53,7 +55,7 @@ export class HttpResponse {
   data?: any
   headers?: { [header: string]: string }
 
-  constructor(data?: any, code: number = 200, headers?: { [header: string]: string }) {
+  constructor(data?: any, code = 200, headers?: { [header: string]: string }) {
     this.code = code
     this.data = data
     this.headers = headers
@@ -65,15 +67,15 @@ export class HttpResponse {
 
     const isBuffer = Buffer.isBuffer(data)
 
-    if (!isBuffer && typeof data === 'object') {
-      type = 'application/json'
+    if (!isBuffer && typeof data === "object") {
+      type = "application/json"
       data = JSON.stringify(data)
     }
 
     if (!rsp.headersSent) {
-      if (type != null) rsp.setHeader('Content-Type', type)
-      rsp.setHeader('Content-Length', (isBuffer ? data : Buffer.from(data)).length)
-      rsp.setHeader('Cache-Control', 'no-store')
+      if (type != null) rsp.setHeader("Content-Type", type)
+      rsp.setHeader("Content-Length", (isBuffer ? data : Buffer.from(data)).length)
+      rsp.setHeader("Cache-Control", "no-store")
 
       if (headers != null) {
         for (const header in headers) rsp.setHeader(header, headers[header])
@@ -104,12 +106,13 @@ export default class Handler {
 
     // Test host
     if (
-      GlobalState.get('CheckHostHeader') &&
-      domainList.find(domain => typeof domain === 'string' ? host === domain : host.match(domain) != null) == null
-    ) return false
+      domainList.find((domain) => (typeof domain === "string" ? host === domain : host.match(domain) != null)) == null
+    )
+      return false
 
     // Test path
-    if (pathList.find(path => typeof path === 'string' ? pathname === path : pathname.match(path) != null) == null) return false
+    if (pathList.find((path) => (typeof path === "string" ? pathname === path : pathname.match(path) != null)) == null)
+      return false
 
     return true
   }

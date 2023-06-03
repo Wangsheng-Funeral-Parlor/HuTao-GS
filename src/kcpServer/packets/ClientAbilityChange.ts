@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AbilityInvokeEntry } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { AbilityInvokeEntry } from "@/types/proto"
 
 export interface ClientAbilityChangeNotify {
   entityId: number
@@ -10,10 +10,10 @@ export interface ClientAbilityChangeNotify {
 
 class ClientAbilityChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('ClientAbilityChange', {
+    super("ClientAbilityChange", {
       notifyWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
-      notifyWaitStateMask: 0xF0FF,
-      notifyWaitStatePass: true
+      notifyWaitStateMask: 0xf0ff,
+      notifyWaitStatePass: true,
     })
   }
 
@@ -26,7 +26,12 @@ class ClientAbilityChangePacket extends Packet implements PacketInterface {
       const { broadcastContextList } = currentScene
       for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
-      await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), [], entityId, !!flag)
+      await this.broadcastNotify(
+        broadcastContextList.filter((ctx) => ctx.player !== player),
+        [],
+        entityId,
+        !!flag
+      )
       return
     }
 
@@ -38,11 +43,16 @@ class ClientAbilityChangePacket extends Packet implements PacketInterface {
     await super.sendNotify(context, data)
   }
 
-  async broadcastNotify(contextList: PacketContext[], invokes: AbilityInvokeEntry[], entityId: number, flag: boolean): Promise<void> {
+  async broadcastNotify(
+    contextList: PacketContext[],
+    invokes: AbilityInvokeEntry[],
+    entityId: number,
+    flag: boolean
+  ): Promise<void> {
     const notifyData: ClientAbilityChangeNotify = {
       entityId,
       invokes,
-      flag
+      flag,
     }
 
     await super.broadcastNotify(contextList, notifyData)
@@ -50,4 +60,4 @@ class ClientAbilityChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: ClientAbilityChangePacket
-export default (() => packet = packet || new ClientAbilityChangePacket())()
+export default (() => (packet = packet || new ClientAbilityChangePacket()))()

@@ -1,4 +1,4 @@
-import { AbilityScalarValueEntry } from '.'
+import { AbilityScalarValueEntry } from "."
 
 export interface AbilityMetaReInitOverrideMap {
   overrideMap: AbilityScalarValueEntry[]

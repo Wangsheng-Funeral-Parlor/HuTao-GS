@@ -3,14 +3,14 @@ function keepValue(val: any): boolean {
 
   const type = typeof val
   switch (type) {
-    case 'object':
+    case "object":
       if (Array.isArray(val)) return val.length > 0
       return true
-    case 'string':
+    case "string":
       return val.length > 0
-    case 'number':
+    case "number":
       return val !== 0
-    case 'boolean':
+    case "boolean":
       return val !== false
     default:
       return true
@@ -28,11 +28,7 @@ export default function protoCleanup(obj: any) {
       continue
     }
 
-    if (
-      v != null &&
-      typeof v === 'object' &&
-      !Array.isArray(v)
-    ) obj[k] = protoCleanup(v)
+    if (v != null && typeof v === "object" && !Array.isArray(v)) obj[k] = protoCleanup(v)
   }
 
   return obj

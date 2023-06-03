@@ -1,2 +1,2 @@
-export * from './EntityFightPropConfig'
-export * from './PlayerInfo'
+export * from "./EntityFightPropConfig"
+export * from "./PlayerInfo"

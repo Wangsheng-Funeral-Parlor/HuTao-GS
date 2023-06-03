@@ -1,5 +1,5 @@
 export class Handshake {
-  static MAGIC_CONNECT = [0xFF, 0xFFFFFFFF]
+  static MAGIC_CONNECT = [0xff, 0xffffffff]
   static MAGIC_SEND_BACK_CONV = [0x145, 0x14514545]
   static MAGIC_DISCONNECT = [0x194, 0x19419494]
 
@@ -10,7 +10,7 @@ export class Handshake {
   Magic2: number
   buffer: Buffer
 
-  constructor(magic: number[] = [0x0, 0x0], conv: number = 0, token: number = 0, data: number = 0) {
+  constructor(magic: number[] = [0x0, 0x0], conv = 0, token = 0, data = 0) {
     this.Magic1 = magic[0]
     this.Conv = conv
     this.Token = token
@@ -48,12 +48,13 @@ export default (data: Buffer): Handshake => {
   const type = data.readUInt32BE(0)
 
   switch (type) {
-    case 255: { // 0xFF -- NEW CONNECTION
+    case 255: {
+      // 0xFF -- NEW CONNECTION
       const handshakeReq = new Handshake()
       handshakeReq.decode(data)
 
       const _Conv = Math.floor(Date.now() / 1000)
-      const _Token = (0xFFCCEEBB ^ ((Date.now() >> 32) & 0xFFFFFFFF)) >>> 0
+      const _Token = (0xffcceebb ^ ((Date.now() >> 32) & 0xffffffff)) >>> 0
       const _Data = handshakeReq.Data
 
       const handshakeRes = new Handshake(Handshake.MAGIC_SEND_BACK_CONV, _Conv, _Token, _Data)
@@ -61,7 +62,8 @@ export default (data: Buffer): Handshake => {
 
       return handshakeRes
     }
-    case 404: { // 0x194 -- DISCONNECTION
+    case 404: {
+      // 0x194 -- DISCONNECTION
       const handshakeReq = new Handshake()
       handshakeReq.decode(data)
 

@@ -1,4 +1,4 @@
-import { ResinCard } from '.'
+import { ResinCard } from "."
 
 export interface ShopCardProduct {
   resinCard?: ResinCard

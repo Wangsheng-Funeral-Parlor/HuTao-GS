@@ -18,5 +18,5 @@ export enum AbilityTargettingEnum {
   TargetTeam = 16,
   CasterOwner = 17,
   CasterOriginOwner = 18,
-  MPLevel = 19
+  MPLevel = 19,
 }

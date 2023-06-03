@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface EnterWorldAreaReq {
   areaType: number
@@ -14,7 +14,7 @@ export interface EnterWorldAreaRsp {
 
 class EnterWorldAreaPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EnterWorldArea')
+    super("EnterWorldArea")
   }
 
   async request(context: PacketContext, data: EnterWorldAreaReq): Promise<void> {
@@ -23,7 +23,7 @@ class EnterWorldAreaPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       areaType,
-      areaId
+      areaId,
     })
   }
 
@@ -33,4 +33,4 @@ class EnterWorldAreaPacket extends Packet implements PacketInterface {
 }
 
 let packet: EnterWorldAreaPacket
-export default (() => packet = packet || new EnterWorldAreaPacket())()
+export default (() => (packet = packet || new EnterWorldAreaPacket()))()

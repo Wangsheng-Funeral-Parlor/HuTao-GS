@@ -1,9 +1,9 @@
-import BaseClass from '#/baseClass'
-import { ChatManager } from '$/manager/chatManager'
-import Player from '$/player'
-import { SystemHintTypeEnum } from '@/types/enum'
-import { ChatInfo } from '@/types/proto'
-import { getTimeSeconds } from '@/utils/time'
+import BaseClass from "#/baseClass"
+import { ChatManager } from "$/manager/chatManager"
+import Player from "$/player"
+import { SystemHintTypeEnum } from "@/types/enum"
+import { ChatInfo } from "@/types/proto"
+import { getTimeSeconds } from "@/utils/time"
 
 export default class ChatChannel extends BaseClass {
   chatManager: ChatManager
@@ -27,7 +27,7 @@ export default class ChatChannel extends BaseClass {
   get playerList() {
     const { chatManager, uidList, _playerList } = this
     const { game } = chatManager
-    return _playerList || uidList.map(uid => game.getPlayerByUid(uid)).filter(player => player != null)
+    return _playerList || uidList.map((uid) => game.getPlayerByUid(uid)).filter((player) => player != null)
   }
 
   // Override player list
@@ -40,13 +40,13 @@ export default class ChatChannel extends BaseClass {
       time: getTimeSeconds(),
       uid: player.uid,
       systemHint: {
-        type
-      }
+        type,
+      },
     }
   }
 
   getPlayer(uid: number) {
-    return this.playerList.find(player => player.uid === uid)
+    return this.playerList.find((player) => player.uid === uid)
   }
 
   async send(sender: Player, chatInfo: ChatInfo, seqId?: number): Promise<boolean> {
@@ -55,7 +55,7 @@ export default class ChatChannel extends BaseClass {
 
     // Update sequence
     let seq = chatInfo.sequence || 0
-    while (chatHistory.find(ci => ci.sequence === seq)) seq++
+    while (chatHistory.find((ci) => ci.sequence === seq)) seq++
     chatInfo.sequence = seq
 
     // Push message to chat history and sort by sequence
@@ -63,12 +63,12 @@ export default class ChatChannel extends BaseClass {
     chatHistory.sort((a, b) => a.sequence - b.sequence)
 
     // Emit message event
-    await this.emit('Message', chatInfo, seqId)
+    await this.emit("Message", chatInfo, seqId)
 
     return true
   }
 
-  pull(seq: number = 0, num: number = 0) {
+  pull(seq = 0, num = 0) {
     return this.chatHistory.slice(seq).slice(-num)
   }
 }

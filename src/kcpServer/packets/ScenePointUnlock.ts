@@ -1,12 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import SceneData from '$/gameData/data/SceneData'
-import Scene from '$/scene'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import SceneData from "$/gameData/data/SceneData"
+import Scene from "$/scene"
 
-const unlockType = [
-  'SceneTransPoint',
-  'DungeonEntry',
-  'VirtualTransPoint'
-]
+const unlockType = ["SceneTransPoint", "DungeonEntry", "VirtualTransPoint", "TransPointNormal", "TransPointStatue"]
 
 export interface ScenePointUnlockNotify {
   sceneId: number
@@ -18,7 +14,7 @@ export interface ScenePointUnlockNotify {
 
 class ScenePointUnlockPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ScenePointUnlock')
+    super("ScenePointUnlock")
   }
 
   async sendNotify(context: PacketContext, scene: Scene): Promise<void> {
@@ -35,14 +31,14 @@ class ScenePointUnlockPacket extends Packet implements PacketInterface {
     }
 
     // add unlocked points
-    pointList.push(...unlockedPointList.filter(id => !pointList.includes(id)))
+    pointList.push(...unlockedPointList.filter((id) => !pointList.includes(id)))
 
     const notifyData: ScenePointUnlockNotify = {
       sceneId,
       pointList,
       lockedPointList: [],
       hidePointList: [],
-      unhidePointList: []
+      unhidePointList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -54,4 +50,4 @@ class ScenePointUnlockPacket extends Packet implements PacketInterface {
 }
 
 let packet: ScenePointUnlockPacket
-export default (() => packet = packet || new ScenePointUnlockPacket())()
+export default (() => (packet = packet || new ScenePointUnlockPacket()))()

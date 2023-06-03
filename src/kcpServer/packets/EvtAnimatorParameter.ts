@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { EvtAnimatorParameterInfo } from '@/types/proto'
-import { ForwardTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { EvtAnimatorParameterInfo } from "@/types/proto"
+import { ForwardTypeEnum } from "@/types/proto/enum"
 
 export interface EvtAnimatorParameterNotify {
   forwardType: ForwardTypeEnum
@@ -9,7 +9,7 @@ export interface EvtAnimatorParameterNotify {
 
 class EvtAnimatorParameterPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtAnimatorParameter')
+    super("EvtAnimatorParameter")
   }
 
   async recvNotify(context: PacketContext, data: EvtAnimatorParameterNotify): Promise<void> {
@@ -30,4 +30,4 @@ class EvtAnimatorParameterPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtAnimatorParameterPacket
-export default (() => packet = packet || new EvtAnimatorParameterPacket())()
+export default (() => (packet = packet || new EvtAnimatorParameterPacket()))()

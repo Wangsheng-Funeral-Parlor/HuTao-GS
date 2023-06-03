@@ -1,4 +1,4 @@
-import ConfigAIMixinSetControllerCondition from './ConfigAIMixinSetControllerCondition'
+import ConfigAIMixinSetControllerCondition from "./ConfigAIMixinSetControllerCondition"
 
 export default interface ConfigAIMixinSetting {
   SetControllerParameterOnBeHitByEntityType: ConfigAIMixinSetControllerCondition[]

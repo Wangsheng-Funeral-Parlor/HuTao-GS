@@ -1,7 +1,7 @@
-import ConfigBaseBornType from '.'
+import ConfigBaseBornType from "."
 
 export default interface ConfigBornByStormLightning extends ConfigBaseBornType {
-  $type: 'ConfigBornByStormLightning'
+  $type: "ConfigBornByStormLightning"
   HitHeightRatio: number
   SelectRange: number
   MaxOffsetLen: number

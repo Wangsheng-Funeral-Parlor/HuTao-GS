@@ -1,8 +1,10 @@
-import AvatarData from '$/gameData/data/AvatarData'
-import { AvatarFetterInfo } from '@/types/proto'
-import FettersUserData from '@/types/user/FettersUserData'
-import Avatar from '..'
-import Fetter from './fetter'
+import Avatar from ".."
+
+import Fetter from "./fetter"
+
+import AvatarData from "$/gameData/data/AvatarData"
+import { AvatarFetterInfo } from "@/types/proto"
+import FettersUserData from "@/types/user/FettersUserData"
 
 export default class FetterList {
   avatar: Avatar
@@ -20,7 +22,7 @@ export default class FetterList {
     const avatarData = await AvatarData.getAvatar(this.avatar.avatarId)
     if (!avatarData) return
 
-    this.fetterList = avatarData.Fetters.map(fetter => new Fetter(this, fetter))
+    this.fetterList = avatarData.Fetters.map((fetter) => new Fetter(this, fetter))
   }
 
   async init(userData: FettersUserData) {
@@ -52,7 +54,7 @@ export default class FetterList {
     return {
       expLevel,
       rewardedFetterLevelList,
-      fetterList: fetterList.map(f => f.export())
+      fetterList: fetterList.map((f) => f.export()),
     }
   }
 
@@ -61,7 +63,7 @@ export default class FetterList {
 
     return {
       expLevel,
-      rewarded: rewardedFetterLevelList
+      rewarded: rewardedFetterLevelList,
     }
   }
 }

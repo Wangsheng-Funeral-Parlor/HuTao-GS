@@ -1,4 +1,4 @@
-import { PersonalLineLockReasonEnum } from './enum'
+import { PersonalLineLockReasonEnum } from "./enum"
 
 export interface LockedPersonallineData {
   chapterId?: number

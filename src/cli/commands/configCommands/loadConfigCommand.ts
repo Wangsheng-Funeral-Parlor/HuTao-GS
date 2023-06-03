@@ -1,36 +1,46 @@
-import CLI from '@/cli'
-import { AVAILABLE_CONFIGS } from '@/config'
-import Server from '@/server'
-import translate from '@/translate'
-import { getJson, setJson } from '@/utils/json'
-import { CommandDefinition } from '..'
+import { CommandDefinition } from ".."
+
+import CLI from "@/cli"
+import { AVAILABLE_CONFIGS } from "@/config"
+import Server from "@/server"
+import translate from "@/translate"
+import { getJson, setJson } from "@/utils/json"
 
 const loadConfigCommand: CommandDefinition = {
-  name: 'loadConfig',
+  name: "loadConfig",
   usage: 2,
   args: [
-    { name: 'name', type: 'str', optional: true, get values() { return AVAILABLE_CONFIGS } }
+    {
+      name: "name",
+      type: "str",
+      optional: true,
+      get values() {
+        return AVAILABLE_CONFIGS
+      },
+    },
   ],
   exec: async (cmdInfo) => {
-    const { args, cli, server } = cmdInfo as { args: string[], cli: CLI, server: Server }
+    const { args, cli, server } = <{ args: string[]; cli: CLI; server: Server }>cmdInfo
     const { print, printError } = cli
+    const [name] = args
 
-    const configName = args[0] || 'default'
-    const allConfigs = getJson('config.json', {})
+    const configName = name || "default"
+    const allConfigs = getJson("config.json", {})
 
-    if (configName === 'current') return printError(translate('cli.commands.loadConfig.error.invalidName', configName))
-    if (allConfigs[configName] == null) return printError(translate('cli.commands.loadConfig.error.notFound', configName))
+    if (configName === "current") return printError(translate("cli.commands.loadConfig.error.invalidName", configName))
+    if (allConfigs[configName] == null)
+      return printError(translate("cli.commands.loadConfig.error.notFound", configName))
 
-    print(translate('cli.commands.loadConfig.info.load', configName))
+    print(translate("cli.commands.loadConfig.info.load", configName))
 
     allConfigs.current = configName
-    if (allConfigs.current === 'default') delete allConfigs.current
+    if (allConfigs.current === "default") delete allConfigs.current
 
-    setJson('config.json', allConfigs)
+    setJson("config.json", allConfigs)
 
     cli.stop()
     await server.restart()
-  }
+  },
 }
 
 export default loadConfigCommand

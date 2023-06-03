@@ -1,9 +1,10 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Vector from '$/utils/vector'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
-import WorldPlayerDie from './WorldPlayerDie'
-import { VectorInfo } from '@/types/proto'
+import WorldPlayerDie from "./WorldPlayerDie"
+
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface AvatarDieAnimationEndReq {
   dieGuid: string
@@ -19,9 +20,9 @@ export interface AvatarDieAnimationEndRsp {
 
 class AvatarDieAnimationEndPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarDieAnimationEnd', {
+    super("AvatarDieAnimationEnd", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -55,7 +56,7 @@ class AvatarDieAnimationEndPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       dieGuid,
-      skillId
+      skillId,
     })
   }
 
@@ -65,4 +66,4 @@ class AvatarDieAnimationEndPacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarDieAnimationEndPacket
-export default (() => packet = packet || new AvatarDieAnimationEndPacket())()
+export default (() => (packet = packet || new AvatarDieAnimationEndPacket()))()

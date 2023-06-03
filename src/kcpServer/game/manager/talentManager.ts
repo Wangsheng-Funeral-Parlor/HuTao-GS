@@ -1,10 +1,10 @@
-import AbilityChange from '#/packets/AbilityChange'
-import AvatarUnlockTalent from '#/packets/AvatarUnlockTalent'
-import Embryo from '$/ability/embryo'
-import Avatar from '$/entity/avatar'
-import Talent from '$/entity/avatar/talent'
-import SkillData from '$/gameData/data/SkillData'
-import TalentUserData from '@/types/user/TalentUserData'
+import AbilityChange from "#/packets/AbilityChange"
+import AvatarUnlockTalent from "#/packets/AvatarUnlockTalent"
+import Embryo from "$/ability/embryo"
+import Avatar from "$/entity/avatar"
+import Talent from "$/entity/avatar/talent"
+import SkillData from "$/gameData/data/SkillData"
+import TalentUserData from "@/types/user/TalentUserData"
 
 export default class TalentManager {
   avatar: Avatar
@@ -25,14 +25,17 @@ export default class TalentManager {
 
   get unlockedTalents(): Talent[] {
     const { talents, unlockedIdList } = this
-    return talents.filter(t => unlockedIdList.includes(t.id))
+    return talents.filter((t) => unlockedIdList.includes(t.id))
   }
 
   async init(userData: TalentUserData) {
     const { unlockedIdList } = userData || {}
 
     this.unlockedIdList.splice(0)
-    if (Array.isArray(unlockedIdList)) this.unlockedIdList.push(...unlockedIdList)
+
+    if (!Array.isArray(unlockedIdList)) return
+
+    this.unlockedIdList.push(...unlockedIdList)
   }
 
   async addFromSkillDepot() {
@@ -48,7 +51,7 @@ export default class TalentManager {
 
     for (const talentId of Talents) {
       const talent = new Talent(this, talentId)
-      await talent.init()
+      talent.init()
       talents.push(talent)
     }
   }
@@ -60,7 +63,7 @@ export default class TalentManager {
 
   getNextTalent(prev?: Talent): Talent | null {
     const { talents } = this
-    return talents.find(t => t.prevTalentId === (prev?.id || null)) || null
+    return talents.find((t) => t.prevTalentId === (prev?.id || null)) || null
   }
 
   async unlockTalent(): Promise<Talent | null> {
@@ -136,14 +139,14 @@ export default class TalentManager {
   }
 
   exportIdList(): number[] {
-    return this.unlockedTalents.map(t => t.id)
+    return this.unlockedTalents.map((t) => t.id)
   }
 
   exportUserData(): TalentUserData {
     const { unlockedIdList } = this
 
     return {
-      unlockedIdList
+      unlockedIdList,
     }
   }
 }

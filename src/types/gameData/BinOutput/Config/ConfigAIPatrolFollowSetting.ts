@@ -1,8 +1,8 @@
-import ConfigAIPatrolFollowData from './ConfigAIPatrolFollowData'
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
+import ConfigAIPatrolFollowData from "./ConfigAIPatrolFollowData"
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
 
 export default interface ConfigAIPatrolFollowSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAIPatrolFollowSetting'
+  $type: "ConfigAIPatrolFollowSetting"
   DefaultSetting: ConfigAIPatrolFollowData
   Specification: { [id: number]: ConfigAIPatrolFollowData }
 }

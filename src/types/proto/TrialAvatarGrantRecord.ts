@@ -1,4 +1,4 @@
-import { GrantReasonEnum } from './enum'
+import { GrantReasonEnum } from "./enum"
 
 export interface TrialAvatarGrantRecord {
   grantReason?: GrantReasonEnum

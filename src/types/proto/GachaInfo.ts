@@ -1,4 +1,4 @@
-import { GachaUpInfo } from '.'
+import { GachaUpInfo } from "."
 
 export interface GachaInfo {
   gachaType: number

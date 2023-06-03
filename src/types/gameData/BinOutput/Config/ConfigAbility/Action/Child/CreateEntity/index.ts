@@ -1,7 +1,5 @@
-import { CreateGadget, CreateItem } from './Child'
+import { CreateGadget, CreateItem } from "./Child"
 
-type CreateEntity =
-  CreateGadget |
-  CreateItem
+type CreateEntity = CreateGadget | CreateItem
 
 export default CreateEntity

@@ -1,5 +1,6 @@
-import { MonsterRoute, SceneFishInfo, SceneWeaponInfo } from '.'
-import { MonsterBornTypeEnum } from './enum'
+import { MonsterBornTypeEnum } from "./enum"
+
+import { MonsterRoute, SceneFishInfo, SceneWeaponInfo } from "."
 
 export interface SceneMonsterInfo {
   fishInfo?: SceneFishInfo

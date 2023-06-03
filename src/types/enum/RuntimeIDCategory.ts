@@ -14,5 +14,5 @@ export enum RuntimeIDCategoryEnum {
   LocalMassive = 21,
   NpcCrowd = 22,
   LocalNpc = 23,
-  HomeWorld = 24
+  HomeWorld = 24,
 }

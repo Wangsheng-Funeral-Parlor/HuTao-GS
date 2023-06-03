@@ -5,7 +5,7 @@ export enum ItemDataTypeEnum {
   NONE = 0,
   MATERIAL = 1,
   EQUIP = 2,
-  FURNITURE = 3
+  FURNITURE = 3,
 }
 
 export interface ItemUserData {

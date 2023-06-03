@@ -1,4 +1,4 @@
-import { MotionInfo } from '.'
+import { MotionInfo } from "."
 
 export interface EntityMoveInfo {
   entityId: number

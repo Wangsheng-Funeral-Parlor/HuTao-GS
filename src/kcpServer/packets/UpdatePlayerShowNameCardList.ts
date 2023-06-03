@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface UpdatePlayerShowNameCardListReq {
   showNameCardIdList: number[]
@@ -13,9 +13,9 @@ export interface UpdatePlayerShowNameCardListRsp {
 
 class UpdatePlayerShowNameCardListPacket extends Packet implements PacketInterface {
   constructor() {
-    super('UpdatePlayerShowNameCardList', {
+    super("UpdatePlayerShowNameCardList", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -27,7 +27,7 @@ class UpdatePlayerShowNameCardListPacket extends Packet implements PacketInterfa
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      showNameCardIdList: profile.showNameCardIdList
+      showNameCardIdList: profile.showNameCardIdList,
     })
   }
 
@@ -37,4 +37,4 @@ class UpdatePlayerShowNameCardListPacket extends Packet implements PacketInterfa
 }
 
 let packet: UpdatePlayerShowNameCardListPacket
-export default (() => packet = packet || new UpdatePlayerShowNameCardListPacket())()
+export default (() => (packet = packet || new UpdatePlayerShowNameCardListPacket()))()

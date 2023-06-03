@@ -1,4 +1,4 @@
-import { RoutePoint } from '.'
+import { RoutePoint } from "."
 
 export interface MonsterRoute {
   routePoints: RoutePoint[]

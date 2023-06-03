@@ -1,6 +1,6 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyAttachAvatar extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyAttachAvatar'
+  $type: "ConfigWidgetToyAttachAvatar"
   UseGadgetId: number
 }

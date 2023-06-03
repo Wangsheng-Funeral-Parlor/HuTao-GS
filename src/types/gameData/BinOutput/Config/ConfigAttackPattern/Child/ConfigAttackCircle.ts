@@ -1,8 +1,9 @@
-import { DynamicFloat } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigSimpleAttackPattern from './ConfigSimpleAttackPattern'
+import ConfigSimpleAttackPattern from "./ConfigSimpleAttackPattern"
+
+import { DynamicFloat } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigAttackCircle extends ConfigSimpleAttackPattern {
-  $type: 'ConfigAttackCircle'
+  $type: "ConfigAttackCircle"
   Height: number
   FanAngle: number
   Radius: DynamicFloat

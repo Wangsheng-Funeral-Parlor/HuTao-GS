@@ -1,10 +1,10 @@
-import AvatarEquipChange from '#/packets/AvatarEquipChange'
-import AvatarTeamUpdate from '#/packets/AvatarTeamUpdate'
-import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
-import { SetUpAvatarTeamReq } from '#/packets/SetUpAvatarTeam'
-import Avatar from '$/entity/avatar'
-import TeamManager from '$/manager/teamManager'
-import { RetcodeEnum } from '@/types/proto/enum'
+import AvatarEquipChange from "#/packets/AvatarEquipChange"
+import AvatarTeamUpdate from "#/packets/AvatarTeamUpdate"
+import SceneTeamUpdate from "#/packets/SceneTeamUpdate"
+import { SetUpAvatarTeamReq } from "#/packets/SetUpAvatarTeam"
+import Avatar from "$/entity/avatar"
+import TeamManager from "$/manager/teamManager"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export default class Team {
   teamManager: TeamManager
@@ -40,15 +40,15 @@ export default class Team {
   getAvatarLimit() {
     const { player } = this.teamManager
     const playerCount = player.currentScene?.playerList?.length || 1
-    return Math.floor(4 / playerCount) + (player.isHost() ? (4 % playerCount) : 0)
+    return Math.floor(4 / playerCount) + (player.isHost() ? 4 % playerCount : 0)
   }
 
-  getAvatarList(bypassLimit: boolean = false): Avatar[] {
+  getAvatarList(bypassLimit = false): Avatar[] {
     return this.avatarList.slice(0, bypassLimit ? this.avatarList.length : this.getAvatarLimit())
   }
 
-  getAliveAvatarList(bypassLimit: boolean = false): Avatar[] {
-    return this.getAvatarList(bypassLimit).filter(avatar => avatar.isAlive())
+  getAliveAvatarList(bypassLimit = false): Avatar[] {
+    return this.getAvatarList(bypassLimit).filter((avatar) => avatar.isAlive())
   }
 
   getAvatar(guid: bigint) {
@@ -57,14 +57,19 @@ export default class Team {
     if (!guidManager.isValidGuid(guid)) return null
     guid = guidManager.getGuid(guid)
 
-    return this.getAvatarList().find(avatar => avatar.guid === guid)
+    return this.getAvatarList().find((avatar) => avatar.guid === guid)
   }
 
   getAliveAvatar() {
-    return this.getAvatarList().find(avatar => avatar.isAlive())
+    return this.getAvatarList().find((avatar) => avatar.isAlive())
   }
 
-  async setUpAvatarTeam(data: SetUpAvatarTeamReq, noNotify: boolean = false, seqId?: number, revive: boolean = false): Promise<RetcodeEnum> {
+  async setUpAvatarTeam(
+    data: SetUpAvatarTeamReq,
+    noNotify = false,
+    seqId?: number,
+    revive = false
+  ): Promise<RetcodeEnum> {
     const { teamManager, avatarList } = this
     const { player, currentTeam } = teamManager
     const { currentScene, currentAvatar: oldAvatar } = player
@@ -72,14 +77,16 @@ export default class Team {
 
     this.initialized = true
 
-    const avatarTeamList = avatarTeamGuidList.map(guid => player.getAvatar(BigInt(guid))).filter(avatar => avatar != null)
+    const avatarTeamList = avatarTeamGuidList
+      .map((guid) => player.getAvatar(BigInt(guid)))
+      .filter((avatar) => avatar != null)
     if (avatarTeamList.length === 0) avatarTeamList.push(player.avatarList[0])
-    if (!revive && !avatarTeamList.find(avatar => avatar.isAlive())) return RetcodeEnum.RET_AVATAR_NOT_ALIVE
+    if (!revive && !avatarTeamList.find((avatar) => avatar.isAlive())) return RetcodeEnum.RET_AVATAR_NOT_ALIVE
 
     avatarList.splice(0)
     avatarList.push(...avatarTeamList)
 
-    const isCurTeam = teamId == null || (Number(!player.isInMp()) * currentTeam) === teamId
+    const isCurTeam = teamId == null || Number(!player.isInMp()) * currentTeam === teamId
 
     if (!noNotify) await this.notify(isCurTeam, teamId, seqId)
     if (!isCurTeam) return RetcodeEnum.RET_SUCC
@@ -112,18 +119,18 @@ export default class Team {
     this.avatarList.splice(0)
   }
 
-  exportGuidList(keepCurAvatar: boolean = false, bypassLimit: boolean = false) {
+  exportGuidList(keepCurAvatar = false, bypassLimit = false) {
     const { currentAvatar } = this.teamManager.player
     const limit = this.getAvatarLimit()
     let avatarList = this.getAvatarList(true)
 
     if (keepCurAvatar && !avatarList.slice(0, limit).includes(currentAvatar)) {
       avatarList = avatarList
-        .map((avatar, i) => [avatar, (avatar === currentAvatar ? -1 : i)])
+        .map((avatar, i) => [avatar, avatar === currentAvatar ? -1 : i])
         .sort((a, b) => Math.sign(<number>a[1] - <number>b[1]))
-        .map(arr => <Avatar>arr[0])
+        .map((arr) => <Avatar>arr[0])
     }
 
-    return avatarList.map(avatar => avatar.guid.toString()).slice(0, bypassLimit ? undefined : limit)
+    return avatarList.map((avatar) => avatar.guid.toString()).slice(0, bypassLimit ? undefined : limit)
   }
 }

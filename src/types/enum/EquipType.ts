@@ -5,5 +5,5 @@ export enum EquipTypeEnum {
   EQUIP_SHOES = 3,
   EQUIP_RING = 4,
   EQUIP_DRESS = 5,
-  EQUIP_WEAPON = 6
+  EQUIP_WEAPON = 6,
 }

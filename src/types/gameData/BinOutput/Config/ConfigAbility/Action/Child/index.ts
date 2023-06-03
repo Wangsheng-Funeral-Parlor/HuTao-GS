@@ -1,26 +1,29 @@
-import { DynamicFloat, DynamicInt, DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigAttackEvent from '$DT/BinOutput/Config/ConfigAttackEvent'
-import ConfigAttackInfo from '$DT/BinOutput/Config/ConfigAttackInfo'
-import ConfigAttackTargetMapEvent from '$DT/BinOutput/Config/ConfigAttackTargetMapEvent'
-import ConfigAudioOperation from '$DT/BinOutput/Config/ConfigAudioOperation'
-import ConfigAvatarHitBucketSetting from '$DT/BinOutput/Config/ConfigAvatarHitBucketSetting'
-import ConfigBornType from '$DT/BinOutput/Config/ConfigBornType'
-import ConfigCameraRadialBlur from '$DT/BinOutput/Config/ConfigCameraRadialBlur'
-import ConfigCameraShake from '$DT/BinOutput/Config/ConfigCameraShake'
-import ConfigHitScene from '$DT/BinOutput/Config/ConfigHitScene'
-import ConfigLightAttach from '$DT/BinOutput/Config/ConfigLightAttach'
-import ConfigLightComponent from '$DT/BinOutput/Config/ConfigLightComponent'
-import ConfigStateCameraParam from '$DT/BinOutput/Config/ConfigStateCameraParam'
-import ConfigTimeSlow from '$DT/BinOutput/Config/ConfigTimeSlow'
-import FocusAssistanceGroup from '$DT/BinOutput/Config/FocusAssistanceGroup'
-import GlobalValuePair from '$DT/BinOutput/Config/GlobalValuePair'
-import RocketJumpExt from '$DT/BinOutput/Config/RocketJumpExt'
-import SelectTargets from '$DT/BinOutput/Config/SelectTargets'
-import SelectTargetsByChildren from '$DT/BinOutput/Config/SelectTargets/Child/SelectTargetsByChildren'
-import ConfigAbilityAction from '..'
-import ConfigAbilityPredicate from '../../Predicate'
-import CreateEntity from './CreateEntity'
-import UtilityAction from './UtilityAction'
+import ConfigAbilityAction from ".."
+import ConfigAbilityPredicate from "../../Predicate"
+
+import CreateEntity from "./CreateEntity"
+import UtilityAction from "./UtilityAction"
+
+import { DynamicFloat, DynamicInt, DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
+import ConfigAttackEvent from "$DT/BinOutput/Config/ConfigAttackEvent"
+import ConfigAttackInfo from "$DT/BinOutput/Config/ConfigAttackInfo"
+import ConfigAttackTargetMapEvent from "$DT/BinOutput/Config/ConfigAttackTargetMapEvent"
+import ConfigAudioOperation from "$DT/BinOutput/Config/ConfigAudioOperation"
+import ConfigAvatarHitBucketSetting from "$DT/BinOutput/Config/ConfigAvatarHitBucketSetting"
+import ConfigBornType from "$DT/BinOutput/Config/ConfigBornType"
+import ConfigCameraRadialBlur from "$DT/BinOutput/Config/ConfigCameraRadialBlur"
+import ConfigCameraShake from "$DT/BinOutput/Config/ConfigCameraShake"
+import ConfigHitScene from "$DT/BinOutput/Config/ConfigHitScene"
+import ConfigLightAttach from "$DT/BinOutput/Config/ConfigLightAttach"
+import ConfigLightComponent from "$DT/BinOutput/Config/ConfigLightComponent"
+import ConfigStateCameraParam from "$DT/BinOutput/Config/ConfigStateCameraParam"
+import ConfigTimeSlow from "$DT/BinOutput/Config/ConfigTimeSlow"
+import FocusAssistanceGroup from "$DT/BinOutput/Config/FocusAssistanceGroup"
+import GlobalValuePair from "$DT/BinOutput/Config/GlobalValuePair"
+import RocketJumpExt from "$DT/BinOutput/Config/RocketJumpExt"
+import SelectTargets from "$DT/BinOutput/Config/SelectTargets"
+import SelectTargetsByChildren from "$DT/BinOutput/Config/SelectTargets/Child/SelectTargetsByChildren"
+import { GadgetStateEnum } from "@/types/enum"
 
 export default interface ConfigBaseAbilityAction {
   Target?: string
@@ -34,35 +37,35 @@ export default interface ConfigBaseAbilityAction {
 }
 
 export interface ActCameraRadialBlur extends ConfigBaseAbilityAction {
-  $type: 'ActCameraRadialBlur'
+  $type: "ActCameraRadialBlur"
   CameraRadialBlur: ConfigCameraRadialBlur
 }
 
 export interface ActCameraShake extends ConfigBaseAbilityAction {
-  $type: 'ActCameraShake'
+  $type: "ActCameraShake"
   CameraShake: ConfigCameraShake
   Born: ConfigBornType
 }
 
 export interface ActTimeSlow extends ConfigBaseAbilityAction {
-  $type: 'ActTimeSlow'
+  $type: "ActTimeSlow"
   TimeSlow: ConfigTimeSlow
   IsGlobal: boolean
 }
 
 export interface AddAvatarSkillInfo extends ConfigBaseAbilityAction {
-  $type: 'AddAvatarSkillInfo'
+  $type: "AddAvatarSkillInfo"
   SkillID: number
 }
 
 export interface AddClimateMeter extends ConfigBaseAbilityAction {
-  $type: 'AddClimateMeter'
+  $type: "AddClimateMeter"
   ClimateType: string
   Value: DynamicFloat
 }
 
 export interface AddElementDurability extends ConfigBaseAbilityAction {
-  $type: 'AddElementDurability'
+  $type: "AddElementDurability"
   Value: DynamicFloat
   ModifierName: string
   ElementType: string
@@ -73,14 +76,14 @@ export interface AddElementDurability extends ConfigBaseAbilityAction {
 }
 
 export interface AddGlobalPos extends ConfigBaseAbilityAction {
-  $type: 'AddGlobalPos'
+  $type: "AddGlobalPos"
   Key: string
   Born: ConfigBornType
   SetTarget: boolean
 }
 
 export interface AddGlobalValue extends ConfigBaseAbilityAction {
-  $type: 'AddGlobalValue'
+  $type: "AddGlobalValue"
   Value: number
   Key: string
   UseLimitRange?: boolean
@@ -90,7 +93,7 @@ export interface AddGlobalValue extends ConfigBaseAbilityAction {
 }
 
 export interface AddGlobalValueToTarget extends ConfigBaseAbilityAction {
-  $type: 'AddGlobalValueToTarget'
+  $type: "AddGlobalValueToTarget"
   SrcTarget: string
   DstTarget: string
   SrcKey: string
@@ -98,35 +101,35 @@ export interface AddGlobalValueToTarget extends ConfigBaseAbilityAction {
 }
 
 export interface AddServerBuff extends ConfigBaseAbilityAction {
-  $type: 'AddServerBuff'
+  $type: "AddServerBuff"
   SBuffId: number
   Time: number
 }
 
 export interface ApplyLevelModifier extends ConfigBaseAbilityAction {
-  $type: 'ApplyLevelModifier'
+  $type: "ApplyLevelModifier"
   ModifierName: string
 }
 
 export interface ApplyModifier extends ConfigBaseAbilityAction {
-  $type: 'ApplyModifier'
+  $type: "ApplyModifier"
   ModifierName: string
 }
 
 export interface AttachAbilityStateResistance extends ConfigBaseAbilityAction {
-  $type: 'AttachAbilityStateResistance'
+  $type: "AttachAbilityStateResistance"
   ResistanceListID: number
   ResistanceBuffDebuffs: string[]
   DurationRatio: number
 }
 
 export interface AttachBulletAimPoint extends ConfigBaseAbilityAction {
-  $type: 'AttachBulletAimPoint'
+  $type: "AttachBulletAimPoint"
   BulletAimPoint: string
 }
 
 export interface AttachEffect extends ConfigBaseAbilityAction {
-  $type: 'AttachEffect'
+  $type: "AttachEffect"
   EffectPattern: string
   Born?: ConfigBornType
   Scale?: number
@@ -134,41 +137,41 @@ export interface AttachEffect extends ConfigBaseAbilityAction {
 }
 
 export interface AttachElementTypeResistance extends ConfigBaseAbilityAction {
-  $type: 'AttachElementTypeResistance'
+  $type: "AttachElementTypeResistance"
   ElementType: string
   DurationRatio: number
 }
 
 export interface AttachLight extends ConfigBaseAbilityAction {
-  $type: 'AttachLight'
+  $type: "AttachLight"
   Attach: ConfigLightAttach
   Light: ConfigLightComponent
 }
 
 export interface AttachModifier extends ConfigBaseAbilityAction {
-  $type: 'AttachModifier'
+  $type: "AttachModifier"
   ModifierName: string
 }
 
 export interface AvatarCameraParam extends ConfigBaseAbilityAction {
-  $type: 'AvatarCameraParam'
+  $type: "AvatarCameraParam"
   CameraParam: ConfigStateCameraParam
 }
 
 export interface AvatarDoBlink extends ConfigBaseAbilityAction {
-  $type: 'AvatarDoBlink'
+  $type: "AvatarDoBlink"
   PreferInput: boolean
   Distance: number
 }
 
 export interface AvatarEnterCameraShot extends ConfigBaseAbilityAction {
-  $type: 'AvatarEnterCameraShot'
+  $type: "AvatarEnterCameraShot"
   CameraMoveCfgPath: string
   ShotType: string
 }
 
 export interface AvatarEnterFocus extends ConfigBaseAbilityAction {
-  $type: 'AvatarEnterFocus'
+  $type: "AvatarEnterFocus"
   CameraFollowLower: DynamicVector
   CameraFollowUpper: DynamicVector
   CameraFollowMaxDegree: number
@@ -187,45 +190,45 @@ export interface AvatarEnterFocus extends ConfigBaseAbilityAction {
 }
 
 export interface AvatarExitCameraShot extends ConfigBaseAbilityAction {
-  $type: 'AvatarExitCameraShot'
+  $type: "AvatarExitCameraShot"
   ShotType: string
 }
 
 export interface AvatarExitClimb extends ConfigBaseAbilityAction {
-  $type: 'AvatarExitClimb'
+  $type: "AvatarExitClimb"
 }
 
 export interface AvatarExitFocus extends ConfigBaseAbilityAction {
-  $type: 'AvatarExitFocus'
+  $type: "AvatarExitFocus"
   KeepRotation: boolean
 }
 
 export interface AvatarSkillStart extends ConfigBaseAbilityAction {
-  $type: 'AvatarSkillStart'
+  $type: "AvatarSkillStart"
   SkillID: number
   CdRatio?: DynamicFloat
   CostStaminaRatio?: DynamicFloat
 }
 
 export interface BanEntityMark extends ConfigBaseAbilityAction {
-  $type: 'BanEntityMark'
+  $type: "BanEntityMark"
   IsBan: boolean
 }
 
 export interface BroadcastNeuronStimulate extends ConfigBaseAbilityAction {
-  $type: 'BroadcastNeuronStimulate'
+  $type: "BroadcastNeuronStimulate"
   NeuronName: string
   Stimulate: boolean
   Range: number
 }
 
 export interface CalcDvalinS04RebornPoint extends ConfigBaseAbilityAction {
-  $type: 'CalcDvalinS04RebornPoint'
+  $type: "CalcDvalinS04RebornPoint"
   Enable: boolean
 }
 
 export interface CallLuaTask extends ConfigBaseAbilityAction {
-  $type: 'CallLuaTask'
+  $type: "CallLuaTask"
   TargetAlias: string
   ValueInt: number
   ValueFloat: number
@@ -233,68 +236,72 @@ export interface CallLuaTask extends ConfigBaseAbilityAction {
 }
 
 export interface ChangeEnviroWeather extends ConfigBaseAbilityAction {
-  $type: 'ChangeEnviroWeather'
+  $type: "ChangeEnviroWeather"
   AreaId: number
   ClimateType: number
   TransDuration: number
 }
 
 export interface ChangeFollowDampTime extends ConfigBaseAbilityAction {
-  $type: 'ChangeFollowDampTime'
+  $type: "ChangeFollowDampTime"
   EffectPattern: string
   PositionDampTime: DynamicFloat
   RotationDampTime: DynamicFloat
 }
 
 export interface ChangeGadgetUIInteractHint extends ConfigBaseAbilityAction {
-  $type: 'ChangeGadgetUIInteractHint'
+  $type: "ChangeGadgetUIInteractHint"
   HintTextMapId: string
+}
+export interface ChangeGadgetState {
+  $type: "ChangeGadgetState"
+  State: GadgetStateEnum
 }
 
 export interface ChangePlayMode extends ConfigBaseAbilityAction {
-  $type: 'ChangePlayMode'
+  $type: "ChangePlayMode"
   ToPlayMode: string
 }
 
 export interface ChangeTag extends ConfigBaseAbilityAction {
-  $type: 'ChangeTag'
+  $type: "ChangeTag"
   IsAdd: boolean
   Tag: string
 }
 
 export interface ClearEndura extends ConfigBaseAbilityAction {
-  $type: 'ClearEndura'
+  $type: "ClearEndura"
   Percent: number
 }
 
 export interface ClearGlobalPos extends ConfigBaseAbilityAction {
-  $type: 'ClearGlobalPos'
+  $type: "ClearGlobalPos"
   Key: string
   SetTarget: boolean
 }
 
 export interface ClearGlobalValue extends ConfigBaseAbilityAction {
-  $type: 'ClearGlobalValue'
+  $type: "ClearGlobalValue"
   Key: string
 }
 
 export interface ClearLockTarget extends ConfigBaseAbilityAction {
-  $type: 'ClearLockTarget'
+  $type: "ClearLockTarget"
 }
 
 export interface ClearPos extends ConfigBaseAbilityAction {
-  $type: 'ClearPos'
+  $type: "ClearPos"
 }
 
 export interface ControlEmotion extends ConfigBaseAbilityAction {
-  $type: 'ControlEmotion'
+  $type: "ControlEmotion"
   ToggleEmoSync: boolean
   ToggleBlink: boolean
   ToggleEyeKey: boolean
 }
 
 export interface CopyGlobalValue extends ConfigBaseAbilityAction {
-  $type: 'CopyGlobalValue'
+  $type: "CopyGlobalValue"
   SrcTarget: string
   DstTarget: string
   SrcKey: string
@@ -302,50 +309,50 @@ export interface CopyGlobalValue extends ConfigBaseAbilityAction {
 }
 
 export interface DamageByAttackValue extends ConfigBaseAbilityAction {
-  $type: 'DamageByAttackValue'
+  $type: "DamageByAttackValue"
   Attacker?: string
   Born?: ConfigBornType
   AttackInfo: ConfigAttackInfo
 }
 
 export interface DebugLog extends ConfigBaseAbilityAction {
-  $type: 'DebugLog'
+  $type: "DebugLog"
   Content: string
 }
 
 export interface DoBlink extends ConfigBaseAbilityAction {
-  $type: 'DoBlink'
+  $type: "DoBlink"
 }
 
 export interface DoTileAction extends ConfigBaseAbilityAction {
-  $type: 'DoTileAction'
+  $type: "DoTileAction"
   ActionID: string
 }
 
 export interface DoWatcherSystemAction extends ConfigBaseAbilityAction {
-  $type: 'DoWatcherSystemAction'
+  $type: "DoWatcherSystemAction"
   WatcherId: number
   AuthorityOnly?: boolean
   InThreatListOnly?: boolean
 }
 
 export interface DoWidgetSystemAction extends ConfigBaseAbilityAction {
-  $type: 'DoWidgetSystemAction'
+  $type: "DoWidgetSystemAction"
   WidgetEvent: string
 }
 
 export interface DropSubfield extends ConfigBaseAbilityAction {
-  $type: 'DropSubfield'
+  $type: "DropSubfield"
   SubfieldName: string
 }
 
 export interface DummyAction extends ConfigBaseAbilityAction {
-  $type: 'DummyAction'
+  $type: "DummyAction"
   ActionList: ConfigAbilityAction[]
 }
 
 export interface DungeonFogEffects extends ConfigBaseAbilityAction {
-  $type: 'DungeonFogEffects'
+  $type: "DungeonFogEffects"
   Enable?: boolean
   CameraFogEffectName: string
   PlayerFogEffectName: string
@@ -353,130 +360,130 @@ export interface DungeonFogEffects extends ConfigBaseAbilityAction {
 }
 
 export interface EnableAfterImage extends ConfigBaseAbilityAction {
-  $type: 'EnableAfterImage'
+  $type: "EnableAfterImage"
   Enable: boolean
   Index: number
 }
 
 export interface EnableAIStealthy extends ConfigBaseAbilityAction {
-  $type: 'EnableAIStealthy'
+  $type: "EnableAIStealthy"
   Enable: boolean
 }
 
 export interface EnableAvatarFlyStateTrail extends ConfigBaseAbilityAction {
-  $type: 'EnableAvatarFlyStateTrail'
+  $type: "EnableAvatarFlyStateTrail"
   SetEnable: boolean
 }
 
 export interface EnableBulletCollisionPluginTrigger extends ConfigBaseAbilityAction {
-  $type: 'EnableBulletCollisionPluginTrigger'
+  $type: "EnableBulletCollisionPluginTrigger"
   SetEnable?: boolean
 }
 
 export interface EnableCameraDof extends ConfigBaseAbilityAction {
-  $type: 'EnableCameraDof'
+  $type: "EnableCameraDof"
   EnableDof: boolean
 }
 
 export interface EnableCrashDamage extends ConfigBaseAbilityAction {
-  $type: 'EnableCrashDamage'
+  $type: "EnableCrashDamage"
   Enable: boolean
 }
 
 export interface EnableGadgetIntee extends ConfigBaseAbilityAction {
-  $type: 'EnableGadgetIntee'
+  $type: "EnableGadgetIntee"
   Enable: boolean
 }
 
 export interface EnableHeadControl extends ConfigBaseAbilityAction {
-  $type: 'EnableHeadControl'
+  $type: "EnableHeadControl"
   Enable: boolean
   Blend: boolean
 }
 
 export interface EnableHitAutoRedirect extends ConfigBaseAbilityAction {
-  $type: 'EnableHitAutoRedirect'
+  $type: "EnableHitAutoRedirect"
   SetEnable: boolean
 }
 
 export interface EnableHitBoxByName extends ConfigBaseAbilityAction {
-  $type: 'EnableHitBoxByName'
+  $type: "EnableHitBoxByName"
   HitBoxNames: string[]
   SetEnable?: boolean
 }
 
 export interface EnableMainInterface extends ConfigBaseAbilityAction {
-  $type: 'EnableMainInterface'
+  $type: "EnableMainInterface"
   Enable: boolean
 }
 
 export interface EnableMonsterMoveOnWater extends ConfigBaseAbilityAction {
-  $type: 'EnableMonsterMoveOnWater'
+  $type: "EnableMonsterMoveOnWater"
   Enable: boolean
 }
 
 export interface EnablePartControl extends ConfigBaseAbilityAction {
-  $type: 'EnablePartControl'
+  $type: "EnablePartControl"
   PartRootNames: string[]
   Enable: boolean
 }
 
 export interface EnablePositionSynchronization extends ConfigBaseAbilityAction {
-  $type: 'EnablePositionSynchronization'
+  $type: "EnablePositionSynchronization"
   Enable: boolean
 }
 
 export interface EnablePushColliderName extends ConfigBaseAbilityAction {
-  $type: 'EnablePushColliderName'
+  $type: "EnablePushColliderName"
   PushColliderNames: string[]
   SetEnable: boolean
 }
 
 export interface EnableRocketJump extends ConfigBaseAbilityAction {
-  $type: 'EnableRocketJump'
+  $type: "EnableRocketJump"
   Type: string
   Enable: boolean
   Extention: RocketJumpExt
 }
 
 export interface EnableSceneTransformByName extends ConfigBaseAbilityAction {
-  $type: 'EnableSceneTransformByName'
+  $type: "EnableSceneTransformByName"
   TransformNames: string[]
   SetEnable: boolean
 }
 
 export interface EnableWetElectricHitBox extends ConfigBaseAbilityAction {
-  $type: 'EnableWetElectricHitBox'
+  $type: "EnableWetElectricHitBox"
   Enabled: boolean
 }
 
 export interface EnterCameraLock extends ConfigBaseAbilityAction {
-  $type: 'EnterCameraLock'
+  $type: "EnterCameraLock"
   TransName: string
   CfgPath: string
 }
 
 export interface EntityDoSkill extends ConfigBaseAbilityAction {
-  $type: 'EntityDoSkill'
+  $type: "EntityDoSkill"
   SkillID: number
   IsHold: boolean
 }
 
 export interface EquipAffixStart extends ConfigBaseAbilityAction {
-  $type: 'EquipAffixStart'
+  $type: "EquipAffixStart"
   CD: DynamicFloat
   EquipAffixDataID: number
 }
 
 export interface ExecuteGadgetLua extends ConfigBaseAbilityAction {
-  $type: 'ExecuteGadgetLua'
+  $type: "ExecuteGadgetLua"
   Param1?: number
   Param2?: number
   Param3?: number
 }
 
 export interface ExecuteGroupTrigger extends ConfigBaseAbilityAction {
-  $type: 'ExecuteGroupTrigger'
+  $type: "ExecuteGroupTrigger"
   SourceName: string
   Param1: number
   Param2: number
@@ -484,18 +491,18 @@ export interface ExecuteGroupTrigger extends ConfigBaseAbilityAction {
 }
 
 export interface FireAISoundEvent extends ConfigBaseAbilityAction {
-  $type: 'FireAISoundEvent'
+  $type: "FireAISoundEvent"
   Volume: number
 }
 
 export interface FireAudio extends ConfigBaseAbilityAction {
-  $type: 'FireAudio'
+  $type: "FireAudio"
   AudioPattern: string
   ForcePlay: boolean
 }
 
 export interface FireEffect extends ConfigBaseAbilityAction {
-  $type: 'FireEffect'
+  $type: "FireEffect"
   EffectPattern: string
   OthereffectPatterns?: string[]
   Born: ConfigBornType
@@ -506,13 +513,13 @@ export interface FireEffect extends ConfigBaseAbilityAction {
 }
 
 export interface FireEffectForStorm extends ConfigBaseAbilityAction {
-  $type: 'FireEffectForStorm'
+  $type: "FireEffectForStorm"
   Born: ConfigBornType
   Height: number
 }
 
 export interface FireEffectToTarget extends ConfigBaseAbilityAction {
-  $type: 'FireEffectToTarget'
+  $type: "FireEffectToTarget"
   EffectPattern: string
   Reverse: boolean
   FromSelf: boolean
@@ -520,36 +527,36 @@ export interface FireEffectToTarget extends ConfigBaseAbilityAction {
 }
 
 export interface FireGainCrystalSeedEvent extends ConfigBaseAbilityAction {
-  $type: 'FireGainCrystalSeedEvent'
+  $type: "FireGainCrystalSeedEvent"
   ElementType: string
 }
 
 export interface FireHitEffect extends ConfigBaseAbilityAction {
-  $type: 'FireHitEffect'
+  $type: "FireHitEffect"
   HitEntity: string
   HitScene: ConfigHitScene
 }
 
 export interface FireMonsterBeingHitAfterImage extends ConfigBaseAbilityAction {
-  $type: 'FireMonsterBeingHitAfterImage'
+  $type: "FireMonsterBeingHitAfterImage"
   EffectIndex: number
 }
 
 export interface FireSubEmitterEffect extends ConfigBaseAbilityAction {
-  $type: 'FireSubEmitterEffect'
+  $type: "FireSubEmitterEffect"
   EffectPattern: string
   Born: ConfigBornType
   Scale: number
 }
 
 export interface FireUIEffect extends ConfigBaseAbilityAction {
-  $type: 'FireUIEffect'
+  $type: "FireUIEffect"
   EffectPattern: string
   EffectSlot: string
 }
 
 export interface FixedAvatarRushMove extends ConfigBaseAbilityAction {
-  $type: 'FixedAvatarRushMove'
+  $type: "FixedAvatarRushMove"
   ToPos: ConfigBornType
   TimeRange: DynamicFloat
   MaxRange: number
@@ -560,7 +567,7 @@ export interface FixedAvatarRushMove extends ConfigBaseAbilityAction {
 }
 
 export interface FixedMonsterRushMove extends ConfigBaseAbilityAction {
-  $type: 'FixedMonsterRushMove'
+  $type: "FixedMonsterRushMove"
   ToPos: ConfigBornType
   TimeRange: DynamicFloat
   MaxRange?: number
@@ -571,12 +578,12 @@ export interface FixedMonsterRushMove extends ConfigBaseAbilityAction {
 }
 
 export interface ForceAirStateFly extends ConfigBaseAbilityAction {
-  $type: 'ForceAirStateFly'
+  $type: "ForceAirStateFly"
   IsActive: boolean
 }
 
 export interface ForceInitMassiveEntity extends ConfigBaseAbilityAction {
-  $type: 'ForceInitMassiveEntity'
+  $type: "ForceInitMassiveEntity"
   Born: ConfigBornType
   Radius: number
   Angle: number
@@ -584,18 +591,18 @@ export interface ForceInitMassiveEntity extends ConfigBaseAbilityAction {
 }
 
 export interface ForceTriggerJump extends ConfigBaseAbilityAction {
-  $type: 'ForceTriggerJump'
+  $type: "ForceTriggerJump"
 }
 
 export interface ForceUseSkillSuccess extends ConfigBaseAbilityAction {
-  $type: 'ForceUseSkillSuccess'
+  $type: "ForceUseSkillSuccess"
   SkillID: number
   Type: string
   Immediately: boolean
 }
 
 export interface GenerateElemBall extends ConfigBaseAbilityAction {
-  $type: 'GenerateElemBall'
+  $type: "GenerateElemBall"
   DropType: string
   ConfigID: number
   Born: ConfigBornType
@@ -604,17 +611,17 @@ export interface GenerateElemBall extends ConfigBaseAbilityAction {
 }
 
 export interface GetPos extends ConfigBaseAbilityAction {
-  $type: 'GetPos'
+  $type: "GetPos"
   Key: string
   PosType: string
 }
 
 export interface GuidePaimonDisappearEnd extends ConfigBaseAbilityAction {
-  $type: 'GuidePaimonDisappearEnd'
+  $type: "GuidePaimonDisappearEnd"
 }
 
 export interface HealHP extends ConfigBaseAbilityAction {
-  $type: 'HealHP'
+  $type: "HealHP"
   Amount?: DynamicFloat
   AmountByCasterMaxHPRatio?: DynamicFloat
   AmountByTargetMaxHPRatio?: DynamicFloat
@@ -622,11 +629,13 @@ export interface HealHP extends ConfigBaseAbilityAction {
   AmountByCasterAttackRatio?: DynamicFloat
   MuteHealEffect?: boolean
   HealRatio?: number
+  Target?: string
+  CdRatio?: string
   IgnoreAbilityProperty?: boolean
 }
 
 export interface HealSP extends ConfigBaseAbilityAction {
-  $type: 'HealSP'
+  $type: "HealSP"
   Amount: DynamicFloat
   AmountByCasterMaxSPRatio: DynamicFloat
   AmountByTargetMaxSPRatio: DynamicFloat
@@ -636,27 +645,27 @@ export interface HealSP extends ConfigBaseAbilityAction {
 }
 
 export interface HideUIBillBoard extends ConfigBaseAbilityAction {
-  $type: 'HideUIBillBoard'
+  $type: "HideUIBillBoard"
   Hide: boolean
 }
 
 export interface IssueCommand extends ConfigBaseAbilityAction {
-  $type: 'IssueCommand'
+  $type: "IssueCommand"
   CommandID: number
   Duration: number
 }
 
 export interface KillGadget extends ConfigBaseAbilityAction {
-  $type: 'KillGadget'
+  $type: "KillGadget"
   GadgetInfo: SelectTargetsByChildren
 }
 
 export interface KillPlayEntity extends ConfigBaseAbilityAction {
-  $type: 'KillPlayEntity'
+  $type: "KillPlayEntity"
 }
 
 export interface KillSelf extends ConfigBaseAbilityAction {
-  $type: 'KillSelf'
+  $type: "KillSelf"
   Duration?: number
   DieStateFlag?: string
   BanDrop?: boolean
@@ -667,7 +676,7 @@ export interface KillSelf extends ConfigBaseAbilityAction {
 }
 
 export interface LoseHP extends ConfigBaseAbilityAction {
-  $type: 'LoseHP'
+  $type: "LoseHP"
   Amount?: DynamicFloat
   AmountByCasterMaxHPRatio?: DynamicFloat
   AmountByTargetMaxHPRatio?: DynamicFloat
@@ -680,7 +689,7 @@ export interface LoseHP extends ConfigBaseAbilityAction {
 }
 
 export interface ModifyAvatarSkillCD extends ConfigBaseAbilityAction {
-  $type: 'ModifyAvatarSkillCD'
+  $type: "ModifyAvatarSkillCD"
   SkillID: number
   SkillSlot: number[]
   CdDelta: DynamicFloat
@@ -688,7 +697,7 @@ export interface ModifyAvatarSkillCD extends ConfigBaseAbilityAction {
 }
 
 export interface MultiplyGlobalValue extends ConfigBaseAbilityAction {
-  $type: 'MultiplyGlobalValue'
+  $type: "MultiplyGlobalValue"
   Value: DynamicFloat
   Key: string
   UseLimitRange: boolean
@@ -698,24 +707,24 @@ export interface MultiplyGlobalValue extends ConfigBaseAbilityAction {
 }
 
 export interface PaimonAction extends ConfigBaseAbilityAction {
-  $type: 'PaimonAction'
+  $type: "PaimonAction"
   From: string
   ActionName: string
 }
 
 export interface PlayEmojiBubble extends ConfigBaseAbilityAction {
-  $type: 'PlayEmojiBubble'
+  $type: "PlayEmojiBubble"
   Name: string
 }
 
 export interface PlayEmoSync extends ConfigBaseAbilityAction {
-  $type: 'PlayEmoSync'
+  $type: "PlayEmoSync"
   DialogID: number
   EmoSyncAssetPath: string
 }
 
 export interface PushDvalinS01Process extends ConfigBaseAbilityAction {
-  $type: 'PushDvalinS01Process'
+  $type: "PushDvalinS01Process"
   Time: number
   ToPercentage: number
   UnBreak: boolean
@@ -725,133 +734,133 @@ export interface PushDvalinS01Process extends ConfigBaseAbilityAction {
 }
 
 export interface PushPos extends ConfigBaseAbilityAction {
-  $type: 'PushPos'
+  $type: "PushPos"
   PosType: ConfigBornType
   SaveTo: string
 }
 
 export interface Randomed extends ConfigBaseAbilityAction {
-  $type: 'Randomed'
+  $type: "Randomed"
   Chance: DynamicFloat
   SuccessActions: ConfigAbilityAction[]
   FailActions: ConfigAbilityAction[]
 }
 
 export interface RegisterAIActionPoint extends ConfigBaseAbilityAction {
-  $type: 'RegisterAIActionPoint'
+  $type: "RegisterAIActionPoint"
   PointType: string
 }
 
 export interface RegistToStageScript extends ConfigBaseAbilityAction {
-  $type: 'RegistToStageScript'
+  $type: "RegistToStageScript"
   Alias: string
 }
 
 export interface ReleaseAIActionPoint extends ConfigBaseAbilityAction {
-  $type: 'ReleaseAIActionPoint'
+  $type: "ReleaseAIActionPoint"
   PointType: string | number
 }
 
 export interface RemoveAvatarSkillInfo extends ConfigBaseAbilityAction {
-  $type: 'RemoveAvatarSkillInfo'
+  $type: "RemoveAvatarSkillInfo"
   SkillID: number
 }
 
 export interface RemoveModifier extends ConfigBaseAbilityAction {
-  $type: 'RemoveModifier'
+  $type: "RemoveModifier"
   ModifierName: string
 }
 
 export interface RemoveServerBuff extends ConfigBaseAbilityAction {
-  $type: 'RemoveServerBuff'
+  $type: "RemoveServerBuff"
   SBuffId: number
   IsTeamBuff: boolean
 }
 
 export interface RemoveUniqueModifier extends ConfigBaseAbilityAction {
-  $type: 'RemoveUniqueModifier'
+  $type: "RemoveUniqueModifier"
   ModifierName: string
 }
 
 export interface RemoveVelocityForce extends ConfigBaseAbilityAction {
-  $type: 'RemoveVelocityForce'
+  $type: "RemoveVelocityForce"
   Forces: string[]
 }
 
 export interface Repeated extends ConfigBaseAbilityAction {
-  $type: 'Repeated'
+  $type: "Repeated"
   RepeatTimes: DynamicInt
   Actions: ConfigAbilityAction[]
 }
 
 export interface ResetAbilitySpecial extends ConfigBaseAbilityAction {
-  $type: 'ResetAbilitySpecial'
+  $type: "ResetAbilitySpecial"
   KeyName: string
   ValueName: string
 }
 
 export interface ResetAIAttackTarget extends ConfigBaseAbilityAction {
-  $type: 'ResetAIAttackTarget'
+  $type: "ResetAIAttackTarget"
 }
 
 export interface ResetAIResistTauntLevel extends ConfigBaseAbilityAction {
-  $type: 'ResetAIResistTauntLevel'
+  $type: "ResetAIResistTauntLevel"
   ResistTauntLevel: string
 }
 
 export interface ResetAIThreatBroadcastRange extends ConfigBaseAbilityAction {
-  $type: 'ResetAIThreatBroadcastRange'
+  $type: "ResetAIThreatBroadcastRange"
   Range: DynamicFloat
 }
 
 export interface ResetAnimatorTrigger extends ConfigBaseAbilityAction {
-  $type: 'ResetAnimatorTrigger'
+  $type: "ResetAnimatorTrigger"
   TriggerID: string
 }
 
 export interface ResetAvatarHitBuckets extends ConfigBaseAbilityAction {
-  $type: 'ResetAvatarHitBuckets'
+  $type: "ResetAvatarHitBuckets"
 }
 
 export interface ResetClimateMeter extends ConfigBaseAbilityAction {
-  $type: 'ResetClimateMeter'
+  $type: "ResetClimateMeter"
   ClimateType: string | number
 }
 
 export interface ResetEnviroEular extends ConfigBaseAbilityAction {
-  $type: 'ResetEnviroEular'
+  $type: "ResetEnviroEular"
   EularAngles: DynamicVector
 }
 
 export interface ReTriggerAISkillInitialCD extends ConfigBaseAbilityAction {
-  $type: 'ReTriggerAISkillInitialCD'
+  $type: "ReTriggerAISkillInitialCD"
   SkillIDs: number[]
 }
 
-export interface ReviveAvatar extends Omit<HealHP, '$type'> {
-  $type: 'ReviveAvatar'
+export interface ReviveAvatar extends Omit<HealHP, "$type"> {
+  $type: "ReviveAvatar"
 }
 
-export interface ReviveDeadAvatar extends Omit<ReviveAvatar, '$type'> {
-  $type: 'ReviveDeadAvatar'
+export interface ReviveDeadAvatar extends Omit<ReviveAvatar, "$type"> {
+  $type: "ReviveDeadAvatar"
   IsReviveOtherPlayerAvatar: boolean
   SkillID: number
-  CdRatio: DynamicFloat
+  CdRatio: string
   Range: number
 }
 
 export interface ReviveElemEnergy extends ConfigBaseAbilityAction {
-  $type: 'ReviveElemEnergy'
+  $type: "ReviveElemEnergy"
   Value: DynamicFloat
 }
 
 export interface ReviveStamina extends ConfigBaseAbilityAction {
-  $type: 'ReviveStamina'
+  $type: "ReviveStamina"
   Value: DynamicFloat
 }
 
 export interface RushMove extends ConfigBaseAbilityAction {
-  $type: 'RushMove'
+  $type: "RushMove"
   ToPos: ConfigBornType
   MinRange: number
   MaxRange: number
@@ -859,7 +868,7 @@ export interface RushMove extends ConfigBaseAbilityAction {
 }
 
 export interface SendEffectTrigger extends ConfigBaseAbilityAction {
-  $type: 'SendEffectTrigger'
+  $type: "SendEffectTrigger"
   Parameter: string
   Type?: string
   Value?: number
@@ -867,7 +876,7 @@ export interface SendEffectTrigger extends ConfigBaseAbilityAction {
 }
 
 export interface ServerLuaCall extends ConfigBaseAbilityAction {
-  $type: 'ServerLuaCall'
+  $type: "ServerLuaCall"
   LuaCallType: string
   IsTarget: boolean
   CallParamList: number[]
@@ -875,17 +884,17 @@ export interface ServerLuaCall extends ConfigBaseAbilityAction {
 }
 
 export interface ServerMonsterLog extends ConfigBaseAbilityAction {
-  $type: 'ServerMonsterLog'
+  $type: "ServerMonsterLog"
   ParamList: number[]
 }
 
 export interface SetAIHitFeeling extends ConfigBaseAbilityAction {
-  $type: 'SetAIHitFeeling'
+  $type: "SetAIHitFeeling"
   Enable: boolean
 }
 
 export interface SetAIParam extends ConfigBaseAbilityAction {
-  $type: 'SetAIParam'
+  $type: "SetAIParam"
   Param: string
   Value: DynamicFloat
   IsBool: boolean
@@ -893,29 +902,29 @@ export interface SetAIParam extends ConfigBaseAbilityAction {
 }
 
 export interface SetAISkillCDAvailableNow extends ConfigBaseAbilityAction {
-  $type: 'SetAISkillCDAvailableNow'
+  $type: "SetAISkillCDAvailableNow"
   SkillIDs: number[]
 }
 
 export interface SetAISkillCDMultiplier extends ConfigBaseAbilityAction {
-  $type: 'SetAISkillCDMultiplier'
+  $type: "SetAISkillCDMultiplier"
   Multiplier: number
 }
 
 export interface SetAISkillGCD extends ConfigBaseAbilityAction {
-  $type: 'SetAISkillGCD'
+  $type: "SetAISkillGCD"
   Value: number
 }
 
 export interface SetAnimatorBool extends ConfigBaseAbilityAction {
-  $type: 'SetAnimatorBool'
+  $type: "SetAnimatorBool"
   BoolID: string
   Value?: boolean
   Persistent?: boolean
 }
 
 export interface SetAnimatorFloat extends ConfigBaseAbilityAction {
-  $type: 'SetAnimatorFloat'
+  $type: "SetAnimatorFloat"
   FloatID: string
   Value: DynamicFloat
   Persistent: boolean
@@ -925,61 +934,61 @@ export interface SetAnimatorFloat extends ConfigBaseAbilityAction {
 }
 
 export interface SetAnimatorInt extends ConfigBaseAbilityAction {
-  $type: 'SetAnimatorInt'
+  $type: "SetAnimatorInt"
   IntID: string
   Value: DynamicFloat
   Persistent: boolean
 }
 
 export interface SetAnimatorTrigger extends ConfigBaseAbilityAction {
-  $type: 'SetAnimatorTrigger'
+  $type: "SetAnimatorTrigger"
   TriggerID: string
   MPTriggerOnRemote: boolean
 }
 
 export interface SetAvatarCanShakeOff extends ConfigBaseAbilityAction {
-  $type: 'SetAvatarCanShakeOff'
+  $type: "SetAvatarCanShakeOff"
   CanShakeOff: boolean
 }
 
 export interface SetAvatarHitBuckets extends ConfigBaseAbilityAction {
-  $type: 'SetAvatarHitBuckets'
+  $type: "SetAvatarHitBuckets"
   OverrideAvatarHitBucketSetting: ConfigAvatarHitBucketSetting
 }
 
 export interface SetCameraLockTime extends ConfigBaseAbilityAction {
-  $type: 'SetCameraLockTime'
+  $type: "SetCameraLockTime"
   LockTime: number
 }
 
 export interface SetCanDieImmediately extends ConfigBaseAbilityAction {
-  $type: 'SetCanDieImmediately'
+  $type: "SetCanDieImmediately"
   DieImmediately: boolean
 }
 
 export interface SetCombatFixedMovePoint extends ConfigBaseAbilityAction {
-  $type: 'SetCombatFixedMovePoint'
+  $type: "SetCombatFixedMovePoint"
   SetPoint: boolean
   ToPos: ConfigBornType
 }
 
 export interface SetCrashDamage extends ConfigBaseAbilityAction {
-  $type: 'SetCrashDamage'
+  $type: "SetCrashDamage"
   Key: string
 }
 
 export interface SetCrystalShieldHpToOverrideMap extends ConfigBaseAbilityAction {
-  $type: 'SetCrystalShieldHpToOverrideMap'
+  $type: "SetCrystalShieldHpToOverrideMap"
   OverrideMapKey: string
 }
 
 export interface SetDvalinS01FlyState extends ConfigBaseAbilityAction {
-  $type: 'SetDvalinS01FlyState'
+  $type: "SetDvalinS01FlyState"
   ToState: number
 }
 
 export interface SetEmissionScaler extends ConfigBaseAbilityAction {
-  $type: 'SetEmissionScaler'
+  $type: "SetEmissionScaler"
   MaterialType: string
   UseDefaultColor: boolean
   Value: number
@@ -987,36 +996,36 @@ export interface SetEmissionScaler extends ConfigBaseAbilityAction {
 }
 
 export interface SetEntityScale extends ConfigBaseAbilityAction {
-  $type: 'SetEntityScale'
+  $type: "SetEntityScale"
   Scale: number
 }
 
 export interface SetExtraAbilityEnable extends ConfigBaseAbilityAction {
-  $type: 'SetExtraAbilityEnable'
+  $type: "SetExtraAbilityEnable"
   Enable: boolean
 }
 
 export interface SetExtraAbilityState extends ConfigBaseAbilityAction {
-  $type: 'SetExtraAbilityState'
+  $type: "SetExtraAbilityState"
   State: string
 }
 
 export interface SetGlobalDir extends ConfigBaseAbilityAction {
-  $type: 'SetGlobalDir'
+  $type: "SetGlobalDir"
   Key: string
   Born: ConfigBornType
   SetTarget: boolean
 }
 
 export interface SetGlobalPos extends ConfigBaseAbilityAction {
-  $type: 'SetGlobalPos'
+  $type: "SetGlobalPos"
   Key: string
   Born: ConfigBornType
   SetTarget: boolean
 }
 
 export interface SetGlobalValue extends ConfigBaseAbilityAction {
-  $type: 'SetGlobalValue'
+  $type: "SetGlobalValue"
   Value: number
   Key: string
   UseLimitRange?: boolean
@@ -1026,18 +1035,18 @@ export interface SetGlobalValue extends ConfigBaseAbilityAction {
 }
 
 export interface SetGlobalValueByTargetDistance extends ConfigBaseAbilityAction {
-  $type: 'SetGlobalValueByTargetDistance'
+  $type: "SetGlobalValueByTargetDistance"
   Key: string
   IsXZ?: boolean
 }
 
 export interface SetGlobalValueList extends ConfigBaseAbilityAction {
-  $type: 'SetGlobalValueList'
+  $type: "SetGlobalValueList"
   GlobalValueList: GlobalValuePair[]
 }
 
 export interface SetGlobalValueToOverrideMap extends ConfigBaseAbilityAction {
-  $type: 'SetGlobalValueToOverrideMap'
+  $type: "SetGlobalValueToOverrideMap"
   AbilityFormula?: string
   IsFromOwner?: boolean
   GlobalValueKey: string
@@ -1045,30 +1054,30 @@ export interface SetGlobalValueToOverrideMap extends ConfigBaseAbilityAction {
 }
 
 export interface SetKeepInAirVelocityForce extends ConfigBaseAbilityAction {
-  $type: 'SetKeepInAirVelocityForce'
+  $type: "SetKeepInAirVelocityForce"
   SetEnable: boolean
 }
 
 export interface SetNeuronEnable extends ConfigBaseAbilityAction {
-  $type: 'SetNeuronEnable'
+  $type: "SetNeuronEnable"
   NeuronName: string
   Enable: boolean
 }
 
 export interface SetNeuronMute extends ConfigBaseAbilityAction {
-  $type: 'SetNeuronMute'
+  $type: "SetNeuronMute"
   NeuronName: string
   Enable: boolean
 }
 
 export interface SetOverrideMapValue extends ConfigBaseAbilityAction {
-  $type: 'SetOverrideMapValue'
+  $type: "SetOverrideMapValue"
   Value: number
   OverrideMapKey: string
 }
 
 export interface SetPaimonLookAtAvatar extends ConfigBaseAbilityAction {
-  $type: 'SetPaimonLookAtAvatar'
+  $type: "SetPaimonLookAtAvatar"
   From: string
   Lookat: boolean
   MinTime: number
@@ -1076,7 +1085,7 @@ export interface SetPaimonLookAtAvatar extends ConfigBaseAbilityAction {
 }
 
 export interface SetPaimonLookAtCamera extends ConfigBaseAbilityAction {
-  $type: 'SetPaimonLookAtCamera'
+  $type: "SetPaimonLookAtCamera"
   From: string
   Lookat: boolean
   MinTime: number
@@ -1084,126 +1093,126 @@ export interface SetPaimonLookAtCamera extends ConfigBaseAbilityAction {
 }
 
 export interface SetPaimonTempOffset extends ConfigBaseAbilityAction {
-  $type: 'SetPaimonTempOffset'
+  $type: "SetPaimonTempOffset"
   From: string
   OffSetPos: DynamicVector
   Time: number
 }
 
 export interface SetPartControlTarget extends ConfigBaseAbilityAction {
-  $type: 'SetPartControlTarget'
+  $type: "SetPartControlTarget"
   PartRootNames: string[]
   TargetType: string
 }
 
 export interface SetPoseBool extends ConfigBaseAbilityAction {
-  $type: 'SetPoseBool'
+  $type: "SetPoseBool"
   BoolID: string
   Value?: boolean
 }
 
 export interface SetPoseFloat extends ConfigBaseAbilityAction {
-  $type: 'SetPoseFloat'
+  $type: "SetPoseFloat"
   FloatID: string
   Value: DynamicFloat
 }
 
 export interface SetPoseInt extends ConfigBaseAbilityAction {
-  $type: 'SetPoseInt'
+  $type: "SetPoseInt"
   IntID: string
   Value: number
 }
 
 export interface SetRandomOverrideMapValue extends ConfigBaseAbilityAction {
-  $type: 'SetRandomOverrideMapValue'
+  $type: "SetRandomOverrideMapValue"
   ValueRangeMax: number
   ValueRangeMin: number
   OverrideMapKey: string
 }
 
 export interface SetSelfAttackTarget extends ConfigBaseAbilityAction {
-  $type: 'SetSelfAttackTarget'
+  $type: "SetSelfAttackTarget"
   TurnToTargetImmediately: boolean
   TurnToTargetKeepUpAxisDirection: boolean
 }
 
 export interface SetSkillAnchor extends ConfigBaseAbilityAction {
-  $type: 'SetSkillAnchor'
+  $type: "SetSkillAnchor"
   Born: ConfigBornType
 }
 
 export interface SetSurroundAnchor extends ConfigBaseAbilityAction {
-  $type: 'SetSurroundAnchor'
+  $type: "SetSurroundAnchor"
   SetPoint: boolean
   ActionPointType: string
   ActionPointID: number
 }
 
 export interface SetSystemValueToOverrideMap extends ConfigBaseAbilityAction {
-  $type: 'SetSystemValueToOverrideMap'
+  $type: "SetSystemValueToOverrideMap"
   Key: string
   Type: string
 }
 
 export interface SetVelocityIgnoreAirGY extends ConfigBaseAbilityAction {
-  $type: 'SetVelocityIgnoreAirGY'
+  $type: "SetVelocityIgnoreAirGY"
   IgnoreAirGY: boolean
 }
 
 export interface SetWeaponAttachPointRealName extends ConfigBaseAbilityAction {
-  $type: 'SetWeaponAttachPointRealName'
+  $type: "SetWeaponAttachPointRealName"
   PartName: string
   RealName: string
 }
 
 export interface SetWeaponBindState extends ConfigBaseAbilityAction {
-  $type: 'SetWeaponBindState'
+  $type: "SetWeaponBindState"
   Place: boolean
   EquipPartName: string
   Born: ConfigBornType
 }
 
 export interface ShowExtraAbility extends ConfigBaseAbilityAction {
-  $type: 'ShowExtraAbility'
+  $type: "ShowExtraAbility"
   SkillID: number
 }
 
 export interface ShowProgressBarAction extends ConfigBaseAbilityAction {
-  $type: 'ShowProgressBarAction'
+  $type: "ShowProgressBarAction"
   Show: boolean
 }
 
 export interface ShowReminder extends ConfigBaseAbilityAction {
-  $type: 'ShowReminder'
+  $type: "ShowReminder"
   Id: number
 }
 
 export interface ShowScreenEffect extends ConfigBaseAbilityAction {
-  $type: 'ShowScreenEffect'
+  $type: "ShowScreenEffect"
   EffectType: string
   Show: boolean
 }
 
 export interface ShowUICombatBar extends ConfigBaseAbilityAction {
-  $type: 'ShowUICombatBar'
+  $type: "ShowUICombatBar"
   Show: boolean
   Fore: boolean
 }
 
 export interface SpawnAttach extends ConfigBaseAbilityAction {
-  $type: 'SpawnAttach'
+  $type: "SpawnAttach"
   Enable: boolean
   AttachName: string
 }
 
 export interface StartDither extends ConfigBaseAbilityAction {
-  $type: 'StartDither'
+  $type: "StartDither"
   Duration: number
   Reverse?: boolean
 }
 
 export interface Summon extends ConfigBaseAbilityAction {
-  $type: 'Summon'
+  $type: "Summon"
   MonsterID: number
   Born: ConfigBornType
   BornSlotIndex: number
@@ -1219,56 +1228,56 @@ export interface Summon extends ConfigBaseAbilityAction {
 }
 
 export interface SumTargetWeightToSelfGlobalValue extends ConfigBaseAbilityAction {
-  $type: 'SumTargetWeightToSelfGlobalValue'
+  $type: "SumTargetWeightToSelfGlobalValue"
   Key: string
 }
 
 export interface SyncEntityPositionByNormalizedTime extends ConfigBaseAbilityAction {
-  $type: 'SyncEntityPositionByNormalizedTime'
+  $type: "SyncEntityPositionByNormalizedTime"
   NormalizedTime: number
 }
 
 export interface SyncToStageScript extends ConfigBaseAbilityAction {
-  $type: 'SyncToStageScript'
+  $type: "SyncToStageScript"
   Alias: string
 }
 
 export interface ToNearstAnchorPoint extends ConfigBaseAbilityAction {
-  $type: 'ToNearstAnchorPoint'
+  $type: "ToNearstAnchorPoint"
 }
 
 export interface TriggerAbility extends ConfigBaseAbilityAction {
-  $type: 'TriggerAbility'
+  $type: "TriggerAbility"
   AbilityName: string
   AbilitySpecials: { [key: string]: DynamicFloat }
   ForceUseSelfCurrentAttackTarget: boolean
 }
 
 export interface TriggerAttackEvent extends ConfigBaseAbilityAction {
-  $type: 'TriggerAttackEvent'
+  $type: "TriggerAttackEvent"
   AttackEvent: ConfigAttackEvent
   TargetType: string
 }
 
 export interface TriggerAttackTargetMapEvent extends ConfigBaseAbilityAction {
-  $type: 'TriggerAttackTargetMapEvent'
+  $type: "TriggerAttackTargetMapEvent"
   AttackTargetMapEvent: ConfigAttackTargetMapEvent
 }
 
 export interface TriggerAudio extends ConfigBaseAbilityAction {
-  $type: 'TriggerAudio'
+  $type: "TriggerAudio"
   Responder: string
   Operation: ConfigAudioOperation
 }
 
 export interface TriggerAuxWeaponTrans extends ConfigBaseAbilityAction {
-  $type: 'TriggerAuxWeaponTrans'
+  $type: "TriggerAuxWeaponTrans"
   SetEnable: boolean
   EquipPart: string
 }
 
 export interface TriggerBullet extends ConfigBaseAbilityAction {
-  $type: 'TriggerBullet'
+  $type: "TriggerBullet"
   BulletID: number
   Born: ConfigBornType
   OwnerIsTarget: boolean
@@ -1280,77 +1289,77 @@ export interface TriggerBullet extends ConfigBaseAbilityAction {
 }
 
 export interface TriggerCreateGadgetToEquipPart extends ConfigBaseAbilityAction {
-  $type: 'TriggerCreateGadgetToEquipPart'
+  $type: "TriggerCreateGadgetToEquipPart"
   GadgetID: number
   EquipPart: string
 }
 
 export interface TriggerDropEquipParts extends ConfigBaseAbilityAction {
-  $type: 'TriggerDropEquipParts'
+  $type: "TriggerDropEquipParts"
   DropAll: boolean
   EquipParts: string[]
 }
 
 export interface TriggerFaceAnimation extends ConfigBaseAbilityAction {
-  $type: 'TriggerFaceAnimation'
+  $type: "TriggerFaceAnimation"
   FaceAnimation: string
 }
 
 export interface TriggerGadgetInteractive extends ConfigBaseAbilityAction {
-  $type: 'TriggerGadgetInteractive'
+  $type: "TriggerGadgetInteractive"
 }
 
 export interface TriggerHideWeapon extends ConfigBaseAbilityAction {
-  $type: 'TriggerHideWeapon'
+  $type: "TriggerHideWeapon"
   Visible: boolean
   PartNames: string[]
 }
 
 export interface TriggerPlayerDie extends ConfigBaseAbilityAction {
-  $type: 'TriggerPlayerDie'
+  $type: "TriggerPlayerDie"
 }
 
 export interface TriggerSetCastShadow extends ConfigBaseAbilityAction {
-  $type: 'TriggerSetCastShadow'
+  $type: "TriggerSetCastShadow"
   CastShadow: boolean
 }
 
 export interface TriggerSetChestLock extends ConfigBaseAbilityAction {
-  $type: 'TriggerSetChestLock'
+  $type: "TriggerSetChestLock"
   Locked: boolean
 }
 
 export interface TriggerSetPassThrough extends ConfigBaseAbilityAction {
-  $type: 'TriggerSetPassThrough'
+  $type: "TriggerSetPassThrough"
   PassThrough: boolean
 }
 
 export interface TriggerSetRenderersEnable extends ConfigBaseAbilityAction {
-  $type: 'TriggerSetRenderersEnable'
+  $type: "TriggerSetRenderersEnable"
   RenderNames: string[]
   SetEnable: boolean
 }
 
 export interface TriggerSetVisible extends ConfigBaseAbilityAction {
-  $type: 'TriggerSetVisible'
+  $type: "TriggerSetVisible"
   Visible: boolean
 }
 
 export interface TriggerTaunt extends ConfigBaseAbilityAction {
-  $type: 'TriggerTaunt'
+  $type: "TriggerTaunt"
   TauntLevel: string
   CareValue: number
 }
 
 export interface TriggerThrowEquipPart extends ConfigBaseAbilityAction {
-  $type: 'TriggerThrowEquipPart'
+  $type: "TriggerThrowEquipPart"
   EquipPart: string
   ChaseAttackTarget: boolean
   Born: ConfigBornType
 }
 
 export interface TryFindBlinkPoint extends ConfigBaseAbilityAction {
-  $type: 'TryFindBlinkPoint'
+  $type: "TryFindBlinkPoint"
   ForwardAngle: number
   MinRange: number
   MaxRange: number
@@ -1359,7 +1368,7 @@ export interface TryFindBlinkPoint extends ConfigBaseAbilityAction {
 }
 
 export interface TryFindBlinkPointByBorn extends ConfigBaseAbilityAction {
-  $type: 'TryFindBlinkPointByBorn'
+  $type: "TryFindBlinkPointByBorn"
   Born: ConfigBornType
   HitSceneTest: boolean
   HitSceneType: string
@@ -1367,7 +1376,7 @@ export interface TryFindBlinkPointByBorn extends ConfigBaseAbilityAction {
 }
 
 export interface TryTriggerPlatformStartMove extends ConfigBaseAbilityAction {
-  $type: 'TryTriggerPlatformStartMove'
+  $type: "TryTriggerPlatformStartMove"
   DetectHeight: number
   DetectWidth: number
   EnableRotationOffset: boolean
@@ -1377,44 +1386,41 @@ export interface TryTriggerPlatformStartMove extends ConfigBaseAbilityAction {
 }
 
 export interface TurnDirection extends ConfigBaseAbilityAction {
-  $type: 'TurnDirection'
+  $type: "TurnDirection"
   TurnMode: string
 }
 
 export interface TurnDirectionToPos extends ConfigBaseAbilityAction {
-  $type: 'TurnDirectionToPos'
+  $type: "TurnDirectionToPos"
   ToPos: ConfigBornType
   MinAngle: number
   MaxAngle: number
 }
 
 export interface UnlockSkill extends ConfigBaseAbilityAction {
-  $type: 'UnlockSkill'
+  $type: "UnlockSkill"
   SkillID: number
 }
 
 export interface UpdateReactionDamage extends ConfigBaseAbilityAction {
-  $type: 'UpdateReactionDamage'
+  $type: "UpdateReactionDamage"
   LevelTarget: string
   ReactionDamageName: string
 }
 
 export interface UpdateUidValue extends ConfigBaseAbilityAction {
-  $type: 'UpdateUidValue'
+  $type: "UpdateUidValue"
 }
 
 export interface UseItem extends ConfigBaseAbilityAction {
-  $type: 'UseItem'
+  $type: "UseItem"
   ItemId: number
   ItemNum: number
 }
 
 export interface UseSkillEliteSet extends ConfigBaseAbilityAction {
-  $type: 'UseSkillEliteSet'
+  $type: "UseSkillEliteSet"
   SkillEliteSetID: number
 }
 
-export {
-  CreateEntity,
-  UtilityAction
-}
+export { CreateEntity, UtilityAction }

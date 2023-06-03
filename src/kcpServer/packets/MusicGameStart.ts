@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface MusicGameStartReq {
   musicBasicId?: number
@@ -15,7 +15,7 @@ export interface MusicGameStartRsp {
 
 class MusicGameStartPacket extends Packet implements PacketInterface {
   constructor() {
-    super('MusicGameStart')
+    super("MusicGameStart")
   }
 
   async request(context: PacketContext, data: MusicGameStartReq): Promise<void> {
@@ -24,12 +24,12 @@ class MusicGameStartPacket extends Packet implements PacketInterface {
     if (musicBasicId != null) {
       await this.response(context, {
         retcode: RetcodeEnum.RET_SUCC,
-        musicBasicId
+        musicBasicId,
       })
     } else if (guid != null) {
       await this.response(context, {
         retcode: RetcodeEnum.RET_SUCC,
-        guid
+        guid,
       })
     }
   }
@@ -40,4 +40,4 @@ class MusicGameStartPacket extends Packet implements PacketInterface {
 }
 
 let packet: MusicGameStartPacket
-export default (() => packet = packet || new MusicGameStartPacket())()
+export default (() => (packet = packet || new MusicGameStartPacket()))()

@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { RetcodeEnum, SceneEnterReasonEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum, SceneEnterReasonEnum } from "@/types/proto/enum"
 
 export interface PlayerQuitDungeonReq {
   pointId: number
@@ -13,9 +13,9 @@ export interface PlayerQuitDungeonRsp {
 
 class PlayerQuitDungeonPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerQuitDungeon', {
+    super("PlayerQuitDungeon", {
       reqState: ClientStateEnum.IN_GAME | ClientStateEnum.SCENE_DUNGEON,
-      reqStateMask: 0xFF00
+      reqStateMask: 0xff00,
     })
   }
 
@@ -23,14 +23,14 @@ class PlayerQuitDungeonPacket extends Packet implements PacketInterface {
     const { player } = context
     const { pointId } = data
 
-    if (!await player.returnToPrevScene(SceneEnterReasonEnum.DUNGEON_QUIT)) {
+    if (!(await player.returnToPrevScene(SceneEnterReasonEnum.DUNGEON_QUIT))) {
       await this.response(context, { retcode: RetcodeEnum.RET_DUNGEON_QUIT_FAIL })
       return
     }
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      pointId
+      pointId,
     })
   }
 
@@ -40,4 +40,4 @@ class PlayerQuitDungeonPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerQuitDungeonPacket
-export default (() => packet = packet || new PlayerQuitDungeonPacket())()
+export default (() => (packet = packet || new PlayerQuitDungeonPacket()))()

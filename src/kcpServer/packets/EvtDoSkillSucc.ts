@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
-import { ForwardTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { ForwardTypeEnum } from "@/types/proto/enum"
 
 export interface EvtDoSkillSuccNotify {
   forwardType: ForwardTypeEnum
@@ -12,9 +12,9 @@ export interface EvtDoSkillSuccNotify {
 
 class EvtDoSkillSuccPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtDoSkillSucc', {
+    super("EvtDoSkillSucc", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -28,4 +28,4 @@ class EvtDoSkillSuccPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtDoSkillSuccPacket
-export default (() => packet = packet || new EvtDoSkillSuccPacket())()
+export default (() => (packet = packet || new EvtDoSkillSuccPacket()))()

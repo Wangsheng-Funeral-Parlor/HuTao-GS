@@ -1,20 +1,23 @@
-import Client from '#/client'
-import PacketHandler from '#/packetHandler'
-import GlobalState from '@/globalState'
-import Logger from '@/logger'
-import Server from '@/server'
-import TLogger from '@/translate/tlogger'
-import { ClientStateEnum } from '@/types/enum'
-import { ENetReasonEnum } from '@/types/proto/enum'
-import { waitTick } from '@/utils/asyncWait'
-import { fileExists, readFile, writeFile } from '@/utils/fileSystem'
-import { join } from 'path'
-import { cwd } from 'process'
-import EventEmitter from 'promise-events'
-import Game from './game'
-import Socket from './socket'
+import { join } from "path"
+import { cwd } from "process"
 
-const logger = new TLogger('KCPSRV', 0xc824ff)
+import EventEmitter from "promise-events"
+
+import Game from "./game"
+import Socket from "./socket"
+
+import Client from "#/client"
+import PacketHandler from "#/packetHandler"
+import GlobalState from "@/globalState"
+import Logger from "@/logger"
+import Server from "@/server"
+import TLogger from "@/translate/tlogger"
+import { ClientStateEnum } from "@/types/enum"
+import { ENetReasonEnum } from "@/types/proto/enum"
+import { waitTick } from "@/utils/asyncWait"
+import { fileExists, readFile, writeFile } from "@/utils/fileSystem"
+
+const logger = new TLogger("KCPSRV", 0xc824ff)
 
 export default class KcpServer extends EventEmitter {
   private loop: NodeJS.Timer
@@ -67,14 +70,14 @@ export default class KcpServer extends EventEmitter {
     // Set client state
     client.state = ClientStateEnum.CONNECTION
 
-    logger.info('message.kcpServer.info.connect', conv?.toString(16)?.padStart(8, '0')?.toUpperCase())
+    logger.info("message.kcpServer.info.connect", conv?.toString(16)?.padStart(8, "0")?.toUpperCase())
     this.clientList.push(client)
 
     return client
   }
 
   getClient(conv: number): Client {
-    return this.clientList.find(client => client.conv === conv)
+    return this.clientList.find((client) => client.conv === conv)
   }
 
   async disconnect(conv: number, enetReason: ENetReasonEnum = ENetReasonEnum.ENET_SERVER_KICK) {
@@ -85,7 +88,11 @@ export default class KcpServer extends EventEmitter {
     await client.destroy(enetReason)
     await socket.disconnect(conv, enetReason)
 
-    logger.info('message.kcpServer.info.disconnect', conv?.toString(16)?.padStart(8, '0')?.toUpperCase(), ENetReasonEnum[enetReason] || enetReason)
+    logger.info(
+      "message.kcpServer.info.disconnect",
+      conv?.toString(16)?.padStart(8, "0")?.toUpperCase(),
+      ENetReasonEnum[enetReason] || enetReason
+    )
     clientList.splice(clientList.indexOf(client), 1)
 
     return true
@@ -99,7 +106,7 @@ export default class KcpServer extends EventEmitter {
   }
 
   update() {
-    Logger.mark('Tick')
+    Logger.mark("Tick")
 
     const { frame, clientList: clients } = this
     const clientList = Object.values(clients)
@@ -111,16 +118,16 @@ export default class KcpServer extends EventEmitter {
 
     this.frame ^= 1
 
-    Logger.measure('Game tick', 'Tick')
+    Logger.measure("Game tick", "Tick")
   }
 
   async dump(name: string, data: Buffer) {
-    if (!GlobalState.get('PacketDump')) return
+    if (!GlobalState.get("PacketDump")) return
 
     try {
-      const dumpPath = join(cwd(), 'data/log/dump', `${name}.bin`)
-      if (data.length <= 0 || (await fileExists(dumpPath) && (await readFile(dumpPath)).length >= data.length)) return
+      const dumpPath = join(cwd(), "data/log/dump", `${name}.bin`)
+      if (data.length <= 0 || ((await fileExists(dumpPath)) && (await readFile(dumpPath)).length >= data.length)) return
       await writeFile(dumpPath, data)
-    } catch (err) { }
+    } catch (err) {}
   }
 }

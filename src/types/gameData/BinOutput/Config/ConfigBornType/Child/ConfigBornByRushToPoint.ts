@@ -1,5 +1,5 @@
-import ConfigBaseBornType from '.'
+import ConfigBaseBornType from "."
 
 export default interface ConfigBornByRushToPoint extends ConfigBaseBornType {
-  $type: 'ConfigBornByRushToPoint'
+  $type: "ConfigBornByRushToPoint"
 }

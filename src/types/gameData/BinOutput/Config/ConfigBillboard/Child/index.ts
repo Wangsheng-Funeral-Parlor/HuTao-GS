@@ -1,4 +1,4 @@
-import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
+import { DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigBaseBillboard {
   AttachPoint: string

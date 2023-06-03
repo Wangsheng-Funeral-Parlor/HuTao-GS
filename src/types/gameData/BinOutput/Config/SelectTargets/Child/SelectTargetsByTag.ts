@@ -1,6 +1,6 @@
-import ConfigBaseSelectTargets from '.'
+import ConfigBaseSelectTargets from "."
 
 export default interface SelectTargetsByTag extends ConfigBaseSelectTargets {
-  $type: 'SelectTargetsByTag'
+  $type: "SelectTargetsByTag"
   Tag: string
 }

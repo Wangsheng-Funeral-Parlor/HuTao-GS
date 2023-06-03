@@ -1,15 +1,15 @@
-import BaseClass from '#/baseClass'
-import AvatarEquipChange from '#/packets/AvatarEquipChange'
-import SceneTeamUpdate from '#/packets/SceneTeamUpdate'
-import Entity from '$/entity'
-import Avatar from '$/entity/avatar'
-import Player from '$/player'
-import Team from '$/team'
-import TeamEntity from '$/team/teamEntity'
-import Vector from '$/utils/vector'
-import { SceneTeamAvatar, TeamEntityInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
-import TeamManagerUserData from '@/types/user/TeamManagerUserData'
+import BaseClass from "#/baseClass"
+import AvatarEquipChange from "#/packets/AvatarEquipChange"
+import SceneTeamUpdate from "#/packets/SceneTeamUpdate"
+import Entity from "$/entity"
+import Avatar from "$/entity/avatar"
+import Player from "$/player"
+import Team from "$/team"
+import TeamEntity from "$/team/teamEntity"
+import Vector from "$/utils/vector"
+import { SceneTeamAvatar, TeamEntityInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
+import TeamManagerUserData from "@/types/user/TeamManagerUserData"
 
 export default class TeamManager extends BaseClass {
   player: Player
@@ -30,7 +30,7 @@ export default class TeamManager extends BaseClass {
       new Team(this), // team 1
       new Team(this), // team 2
       new Team(this), // team 3
-      new Team(this)  // team 4
+      new Team(this), // team 4
     ]
 
     super.initHandlers(player)
@@ -46,18 +46,26 @@ export default class TeamManager extends BaseClass {
       const avatarGuidList = teamGuidList?.[i - 1]
 
       if (avatarGuidList != null) {
-        await teamList[i].setUpAvatarTeam({
-          teamId: i,
-          avatarTeamGuidList: avatarGuidList,
-          curAvatarGuid: curAvatarGuid || null
-        }, true, undefined, true)
+        await teamList[i].setUpAvatarTeam(
+          {
+            teamId: i,
+            avatarTeamGuidList: avatarGuidList,
+            curAvatarGuid: curAvatarGuid || null,
+          },
+          true,
+          undefined,
+          true
+        )
       } else {
-        await teamList[i].setUpAvatarTeam({
-          teamId: i,
-          avatarTeamGuidList: [
-            player.avatarList[0].guid.toString()
-          ]
-        }, true, undefined, true)
+        await teamList[i].setUpAvatarTeam(
+          {
+            teamId: i,
+            avatarTeamGuidList: [player.avatarList[0].guid.toString()],
+          },
+          true,
+          undefined,
+          true
+        )
       }
     }
   }
@@ -68,12 +76,13 @@ export default class TeamManager extends BaseClass {
     this.currentTeam = 1
 
     for (let i = 1; i <= 4; i++) {
-      await teamList[i].setUpAvatarTeam({
-        teamId: i,
-        avatarTeamGuidList: [
-          player.avatarList[0].guid.toString()
-        ]
-      }, true)
+      await teamList[i].setUpAvatarTeam(
+        {
+          teamId: i,
+          avatarTeamGuidList: [player.avatarList[0].guid.toString()],
+        },
+        true
+      )
     }
   }
 
@@ -109,9 +118,9 @@ export default class TeamManager extends BaseClass {
     return RetcodeEnum.RET_SUCC
   }
 
-  getTeam(teamId?: number, singlePlayer: boolean = false): Team {
+  getTeam(teamId?: number, singlePlayer = false): Team {
     const { player, teamList, currentTeam } = this
-    return teamList[player.isInMp() && !singlePlayer ? 0 : (teamId || currentTeam)]
+    return teamList[player.isInMp() && !singlePlayer ? 0 : teamId || currentTeam]
   }
 
   async setTeam(teamId: number, seqId?: number): Promise<RetcodeEnum> {
@@ -153,7 +162,7 @@ export default class TeamManager extends BaseClass {
       if (teamId != null && i !== teamId) continue
 
       avatarTeamMap[i] = {
-        avatarGuidList: teamList[i].exportGuidList()
+        avatarGuidList: teamList[i].exportGuidList(),
       }
     }
 
@@ -162,7 +171,7 @@ export default class TeamManager extends BaseClass {
 
   exportSceneTeamAvatarList(): SceneTeamAvatar[] {
     const team = this.getTeam()
-    return team.getAvatarList().map(avatar => avatar.exportSceneTeamAvatar())
+    return team.getAvatarList().map((avatar) => avatar.exportSceneTeamAvatar())
   }
 
   exportTeamEntityInfo(): TeamEntityInfo {
@@ -171,7 +180,7 @@ export default class TeamManager extends BaseClass {
     return {
       teamEntityId: entity.entityId,
       authorityPeerId: player.peerId,
-      teamAbilityInfo: {}
+      teamAbilityInfo: {},
     }
   }
 
@@ -181,7 +190,7 @@ export default class TeamManager extends BaseClass {
     return {
       currentTeam,
       curAvatarGuid: player.currentAvatar?.guid?.toString() || false,
-      teamGuidList: teamList.slice(1, 5).map(team => team.exportGuidList(false, true))
+      teamGuidList: teamList.slice(1, 5).map((team) => team.exportGuidList(false, true)),
     }
   }
 }

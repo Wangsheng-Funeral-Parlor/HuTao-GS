@@ -1,4 +1,4 @@
-import { AbilityIdentifier, AttackHitEffectResult, HitCollision, VectorInfo } from '.'
+import { AbilityIdentifier, AttackHitEffectResult, HitCollision, VectorInfo } from "."
 
 export interface AttackResult {
   attackerId: number

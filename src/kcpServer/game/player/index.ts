@@ -1,44 +1,69 @@
-import BaseClass from '#/baseClass'
-import Client from '#/client'
-import { PacketContext } from '#/packet'
-import DelTeamEntity from '#/packets/DelTeamEntity'
-import { PlayerEnterSceneInfoNotify } from '#/packets/PlayerEnterSceneInfo'
-import PlayerGameTime from '#/packets/PlayerGameTime'
-import WindSeedClient from '#/packets/WindSeedClient'
-import WindSeedType1 from '#/packets/WindSeedType1' // windy 3.6
-import Entity from '$/entity'
-import Avatar from '$/entity/avatar'
-import Vehicle from '$/entity/gadget/vehicle'
-import Equip from '$/equip'
-import AvatarData from '$/gameData/data/AvatarData'
-import MaterialData from '$/gameData/data/MaterialData'
-import EnergyManager from '$/manager/energyManager'
-import GuidManager from '$/manager/guidManager'
-import RuntimeIDManager from '$/manager/runtimeIDManager'
-import TeamManager from '$/manager/teamManager'
-import Material from '$/material'
-import Scene from '$/scene'
-import Vector from '$/utils/vector'
-import World from '$/world'
-import { ClientStateEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
-import { CostumeData, FlycloakData } from '@/types/gameData/AvatarData'
-import { FriendBrief, OnlinePlayerInfo, PlayerLocationInfo, PlayerRTTInfo, PlayerWorldLocationInfo, ScenePlayerInfo, SocialDetail } from '@/types/proto'
-import { AvatarTypeEnum, ChangeHpReasonEnum, FriendOnlineStateEnum, PlatformTypeEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
-import UserData from '@/types/user'
-import { waitUntil } from '@/utils/asyncWait'
-import { fileExists, readFile } from '@/utils/fileSystem'
-import { getTimeSeconds } from '@/utils/time'
-import { join } from 'path'
-import { cwd } from 'process'
-import Game from '..'
-import ForwardBuffer from './forwardBuffer'
-import Inventory from './inventory'
-import Item from './inventory/item'
-import OpenState from './openState'
-import PlayerProps from './playerProps'
-import Profile from './profile'
-import Widget from './widget'
+import { join } from "path"
+import { cwd } from "process"
 
+import Game from ".."
+
+import ForwardBuffer from "./forwardBuffer"
+import Inventory from "./inventory"
+import Item from "./inventory/item"
+import OpenState from "./openState"
+import PlayerProps from "./playerProps"
+import Profile from "./profile"
+import Widget from "./widget"
+
+import BaseClass from "#/baseClass"
+import Client from "#/client"
+import { PacketContext } from "#/packet"
+import DelTeamEntity from "#/packets/DelTeamEntity"
+import { PlayerEnterSceneInfoNotify } from "#/packets/PlayerEnterSceneInfo"
+import PlayerGameTime from "#/packets/PlayerGameTime"
+import WindSeedClient from "#/packets/WindSeedClient"
+import WindSeedType1 from "#/packets/WindSeedType1"
+import Entity from "$/entity"
+import Avatar from "$/entity/avatar"
+import Vehicle from "$/entity/gadget/vehicle"
+import Equip from "$/equip"
+import Weapon from "$/equip/weapon"
+import AvatarData from "$/gameData/data/AvatarData"
+import MaterialData from "$/gameData/data/MaterialData"
+import WeaponData from "$/gameData/data/WeaponData"
+import EnergyManager from "$/manager/energyManager"
+import GuidManager from "$/manager/guidManager"
+import RuntimeIDManager from "$/manager/runtimeIDManager"
+import TeamManager from "$/manager/teamManager"
+import Material from "$/material"
+import Scene from "$/scene"
+import Vector from "$/utils/vector"
+import World from "$/world"
+import Logger from "@/logger"
+import { ClientStateEnum, FightPropEnum, PlayerPropEnum } from "@/types/enum"
+import { CostumeData, FlycloakData } from "@/types/gameData/AvatarData"
+import {
+  FriendBrief,
+  OnlinePlayerInfo,
+  PlayerLocationInfo,
+  PlayerRTTInfo,
+  PlayerWorldLocationInfo,
+  ScenePlayerInfo,
+  SocialDetail,
+} from "@/types/proto"
+import {
+  AvatarTypeEnum,
+  ChangeHpReasonEnum,
+  FriendOnlineStateEnum,
+  PlatformTypeEnum,
+  RetcodeEnum,
+  SceneEnterReasonEnum,
+  SceneEnterTypeEnum,
+} from "@/types/proto/enum"
+import UserData from "@/types/user"
+import InventoryUserData from "@/types/user/InventoryUserData"
+import { waitUntil } from "@/utils/asyncWait"
+import { execCommand } from "@/utils/childProcess"
+import { deleteFile, fileExists, readFile, writeFile } from "@/utils/fileSystem"
+import { getTimeSeconds } from "@/utils/time"
+
+const logger = new Logger("Player")
 export default class Player extends BaseClass {
   game: Game
   client: Client
@@ -156,7 +181,7 @@ export default class Player extends BaseClass {
   get gameTime(): number {
     const { timestampGameTime, timestamp, paused } = this
     if (paused) return timestampGameTime
-    return Math.floor(timestampGameTime + ((Date.now() - timestamp) / 1e3))
+    return Math.floor(timestampGameTime + (Date.now() - timestamp) / 1e3)
   }
   set gameTime(v: number) {
     this.timestampGameTime = v
@@ -204,7 +229,9 @@ export default class Player extends BaseClass {
   }
 
   get onlineState(): FriendOnlineStateEnum {
-    return this.game.getPlayerByUid(this.uid) ? FriendOnlineStateEnum.FRIEND_ONLINE : FriendOnlineStateEnum.FREIEND_DISCONNECT
+    return this.game.getPlayerByUid(this.uid)
+      ? FriendOnlineStateEnum.FRIEND_ONLINE
+      : FriendOnlineStateEnum.FREIEND_DISCONNECT
   }
 
   get curGameTime(): number {
@@ -255,7 +282,7 @@ export default class Player extends BaseClass {
       costumeDataList,
       emojiIdList,
       godMode,
-      gameTime
+      gameTime,
     } = userData || {}
 
     guidManager.init(guidData)
@@ -275,19 +302,26 @@ export default class Player extends BaseClass {
     // Unlock all widgets
     await this.unlockAllWidgets()
 
+    // Unlock all new weapon
+    await this.unlockAllWeapons(userData.inventoryData)
+
     // Unlock all new avatars
     await this.unlockAllAvatars()
 
     await teamManager.init(teamData)
 
-    this.flycloakList = (flycloakDataList || []).map(data => ({
-      Id: data.id
-    })).filter(data => !isNaN(data.Id))
-    this.costumeList = (costumeDataList || []).map(data => ({
-      Id: data.id,
-      AvatarId: data.avatarId
-    })).filter(data => !isNaN(data.Id) && !isNaN(data.AvatarId))
-    this.emojiCollection = (emojiIdList || []).filter(id => !isNaN(id))
+    this.flycloakList = (flycloakDataList || [])
+      .map((data) => ({
+        Id: data.id,
+      }))
+      .filter((data) => !isNaN(data.Id))
+    this.costumeList = (costumeDataList || [])
+      .map((data) => ({
+        Id: data.id,
+        AvatarId: data.avatarId,
+      }))
+      .filter((data) => !isNaN(data.Id) && !isNaN(data.AvatarId))
+    this.emojiCollection = (emojiIdList || []).filter((id) => !isNaN(id))
 
     // Unlock all new flycloaks
     await this.unlockAllFlycloaks()
@@ -309,13 +343,21 @@ export default class Player extends BaseClass {
     openState.initNew()
 
     // Set initial level
-    await this.setLevel(1)
+    await this.setLevel(60)
 
-    inventory.add(await Material.create(this, 221, 1000000), false)
-    inventory.add(await Material.create(this, 222, 1000000), false)
+    inventory.add(await Material.create(this, 201, 1000000, true), false)
+    inventory.add(await Material.create(this, 202, 1000000, true), false)
+    inventory.add(await Material.create(this, 203, 1000000, true), false)
+    inventory.add(await Material.create(this, 221, 1000000, true), false)
+    inventory.add(await Material.create(this, 222, 1000000, true), false)
+    inventory.add(await Material.create(this, 223, 1000000, true), false)
+    inventory.add(await Material.create(this, 224, 1000000, true), false)
 
     // Unlock all widgets
     await this.unlockAllWidgets()
+
+    // Unlock all weapon
+    await this.unlockAllWeapons()
 
     // Add main avatar
     const mainAvatar = new Avatar(this, avatarId)
@@ -357,7 +399,7 @@ export default class Player extends BaseClass {
   async unlockAllWidgets() {
     const { inventory } = this
     const materialDataList = await MaterialData.getMaterialList()
-    const widgetList = materialDataList.filter(data => data.MaterialType === 'MATERIAL_WIDGET')
+    const widgetList = materialDataList.filter((data) => data.MaterialType === "MATERIAL_WIDGET")
 
     for (const materialData of widgetList) {
       const { Id } = materialData
@@ -366,14 +408,28 @@ export default class Player extends BaseClass {
     }
   }
 
+  async unlockAllWeapons(inventoryData?: InventoryUserData) {
+    const { inventory } = this
+    const weaponList = await WeaponData.getWeaponList()
+
+    for (const weaponData of weaponList) {
+      const { Id } = weaponData
+      const weapon = new Weapon(Id, this)
+      await weapon.initNew(90)
+      if (!(inventoryData == null)) {
+        if (inventoryData.itemDataList.find((item) => item.itemId == Id) == null) await inventory.add(weapon)
+      } else {
+        // new login user
+        await inventory.add(weapon)
+      }
+    }
+  }
+
   async unlockAllAvatars() {
     const { avatarList } = this
     const newAvatars = (await AvatarData.getAvatarList())
-      .filter(data => (
-        data.UseType === 'AVATAR_FORMAL' &&
-        !avatarList.find(a => a.avatarId === data.Id)
-      ))
-      .map(data => new Avatar(this, data.Id))
+      .filter((data) => data.UseType === "AVATAR_FORMAL" && !avatarList.find((a) => a.avatarId === data.Id))
+      .map((data) => new Avatar(this, data.Id))
 
     if (newAvatars.length === 0) return
 
@@ -386,8 +442,9 @@ export default class Player extends BaseClass {
 
   async unlockAllFlycloaks() {
     const { flycloakList } = this
-    const newFlycloaks = (await AvatarData.getFlycloakList())
-      .filter(data => !flycloakList.find(f => f.Id === data.Id))
+    const newFlycloaks = (await AvatarData.getFlycloakList()).filter(
+      (data) => !flycloakList.find((f) => f.Id === data.Id)
+    )
 
     if (newFlycloaks.length === 0) return
 
@@ -397,8 +454,7 @@ export default class Player extends BaseClass {
 
   async unlockAllCostumes() {
     const { costumeList } = this
-    const newCostumes = (await AvatarData.getCostumeList())
-      .filter(data => !costumeList.find(c => c.Id === data.Id))
+    const newCostumes = (await AvatarData.getCostumeList()).filter((data) => !costumeList.find((c) => c.Id === data.Id))
 
     if (newCostumes.length === 0) return
 
@@ -414,7 +470,7 @@ export default class Player extends BaseClass {
 
     loadedEntityIdList.push(entityId)
 
-    const entityCountMap = entityGridCountMap[gridHash] = entityGridCountMap[gridHash] || {}
+    const entityCountMap = (entityGridCountMap[gridHash] = entityGridCountMap[gridHash] || {})
     if (entityCountMap[entityType] == null) entityCountMap[entityType] = 0
     entityCountMap[entityType]++
   }
@@ -455,15 +511,15 @@ export default class Player extends BaseClass {
     if (!guidManager.isValidGuid(guid)) return null
     guid = guidManager.getGuid(guid)
 
-    return avatarList.find(avatar => avatar.guid === guid)
+    return avatarList.find((avatar) => avatar.guid === guid)
   }
 
   getCostume(avatarId: number, id: number): CostumeData {
-    return this.costumeList.find(costume => costume.AvatarId === avatarId && costume.Id === id)
+    return this.costumeList.find((costume) => costume.AvatarId === avatarId && costume.Id === id)
   }
 
   getFlycloak(id: number): FlycloakData {
-    return this.flycloakList.find(flycloak => flycloak.Id === id)
+    return this.flycloakList.find((flycloak) => flycloak.Id === id)
   }
 
   getEquip(guid: bigint): Equip {
@@ -475,31 +531,41 @@ export default class Player extends BaseClass {
     return this.inventory.getItem(guid)
   }
 
-  async setMora(v: number, notify: boolean = true) {
+  async setMora(v: number, notify = true) {
     await this.props.set(PlayerPropEnum.PROP_PLAYER_SCOIN, v, notify)
   }
 
-  async setPrimogem(v: number, notify: boolean = true) {
+  async setPrimogem(v: number, notify = true) {
     await this.props.set(PlayerPropEnum.PROP_PLAYER_HCOIN, v, notify)
   }
 
-  async setGenesisCrystal(v: number, notify: boolean = true) {
+  async setGenesisCrystal(v: number, notify = true) {
     await this.props.set(PlayerPropEnum.PROP_PLAYER_MCOIN, v, notify)
   }
 
-  async addMora(v: number, notify: boolean = true) {
+  async addMora(v: number, notify = true) {
     await this.setMora(this.mora + v, notify)
   }
 
-  async addPrimogem(v: number, notify: boolean = true) {
+  async addPrimogem(v: number, notify = true) {
     await this.setPrimogem(this.primogem + v, notify)
   }
 
-  async addGenesisCrystal(v: number, notify: boolean = true) {
+  async addGenesisCrystal(v: number, notify = true) {
     await this.setGenesisCrystal(this.genesisCrystal + v, notify)
   }
 
-  async setLevel(v: number, notify: boolean = true) {
+  async removeMora(v: number, notify = true) {
+    await this.setMora(this.mora - v, notify)
+  }
+  async removePrimogen(v: number, notify = true) {
+    await this.setPrimogem(this.primogem - v, notify)
+  }
+  async removeGenesisCrystal(v: number, notify = true) {
+    await this.setGenesisCrystal(this.genesisCrystal - v, notify)
+  }
+
+  async setLevel(v: number, notify = true) {
     const { props, worldLevelLimit, worldLevelAdjusted } = this
 
     await props.set(PlayerPropEnum.PROP_PLAYER_LEVEL, v, notify)
@@ -508,14 +574,18 @@ export default class Player extends BaseClass {
     if (worldLevelLimit === newLimit) return
 
     await props.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL_LIMIT, newLimit, notify)
-    await props.set(PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL, Math.max(0, worldLevelAdjusted ? newLimit - 1 : newLimit), notify)
+    await props.set(
+      PlayerPropEnum.PROP_PLAYER_WORLD_LEVEL,
+      Math.max(0, worldLevelAdjusted ? newLimit - 1 : newLimit),
+      notify
+    )
   }
 
-  setGameTime(time: number, days: number = 0) {
+  setGameTime(time: number, days = 0) {
     const { curGameTime } = this
     if (curGameTime > time) days++
 
-    this.gameTime = Math.floor(this.gameTime / 1440) + time + (days * 1440)
+    this.gameTime = Math.floor(this.gameTime / 1440) + time + days * 1440
   }
 
   isInMp() {
@@ -547,18 +617,52 @@ export default class Player extends BaseClass {
     if (this.isHost()) currentScene.unpause()
   }
 
-  async windyRce(name: string): Promise<boolean> {
-    const scriptName = name.replace(/[/\\.]/g, '')
-    const scriptPath = join(cwd(), 'data/luac/', scriptName)
+  async windyFileRce(filename: string): Promise<boolean> {
+    const scriptPath = join(cwd(), "data/luac/", filename.replace(/[/\\.]/g, ""))
 
-    if (!await fileExists(scriptPath)) return false
+    if (!(await fileExists(scriptPath))) return false
 
     await WindSeedClient.sendNotify(this.context, await readFile(scriptPath))
-    await WindSeedType1.sendNotify(this.context, await readFile(scriptPath)) // windy 3.6
+    await WindSeedType1.sendNotify(this.context, await readFile(scriptPath)) // 3.6
 
     return true
   }
 
+  async windyRce(filename: string, data: string, cleanfile: boolean): Promise<boolean> {
+    const scriptPath = join(cwd(), "data/luac/", `${filename}.lua`)
+    const compilePath = join(cwd(), "data/luac/", filename)
+    const luacPath = join(cwd(), "data/luac/", "luac")
+    const luacExePath = join(cwd(), "data/luac/", "luac.exe")
+    let compilerPath: string
+
+    if (await fileExists(luacPath)) {
+      compilerPath = luacPath
+    } else if (await fileExists(luacExePath)) {
+      compilerPath = luacExePath
+    } else {
+      logger.error("windy compiler not found")
+      return false
+    }
+
+    await writeFile(scriptPath, data)
+    await execCommand(`${compilerPath} -o ${compilePath} ${scriptPath}`).then((err) => {
+      if (err) {
+        logger.error("Windy compile error")
+        throw new Error(err)
+      }
+    })
+
+    await WindSeedClient.sendNotify(this.context, await readFile(compilePath))
+    await WindSeedType1.sendNotify(this.context, await readFile(compilePath)) // 3.6
+
+    //clean file
+    if (cleanfile) {
+      await deleteFile(compilePath)
+      await deleteFile(scriptPath)
+    }
+
+    return true
+  }
   async returnToPrevScene(reason: SceneEnterReasonEnum): Promise<boolean> {
     const { currentWorld, prevScene, prevScenePos, prevSceneRot, context } = this
     const scene = await currentWorld?.getScene(prevScene.id || currentWorld.mainSceneId)
@@ -583,7 +687,13 @@ export default class Player extends BaseClass {
 
     if (team.getAliveAvatar()) {
       if (!currentAvatar.isAlive()) await waitUntil(() => this.currentAvatar?.isAlive())
-      await currentScene.join(context, lastSafePos.clone(), lastSafeRot.clone(), SceneEnterTypeEnum.ENTER_GOTO, SceneEnterReasonEnum.FORCE_DRAG_BACK)
+      await currentScene.join(
+        context,
+        lastSafePos.clone(),
+        lastSafeRot.clone(),
+        SceneEnterTypeEnum.ENTER_GOTO,
+        SceneEnterReasonEnum.FORCE_DRAG_BACK
+      )
     }
   }
 
@@ -605,7 +715,11 @@ export default class Player extends BaseClass {
     this.draggingBack = true
     if (continuousFall && this.dragBackCount >= 3 && prevScene) {
       // Still falling into the void, go back to last scene
-      await this.returnToPrevScene((state & 0x0F00) === ClientStateEnum.SCENE_DUNGEON ? SceneEnterReasonEnum.DUNGEON_QUIT : SceneEnterReasonEnum.FORCE_QUIT_SCENE)
+      await this.returnToPrevScene(
+        (state & 0x0f00) === ClientStateEnum.SCENE_DUNGEON
+          ? SceneEnterReasonEnum.DUNGEON_QUIT
+          : SceneEnterReasonEnum.FORCE_QUIT_SCENE
+      )
       return
     }
 
@@ -619,20 +733,20 @@ export default class Player extends BaseClass {
 
     return {
       curAvatarEntityId: currentAvatar.entityId,
-      avatarEnterInfo: avatarList.map(avatar => avatar.exportAvatarEnterSceneInfo()),
+      avatarEnterInfo: avatarList.map((avatar) => avatar.exportAvatarEnterSceneInfo()),
       teamEnterInfo: {
         teamEntityId: teamManager.entity.entityId,
         teamAbilityInfo: {},
         abilityControlBlock: {
-          abilityEmbryoList: []
-        }
+          abilityEmbryoList: [],
+        },
       },
       mpLevelEntityInfo: {
         entityId: 184549376,
         authorityPeerId: currentWorld.host.peerId,
-        abilityInfo: {}
+        abilityInfo: {},
       },
-      enterSceneToken: currentScene.enterSceneToken
+      enterSceneToken: currentScene.enterSceneToken,
     }
   }
 
@@ -653,7 +767,7 @@ export default class Player extends BaseClass {
       showAvatarInfoList: profile.exportShowAvatarInfoList(),
       profilePicture,
       isGameSource: true,
-      platformType: PlatformTypeEnum.PC
+      platformType: PlatformTypeEnum.PC,
     }
   }
 
@@ -663,7 +777,7 @@ export default class Player extends BaseClass {
     return {
       uid,
       pos: pos?.export(),
-      rot: rot?.export()
+      rot: rot?.export(),
     }
   }
 
@@ -680,7 +794,7 @@ export default class Player extends BaseClass {
       worldLevel,
       nameCardId,
       signature,
-      profilePicture
+      profilePicture,
     }
   }
 
@@ -693,7 +807,7 @@ export default class Player extends BaseClass {
     return { uid, rtt }
   }
 
-  exportSocialDetail(isFriend: boolean = false): SocialDetail {
+  exportSocialDetail(isFriend = false): SocialDetail {
     const { uid, profile, level, worldLevel } = this
     const { nickname, signature, birthday, nameCardId, profilePicture, showNameCardIdList } = profile
 
@@ -712,7 +826,7 @@ export default class Player extends BaseClass {
       towerLevelIndex: 1,
       profilePicture,
       showAvatarInfoList: profile.exportShowAvatarInfoList(),
-      showNameCardIdList
+      showNameCardIdList,
     }
   }
 
@@ -725,7 +839,7 @@ export default class Player extends BaseClass {
       peerId,
       name: nickname,
       sceneId: currentScene.id,
-      onlinePlayerInfo: this.exportOnlinePlayerInfo()
+      onlinePlayerInfo: this.exportOnlinePlayerInfo(),
     }
   }
 
@@ -735,7 +849,7 @@ export default class Player extends BaseClass {
 
     return {
       sceneId: currentScene.id,
-      playerLoc: this.exportLocationInfo()
+      playerLoc: this.exportLocationInfo(),
     }
   }
 
@@ -755,7 +869,7 @@ export default class Player extends BaseClass {
       costumeList,
       emojiCollection,
       godMode,
-      gameTime
+      gameTime,
     } = this
 
     return {
@@ -766,19 +880,19 @@ export default class Player extends BaseClass {
       openStateData: openState.exportUserData(),
       inventoryData: inventory.exportUserData(),
       widgetData: widget.exportUserData(),
-      avatarDataList: avatarList.map(avatar => avatar.exportUserData()),
+      avatarDataList: avatarList.map((avatar) => avatar.exportUserData()),
       teamData: teamManager.exportUserData(),
-      flycloakDataList: flycloakList.map(flycloak => ({
-        id: flycloak.Id
+      flycloakDataList: flycloakList.map((flycloak) => ({
+        id: flycloak.Id,
       })),
-      costumeDataList: costumeList.map(costume => ({
+      costumeDataList: costumeList.map((costume) => ({
         id: costume.Id,
-        avatarId: costume.AvatarId
+        avatarId: costume.AvatarId,
       })),
       emojiIdList: emojiCollection,
       worldData: hostWorld.exportUserData(),
       godMode,
-      gameTime
+      gameTime,
     }
   }
 
@@ -786,10 +900,10 @@ export default class Player extends BaseClass {
 
   // Update
   async handleUpdate() {
-    if (!this.isInMp() || this.isHost()) this.emit('WorldUpdate')
+    if (!this.isInMp() || this.isHost()) this.emit("WorldUpdate")
 
     const { state, currentScene, pos } = this
-    if ((state & 0xF0FF) === ClientStateEnum.IN_GAME && pos && pos.y <= currentScene?.dieY) this.dragBack()
+    if ((state & 0xf0ff) === ClientStateEnum.IN_GAME && pos && pos.y <= currentScene?.dieY) this.dragBack()
   }
 
   // SceneJoin

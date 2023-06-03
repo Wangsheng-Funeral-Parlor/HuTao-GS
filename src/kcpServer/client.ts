@@ -1,24 +1,26 @@
-import BaseClass from '#/baseClass'
-import Player from '$/player'
-import config from '@/config'
-import TLogger from '@/translate/tlogger'
-import { ClientStateEnum } from '@/types/enum'
-import { PacketHead } from '@/types/kcp'
-import { ENetReasonEnum } from '@/types/proto/enum'
-import MT19937 from '@/utils/mt19937'
-import { versionStrToNum } from '@/utils/version'
-import KcpServer from './'
-import KcpWorkerInterface from './socket/worker/kcpWorker/kcpWorkerInterface'
-import protoCleanup from './utils/protoCleanup'
+import KcpWorkerInterface from "./socket/worker/kcpWorker/kcpWorkerInterface"
+import protoCleanup from "./utils/protoCleanup"
 
-const logger = new TLogger('CLIENT', 0xffdb4a)
+import KcpServer from "./"
+
+import BaseClass from "#/baseClass"
+import Player from "$/player"
+import config from "@/config"
+import TLogger from "@/translate/tlogger"
+import { ClientStateEnum } from "@/types/enum"
+import { PacketHead } from "@/types/kcp"
+import { ENetReasonEnum } from "@/types/proto/enum"
+import MT19937 from "@/utils/mt19937"
+import { versionStrToNum } from "@/utils/version"
+
+const logger = new TLogger("CLIENT", 0xffdb4a)
 
 const noCleanupPackets = [
-  'AvatarFightPropUpdateNotify',
-  'EntityFightPropChangeReasonNotify',
-  'EntityFightPropUpdateNotify',
-  'PlayerPropNotify',
-  'VehicleStaminaNotify'
+  "AvatarFightPropUpdateNotify",
+  "EntityFightPropChangeReasonNotify",
+  "EntityFightPropUpdateNotify",
+  "PlayerPropNotify",
+  "VehicleStaminaNotify",
 ]
 
 export default class Client extends BaseClass {
@@ -64,10 +66,10 @@ export default class Client extends BaseClass {
   }
   set state(v) {
     this._state = v
-    const m = v & 0xF000
-    const t = v & 0x0F00
-    const s = v & 0x00FF
-    logger.debug('message.client.debug.stateChange', ClientStateEnum[m], t > 0 ? ClientStateEnum[t] : null, s)
+    const m = v & 0xf000
+    const t = v & 0x0f00
+    const s = v & 0x00ff
+    logger.debug("message.client.debug.stateChange", ClientStateEnum[m], t > 0 ? ClientStateEnum[t] : null, s)
   }
 
   // Destroy client
@@ -92,8 +94,8 @@ export default class Client extends BaseClass {
       return
     }
 
-    this.emit('update')
-    if (player) player.emit('Update')
+    this.emit("update")
+    if (player) player.emit("Update")
   }
 
   // Generate xor key from seed
@@ -103,8 +105,8 @@ export default class Client extends BaseClass {
     const worker = socket.getWorker<KcpWorkerInterface>(workerId)
     if (!worker) return
 
-    const doubleInit = versionStrToNum(config.version) >= 0x010500
-    logger.debug('message.client.debug.seed', seed, doubleInit)
+    const doubleInit = versionStrToNum(config.game.version) >= 0x010500
+    logger.debug("message.client.debug.seed", seed, doubleInit)
 
     const mt = new MT19937()
     mt.seed(seed)
@@ -122,7 +124,7 @@ export default class Client extends BaseClass {
 
   // Set client player uid
   setUid(auid: string, uid: number): void {
-    logger.debug('message.client.debug.uid', uid)
+    logger.debug("message.client.debug.uid", uid)
 
     this.auid = auid
     this.uid = uid
@@ -130,6 +132,11 @@ export default class Client extends BaseClass {
 
   // Send packet
   async sendPacket(packetName: string, packetHead: PacketHead, obj: object) {
-    await this.server.socket.sendPacket(this.conv, packetName, packetHead, noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj))
+    await this.server.socket.sendPacket(
+      this.conv,
+      packetName,
+      packetHead,
+      noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj)
+    )
   }
 }

@@ -1,1 +1,1 @@
-export default interface ConfigEmojiBubble { }
+export default interface ConfigEmojiBubble {}

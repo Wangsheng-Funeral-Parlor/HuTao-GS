@@ -1,7 +1,8 @@
-import { PlayerPropEnum } from '@/types/enum'
-import { PropPair, PropValue } from '@/types/proto'
-import PropsUserData from '@/types/user/PropsUserData'
-import Entity from '.'
+import Entity from "."
+
+import { PlayerPropEnum } from "@/types/enum"
+import { PropPair, PropValue } from "@/types/proto"
+import PropsUserData from "@/types/user/PropsUserData"
 
 export default class EntityProps {
   entity: Entity
@@ -21,9 +22,9 @@ export default class EntityProps {
     }
   }
 
-  initNew(level: number = 1) {
+  initNew(level = 1) {
     this.set(PlayerPropEnum.PROP_EXP, 0)
-    this.set(PlayerPropEnum.PROP_BREAK_LEVEL, 0)
+    this.set(PlayerPropEnum.PROP_BREAK_LEVEL, 6)
     this.set(PlayerPropEnum.PROP_SATIATION_VAL, 0)
     this.set(PlayerPropEnum.PROP_SATIATION_PENALTY_TIME, 0)
     this.set(PlayerPropEnum.PROP_LEVEL, level)
@@ -61,7 +62,7 @@ export default class EntityProps {
     const propValue = this.exportPropValue(type)
     return {
       type: propValue.type,
-      propValue
+      propValue,
     }
   }
 
@@ -70,7 +71,7 @@ export default class EntityProps {
     return {
       type,
       ival: value,
-      val: value
+      val: value,
     }
   }
 

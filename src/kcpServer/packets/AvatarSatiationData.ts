@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AvatarSatiationData } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { AvatarSatiationData } from "@/types/proto"
 
 export interface AvatarSatiationDataNotify {
   satiationDataList: AvatarSatiationData[]
@@ -8,14 +8,14 @@ export interface AvatarSatiationDataNotify {
 
 class AvatarSatiationDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarSatiationData')
+    super("AvatarSatiationData")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
     if (!this.checkState(context, ClientStateEnum.LOGIN, true)) return
 
     const notifyData: AvatarSatiationDataNotify = {
-      satiationDataList: context.player.avatarList.map(a => a.exportSatiationData())
+      satiationDataList: context.player.avatarList.map((a) => a.exportSatiationData()),
     }
 
     await super.sendNotify(context, notifyData)
@@ -23,4 +23,4 @@ class AvatarSatiationDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarSatiationDataPacket
-export default (() => packet = packet || new AvatarSatiationDataPacket())()
+export default (() => (packet = packet || new AvatarSatiationDataPacket()))()

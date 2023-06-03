@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Avatar from '$/entity/avatar'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import Avatar from "$/entity/avatar"
 
 export interface AvatarFlycloakChangeNotify {
   avatarGuid: string
@@ -8,13 +8,13 @@ export interface AvatarFlycloakChangeNotify {
 
 class AvatarFlycloakChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarFlycloakChange')
+    super("AvatarFlycloakChange")
   }
 
   async sendNotify(context: PacketContext, avatar: Avatar): Promise<void> {
     const notifyData: AvatarFlycloakChangeNotify = {
       avatarGuid: avatar.guid.toString(),
-      flycloakId: avatar.wearingFlycloakId
+      flycloakId: avatar.wearingFlycloakId,
     }
 
     await super.sendNotify(context, notifyData)
@@ -26,4 +26,4 @@ class AvatarFlycloakChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarFlycloakChangePacket
-export default (() => packet = packet || new AvatarFlycloakChangePacket())()
+export default (() => (packet = packet || new AvatarFlycloakChangePacket()))()

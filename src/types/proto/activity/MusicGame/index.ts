@@ -1,3 +1,3 @@
-export * from './MusicBriefInfo'
-export * from './MusicGameActivityDetailInfo'
-export * from './MusicGameRecord'
+export * from "./MusicBriefInfo"
+export * from "./MusicGameActivityDetailInfo"
+export * from "./MusicGameRecord"

@@ -1,4 +1,4 @@
-import ConfigBaseBillboard from '.'
+import ConfigBaseBillboard from "."
 
 export default interface ConfigCombatBillboard extends ConfigBaseBillboard {
   ShowHPBar: boolean

@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Vector from '$/utils/vector'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface ChangeAvatarReq {
   guid: string
@@ -19,9 +19,9 @@ export interface ChangeAvatarRsp {
 
 class ChangeAvatarPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ChangeAvatar', {
+    super("ChangeAvatar", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStateMask: 0xF0FF
+      reqStateMask: 0xf0ff,
     })
   }
 
@@ -31,20 +31,24 @@ class ChangeAvatarPacket extends Packet implements PacketInterface {
     const { guid, skillId, isMove, movePos } = data
 
     // Set client state
-    player.state = (state & 0xFF00) | ClientStateEnum.CHANGE_AVATAR
+    player.state = (state & 0xff00) | ClientStateEnum.CHANGE_AVATAR
 
     const team = player.teamManager.getTeam()
     const avatar = team.getAvatar(BigInt(guid))
-    const retcode = await player.changeAvatar(avatar, isMove ? new Vector(movePos.x, movePos.y, movePos.z) : undefined, seqId)
+    const retcode = await player.changeAvatar(
+      avatar,
+      isMove ? new Vector(movePos.x, movePos.y, movePos.z) : undefined,
+      seqId
+    )
 
     await this.response(context, {
       retcode,
       curGuid: guid,
-      skillId
+      skillId,
     })
 
     // Set client state
-    player.state = (state & 0xFF00)
+    player.state = state & 0xff00
   }
 
   async response(context: PacketContext, data: ChangeAvatarRsp): Promise<void> {
@@ -53,4 +57,4 @@ class ChangeAvatarPacket extends Packet implements PacketInterface {
 }
 
 let packet: ChangeAvatarPacket
-export default (() => packet = packet || new ChangeAvatarPacket())()
+export default (() => (packet = packet || new ChangeAvatarPacket()))()

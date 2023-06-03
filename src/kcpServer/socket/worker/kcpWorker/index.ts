@@ -1,31 +1,30 @@
-import { getNameByCmdId, PACKET_HEAD } from '#/cmdIds'
-import Packet from '#/packet'
-import config from '@/config'
-import { LogLevel } from '@/logger'
-import { PacketHead } from '@/types/kcp'
-import { QueryCurrRegionHttpRsp } from '@/types/proto'
-import { ENetReasonEnum } from '@/types/proto/enum'
-import { waitMs } from '@/utils/asyncWait'
-import DispatchKey from '@/utils/dispatchKey'
-import { fileExists, readFile } from '@/utils/fileSystem'
-import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
-import { dataToProtobuffer } from '@/utils/proto'
-import { xor } from '@/utils/xor'
-import { join } from 'path'
-import { cwd } from 'process'
-import Worker, { WorkerOpcode } from '../'
-import { ConnectionInfo } from '../recvWorker'
-import { AcceptTypes, decodeDataList } from '../utils/data'
-import { Handshake } from '../utils/handshake'
-import { Kcp } from '../utils/kcp'
+import { join } from "path"
+import { cwd } from "process"
 
-const { version, autoPatch } = config
+import Worker, { WorkerOpcode } from "../"
+import { ConnectionInfo } from "../recvWorker"
+import { AcceptTypes, decodeDataList } from "../utils/data"
+import { Handshake } from "../utils/handshake"
+import { Kcp } from "../utils/kcp"
 
-const skipWaitPackets = [
-  'AbilityInvocationsNotify',
-  'CombatInvocationsNotify',
-  'UnionCmdNotify'
-]
+import { getNameByCmdId, PACKET_HEAD } from "#/cmdIds"
+import Packet from "#/packet"
+import config from "@/config"
+import { LogLevel } from "@/logger"
+import { PacketHead } from "@/types/kcp"
+import { QueryCurrRegionHttpRsp } from "@/types/proto"
+import { ENetReasonEnum } from "@/types/proto/enum"
+import { waitMs } from "@/utils/asyncWait"
+import DispatchKey from "@/utils/dispatchKey"
+import { fileExists, readFile } from "@/utils/fileSystem"
+import { getEc2bKey } from "@/utils/mhyCrypto/ec2b"
+import { dataToProtobuffer } from "@/utils/proto"
+import { xor } from "@/utils/xor"
+
+const { version } = config.game
+const { autoPatch } = config.dispatch
+
+const skipWaitPackets = ["AbilityInvocationsNotify", "CombatInvocationsNotify", "UnionCmdNotify"]
 
 export default class KcpWorker extends Worker {
   recvWIPort: number | null
@@ -70,7 +69,11 @@ export default class KcpWorker extends Worker {
     if (autoPatch) {
       const binPath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
       if (await fileExists(binPath)) {
-        const curRegionRsp: QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+        const curRegionRsp: QueryCurrRegionHttpRsp = await dataToProtobuffer(
+          await readFile(binPath),
+          "QueryCurrRegionHttpRsp",
+          true
+        )
         key = getEc2bKey(Buffer.from(curRegionRsp.clientSecretKey))
       }
     } else {
@@ -99,7 +102,7 @@ export default class KcpWorker extends Worker {
   private updateKcp() {
     const { kcp } = this
     kcp.update(Date.now())
-    this.sendToInterface(WorkerOpcode.KcpStateNotify, kcp.isDeadLink(), kcp.rtt)
+    this.sendToInterface(WorkerOpcode.KcpStateNotify, kcp.isDeadLink())
   }
 
   private async waitPacketRsp(seqId: number) {
@@ -108,7 +111,7 @@ export default class KcpWorker extends Worker {
         const [rspSeqId] = <[number]>await this.waitForMessage(WorkerOpcode.RecvPacketRsp, 2e3)
         if (rspSeqId === seqId) break
       }
-    } catch (err) { }
+    } catch (err) {}
   }
 
   async sendToRecvWorker(opcode: WorkerOpcode, ...args: AcceptTypes[]) {
@@ -144,9 +147,9 @@ export default class KcpWorker extends Worker {
       this.timer = setInterval(this.updateKcp.bind(this), 1e3 / 30)
 
       this.sendToInterface(WorkerOpcode.InitKcpRsp, true)
-      this.log(LogLevel.DEBUG, 'message.worker.debug.initKcpSuccess', conv.toString(16).padStart(8, '0').toUpperCase())
+      this.log(LogLevel.DEBUG, "message.worker.debug.initKcpSuccess", conv.toString(16).padStart(8, "0").toUpperCase())
     } catch (err) {
-      this.log(LogLevel.ERROR, 'message.worker.error.initKcpFail', err)
+      this.log(LogLevel.ERROR, "message.worker.error.initKcpFail", err)
       this.sendToInterface(WorkerOpcode.InitKcpRsp, false)
     }
   }
@@ -169,7 +172,7 @@ export default class KcpWorker extends Worker {
         xor(packet, this.key)
 
         if (!Packet.isPacket(packet)) {
-          this.log(LogLevel.WARN, 'message.worker.warn.invalidPacket')
+          this.log(LogLevel.WARN, "message.worker.warn.invalidPacket")
           continue
         }
 
@@ -184,7 +187,7 @@ export default class KcpWorker extends Worker {
         if (!skipWaitPackets.includes(<string>getNameByCmdId(packetID))) await this.waitPacketRsp(seqId)
       }
     } catch (err) {
-      this.log(LogLevel.ERROR, 'message.worker.error.UDPError', err)
+      this.log(LogLevel.ERROR, "message.worker.error.UDPError", err)
     } finally {
       this.receiving = false
     }
@@ -211,7 +214,7 @@ export default class KcpWorker extends Worker {
       kcp.send(Packet.encode(packetHead, packetData, packetID, key))
       this.sendToInterface(WorkerOpcode.SendPacketRsp, true)
     } catch (err) {
-      this.log(LogLevel.ERROR, 'message.worker.error.sendPacketError', err)
+      this.log(LogLevel.ERROR, "message.worker.error.sendPacketError", err)
       this.sendToInterface(WorkerOpcode.SendPacketRsp, false)
     }
   }

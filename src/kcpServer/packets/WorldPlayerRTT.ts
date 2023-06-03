@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayerRTTInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayerRTTInfo } from "@/types/proto"
 
 export interface WorldPlayerRTTNotify {
   playerRttList: PlayerRTTInfo[]
@@ -8,7 +8,7 @@ export interface WorldPlayerRTTNotify {
 
 class WorldPlayerRTTPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WorldPlayerRTT')
+    super("WorldPlayerRTT")
   }
 
   async sendNotify(context: PacketContext, data: WorldPlayerRTTNotify): Promise<void> {
@@ -23,4 +23,4 @@ class WorldPlayerRTTPacket extends Packet implements PacketInterface {
 }
 
 let packet: WorldPlayerRTTPacket
-export default (() => packet = packet || new WorldPlayerRTTPacket())()
+export default (() => (packet = packet || new WorldPlayerRTTPacket()))()

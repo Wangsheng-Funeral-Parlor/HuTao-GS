@@ -1,13 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import SceneData from '$/gameData/data/SceneData'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import SceneData from "$/gameData/data/SceneData"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-const unlockType = [
-  'SceneTransPoint',
-  'DungeonEntry',
-  'VirtualTransPoint'
-]
+const unlockType = ["SceneTransPoint", "DungeonEntry", "VirtualTransPoint", "TransPointNormal", "TransPointStatue"]
 
 export interface GetScenePointReq {
   sceneId: number
@@ -31,9 +27,9 @@ export interface GetScenePointRsp {
 
 class GetScenePointPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetScenePoint', {
+    super("GetScenePoint", {
       reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH,
-      reqWaitStatePass: true
+      reqWaitStatePass: true,
     })
   }
 
@@ -63,7 +59,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
     }
 
     // add unlocked points
-    pointList.push(...scene.unlockedPointList.filter(id => !pointList.includes(id)))
+    pointList.push(...scene.unlockedPointList.filter((id) => !pointList.includes(id)))
 
     for (const cityConfig of sceneData.City) areaList.push(...cityConfig.AreaIdVec)
 
@@ -78,7 +74,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
       groupUnlimitPointList: [],
       notInteractDungeonEntryList: [],
       hidePointList: [],
-      unhidePointList: pointList
+      unhidePointList: [],
     })
   }
 
@@ -88,4 +84,4 @@ class GetScenePointPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetScenePointPacket
-export default (() => packet = packet || new GetScenePointPacket())()
+export default (() => (packet = packet || new GetScenePointPacket()))()

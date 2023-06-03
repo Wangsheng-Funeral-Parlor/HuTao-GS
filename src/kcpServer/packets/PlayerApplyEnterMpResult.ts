@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Player from '$/player'
-import { ClientStateEnum } from '@/types/enum'
-import { ApplyEnterResultReasonEnum, RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Player from "$/player"
+import { ClientStateEnum } from "@/types/enum"
+import { ApplyEnterResultReasonEnum, RetcodeEnum } from "@/types/proto/enum"
 
 export interface PlayerApplyEnterMpResultReq {
   applyUid: number
@@ -24,9 +24,9 @@ export interface PlayerApplyEnterMpResultNotify {
 
 class PlayerApplyEnterMpResultPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerApplyEnterMpResult', {
+    super("PlayerApplyEnterMpResult", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -37,7 +37,7 @@ class PlayerApplyEnterMpResultPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       applyUid,
-      isAgreed
+      isAgreed,
     })
 
     const applyPlayer = game.getPlayerByUid(applyUid)
@@ -48,13 +48,18 @@ class PlayerApplyEnterMpResultPacket extends Packet implements PacketInterface {
     await super.response(context, data)
   }
 
-  async sendNotify(context: PacketContext, targetPlayer: Player, isAgreed: boolean, reason: ApplyEnterResultReasonEnum = ApplyEnterResultReasonEnum.PLAYER_JUDGE): Promise<void> {
+  async sendNotify(
+    context: PacketContext,
+    targetPlayer: Player,
+    isAgreed: boolean,
+    reason: ApplyEnterResultReasonEnum = ApplyEnterResultReasonEnum.PLAYER_JUDGE
+  ): Promise<void> {
     const { uid, profile } = targetPlayer
     const notifyData: PlayerApplyEnterMpResultNotify = {
       targetUid: uid,
       isAgreed,
       reason,
-      targetNickname: profile.nickname
+      targetNickname: profile.nickname,
     }
 
     await super.sendNotify(context, notifyData)
@@ -62,4 +67,4 @@ class PlayerApplyEnterMpResultPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerApplyEnterMpResultPacket
-export default (() => packet = packet || new PlayerApplyEnterMpResultPacket())()
+export default (() => (packet = packet || new PlayerApplyEnterMpResultPacket()))()

@@ -1,5 +1,5 @@
-import ConfigAvatar from './BinOutput/Config/ConfigAvatar'
-import FetterDataList from './FetterData'
+import ConfigAvatar from "./BinOutput/Config/ConfigAvatar"
+import FetterDataList from "./FetterData"
 
 export interface AvatarData {
   UseType: string

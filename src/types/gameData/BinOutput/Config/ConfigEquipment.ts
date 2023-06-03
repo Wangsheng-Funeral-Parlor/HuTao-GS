@@ -1,5 +1,5 @@
-import ConfigBladeElementFx from './ConfigBladeElementFx'
-import ConfigBowData from './ConfigBowData'
+import ConfigBladeElementFx from "./ConfigBladeElementFx"
+import ConfigBowData from "./ConfigBowData"
 
 export default interface ConfigEquipment {
   AttachTo: string

@@ -1,6 +1,5 @@
-import ConfigParabolaBulletMoveCorrection from './Child/ConfigParabolaBulletMoveCorrection'
+import ConfigParabolaBulletMoveCorrection from "./Child/ConfigParabolaBulletMoveCorrection"
 
-type ConfigMoveCorrection =
-  ConfigParabolaBulletMoveCorrection
+type ConfigMoveCorrection = ConfigParabolaBulletMoveCorrection
 
 export default ConfigMoveCorrection

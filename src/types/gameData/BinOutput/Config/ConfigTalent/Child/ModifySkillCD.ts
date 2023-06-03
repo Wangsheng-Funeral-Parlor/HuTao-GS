@@ -1,7 +1,7 @@
-import ConfigBaseTalentMixin from '.'
+import ConfigBaseTalentMixin from "."
 
 export default interface ModifySkillCD extends ConfigBaseTalentMixin {
-  $type: 'ModifySkillCD'
+  $type: "ModifySkillCD"
   SkillID: number
   CdDelta: number
   CdRatio: number

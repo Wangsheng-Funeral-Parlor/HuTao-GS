@@ -1,4 +1,4 @@
-import { ChildQuest, ParentQuestRandomInfo } from '.'
+import { ChildQuest, ParentQuestRandomInfo } from "."
 
 export interface ParentQuest {
   parentQuestId?: number
@@ -10,5 +10,5 @@ export interface ParentQuest {
   parentQuestState?: number
   questVarSeq?: number
   timeVarMap?: { [k: number]: number }
-  GJJJKEIPAPC?: number
+  videoKey?: number
 }

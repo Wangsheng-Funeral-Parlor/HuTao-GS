@@ -1,14 +1,28 @@
+import { GadgetBornTypeEnum } from "./enum"
+
 import {
   AbilityGadgetInfo,
   BlossomChestInfo,
   BossChestInfo,
-  ClientGadgetInfo, CustomGadgetTreeInfo, EchoShellInfo, FishPoolInfo, FoundationInfo, GadgetGeneralRewardInfo, GadgetPlayInfo, GatherGadgetInfo,
-  ItemInfo, MpPlayRewardInfo, OfferingInfo, PlatformInfo, RoguelikeGadgetInfo, ScreenInfo, StatueGadgetInfo,
+  ClientGadgetInfo,
+  CustomGadgetTreeInfo,
+  EchoShellInfo,
+  FishPoolInfo,
+  FoundationInfo,
+  GadgetGeneralRewardInfo,
+  GadgetPlayInfo,
+  GatherGadgetInfo,
+  ItemInfo,
+  MpPlayRewardInfo,
+  OfferingInfo,
+  PlatformInfo,
+  RoguelikeGadgetInfo,
+  ScreenInfo,
+  StatueGadgetInfo,
   VehicleInfo,
   WeatherInfo,
-  WorktopInfo
-} from '.'
-import { GadgetBornTypeEnum } from './enum'
+  WorktopInfo,
+} from "."
 
 export interface SceneGadgetInfo {
   trifleItem?: ItemInfo

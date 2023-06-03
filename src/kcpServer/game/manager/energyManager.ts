@@ -1,9 +1,9 @@
-import TrifleItem from '$/entity/gadget/trifleItem'
-import Material from '$/material'
-import Player from '$/player'
-import Item from '$/player/inventory/item'
-import Vector from '$/utils/vector'
-import { ElemTypeEnum } from '@/types/enum'
+import TrifleItem from "$/entity/gadget/trifleItem"
+import Material from "$/material"
+import Player from "$/player"
+import Item from "$/player/inventory/item"
+import Vector from "$/utils/vector"
+import { ElemTypeEnum } from "@/types/enum"
 
 interface DropInfo {
   id: number
@@ -24,13 +24,10 @@ export default class EnergyManager {
 
     const infoList: DropInfo[] = []
 
-    if (dropId > 10 && dropId < 40 && (dropId % 10) >= 1 && (dropId % 10) <= 7) {
-      let offset = ((dropId - 1) % 10)
+    if (dropId > 10 && dropId < 40 && dropId % 10 >= 1 && dropId % 10 <= 7) {
+      let offset = (dropId - 1) % 10
 
-      if (
-        (dropId < 20) ||
-        (dropId < 30 && ((dropId - 1) % 4) < 2)
-      ) offset += 16
+      if (dropId < 20 || (dropId < 30 && (dropId - 1) % 4 < 2)) offset += 16
 
       infoList.push({ id: 2001 + offset, count: 1 })
     }
@@ -50,7 +47,7 @@ export default class EnergyManager {
     for (const info of infoList) await this.spawnDrop(pos, info.id, info.count, seqId)
   }
 
-  async spawnDrop(pos: Vector, id: number, count: number = 1, seqId?: number): Promise<void> {
+  async spawnDrop(pos: Vector, id: number, count = 1, seqId?: number): Promise<void> {
     const { player } = this
     const { currentScene } = player
     if (currentScene == null) return
@@ -64,24 +61,24 @@ export default class EnergyManager {
     await entityManager.add(entity, undefined, undefined, seqId)
   }
 
-  async addAllEnergy(energy: number = 0): Promise<void> {
+  async addAllEnergy(energy = 0): Promise<void> {
     const { player } = this
     const { teamManager, currentScene, currentAvatar } = player
     if (currentScene == null) return
 
-    const penaltyMul = Math.max(0.1, 1 - (currentScene.exportSceneTeamAvatarList().length * 0.1))
+    const penaltyMul = Math.max(0.1, 1 - currentScene.exportSceneTeamAvatarList().length * 0.1)
     const { avatarList } = teamManager.getTeam()
     for (const avatar of avatarList) {
       await avatar.gainEnergy(energy * (avatar === currentAvatar ? 1 : penaltyMul), false, true)
     }
   }
 
-  async addElemEnergy(elemType: ElemTypeEnum = 0, sameElemEnergy: number = 0, diffElemEnergy: number = 0): Promise<void> {
+  async addElemEnergy(elemType: ElemTypeEnum = 0, sameElemEnergy = 0, diffElemEnergy = 0): Promise<void> {
     const { player } = this
     const { teamManager, currentScene, currentAvatar } = player
     if (currentScene == null) return
 
-    const penaltyMul = Math.max(0.1, 1 - (currentScene.exportSceneTeamAvatarList().length * 0.1))
+    const penaltyMul = Math.max(0.1, 1 - currentScene.exportSceneTeamAvatarList().length * 0.1)
     const { avatarList } = teamManager.getTeam()
     for (const avatar of avatarList) {
       const { skillManager } = avatar

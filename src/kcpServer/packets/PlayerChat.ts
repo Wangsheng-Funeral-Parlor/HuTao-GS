@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ChatInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { ChatInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PlayerChatReq {
   channelId: number
@@ -20,9 +20,9 @@ export interface PlayerChatNotify {
 
 class PlayerChatPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerChat', {
+    super("PlayerChat", {
       reqState: ClientStateEnum.ENTER_SCENE,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -32,7 +32,7 @@ class PlayerChatPacket extends Packet implements PacketInterface {
 
     chatInfo.uid = player.uid
 
-    if (!await game.chatManager.sendPublic(player.currentWorld, channelId || 0, chatInfo)) {
+    if (!(await game.chatManager.sendPublic(player.currentWorld, channelId || 0, chatInfo))) {
       await this.response(context, { retcode: RetcodeEnum.RET_SVR_ERROR })
       return
     }
@@ -56,4 +56,4 @@ class PlayerChatPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerChatPacket
-export default (() => packet = packet || new PlayerChatPacket())()
+export default (() => (packet = packet || new PlayerChatPacket()))()

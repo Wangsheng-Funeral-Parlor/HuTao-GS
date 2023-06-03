@@ -1,7 +1,7 @@
-import ConfigAIMixinSetAnimatorTrigger from './ConfigAIMixinSetAnimatorTrigger'
-import ConfigAIMixinSetBool from './ConfigAIMixinSetBool'
-import ConfigAIMixinSetFloat from './ConfigAIMixinSetFloat'
-import ConfigAIMixinSetInt from './ConfigAIMixinSetInt'
+import ConfigAIMixinSetAnimatorTrigger from "./ConfigAIMixinSetAnimatorTrigger"
+import ConfigAIMixinSetBool from "./ConfigAIMixinSetBool"
+import ConfigAIMixinSetFloat from "./ConfigAIMixinSetFloat"
+import ConfigAIMixinSetInt from "./ConfigAIMixinSetInt"
 
 export default interface ConfigAIMixinActions {
   SetPoseBool: ConfigAIMixinSetBool[]

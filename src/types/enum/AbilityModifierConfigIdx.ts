@@ -10,5 +10,5 @@ export enum AbilityModifierConfigIdxEnum {
   OnAvatarIn = 8,
   OnAvatarOut = 9,
   OnReconnect = 10,
-  OnChangeAuthority = 11
+  OnChangeAuthority = 11,
 }

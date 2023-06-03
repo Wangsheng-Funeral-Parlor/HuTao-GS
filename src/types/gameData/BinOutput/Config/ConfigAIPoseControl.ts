@@ -1,4 +1,4 @@
-import ConfigAIPoseControlItem from './ConfigAIPoseControlItem'
+import ConfigAIPoseControlItem from "./ConfigAIPoseControlItem"
 
 export default interface ConfigAIPoseControl {
   Items: ConfigAIPoseControlItem[]

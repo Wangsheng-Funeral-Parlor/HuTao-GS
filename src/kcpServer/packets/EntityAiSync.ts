@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AiSyncInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { AiSyncInfo } from "@/types/proto"
 
 export interface EntityAiSyncNotify {
   infoList: AiSyncInfo[]
@@ -9,15 +9,18 @@ export interface EntityAiSyncNotify {
 
 class EntityAiSyncPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EntityAiSync', {
+    super("EntityAiSync", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
   async recvNotify(context: PacketContext, data: EntityAiSyncNotify): Promise<void> {
     const { player } = context
-    await this.broadcastNotify(player?.currentScene?.broadcastContextList.filter(ctx => ctx.player !== player) || [], data)
+    await this.broadcastNotify(
+      player?.currentScene?.broadcastContextList.filter((ctx) => ctx.player !== player) || [],
+      data
+    )
   }
 
   async sendNotify(context: PacketContext, data: EntityAiSyncNotify): Promise<void> {
@@ -30,4 +33,4 @@ class EntityAiSyncPacket extends Packet implements PacketInterface {
 }
 
 let packet: EntityAiSyncPacket
-export default (() => packet = packet || new EntityAiSyncPacket())()
+export default (() => (packet = packet || new EntityAiSyncPacket()))()

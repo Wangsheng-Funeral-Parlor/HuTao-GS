@@ -1,4 +1,4 @@
-import ConfigGadget from './BinOutput/Config/ConfigGadget'
+import ConfigGadget from "./BinOutput/Config/ConfigGadget"
 
 export interface GadgetData {
   JsonName: string

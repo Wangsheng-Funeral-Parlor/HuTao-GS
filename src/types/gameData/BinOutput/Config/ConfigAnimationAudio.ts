@@ -1,5 +1,5 @@
-import ConfigAnimationRecurrentSpeech from './ConfigAnimationRecurrentSpeech'
-import ConfigStateAudioEvent from './ConfigStateAudioEvent'
+import ConfigAnimationRecurrentSpeech from "./ConfigAnimationRecurrentSpeech"
+import ConfigStateAudioEvent from "./ConfigStateAudioEvent"
 
 export default interface ConfigAnimationAudio {
   OnTransitionIn: ConfigStateAudioEvent[]

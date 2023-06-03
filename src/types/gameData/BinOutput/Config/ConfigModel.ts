@@ -1,4 +1,4 @@
-import ConfigMatLinearChangedByDistance from './ConfigMatLinearChangedByDistance'
+import ConfigMatLinearChangedByDistance from "./ConfigMatLinearChangedByDistance"
 
 export default interface ConfigModel {
   MatLinearChangedByDistance: ConfigMatLinearChangedByDistance[]

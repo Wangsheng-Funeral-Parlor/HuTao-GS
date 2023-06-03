@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface EvtAvatarStandUpNotify {
   entityId: number
@@ -10,9 +10,9 @@ export interface EvtAvatarStandUpNotify {
 
 class EvtAvatarStandUpPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtAvatarStandUp', {
+    super("EvtAvatarStandUp", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -30,4 +30,4 @@ class EvtAvatarStandUpPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtAvatarStandUpPacket
-export default (() => packet = packet || new EvtAvatarStandUpPacket())()
+export default (() => (packet = packet || new EvtAvatarStandUpPacket()))()

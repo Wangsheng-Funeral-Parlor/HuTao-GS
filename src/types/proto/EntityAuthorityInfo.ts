@@ -1,4 +1,10 @@
-import { AbilitySyncStateInfo, AnimatorParameterValueInfoPair, EntityRendererChangedInfo, SceneEntityAiInfo, VectorInfo } from '.'
+import {
+  AbilitySyncStateInfo,
+  AnimatorParameterValueInfoPair,
+  EntityRendererChangedInfo,
+  SceneEntityAiInfo,
+  VectorInfo,
+} from "."
 
 export interface EntityAuthorityInfo {
   abilityInfo: AbilitySyncStateInfo

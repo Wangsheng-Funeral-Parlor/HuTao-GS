@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { EntityClientData } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { EntityClientData } from "@/types/proto"
 
 export interface SetEntityClientDataNotify {
   entityId: number
@@ -9,10 +9,10 @@ export interface SetEntityClientDataNotify {
 
 class SetEntityClientDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetEntityClientData', {
+    super("SetEntityClientData", {
       notifyWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
-      notifyWaitStateMask: 0xF0FF,
-      notifyWaitStatePass: true
+      notifyWaitStateMask: 0xf0ff,
+      notifyWaitStatePass: true,
     })
   }
 
@@ -22,7 +22,10 @@ class SetEntityClientDataPacket extends Packet implements PacketInterface {
 
     for (const ctx of broadcastContextList) ctx.seqId = context.seqId
 
-    await this.broadcastNotify(broadcastContextList.filter(ctx => ctx.player !== player), data)
+    await this.broadcastNotify(
+      broadcastContextList.filter((ctx) => ctx.player !== player),
+      data
+    )
   }
 
   async sendNotify(context: PacketContext, data: SetEntityClientDataNotify): Promise<void> {
@@ -35,4 +38,4 @@ class SetEntityClientDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: SetEntityClientDataPacket
-export default (() => packet = packet || new SetEntityClientDataPacket())()
+export default (() => (packet = packet || new SetEntityClientDataPacket()))()

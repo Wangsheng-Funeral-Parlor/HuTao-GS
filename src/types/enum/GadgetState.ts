@@ -14,5 +14,5 @@ export enum GadgetStateEnum {
   StatueActive = 0x191,
   Action01 = 0x385,
   Action02 = 0x386,
-  Action03 = 0x387
+  Action03 = 0x387,
 }

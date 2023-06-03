@@ -1,7 +1,7 @@
-import ConfigBaseTalentMixin from '.'
+import ConfigBaseTalentMixin from "."
 
 export default interface ModifySkillCost extends ConfigBaseTalentMixin {
-  $type: 'ModifySkillCost'
+  $type: "ModifySkillCost"
   SkillID: number
   CostDelta: number
   CostRatio: number

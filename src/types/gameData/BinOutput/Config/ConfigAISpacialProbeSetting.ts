@@ -1,8 +1,8 @@
-import ConfigAISpacialProbeData from './ConfigAISpacialProbeData'
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
+import ConfigAISpacialProbeData from "./ConfigAISpacialProbeData"
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
 
 export default interface ConfigAISpacialProbeSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAISpacialProbeSetting'
+  $type: "ConfigAISpacialProbeSetting"
   DefaultSetting: ConfigAISpacialProbeData
   Specification: { [id: number]: ConfigAISpacialProbeData }
 }

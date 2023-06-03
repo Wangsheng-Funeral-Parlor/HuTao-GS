@@ -1,6 +1,6 @@
-import ConfigBaseBornType from '.'
+import ConfigBaseBornType from "."
 
 export default interface ConfigBornByPredicatePoint extends ConfigBaseBornType {
-  $type: 'ConfigBornByPredicatePoint'
+  $type: "ConfigBornByPredicatePoint"
   TimeForPredictive: number
 }

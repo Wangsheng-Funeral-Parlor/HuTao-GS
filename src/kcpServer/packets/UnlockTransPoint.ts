@@ -1,6 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import ScenePointUnlock from './ScenePointUnlock'
+import ScenePointUnlock from "./ScenePointUnlock"
+
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface UnlockTransPointReq {
   sceneId: number
@@ -13,7 +14,7 @@ export interface UnlockTransPointRsp {
 
 class UnlockTransPointPacket extends Packet implements PacketInterface {
   constructor() {
-    super('UnlockTransPoint')
+    super("UnlockTransPoint")
   }
 
   async request(context: PacketContext, data: UnlockTransPointReq): Promise<void> {
@@ -48,4 +49,4 @@ class UnlockTransPointPacket extends Packet implements PacketInterface {
 }
 
 let packet: UnlockTransPointPacket
-export default (() => packet = packet || new UnlockTransPointPacket())()
+export default (() => (packet = packet || new UnlockTransPointPacket()))()

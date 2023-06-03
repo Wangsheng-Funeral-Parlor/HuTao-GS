@@ -1,10 +1,10 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
 
-export interface DoSetPlayerBornDataNotify { }
+export interface DoSetPlayerBornDataNotify {}
 
 class DoSetPlayerBornDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('DoSetPlayerBornData')
+    super("DoSetPlayerBornData")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -15,4 +15,4 @@ class DoSetPlayerBornDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: DoSetPlayerBornDataPacket
-export default (() => packet = packet || new DoSetPlayerBornDataPacket())()
+export default (() => (packet = packet || new DoSetPlayerBornDataPacket()))()

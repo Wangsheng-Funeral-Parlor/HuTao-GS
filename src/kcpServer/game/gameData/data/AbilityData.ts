@@ -1,14 +1,14 @@
-import Loader from '$/gameData/loader'
-import ConfigAbility from '$DT/BinOutput/Config/ConfigAbility'
-import ConfigAbilityAction from '$DT/BinOutput/Config/ConfigAbility/Action'
-import ConfigAbilityMixin from '$DT/BinOutput/Config/ConfigAbility/Mixin'
-import ConfigAbilityGroup from '$DT/BinOutput/Config/ConfigAbilityGroup'
-import { AbilityConfigIdxEnum, AbilityModifierConfigIdxEnum } from '@/types/enum'
-import AbilityDataGroup from '@/types/gameData/AbilityData'
-import { AbilityString } from '@/types/proto'
-import { getStringHash } from '@/utils/hash'
+import Loader from "$/gameData/loader"
+import ConfigAbility from "$DT/BinOutput/Config/ConfigAbility"
+import ConfigAbilityAction from "$DT/BinOutput/Config/ConfigAbility/Action"
+import ConfigAbilityMixin from "$DT/BinOutput/Config/ConfigAbility/Mixin"
+import ConfigAbilityGroup from "$DT/BinOutput/Config/ConfigAbilityGroup"
+import { AbilityConfigIdxEnum, AbilityModifierConfigIdxEnum } from "@/types/enum"
+import AbilityDataGroup from "@/types/gameData/AbilityData"
+import { AbilityString } from "@/types/proto"
+import { getStringHash } from "@/utils/hash"
 
-const sortStr = (a: string, b: string) => a < b ? -1 : 1
+const sortStr = (a: string, b: string) => (a < b ? -1 : 1)
 
 class AbilityDataLoader extends Loader {
   declare data: AbilityDataGroup
@@ -17,7 +17,7 @@ class AbilityDataLoader extends Loader {
   abilityMap: { [name: string]: ConfigAbility }
 
   constructor() {
-    super('AbilityData')
+    super("AbilityData", "message.cache.debug.ability")
 
     this.hashMap = {}
     this.abilityMap = {}
@@ -31,7 +31,7 @@ class AbilityDataLoader extends Loader {
     let i = valList.length
     let d = 8
     while (localId > 0) {
-      const val = (localId % (d * 64))
+      const val = localId % (d * 64)
       valList[--i] = val / d
       localId -= val
       d *= 64
@@ -59,25 +59,27 @@ class AbilityDataLoader extends Loader {
     }
   }
 
-  private getActionList(actions: (ConfigAbilityAction | ConfigAbilityMixin)[]): (ConfigAbilityAction | ConfigAbilityMixin)[] {
+  private getActionList(
+    actions: (ConfigAbilityAction | ConfigAbilityMixin)[]
+  ): (ConfigAbilityAction | ConfigAbilityMixin)[] {
     const actionList = []
     if (!Array.isArray(actions)) return actionList
 
     for (const action of actions) {
       actionList.push(action)
       switch (action.$type) {
-        case 'DummyAction':
+        case "DummyAction":
           actionList.push(...this.getActionList(action.ActionList))
           break
-        case 'Predicated':
-        case 'Randomed':
+        case "Predicated":
+        case "Randomed":
           actionList.push(...this.getActionList(action.SuccessActions))
           actionList.push(...this.getActionList(action.FailActions))
           break
-        case 'Repeated':
+        case "Repeated":
           actionList.push(...this.getActionList(action.Actions))
           break
-        case 'TryTriggerPlatformStartMove':
+        case "TryTriggerPlatformStartMove":
           actionList.push(...this.getActionList(action.FailActions))
           break
       }
@@ -87,7 +89,7 @@ class AbilityDataLoader extends Loader {
   }
 
   private addString(str: string): void {
-    if (typeof str !== 'string') return
+    if (typeof str !== "string") return
     this.hashMap[getStringHash(str)] = str
   }
 
@@ -115,7 +117,7 @@ class AbilityDataLoader extends Loader {
 
     const { data } = this
     for (const groupName in data) {
-      if (groupName === 'Group') continue
+      if (groupName === "Group") continue
 
       const group: { [name: string]: { [override: string]: ConfigAbility }[] } = data[groupName]
       if (group == null) continue
@@ -129,23 +131,21 @@ class AbilityDataLoader extends Loader {
     }
   }
 
-  async getData(): Promise<AbilityDataGroup> {
-    return super.getData()
+  async getData(): Promise<void> {
+    await super.getData()
   }
 
-  async getAbilityGroup(name: string): Promise<ConfigAbilityGroup> {
-    await this.getData()
+  getAbilityGroup(name: string): ConfigAbilityGroup {
     return this.data?.Group?.[name] || null
   }
 
-  async getAbility(name: string): Promise<ConfigAbility> {
-    await this.getData()
+  getAbility(name: string): ConfigAbility {
     return this.abilityMap[name] || null
   }
 
-  async getActionByLocalId(abilityName: string, localId: number): Promise<ConfigAbilityAction | ConfigAbilityMixin> {
+  getActionByLocalId(abilityName: string, localId: number): ConfigAbilityAction | ConfigAbilityMixin {
     const configInfo = this.parseLocalId(localId)
-    const abilityData = await this.getAbility(abilityName)
+    const abilityData = this.getAbility(abilityName)
     if (configInfo == null || !abilityData) return null
 
     const { typeTag, actionID, configIdx, mixinIdx, modifierIdx } = configInfo
@@ -158,15 +158,17 @@ class AbilityDataLoader extends Loader {
         return abilityData.AbilityMixins?.[mixinIdx]
       }
       case 3: {
-        const modifier = Object.entries(abilityData.Modifiers || {})
-          .sort((a, b) => sortStr(a[0], b[0]))[modifierIdx]?.[1]
+        const modifier = Object.entries(abilityData.Modifiers || {}).sort((a, b) => sortStr(a[0], b[0]))[
+          modifierIdx
+        ]?.[1]
         if (modifier == null) return null
 
         return this.getActionList(modifier[AbilityModifierConfigIdxEnum[configIdx]])[actionID - 1]
       }
       case 4: {
-        const modifier = Object.entries(abilityData.Modifiers || {})
-          .sort((a, b) => sortStr(a[0], b[0]))[modifierIdx]?.[1]
+        const modifier = Object.entries(abilityData.Modifiers || {}).sort((a, b) => sortStr(a[0], b[0]))[
+          modifierIdx
+        ]?.[1]
         if (modifier == null) return null
 
         return modifier.ModifierMixins?.[mixinIdx]
@@ -176,9 +178,7 @@ class AbilityDataLoader extends Loader {
     }
   }
 
-  async lookupString(abilityString: AbilityString): Promise<string | null> {
-    await this.getData()
-
+  lookupString(abilityString: AbilityString): string | null {
     const { str, hash } = abilityString || {}
     if (str) return str
 
@@ -187,4 +187,4 @@ class AbilityDataLoader extends Loader {
 }
 
 let loader: AbilityDataLoader
-export default (() => loader = loader || new AbilityDataLoader())()
+export default (() => (loader = loader || new AbilityDataLoader()))()

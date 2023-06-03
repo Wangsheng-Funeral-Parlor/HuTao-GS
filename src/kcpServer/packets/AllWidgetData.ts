@@ -1,6 +1,13 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { AnchorPointData, ClientCollectorData, LunchBoxData, OneoffGatherPointDetectorData, WidgetCoolDownData, WidgetSlotData } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import {
+  AnchorPointData,
+  ClientCollectorData,
+  LunchBoxData,
+  OneoffGatherPointDetectorData,
+  WidgetCoolDownData,
+  WidgetSlotData,
+} from "@/types/proto"
 
 export interface AllWidgetDataNotify {
   anchorPointList: AnchorPointData[]
@@ -15,7 +22,7 @@ export interface AllWidgetDataNotify {
 
 class AllWidgetDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AllWidgetData')
+    super("AllWidgetData")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -25,4 +32,4 @@ class AllWidgetDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: AllWidgetDataPacket
-export default (() => packet = packet || new AllWidgetDataPacket())()
+export default (() => (packet = packet || new AllWidgetDataPacket()))()

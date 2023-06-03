@@ -1,5 +1,5 @@
-import ConfigAIBuddySkillCondition from './ConfigAIBuddySkillCondition'
-import ConfigAISkillCastCondition from './ConfigAISkillCastCondition'
+import ConfigAIBuddySkillCondition from "./ConfigAIBuddySkillCondition"
+import ConfigAISkillCastCondition from "./ConfigAISkillCastCondition"
 
 export default interface ConfigAISkill {
   Name: string

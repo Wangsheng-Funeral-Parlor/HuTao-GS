@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { AddWindBulletNotify, AreaNotify, RefreshNotify } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { AddWindBulletNotify, AreaNotify, RefreshNotify } from "@/types/proto"
 
 export interface WindSeedClientNotify {
   refreshNotify?: RefreshNotify
@@ -9,16 +9,16 @@ export interface WindSeedClientNotify {
 
 class WindSeedClientPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WindSeedClient')
+    super("WindSeedClient")
   }
 
   async sendNotify(context: PacketContext, buf: Buffer): Promise<void> {
     const notifyData: WindSeedClientNotify = {
       areaNotify: {
         areaId: 1,
-        areaCode: buf.toString('base64'),
-        areaType: 1
-      }
+        areaCode: buf.toString("base64"),
+        areaType: 1,
+      },
     }
 
     await super.sendNotify(context, notifyData)
@@ -30,4 +30,4 @@ class WindSeedClientPacket extends Packet implements PacketInterface {
 }
 
 let packet: WindSeedClientPacket
-export default (() => packet = packet || new WindSeedClientPacket())()
+export default (() => (packet = packet || new WindSeedClientPacket()))()

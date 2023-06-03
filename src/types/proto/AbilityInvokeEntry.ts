@@ -1,5 +1,6 @@
-import { AbilityInvokeEntryHead } from '.'
-import { AbilityInvokeArgumentEnum, ForwardTypeEnum } from './enum'
+import { AbilityInvokeArgumentEnum, ForwardTypeEnum } from "./enum"
+
+import { AbilityInvokeEntryHead } from "."
 
 export interface AbilityInvokeEntry {
   head: AbilityInvokeEntryHead
@@ -10,4 +11,5 @@ export interface AbilityInvokeEntry {
   forwardPeer: number
   eventId: number
   totalTickTime: number
+  isIgnoreAuth?: boolean
 }

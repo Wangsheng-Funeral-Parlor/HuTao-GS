@@ -1,7 +1,8 @@
-import OpenStateChange from '#/packets/OpenStateChange'
-import { OpenStateEnum } from '@/types/proto/enum'
-import PropsUserData from '@/types/user/PropsUserData'
-import Player from '.'
+import Player from "."
+
+import OpenStateChange from "#/packets/OpenStateChange"
+import { OpenStateEnum } from "@/types/proto/enum"
+import PropsUserData from "@/types/user/PropsUserData"
 
 export default class OpenState {
   player: Player
@@ -26,15 +27,13 @@ export default class OpenState {
 
   initNew() {
     for (const key in OpenStateEnum) {
-      if (!isNaN(Number(key)) || key.indexOf('_GUIDE') >= 0) continue
+      if (!isNaN(Number(key)) || key.indexOf("_GUIDE") >= 0) continue
 
       this.openStateMap[OpenStateEnum[key]] = true
     }
-
-    this.set(OpenStateEnum.OPEN_STATE_GACHA, false)
   }
 
-  async set(key: number, val: number | boolean, notify: boolean = false): Promise<void> {
+  async set(key: number, val: number | boolean, notify = false): Promise<void> {
     const { player, openStateMap } = this
     openStateMap[key] = !!val
 
@@ -42,7 +41,7 @@ export default class OpenState {
   }
 
   exportOpenStateMap() {
-    return Object.fromEntries(Object.entries(this.openStateMap).map(e => [e[0], Number(e[1])]))
+    return Object.fromEntries(Object.entries(this.openStateMap).map((e) => [e[0], Number(e[1])]))
   }
 
   exportUserData(): PropsUserData {

@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { VectorInfo } from '@/types/proto'
-import { SceneEnterTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { VectorInfo } from "@/types/proto"
+import { SceneEnterTypeEnum } from "@/types/proto/enum"
 
 export interface PlayerEnterSceneNotify {
   sceneId: number
@@ -23,7 +23,7 @@ export interface PlayerEnterSceneNotify {
 
 class PlayerEnterScenePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerEnterScene')
+    super("PlayerEnterScene")
   }
 
   async sendNotify(context: PacketContext, data: PlayerEnterSceneNotify): Promise<void> {
@@ -32,4 +32,4 @@ class PlayerEnterScenePacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerEnterScenePacket
-export default (() => packet = packet || new PlayerEnterScenePacket())()
+export default (() => (packet = packet || new PlayerEnterScenePacket()))()

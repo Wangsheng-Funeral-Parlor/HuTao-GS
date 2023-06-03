@@ -1,39 +1,55 @@
-import BaseClass from '#/baseClass'
-import { PacketContext } from '#/packet'
-import GuestBeginEnterScene from '#/packets/GuestBeginEnterScene'
-import PlayerEnterScene, { PlayerEnterSceneNotify } from '#/packets/PlayerEnterScene'
-import ScenePlayerLocation from '#/packets/ScenePlayerLocation'
-import SceneTime from '#/packets/SceneTime'
-import uidPrefix from '#/utils/uidPrefix'
-import Entity from '$/entity'
-import Gadget from '$/entity/gadget'
-import TrifleItem from '$/entity/gadget/trifleItem'
-import Vehicle from '$/entity/gadget/vehicle'
-import DungeonData from '$/gameData/data/DungeonData'
-import SceneData from '$/gameData/data/SceneData'
-import CombatManager from '$/manager/combatManager'
-import EntityManager from '$/manager/entityManager'
-import VehicleManager from '$/manager/vehicleManager'
-import Material from '$/material'
-import Player from '$/player'
-import Item from '$/player/inventory/item'
-import Vector from '$/utils/vector'
-import World from '$/world'
-import GlobalState from '@/globalState'
-import Logger from '@/logger'
-import translate from '@/translate'
-import TLogger from '@/translate/tlogger'
-import { ClientStateEnum } from '@/types/enum'
-import { AbilityInvokeEntry, CombatInvokeEntry, PlayerWorldSceneInfo, ScenePlayerInfo, SceneTeamAvatar } from '@/types/proto'
-import { ProtEntityTypeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
-import SceneUserData from '@/types/user/SceneUserData'
-import { getTimeSeconds } from '@/utils/time'
-import SceneBlock from './sceneBlock'
-import SceneTag from './sceneTag'
+import { join } from "path"
+import { cwd } from "process"
+
+import SceneBlock from "./sceneBlock"
+import SceneTag from "./sceneTag"
+
+import BaseClass from "#/baseClass"
+import { PacketContext } from "#/packet"
+import GuestBeginEnterScene from "#/packets/GuestBeginEnterScene"
+import PlayerEnterScene, { PlayerEnterSceneNotify } from "#/packets/PlayerEnterScene"
+import ScenePlayerLocation from "#/packets/ScenePlayerLocation"
+import SceneTime from "#/packets/SceneTime"
+import uidPrefix from "#/utils/uidPrefix"
+import Challenge from "$/challenge"
+import Entity from "$/entity"
+import Gadget from "$/entity/gadget"
+import TrifleItem from "$/entity/gadget/trifleItem"
+import Vehicle from "$/entity/gadget/vehicle"
+import DungeonData from "$/gameData/data/DungeonData"
+import SceneData from "$/gameData/data/SceneData"
+import CombatManager from "$/manager/combatManager"
+import EntityManager from "$/manager/entityManager"
+import VehicleManager from "$/manager/vehicleManager"
+import Material from "$/material"
+import Player from "$/player"
+import Item from "$/player/inventory/item"
+import ScriptLoader from "$/script/scriptLoader"
+import scriptManager from "$/script/scriptManager"
+import ScriptTrigger from "$/script/scriptTrigger"
+import Vector from "$/utils/vector"
+import World from "$/world"
+import config from "@/config"
+import GlobalState from "@/globalState"
+import Logger from "@/logger"
+import translate from "@/translate"
+import TLogger from "@/translate/tlogger"
+import { ClientStateEnum } from "@/types/enum"
+import {
+  AbilityInvokeEntry,
+  CombatInvokeEntry,
+  PlayerWorldSceneInfo,
+  ScenePlayerInfo,
+  SceneTeamAvatar,
+} from "@/types/proto"
+import { ProtEntityTypeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
+import SceneUserData from "@/types/user/SceneUserData"
+import { fileExists } from "@/utils/fileSystem"
+import { getTimeSeconds } from "@/utils/time"
 
 const HIT_TREE_CD = 86400e3 // 1 day
 
-const logger = new TLogger('GSCENE', 0xefa8ec)
+const logger = new TLogger("GSCENE", 0xefa8ec)
 
 export default class Scene extends BaseClass {
   world: World
@@ -51,6 +67,10 @@ export default class Scene extends BaseClass {
   entityManager: EntityManager
   combatManager: CombatManager
   vehicleManager: VehicleManager
+  scriptManager: scriptManager
+
+  scriptLoader: ScriptLoader
+  scriptTrigger: ScriptTrigger
 
   playerList: Player[]
 
@@ -70,6 +90,10 @@ export default class Scene extends BaseClass {
   sceneBlockInit: boolean
   destroyed: boolean
 
+  EnableScript: boolean
+
+  activeChallenge: Challenge
+
   constructor(world: World, sceneId: number) {
     super()
 
@@ -87,10 +111,18 @@ export default class Scene extends BaseClass {
     this.entityManager = new EntityManager(this)
     this.combatManager = new CombatManager(this)
     this.vehicleManager = new VehicleManager(this)
+    this.scriptManager = new scriptManager(this)
+
+    this.scriptLoader = new ScriptLoader()
+    this.scriptTrigger = new ScriptTrigger()
 
     this.playerList = []
 
-    this.dieY = 0
+    this.dieY = -1000
+
+    fileExists(join(cwd(), `data/game/${config.game.version}/Scripts/Scene/${sceneId}/scene${sceneId}.lua`)).then(
+      (exists) => (this.EnableScript = GlobalState.get("EnableScript") && exists)
+    )
 
     super.initHandlers(this)
   }
@@ -99,17 +131,17 @@ export default class Scene extends BaseClass {
     const { id } = this
     const sceneData = await SceneData.getScene(id)
 
-    this.type = sceneData.Type || 'SCENE_WORLD'
+    this.type = sceneData.Type || "SCENE_WORLD"
 
-    this.sceneTagList = sceneData?.Tag?.map(tagData => new SceneTag(this, tagData)) || []
-    this.sceneBlockList = Object.keys(sceneData?.Block || {}).map(e => new SceneBlock(this, parseInt(e)))
+    this.sceneTagList = sceneData?.Tag?.map((tagData) => new SceneTag(this, tagData)) || []
+    this.sceneBlockList = Object.keys(sceneData?.Block || {}).map((e) => new SceneBlock(this, parseInt(e)))
 
-    this.dieY = sceneData?.DieY || 0
+    this.dieY = sceneData?.DieY || -1000
     this.isLocked = !!sceneData?.IsLocked
   }
 
   get broadcastContextList(): PacketContext[] {
-    return this.playerList.map(player => player.context)
+    return this.playerList.map((player) => player.context)
   }
 
   get host(): Player {
@@ -140,7 +172,7 @@ export default class Scene extends BaseClass {
 
     entityManager.init()
 
-    if (hitTreeMap != null && typeof hitTreeMap === 'object') Object.assign(this.hitTreeMap, hitTreeMap)
+    if (hitTreeMap != null && typeof hitTreeMap === "object") Object.assign(this.hitTreeMap, hitTreeMap)
 
     if (Array.isArray(unlockedPointList)) {
       for (const pointId of unlockedPointList) this.unlockPoint(pointId)
@@ -151,7 +183,7 @@ export default class Scene extends BaseClass {
 
     if (fullInit) this.initSceneBlocks()
 
-    Logger.measure('Scene init', scenePerfMark)
+    Logger.measure("Scene init", scenePerfMark)
     Logger.clearMarks(scenePerfMark)
   }
 
@@ -170,7 +202,7 @@ export default class Scene extends BaseClass {
 
     if (fullInit) this.initSceneBlocks()
 
-    Logger.measure('Scene init', scenePerfMark)
+    Logger.measure("Scene init", scenePerfMark)
     Logger.clearMarks(scenePerfMark)
   }
 
@@ -199,15 +231,20 @@ export default class Scene extends BaseClass {
     if (sceneBlockInit) return
     this.sceneBlockInit = true
 
-    if (!GlobalState.get('WorldSpawn')) return
-    for (const block of sceneBlockList) await block.initNew()
+    // wait constructor fileExists
+    while (this.EnableScript === undefined) {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+
+    if (!this.EnableScript) return
+    for (const block of sceneBlockList) block.initNew()
   }
 
   updateHitTreeMap() {
     const { hitTreeMap } = this
     const now = Date.now()
     for (const hash in hitTreeMap) {
-      hitTreeMap[hash] = hitTreeMap[hash].filter(t => now - t <= HIT_TREE_CD)
+      hitTreeMap[hash] = hitTreeMap[hash].filter((t) => now - t <= HIT_TREE_CD)
       if (hitTreeMap[hash].length <= 0) delete hitTreeMap[hash]
     }
   }
@@ -262,10 +299,11 @@ export default class Scene extends BaseClass {
     for (const entry of invokes) {
       const entity = entityManager.getEntity(entry?.entityId)
       if (entity == null) {
-        logger.debug('message.scene.debug.abilityInvokeNoEntity', entry)
+        entry.abilityData = entry.abilityData.toString()
+        logger.debug("message.scene.debug.abilityInvokeNoEntity", entry)
         continue
       }
-      await entity?.abilityManager?.emit('AbilityInvoke', context, entry)
+      await entity?.abilityManager?.emit("AbilityInvoke", context, entry)
     }
   }
 
@@ -279,7 +317,7 @@ export default class Scene extends BaseClass {
 
     forwardBuffer.setAdditionalData(seqId, entityId, !!flag)
 
-    for (const entry of invokes) await entity?.abilityManager?.emit('ClientAbilityChange', context, entry)
+    for (const entry of invokes) await entity?.abilityManager?.emit("ClientAbilityChange", context, entry)
   }
 
   async clientAbilityInitFinish(context: PacketContext, invokes: AbilityInvokeEntry[], entityId: number) {
@@ -292,14 +330,14 @@ export default class Scene extends BaseClass {
 
     forwardBuffer.setAdditionalData(seqId, entityId)
 
-    for (const entry of invokes) await entity?.abilityManager?.emit('ClientAbilityInitFinish', context, entry)
+    for (const entry of invokes) await entity?.abilityManager?.emit("ClientAbilityInitFinish", context, entry)
   }
 
   async combatInvoke(context: PacketContext, invokes: CombatInvokeEntry[]) {
     if (invokes == null || invokes.length === 0) return
 
     const { combatManager } = this
-    for (const entry of invokes) await combatManager.emit('CombatInvoke', context, entry)
+    for (const entry of invokes) await combatManager.emit("CombatInvoke", context, entry)
   }
 
   async spawnDropsById(pos: Vector, dropId: number, seqId?: number) {
@@ -318,7 +356,7 @@ export default class Scene extends BaseClass {
     const { player } = context
     const { state, currentScene, pos: playerPos, rot: playerRot } = player
 
-    let sceneType = (state & 0x0F00)
+    let sceneType = state & 0x0f00
     switch (enterReason) {
       case SceneEnterReasonEnum.DUNGEON_ENTER:
         sceneType = ClientStateEnum.SCENE_DUNGEON
@@ -335,7 +373,17 @@ export default class Scene extends BaseClass {
 
     if (currentScene) await player.currentScene.leave(context)
 
-    logger.debug('message.scene.debug.joinInfo', uidPrefix(translate('message.scene.debug.join'), host, 0xefef00), player.uid, id, Math.floor(pos.x), Math.floor(pos.y), Math.floor(pos.z), SceneEnterTypeEnum[enterType], SceneEnterReasonEnum[enterReason])
+    logger.debug(
+      "message.scene.debug.joinInfo",
+      uidPrefix(translate("message.scene.debug.join"), host, 0xefef00),
+      player.uid,
+      id,
+      Math.floor(pos.x),
+      Math.floor(pos.y),
+      Math.floor(pos.z),
+      SceneEnterTypeEnum[enterType],
+      SceneEnterReasonEnum[enterReason]
+    )
 
     if (!world.isHost(player)) await GuestBeginEnterScene.sendNotify(host.context, this, player)
 
@@ -348,10 +396,10 @@ export default class Scene extends BaseClass {
       worldLevel: world.level,
       enterSceneToken,
       isFirstLoginEnterScene: enterReason === SceneEnterReasonEnum.LOGIN,
-      sceneTagIdList: sceneTagList.filter(tag => tag.isActive()).map(tag => tag.id),
+      sceneTagIdList: sceneTagList.filter((tag) => tag.isActive()).map((tag) => tag.id),
       enterReason,
       worldType: 1,
-      sceneTransaction: `${id}-${host.uid}-${getTimeSeconds()}-33696`
+      sceneTransaction: `${id}-${host.uid}-${getTimeSeconds()}-33696`,
     }
 
     if (currentScene && playerPos) {
@@ -377,7 +425,7 @@ export default class Scene extends BaseClass {
     playerPos.copy(pos)
     playerRot.copy(rot)
 
-    await player.emit('SceneJoin', this, context)
+    await player.emit("SceneJoin", this, context)
 
     // Set client state
     player.state = ClientStateEnum.ENTER_SCENE | sceneType
@@ -393,16 +441,21 @@ export default class Scene extends BaseClass {
     // Check if player is in scene
     if (!playerList.includes(player)) return
 
-    logger.debug('message.scene.debug.quitInfo', uidPrefix(translate('message.scene.debug.quit'), host, 0xffff00), uid, id)
+    logger.debug(
+      "message.scene.debug.quitInfo",
+      uidPrefix(translate("message.scene.debug.quit"), host, 0xffff00),
+      uid,
+      id
+    )
 
     // Set client state
-    player.state = ClientStateEnum.POST_LOGIN | (player.state & 0x0F00)
+    player.state = ClientStateEnum.POST_LOGIN | (player.state & 0x0f00)
 
     player.currentScene = null
     playerList.splice(playerList.indexOf(player), 1)
 
-    await player.emit('SceneLeave', this, context)
-    await this.emit('PlayerLeave', player)
+    await player.emit("SceneLeave", this, context)
+    await this.emit("PlayerLeave", player)
 
     // Destroy scene if no player is inside
     if (playerList.length > 0 || player.nextScene === this) return
@@ -428,7 +481,7 @@ export default class Scene extends BaseClass {
 
   exportSceneTeamAvatarList(): SceneTeamAvatar[] {
     const { playerList } = this
-    return [].concat(...playerList.map(player => player.teamManager.exportSceneTeamAvatarList()))
+    return [].concat(...playerList.map((player) => player.teamManager.exportSceneTeamAvatarList()))
   }
 
   exportSceneInfo(): PlayerWorldSceneInfo {
@@ -436,13 +489,13 @@ export default class Scene extends BaseClass {
 
     return {
       sceneId: id,
-      sceneTagIdList: sceneTagList.filter(tag => tag.isActive()).map(tag => tag.id),
-      isLocked
+      sceneTagIdList: sceneTagList.filter((tag) => tag.isActive()).map((tag) => tag.id),
+      isLocked,
     }
   }
 
   exportScenePlayerInfoList(): ScenePlayerInfo[] {
-    return this.playerList.map(p => p.exportScenePlayerInfo())
+    return this.playerList.map((p) => p.exportScenePlayerInfo())
   }
 
   exportUserData(): SceneUserData {
@@ -451,7 +504,7 @@ export default class Scene extends BaseClass {
     return {
       hitTreeMap,
       unlockedPointList,
-      sceneTime
+      sceneTime,
     }
   }
 
@@ -459,13 +512,26 @@ export default class Scene extends BaseClass {
 
   // SceneUpdate
   async handleSceneUpdate() {
-    const { id, vehicleManager, sceneBlockList, playerList, broadcastContextList, lastThunder, lastLocUpdate, lastTimeUpdate } = this
+    const {
+      id,
+      vehicleManager,
+      sceneBlockList,
+      playerList,
+      broadcastContextList,
+      lastThunder,
+      lastLocUpdate,
+      lastTimeUpdate,
+    } = this
 
-    for (const sceneBlock of sceneBlockList) await sceneBlock.emit('Update')
+    for (const sceneBlock of sceneBlockList) await sceneBlock.emit("Update")
+
+    if (this.activeChallenge != null) {
+      this.activeChallenge.onCheckTimeOut()
+    }
 
     if (lastThunder == null || Date.now() - lastThunder > 5e3) {
-      this.lastThunder = Date.now() - (Math.random() * 5e3)
-      const thunderTargets = playerList.filter(p => p.thunderTarget)
+      this.lastThunder = Date.now() - Math.random() * 5e3
+      const thunderTargets = playerList.filter((p) => p.thunderTarget)
       for (const player of thunderTargets) await this.spawnThunder(player)
     }
 
@@ -473,8 +539,8 @@ export default class Scene extends BaseClass {
       this.lastLocUpdate = Date.now()
       await ScenePlayerLocation.broadcastNotify(broadcastContextList, {
         sceneId: id,
-        playerLocList: playerList.map(player => player.exportLocationInfo()),
-        vehicleLocList: vehicleManager.exportVehicleLocationInfoList()
+        playerLocList: playerList.map((player) => player.exportLocationInfo()),
+        vehicleLocList: vehicleManager.exportVehicleLocationInfoList(),
       })
     }
 

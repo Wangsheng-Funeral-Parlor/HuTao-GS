@@ -1,9 +1,9 @@
-import ConfigAbilityAction from './ConfigAbility/Action'
-import ConfigAbilityMixin from './ConfigAbility/Mixin'
-import ConfigAbilityModifier from './ConfigAbilityModifier'
+import ConfigAbilityAction from "./ConfigAbility/Action"
+import ConfigAbilityMixin from "./ConfigAbility/Mixin"
+import ConfigAbilityModifier from "./ConfigAbilityModifier"
 
 export default interface ConfigAbility {
-  $type: 'ConfigAbility'
+  $type: "ConfigAbility"
   AbilityName: string
   AbilityMixins: ConfigAbilityMixin[]
   AbilitySpecials: { [key: string]: object }

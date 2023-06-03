@@ -13,6 +13,8 @@ EN | [简中](README_zh-CN.md)
 * Automatically gives all characters
 * Combat
 * Spawning monsters
+* Scene Script
+* Challenge
 
 ## Requirements ##
 
@@ -27,14 +29,13 @@ EN | [简中](README_zh-CN.md)
 * Download repository
 * Install dependencies by running ```npm i```
 
-## Building (Choose one) ##
+## Starting the server (Choose one) ##
 
-## Build development ##
-Run ```npm run build-dev```
-## Build release(webpack) ##
-Run ```npm run build-rel```
-## Build release(executable) ##
-Run ```npm run build```
+## Starting development server ##
+Run ```npm run start:dev```
+## Starting release server(executable) ##
+Run ```npm run build```  
+```running HuTao-GS.exe``` ```(Located at ./dist directory)```
 
 ## Resources ##
 
@@ -79,17 +80,6 @@ Run ```npm run build```
 >Please complete the steps in Resources before you continue.
 
 * You need patch Metadata (Only for 3.0.0 and lower versions) You can patch it with in-console command
-
-## Starting the server (Choose one) ##
-
-## Starting development server ##
-Start server by running ```START-DEV.bat```
-
-## Starting release server(webpack) ##
-Start server by running ```START-REL.bat```
-
-## Starting release server(executable) ##
-Start server by ```running HuTao-GS.exe``` ```(Located at ./dist directory)```
 
 ## Stopping ##
 

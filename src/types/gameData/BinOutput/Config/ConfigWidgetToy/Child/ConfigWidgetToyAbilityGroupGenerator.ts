@@ -1,6 +1,6 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyAbilityGroupGenerator extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyAbilityGroupGenerator'
+  $type: "ConfigWidgetToyAbilityGroupGenerator"
   AbilityGroupName: string
 }

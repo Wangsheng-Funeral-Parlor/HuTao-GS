@@ -5,15 +5,15 @@ export enum DataType {
   BOOL,
   BIGINT,
   INT32,
-  FLOAT
+  FLOAT,
 }
 
 export type AcceptTypes = Buffer | string | boolean | bigint | number | null
 
-export function sizeOf(buf: Buffer, offset: number = 0) {
+export function sizeOf(buf: Buffer, offset = 0) {
   if (buf.length < offset + 1) return -1
 
-  const type = buf.readUInt8(offset) & 0x7F
+  const type = buf.readUInt8(offset) & 0x7f
   switch (type) {
     case DataType.NULL:
       return 1
@@ -38,28 +38,28 @@ export function encodeData(data: AcceptTypes): Buffer {
 
   const dataType = typeof data
   switch (typeof data) {
-    case 'string':
-      data = Buffer.from(data, 'utf8')
+    case "string":
+      data = Buffer.from(data, "utf8")
     // convert string to buffer
-    case 'object': {
-      if (!Buffer.isBuffer(data)) throw new Error('Invalid data type')
+    case "object": {
+      if (!Buffer.isBuffer(data)) throw new Error("Invalid data type")
       const len = data.length
       const buf = Buffer.alloc(5 + len)
-      buf.writeUInt8(dataType === 'string' ? DataType.STRING : DataType.BUFFER)
+      buf.writeUInt8(dataType === "string" ? DataType.STRING : DataType.BUFFER)
       buf.writeUInt32LE(len, 1)
       data.copy(buf, 5)
       return buf
     }
-    case 'boolean': {
+    case "boolean": {
       return Buffer.from([DataType.BOOL | (Number(!!data) << 7)])
     }
-    case 'bigint': {
+    case "bigint": {
       const buf = Buffer.alloc(9)
       buf.writeUInt8(DataType.BIGINT)
       buf.writeBigUInt64LE(data, 1)
       return buf
     }
-    case 'number': {
+    case "number": {
       const buf = Buffer.alloc(5)
       if (Number(data) % 1 === 0) {
         buf.writeUInt8(DataType.INT32)
@@ -71,12 +71,12 @@ export function encodeData(data: AcceptTypes): Buffer {
       return buf
     }
     default:
-      throw new Error('Invalid data type')
+      throw new Error("Invalid data type")
   }
 }
 
-export function decodeData(buf: Buffer, offset: number = 0): AcceptTypes {
-  const type = buf.readUInt8(offset) & 0x7F
+export function decodeData(buf: Buffer, offset = 0): AcceptTypes {
+  const type = buf.readUInt8(offset) & 0x7f
   const data = buf.subarray(offset + 1)
 
   switch (type) {
@@ -88,10 +88,10 @@ export function decodeData(buf: Buffer, offset: number = 0): AcceptTypes {
       const out = Buffer.alloc(sizeOf(buf, offset) - 5)
       data.copy(out, 0, 4)
       if (type === DataType.BUFFER) return out
-      return out.toString('utf8')
+      return out.toString("utf8")
     }
     case DataType.BOOL: {
-      return (buf.readUInt8(offset) >> 7) !== 0
+      return buf.readUInt8(offset) >> 7 !== 0
     }
     case DataType.BIGINT: {
       return data.readBigUInt64LE()
@@ -103,11 +103,11 @@ export function decodeData(buf: Buffer, offset: number = 0): AcceptTypes {
       return data.readFloatLE()
     }
     default:
-      throw new Error('Invalid data type')
+      throw new Error("Invalid data type")
   }
 }
 
-export function decodeDataList(buf: Buffer, offset: number = 0): AcceptTypes[] {
+export function decodeDataList(buf: Buffer, offset = 0): AcceptTypes[] {
   const output: AcceptTypes[] = []
 
   while (true) {

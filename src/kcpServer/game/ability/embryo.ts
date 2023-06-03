@@ -1,6 +1,6 @@
-import AbilityManager from '$/manager/abilityManager'
-import { AbilityEmbryo } from '@/types/proto'
-import { getStringHash } from '@/utils/hash'
+import AbilityManager from "$/manager/abilityManager"
+import { AbilityEmbryo } from "@/types/proto"
+import { getStringHash } from "@/utils/hash"
 
 export default class Embryo {
   manager: AbilityManager
@@ -22,7 +22,7 @@ export default class Embryo {
     return {
       abilityId: id,
       abilityNameHash: getStringHash(name),
-      abilityOverrideNameHash: getStringHash(overrideName)
+      abilityOverrideNameHash: getStringHash(overrideName),
     }
   }
 }

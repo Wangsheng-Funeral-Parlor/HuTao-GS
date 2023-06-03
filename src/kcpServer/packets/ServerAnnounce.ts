@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { AnnounceData } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { AnnounceData } from "@/types/proto"
 
 export interface ServerAnnounceNotify {
   announceDataList: AnnounceData[]
@@ -7,7 +7,7 @@ export interface ServerAnnounceNotify {
 
 class ServerAnnouncePacket extends Packet implements PacketInterface {
   constructor() {
-    super('ServerAnnounce')
+    super("ServerAnnounce")
   }
 
   async sendNotify(context: PacketContext, announceDataList: AnnounceData[]): Promise<void> {
@@ -22,4 +22,4 @@ class ServerAnnouncePacket extends Packet implements PacketInterface {
 }
 
 let packet: ServerAnnouncePacket
-export default (() => packet = packet || new ServerAnnouncePacket())()
+export default (() => (packet = packet || new ServerAnnouncePacket()))()

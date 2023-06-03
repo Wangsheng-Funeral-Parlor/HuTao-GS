@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PropValue } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PropValue } from "@/types/proto"
 
 export interface PlayerDataNotify {
   nickName: string
@@ -12,7 +12,7 @@ export interface PlayerDataNotify {
 
 class PlayerDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerData')
+    super("PlayerData")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -24,7 +24,7 @@ class PlayerDataPacket extends Packet implements PacketInterface {
       nickName: nickname,
       serverTime: Date.now().toString(),
       regionId: 49,
-      propMap: props.exportPropMap()
+      propMap: props.exportPropMap(),
     }
 
     await super.sendNotify(context, notifyData)
@@ -32,4 +32,4 @@ class PlayerDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerDataPacket
-export default (() => packet = packet || new PlayerDataPacket())()
+export default (() => (packet = packet || new PlayerDataPacket()))()

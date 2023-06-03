@@ -1,5 +1,6 @@
-import { VectorInfo } from '.'
-import { HitColliderTypeEnum } from './enum'
+import { HitColliderTypeEnum } from "./enum"
+
+import { VectorInfo } from "."
 
 export interface HitCollision {
   hitColliderType: HitColliderTypeEnum

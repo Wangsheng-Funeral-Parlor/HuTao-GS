@@ -1,8 +1,9 @@
-import PlayerChat from '#/packets/PlayerChat'
-import { ChatManager } from '$/manager/chatManager'
-import World from '$/world'
-import { ChatInfo } from '@/types/proto'
-import ChatChannel from './chatChannel'
+import ChatChannel from "./chatChannel"
+
+import PlayerChat from "#/packets/PlayerChat"
+import { ChatManager } from "$/manager/chatManager"
+import World from "$/world"
+import { ChatInfo } from "@/types/proto"
 
 export default class PublicChatChannel extends ChatChannel {
   world: World
@@ -19,7 +20,7 @@ export default class PublicChatChannel extends ChatChannel {
   }
 
   async handleMessage(chatInfo: ChatInfo, seqId?: number): Promise<void> {
-    const contextList = this.playerList.map(player => {
+    const contextList = this.playerList.map((player) => {
       const ctx = player.context
       ctx.seqId = seqId || null
       return ctx

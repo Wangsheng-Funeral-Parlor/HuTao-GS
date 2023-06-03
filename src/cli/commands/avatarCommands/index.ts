@@ -1,12 +1,16 @@
-import { CommandDefinition } from '..'
-import equipCommand from './equipCommand'
-import godCommand from './godCommand'
-import guidCommand from './guidCommand'
-import healCommand from './healCommand'
-import rechargeCommand from './rechargeCommand'
-import setcsCommand from './setcsCommand'
-import setfpCommand from './setfpCommand'
-import talentCommand from './talentCommand'
+import { CommandDefinition } from ".."
+
+import damageCommand from "./damage"
+import equipCommand from "./equipCommand"
+import godCommand from "./godCommand"
+import guidCommand from "./guidCommand"
+import healCommand from "./healCommand"
+import nocdCommand from "./nocdCommand"
+import rechargeCommand from "./rechargeCommand"
+import setcsCommand from "./setcsCommand"
+import setfpCommand from "./setfpCommand"
+import switchelementCommand from "./switchelementCommand"
+import talentCommand from "./talentCommand"
 
 const avatarCommands: CommandDefinition[] = [
   godCommand,
@@ -16,7 +20,10 @@ const avatarCommands: CommandDefinition[] = [
   equipCommand,
   setcsCommand,
   setfpCommand,
-  talentCommand
+  talentCommand,
+  switchelementCommand,
+  nocdCommand,
+  damageCommand,
 ]
 
 export default avatarCommands

@@ -1,4 +1,4 @@
-import { ResVersionConfig } from '.'
+import { ResVersionConfig } from "."
 
 export interface RegionInfo {
   gateserverIp?: string

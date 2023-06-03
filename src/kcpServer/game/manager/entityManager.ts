@@ -1,18 +1,18 @@
-import BaseClass from '#/baseClass'
-import EntityAuthorityChange from '#/packets/EntityAuthorityChange'
-import SceneEntityAppear from '#/packets/SceneEntityAppear'
-import SceneEntityDisappear from '#/packets/SceneEntityDisappear'
-import uidPrefix from '#/utils/uidPrefix'
-import Entity from '$/entity'
-import Avatar from '$/entity/avatar'
-import Player from '$/player'
-import Scene from '$/scene'
-import Vector from '$/utils/vector'
-import TLogger from '@/translate/tlogger'
-import { ClientStateEnum, EntityTypeEnum } from '@/types/enum'
-import { ProtEntityTypeEnum, SceneEnterTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
+import BaseClass from "#/baseClass"
+import EntityAuthorityChange from "#/packets/EntityAuthorityChange"
+import SceneEntityAppear from "#/packets/SceneEntityAppear"
+import SceneEntityDisappear from "#/packets/SceneEntityDisappear"
+import uidPrefix from "#/utils/uidPrefix"
+import Entity from "$/entity"
+import Avatar from "$/entity/avatar"
+import Player from "$/player"
+import Scene from "$/scene"
+import Vector from "$/utils/vector"
+import TLogger from "@/translate/tlogger"
+import { ClientStateEnum, EntityTypeEnum } from "@/types/enum"
+import { ProtEntityTypeEnum, SceneEnterTypeEnum, VisionTypeEnum } from "@/types/proto/enum"
 
-const logger = new TLogger('ENTITY', 0x00a0ff)
+const logger = new TLogger("ENTITY", 0x00a0ff)
 
 export const WORLD_VIEW_DIST = 128
 export const DEFAULT_VIEW_DIST = 256
@@ -21,7 +21,7 @@ export const DEFAULT_ENTITY_LIMIT = 32
 export const ENTITY_LIMIT = {
   [EntityTypeEnum.Monster]: 12,
   [EntityTypeEnum.Gadget]: 128,
-  [EntityTypeEnum.Chest]: 128
+  [EntityTypeEnum.Chest]: 128,
 }
 
 interface EntityLoadState {
@@ -30,7 +30,7 @@ interface EntityLoadState {
 }
 
 function getPrefix(player: Player, visionType: VisionTypeEnum): string {
-  return uidPrefix(VisionTypeEnum[visionType].split('_')[1]?.slice(0, 4)?.padEnd(4, ' ') || '????', player, 0xe0a000)
+  return uidPrefix(VisionTypeEnum[visionType].split("_")[1]?.slice(0, 4)?.padEnd(4, " ") || "????", player, 0xe0a000)
 }
 
 export default class EntityManager extends BaseClass {
@@ -77,7 +77,7 @@ export default class EntityManager extends BaseClass {
     if (entityIdCounter[protEntityType] == null) entityIdCounter[protEntityType] = Math.floor(Math.random() * 0x10000)
 
     if (forceSetId != null) {
-      entityIdCounter[protEntityType] = forceSetId & 0xFFFFFF
+      entityIdCounter[protEntityType] = forceSetId & 0xffffff
       return forceSetId
     }
 
@@ -103,7 +103,7 @@ export default class EntityManager extends BaseClass {
 
     return (
       isOnScene &&
-      (state & 0xF0FF) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE) &&
+      (state & 0xf0ff) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_ENTER_SCENE_DONE) &&
       entity.distanceTo2D(currentAvatar) <= viewDistance &&
       scene === currentScene &&
       (loaded || this.isGridAvailable(player, entityType, gridHash))
@@ -115,7 +115,7 @@ export default class EntityManager extends BaseClass {
     return !loadedEntityIdList.includes(entity.entityId) && this.isEntityLoadable(player, entity, false)
   }
 
-  private canUnloadEntity(player: Player, entity: Entity, force: boolean = false) {
+  private canUnloadEntity(player: Player, entity: Entity, force = false) {
     const { loadedEntityIdList } = player
     return loadedEntityIdList.includes(entity.entityId) && (force || !this.isEntityLoadable(player, entity, true))
   }
@@ -128,7 +128,7 @@ export default class EntityManager extends BaseClass {
 
     const { nearbyHash, entityTypeMap } = (entityGridMap[hash] = entityGridMap[hash] || {
       nearbyHash: [],
-      entityTypeMap: {}
+      entityTypeMap: {},
     })
     const entityMap = (entityTypeMap[entityType] = entityTypeMap[entityType] || {})
 
@@ -170,7 +170,12 @@ export default class EntityManager extends BaseClass {
     entity.gridHash = null
   }
 
-  private playerLoadEntity(player: Player, entity: Entity, visionType: VisionTypeEnum, param?: number): EntityLoadState {
+  private playerLoadEntity(
+    player: Player,
+    entity: Entity,
+    visionType: VisionTypeEnum,
+    param?: number
+  ): EntityLoadState {
     const { loadedEntityIdList } = player
     const { entityId } = entity
 
@@ -185,11 +190,16 @@ export default class EntityManager extends BaseClass {
 
     return {
       stateChanged: canLoad,
-      loaded: loadedEntityIdList.includes(entityId)
+      loaded: loadedEntityIdList.includes(entityId),
     }
   }
 
-  private playerUnloadEntity(player: Player, entity: Entity, visionType: VisionTypeEnum, force: boolean = false): EntityLoadState {
+  private playerUnloadEntity(
+    player: Player,
+    entity: Entity,
+    visionType: VisionTypeEnum,
+    force = false
+  ): EntityLoadState {
     const { loadedEntityIdList } = player
     const { entityId } = entity
 
@@ -204,14 +214,14 @@ export default class EntityManager extends BaseClass {
 
     return {
       stateChanged: canUnload,
-      loaded: loadedEntityIdList.includes(entityId)
+      loaded: loadedEntityIdList.includes(entityId),
     }
   }
 
   init() {
     const { scene } = this
 
-    this.viewDistance = scene.type === 'SCENE_WORLD' ? WORLD_VIEW_DIST : DEFAULT_VIEW_DIST
+    this.viewDistance = scene.type === "SCENE_WORLD" ? WORLD_VIEW_DIST : DEFAULT_VIEW_DIST
   }
 
   async destroy() {
@@ -219,7 +229,7 @@ export default class EntityManager extends BaseClass {
     for (const key in registeredEntityMap) await this.unregister(registeredEntityMap[key], true)
   }
 
-  getEntity(entityId: number, onScene: boolean = false): Entity | null {
+  getEntity(entityId: number, onScene = false): Entity | null {
     const entity = this.registeredEntityMap[entityId]
     if (!entity || (onScene && !entity.isOnScene)) return null
 
@@ -260,20 +270,20 @@ export default class EntityManager extends BaseClass {
 
     this.registeredEntityMap[entityId] = entity
 
-    await entity.emit('Register')
+    await entity.emit("Register")
 
-    logger.verbose('message.entity.debug.register', entityId)
+    logger.verbose("message.entity.debug.register", entityId)
   }
 
-  async unregister(entity: Entity, batch: boolean = false): Promise<void> {
+  async unregister(entity: Entity, batch = false): Promise<void> {
     const { manager, entityId } = entity
 
     if (manager !== this) return
     if (this.getEntity(entityId, true)) await this.remove(entity, VisionTypeEnum.VISION_REMOVE, undefined, batch)
 
-    logger.verbose('message.entity.debug.unregister', entityId)
+    logger.verbose("message.entity.debug.unregister", entityId)
 
-    await entity.emit('Unregister')
+    await entity.emit("Unregister")
 
     delete this.registeredEntityMap[entityId]
 
@@ -281,7 +291,13 @@ export default class EntityManager extends BaseClass {
     entity.entityId = null
   }
 
-  async add(entity: Entity, visionType: VisionTypeEnum = VisionTypeEnum.VISION_BORN, param?: number, seqId?: number, batch: boolean = false): Promise<void> {
+  async add(
+    entity: Entity,
+    visionType: VisionTypeEnum = VisionTypeEnum.VISION_BORN,
+    param?: number,
+    seqId?: number,
+    batch = false
+  ): Promise<void> {
     if (entity.manager !== this) await this.register(entity)
 
     const { scene } = this
@@ -296,8 +312,8 @@ export default class EntityManager extends BaseClass {
     motion.sceneTime = null
     motion.reliableSeq = null
 
-    if (batch) logger.verbose('message.entity.debug.add', entityId)
-    else logger.debug('message.entity.debug.add', entityId)
+    if (batch) logger.verbose("message.entity.debug.add", entityId)
+    else logger.debug("message.entity.debug.add", entityId)
 
     for (const player of playerList) {
       const { stateChanged } = this.playerLoadEntity(player, entity, visionType, param)
@@ -305,11 +321,16 @@ export default class EntityManager extends BaseClass {
     }
 
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)
-    await entity.emit('OnScene')
+    await entity.emit("OnScene")
   }
 
-  async remove(entity: Entity | number, visionType: VisionTypeEnum = VisionTypeEnum.VISION_MISS, seqId?: number, batch: boolean = false): Promise<void> {
-    const targetEntity = typeof entity === 'number' ? this.getEntity(entity) : entity
+  async remove(
+    entity: Entity | number,
+    visionType: VisionTypeEnum = VisionTypeEnum.VISION_MISS,
+    seqId?: number,
+    batch = false
+  ): Promise<void> {
+    const targetEntity = typeof entity === "number" ? this.getEntity(entity) : entity
 
     if (targetEntity == null) return
 
@@ -321,8 +342,8 @@ export default class EntityManager extends BaseClass {
     targetEntity.authorityPeerId = null
     targetEntity.isOnScene = false
 
-    if (batch) logger.verbose('message.entity.debug.remove', entityId)
-    else logger.debug('message.entity.debug.remove', entityId)
+    if (batch) logger.verbose("message.entity.debug.remove", entityId)
+    else logger.debug("message.entity.debug.remove", entityId)
 
     for (const player of playerList) {
       const { stateChanged } = this.playerUnloadEntity(player, targetEntity, visionType, true)
@@ -334,13 +355,13 @@ export default class EntityManager extends BaseClass {
     await this.updateGrid(entityType, gridHash)
 
     await EntityAuthorityChange.broadcastNotify(broadcastContextList)
-    await targetEntity.emit('OffScene')
+    await targetEntity.emit("OffScene")
   }
 
   async replace(oldEntity: Entity, newEntity: Entity, seqId?: number) {
     const { entityId: oldEntityId } = oldEntity
 
-    logger.debug('message.entity.debug.replace', oldEntity.entityId, newEntity.entityId)
+    logger.debug("message.entity.debug.replace", oldEntity.entityId, newEntity.entityId)
 
     await this.remove(oldEntity, VisionTypeEnum.VISION_REPLACE, seqId)
     await this.add(newEntity, VisionTypeEnum.VISION_REPLACE, oldEntityId, seqId)
@@ -351,9 +372,9 @@ export default class EntityManager extends BaseClass {
     const { playerList } = scene
     const { entityId, entityType, gridHash: oldHash } = entity
 
-    logger.debug('message.entity.debug.updateEntity', entityId)
+    logger.debug("message.entity.debug.updateEntity", entityId)
 
-    const loadedPlayerList = playerList.filter(p => p.loadedEntityIdList.includes(entityId))
+    const loadedPlayerList = playerList.filter((p) => p.loadedEntityIdList.includes(entityId))
 
     // Move to new grid
     for (const player of loadedPlayerList) player.unloadEntity(entity)
@@ -368,7 +389,7 @@ export default class EntityManager extends BaseClass {
 
     if (entityType === EntityTypeEnum.Avatar) await this.updateAllEntity((<Avatar>entity).player)
 
-    scene.emit('EntityUpdate', entity)
+    scene.emit("EntityUpdate", entity)
   }
 
   async updateGrid(entityType: EntityTypeEnum, gridHash: number) {
@@ -407,7 +428,7 @@ export default class EntityManager extends BaseClass {
       seenEntityIdList.push(entityId)
     }
 
-    const missingEntityIdList = loadedEntityIdList.filter(entityId => !seenEntityIdList.includes(entityId))
+    const missingEntityIdList = loadedEntityIdList.filter((entityId) => !seenEntityIdList.includes(entityId))
     for (const entityId of missingEntityIdList) {
       const entity = this.getEntity(entityId, true)
       if (!entity) continue
@@ -449,13 +470,14 @@ export default class EntityManager extends BaseClass {
 
     for (const visionType in appearQueue) {
       const param = paramBuffer[visionType]
-      const queue = appearQueue[visionType].splice(0).filter(entity => entity.manager === this)
+      const queue = appearQueue[visionType].splice(0).filter((entity) => entity.manager === this)
       if (queue.length === 0) continue
 
       if (queue.length <= 4) {
-        for (const entity of queue) logger.debug('generic.param4', getPrefix(player, parseInt(visionType)), 'A', 'EntityID:', entity.entityId)
+        for (const entity of queue)
+          logger.debug("generic.param4", getPrefix(player, parseInt(visionType)), "A", "EntityID:", entity.entityId)
       } else {
-        logger.debug('generic.param3', getPrefix(player, parseInt(visionType)), 'A', `x${queue.length}`)
+        logger.debug("generic.param3", getPrefix(player, parseInt(visionType)), "A", `x${queue.length}`)
       }
 
       await SceneEntityAppear.sendNotify(context, queue, parseInt(visionType), param)
@@ -473,9 +495,10 @@ export default class EntityManager extends BaseClass {
       if (queue.length === 0) continue
 
       if (queue.length <= 4) {
-        for (const entityId of queue) logger.debug('generic.param4', getPrefix(player, parseInt(visionType)), 'D', 'EntityID:', entityId)
+        for (const entityId of queue)
+          logger.debug("generic.param4", getPrefix(player, parseInt(visionType)), "D", "EntityID:", entityId)
       } else {
-        logger.debug('generic.param3', getPrefix(player, parseInt(visionType)), 'D', `x${queue.length}`)
+        logger.debug("generic.param3", getPrefix(player, parseInt(visionType)), "D", `x${queue.length}`)
       }
 
       await SceneEntityDisappear.sendNotify(context, queue.splice(0), parseInt(visionType))

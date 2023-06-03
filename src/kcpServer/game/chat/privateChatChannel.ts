@@ -1,10 +1,11 @@
-import PrivateChat, { PrivateChatReq } from '#/packets/PrivateChat'
-import { ChatManager } from '$/manager/chatManager'
-import Player from '$/player'
-import { ChatInfo } from '@/types/proto'
-import { getTimeSeconds } from '@/utils/time'
-import ChatChannel from './chatChannel'
-import CommandHandler from './commandHandler'
+import ChatChannel from "./chatChannel"
+import CommandHandler from "./commandHandler"
+
+import PrivateChat, { PrivateChatReq } from "#/packets/PrivateChat"
+import { ChatManager } from "$/manager/chatManager"
+import Player from "$/player"
+import { ChatInfo } from "@/types/proto"
+import { getTimeSeconds } from "@/utils/time"
 
 export default class PrivateChatChannel extends ChatChannel {
   privateChatId: string
@@ -27,7 +28,7 @@ export default class PrivateChatChannel extends ChatChannel {
     const chatInfo: ChatInfo = {
       time: getTimeSeconds(),
       uid: sender.uid,
-      toUid: req.targetUid
+      toUid: req.targetUid,
     }
 
     if (req.text) chatInfo.text = req.text
@@ -37,16 +38,16 @@ export default class PrivateChatChannel extends ChatChannel {
   }
 
   static getId(sender: Player, targetUid: number): string {
-    return [sender.uid, targetUid].sort((a, b) => Math.sign(a - b)).join('-')
+    return [sender.uid, targetUid].sort((a, b) => Math.sign(a - b)).join("-")
   }
 
   async handleMessage(chatInfo: ChatInfo, seqId?: number): Promise<void> {
     // set toUid if not set
     if (chatInfo.toUid == null) {
-      chatInfo.toUid = this.playerList.find(player => player.uid !== chatInfo.uid).uid
+      chatInfo.toUid = this.playerList.find((player) => player.uid !== chatInfo.uid).uid
     }
 
-    const contextList = this.playerList.map(player => {
+    const contextList = this.playerList.map((player) => {
       const ctx = player.context
       ctx.seqId = seqId || null
       return ctx

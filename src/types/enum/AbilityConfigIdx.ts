@@ -9,5 +9,5 @@ export enum AbilityConfigIdxEnum {
   OnDetach = 7,
   OnAvatarIn = 8,
   OnAvatarOut = 9,
-  OnTriggerAvatarRay = 10
+  OnTriggerAvatarRay = 10,
 }

@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Avatar from '$/entity/avatar'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Avatar from "$/entity/avatar"
 
 export interface AvatarSkillDepotChangeNotify {
   avatarGuid: string
@@ -14,7 +14,7 @@ export interface AvatarSkillDepotChangeNotify {
 
 class AvatarSkillDepotChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarSkillDepotChange')
+    super("AvatarSkillDepotChange")
   }
 
   async sendNotify(context: PacketContext, avatar: Avatar): Promise<void> {
@@ -29,7 +29,7 @@ class AvatarSkillDepotChangePacket extends Packet implements PacketInterface {
       proudSkillList: inherentProudSkillList,
       coreProudSkillLevel: 1,
       skillLevelMap,
-      proudSkillExtraLevelMap
+      proudSkillExtraLevelMap,
     }
 
     await super.sendNotify(context, notifyData)
@@ -41,4 +41,4 @@ class AvatarSkillDepotChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarSkillDepotChangePacket
-export default (() => packet = packet || new AvatarSkillDepotChangePacket())()
+export default (() => (packet = packet || new AvatarSkillDepotChangePacket()))()

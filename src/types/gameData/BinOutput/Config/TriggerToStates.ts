@@ -1,4 +1,4 @@
-import BowDrawTime from './BowDrawTime'
+import BowDrawTime from "./BowDrawTime"
 
 export default interface TriggerToStates {
   Trigger: string

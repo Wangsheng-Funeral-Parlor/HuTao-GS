@@ -1,4 +1,4 @@
-import ConfigAIFacingMoveWeight from './ConfigAIFacingMoveWeight'
+import ConfigAIFacingMoveWeight from "./ConfigAIFacingMoveWeight"
 
 export default interface ConfigAIFacingMoveData {
   SpeedLevel: number

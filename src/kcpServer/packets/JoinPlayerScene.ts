@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface JoinPlayerSceneReq {
   targetUid: number
@@ -12,9 +12,9 @@ export interface JoinPlayerSceneRsp {
 
 class JoinPlayerScenePacket extends Packet implements PacketInterface {
   constructor() {
-    super('JoinPlayerScene', {
+    super("JoinPlayerScene", {
       reqWaitState: ClientStateEnum.POST_LOGIN,
-      reqWaitStatePass: true
+      reqWaitStatePass: true,
     })
   }
 
@@ -28,7 +28,7 @@ class JoinPlayerScenePacket extends Packet implements PacketInterface {
     const { hostWorld } = targetPlayer
 
     await this.response(context, {
-      retcode: hostWorld.mpMode ? RetcodeEnum.RET_SUCC : RetcodeEnum.RET_JOIN_OTHER_WAIT
+      retcode: hostWorld.mpMode ? RetcodeEnum.RET_SUCC : RetcodeEnum.RET_JOIN_OTHER_WAIT,
     })
 
     const hostAlreadyInMp = hostWorld.mpMode
@@ -48,4 +48,4 @@ class JoinPlayerScenePacket extends Packet implements PacketInterface {
 }
 
 let packet: JoinPlayerScenePacket
-export default (() => packet = packet || new JoinPlayerScenePacket())()
+export default (() => (packet = packet || new JoinPlayerScenePacket()))()

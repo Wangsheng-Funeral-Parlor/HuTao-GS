@@ -1,6 +1,9 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import PlayerGameTime from "./PlayerGameTime"
+import SceneTime from "./SceneTime"
+
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PlayerSetPauseReq {
   isPaused: boolean
@@ -12,9 +15,9 @@ export interface PlayerSetPauseRsp {
 
 class PlayerSetPausePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerSetPause', {
+    super("PlayerSetPause", {
       reqState: ClientStateEnum.ENTER_SCENE,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -27,6 +30,9 @@ class PlayerSetPausePacket extends Packet implements PacketInterface {
     }
 
     await this.response(context, { retcode: RetcodeEnum.RET_SUCC })
+
+    await PlayerGameTime.sendNotify(context)
+    await SceneTime.sendNotify(context)
   }
 
   async response(context: PacketContext, data: PlayerSetPauseRsp): Promise<void> {
@@ -35,4 +41,4 @@ class PlayerSetPausePacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerSetPausePacket
-export default (() => packet = packet || new PlayerSetPausePacket())()
+export default (() => (packet = packet || new PlayerSetPausePacket()))()

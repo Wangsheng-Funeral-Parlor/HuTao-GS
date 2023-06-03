@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface SceneAudioNotify {
   sourceUid: number
@@ -11,9 +11,9 @@ export interface SceneAudioNotify {
 
 class SceneAudioPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneAudio', {
+    super("SceneAudio", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStateMask: 0xF0FF
+      notifyStateMask: 0xf0ff,
     })
   }
 
@@ -21,7 +21,10 @@ class SceneAudioPacket extends Packet implements PacketInterface {
     const { broadcastContextList } = context.player.currentScene
     const { sourceUid } = data
 
-    await this.broadcastNotify(broadcastContextList.filter(t => t.player.uid !== sourceUid), data)
+    await this.broadcastNotify(
+      broadcastContextList.filter((t) => t.player.uid !== sourceUid),
+      data
+    )
   }
 
   async sendNotify(context: PacketContext, data: SceneAudioNotify): Promise<void> {
@@ -34,4 +37,4 @@ class SceneAudioPacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneAudioPacket
-export default (() => packet = packet || new SceneAudioPacket())()
+export default (() => (packet = packet || new SceneAudioPacket()))()

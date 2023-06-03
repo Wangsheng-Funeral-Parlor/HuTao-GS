@@ -1,17 +1,23 @@
-import AvatarFightPropUpdate from '#/packets/AvatarFightPropUpdate'
-import EntityFightPropChangeReason, { EntityFightPropChangeReasonNotify } from '#/packets/EntityFightPropChangeReason'
-import EntityFightPropUpdate from '#/packets/EntityFightPropUpdate'
-import Reliquary from '$/equip/reliquary'
-import Weapon from '$/equip/weapon'
-import { CurveArithEnum, ElemTypeEnum, FightPropEnum } from '@/types/enum'
-import { EntityFightPropConfig } from '@/types/game'
-import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
-import { FightPropPair } from '@/types/proto'
-import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
-import PropsUserData from '@/types/user/PropsUserData'
-import Entity from '.'
-import Avatar from './avatar'
-import Monster from './monster'
+import Avatar from "./avatar"
+import Monster from "./monster"
+
+import Entity from "."
+
+import AvatarFightPropUpdate from "#/packets/AvatarFightPropUpdate"
+import EntityFightPropChangeReason, { EntityFightPropChangeReasonNotify } from "#/packets/EntityFightPropChangeReason"
+import EntityFightPropUpdate from "#/packets/EntityFightPropUpdate"
+import Reliquary from "$/equip/reliquary"
+import Weapon from "$/equip/weapon"
+import Config from "@/config"
+import Logger from "@/logger"
+import { CurveArithEnum, ElemTypeEnum, FightPropEnum } from "@/types/enum"
+import { EntityFightPropConfig } from "@/types/game"
+import { CurveExcelConfig } from "@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig"
+import { FightPropPair } from "@/types/proto"
+import { ChangeEnergyReasonEnum, ChangeHpReasonEnum, ProtEntityTypeEnum } from "@/types/proto/enum"
+import PropsUserData from "@/types/user/PropsUserData"
+
+const logger = new Logger("fightProp", 0xf5c242)
 
 const ElemTypeFightPropMaxEnergyMap = {
   [ElemTypeEnum.FIRE]: FightPropEnum.FIGHT_PROP_MAX_FIRE_ENERGY,
@@ -20,7 +26,7 @@ const ElemTypeFightPropMaxEnergyMap = {
   [ElemTypeEnum.GRASS]: FightPropEnum.FIGHT_PROP_MAX_GRASS_ENERGY,
   [ElemTypeEnum.WIND]: FightPropEnum.FIGHT_PROP_MAX_WIND_ENERGY,
   [ElemTypeEnum.ICE]: FightPropEnum.FIGHT_PROP_MAX_ICE_ENERGY,
-  [ElemTypeEnum.ROCK]: FightPropEnum.FIGHT_PROP_MAX_ROCK_ENERGY
+  [ElemTypeEnum.ROCK]: FightPropEnum.FIGHT_PROP_MAX_ROCK_ENERGY,
 }
 
 const ElemTypeFightPropCurEnergyMap = {
@@ -30,7 +36,7 @@ const ElemTypeFightPropCurEnergyMap = {
   [ElemTypeEnum.GRASS]: FightPropEnum.FIGHT_PROP_CUR_GRASS_ENERGY,
   [ElemTypeEnum.WIND]: FightPropEnum.FIGHT_PROP_CUR_WIND_ENERGY,
   [ElemTypeEnum.ICE]: FightPropEnum.FIGHT_PROP_CUR_ICE_ENERGY,
-  [ElemTypeEnum.ROCK]: FightPropEnum.FIGHT_PROP_CUR_ROCK_ENERGY
+  [ElemTypeEnum.ROCK]: FightPropEnum.FIGHT_PROP_CUR_ROCK_ENERGY,
 }
 
 const DYNAMIC_PROPS = [
@@ -66,7 +72,7 @@ const DYNAMIC_PROPS = [
   FightPropEnum.FIGHT_PROP_SPEED_PERCENT,
   FightPropEnum.FIGHT_PROP_PHYSICAL_SUB_HURT,
   FightPropEnum.FIGHT_PROP_ADD_HURT,
-  FightPropEnum.FIGHT_PROP_SUB_HURT
+  FightPropEnum.FIGHT_PROP_SUB_HURT,
 ]
 
 export interface FightPropChangeReason {
@@ -92,7 +98,7 @@ export default class FightProp {
     }
   }
 
-  async update(notify: boolean = false): Promise<void> {
+  async update(notify = false): Promise<void> {
     const curve = this.getCurve()
     if (!curve) return
 
@@ -103,7 +109,10 @@ export default class FightProp {
       return
     }
 
-    const hpPercent = this.get(FightPropEnum.FIGHT_PROP_MAX_HP) > 0 ? (this.get(FightPropEnum.FIGHT_PROP_CUR_HP) / this.get(FightPropEnum.FIGHT_PROP_MAX_HP)) : 1
+    const hpPercent =
+      this.get(FightPropEnum.FIGHT_PROP_MAX_HP) > 0
+        ? this.get(FightPropEnum.FIGHT_PROP_CUR_HP) / this.get(FightPropEnum.FIGHT_PROP_MAX_HP)
+        : 1
 
     this.updateBaseStats(curve)
 
@@ -146,7 +155,7 @@ export default class FightProp {
     const val = this.get(FightPropEnum.FIGHT_PROP_HP)
     const per = this.get(FightPropEnum.FIGHT_PROP_HP_PERCENT)
 
-    this.set(FightPropEnum.FIGHT_PROP_MAX_HP, (base * (1 + per)) + val)
+    this.set(FightPropEnum.FIGHT_PROP_MAX_HP, base * (1 + per) + val)
   }
 
   private updateAtkStats() {
@@ -154,7 +163,7 @@ export default class FightProp {
     const val = this.get(FightPropEnum.FIGHT_PROP_ATTACK)
     const per = this.get(FightPropEnum.FIGHT_PROP_ATTACK_PERCENT)
 
-    this.set(FightPropEnum.FIGHT_PROP_CUR_ATTACK, (base * (1 + per)) + val)
+    this.set(FightPropEnum.FIGHT_PROP_CUR_ATTACK, base * (1 + per) + val)
   }
 
   private updateDefStats() {
@@ -162,14 +171,28 @@ export default class FightProp {
     const val = this.get(FightPropEnum.FIGHT_PROP_DEFENSE)
     const per = this.get(FightPropEnum.FIGHT_PROP_DEFENSE_PERCENT)
 
-    this.set(FightPropEnum.FIGHT_PROP_CUR_DEFENSE, (base * (1 + per)) + val)
+    this.set(FightPropEnum.FIGHT_PROP_CUR_DEFENSE, base * (1 + per) + val)
   }
 
   private updateEnergyStats() {
-    const costElemType = this.getCostElemType()
-    const maxEnergy = this.getCostElemVal()
-    const energyPercent = this.getMaxEnergy() > 0 ? (this.getCurEnergy() / this.getMaxEnergy()) : 1
+    let costElemType = this.getCostElemType()
+    let maxEnergy = this.getCostElemVal()
+    let energyPercent = this.getMaxEnergy() > 0 ? this.getCurEnergy() / this.getMaxEnergy() : 1
+    const { res_developer } = Config
 
+    logger.debug("updateEnergyStats:", costElemType, maxEnergy, energyPercent, this.entity.name)
+
+    if (costElemType == 0 && maxEnergy == 0) {
+      for (const data in res_developer) {
+        if (this.entity.name.toUpperCase() == data.toUpperCase()) {
+          logger.debug(data, res_developer, res_developer[data])
+          costElemType = res_developer[data][0]
+          maxEnergy = res_developer[data][1] || 1
+          energyPercent = res_developer[data][2] || 1
+        }
+      }
+    }
+    if (costElemType == 0 && maxEnergy == 0) logger.warn("updateEnergyStats: Skill Data not enough:", this.entity.name)
     // Max energy
     this.set(ElemTypeFightPropMaxEnergyMap[costElemType], maxEnergy)
 
@@ -208,7 +231,7 @@ export default class FightProp {
     }
   }
 
-  private applyCurve(base: number, curveArith: CurveArithEnum, value: number = 0) {
+  private applyCurve(base: number, curveArith: CurveArithEnum, value = 0) {
     switch (curveArith) {
       case CurveArithEnum.ARITH_ADD:
         return base + value
@@ -222,7 +245,7 @@ export default class FightProp {
   private calcBaseAttack(curve: CurveExcelConfig) {
     const { AttackBase } = this.entity.config
     const curveType = this.getPropCurve(FightPropEnum.FIGHT_PROP_BASE_ATTACK)?.Type
-    const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
+    const curveInfo = curve.CurveInfos.find((i) => i.Type === curveType)
     if (!curveInfo) return AttackBase
     return this.applyCurve(AttackBase, CurveArithEnum[curveInfo.Arith], curveInfo.Value)
   }
@@ -230,7 +253,7 @@ export default class FightProp {
   private calcBaseDefense(curve: CurveExcelConfig) {
     const { DefenseBase } = this.entity.config
     const curveType = this.getPropCurve(FightPropEnum.FIGHT_PROP_BASE_DEFENSE)?.Type
-    const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
+    const curveInfo = curve.CurveInfos.find((i) => i.Type === curveType)
     if (!curveInfo) return DefenseBase
     return this.applyCurve(DefenseBase, CurveArithEnum[curveInfo.Arith], curveInfo.Value)
   }
@@ -238,7 +261,7 @@ export default class FightProp {
   private calcBaseHp(curve: CurveExcelConfig) {
     const { HpBase } = this.entity.config
     const curveType = this.getPropCurve(FightPropEnum.FIGHT_PROP_BASE_HP)?.Type
-    const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
+    const curveInfo = curve.CurveInfos.find((i) => i.Type === curveType)
     if (!curveInfo) return HpBase
     return this.applyCurve(HpBase, CurveArithEnum[curveInfo.Arith], curveInfo.Value)
   }
@@ -250,7 +273,7 @@ export default class FightProp {
 
       const propCurve = this.getPropCurve(prop)
       const curveType = propCurve?.Type
-      const curveInfo = curve.CurveInfos.find(i => i.Type === curveType)
+      const curveInfo = curve.CurveInfos.find((i) => i.Type === curveType)
       if (!curveInfo) continue
 
       this.set(prop, this.applyCurve(propCurve.Value, CurveArithEnum[curveInfo.Arith], curveInfo.Value))
@@ -260,14 +283,14 @@ export default class FightProp {
   private getCurve() {
     const { entity } = this
     const { level, growCurve } = entity
-    return growCurve.find(c => c.Level === level)
+    return growCurve.find((c) => c.Level === level)
   }
 
-  private getPropCurve(prop: FightPropEnum): { Type: string, Value?: number } {
+  private getPropCurve(prop: FightPropEnum): { Type: string; Value?: number } {
     const { PropGrowCurves } = <EntityFightPropConfig>(this.entity.config || {})
     if (PropGrowCurves == null) return null
 
-    const propCurve = PropGrowCurves.find(c => FightPropEnum[c.PropType] === prop)
+    const propCurve = PropGrowCurves.find((c) => FightPropEnum[c.PropType] === prop)
     if (!propCurve) return null
 
     if (propCurve.Value == null) return { Type: propCurve.Type }
@@ -280,9 +303,9 @@ export default class FightProp {
 
     switch (entityType) {
       case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
-        return [(entity as Avatar).weapon].filter(weapon => weapon != null)
+        return [(<Avatar>entity).weapon].filter((weapon) => weapon != null)
       case ProtEntityTypeEnum.PROT_ENTITY_MONSTER:
-        return (entity as Monster).weaponList
+        return (<Monster>entity).weaponList
       default:
         return []
     }
@@ -298,11 +321,11 @@ export default class FightProp {
   }
 
   private getCostElemVal(): number {
-    return (this.entity as Avatar).skillManager.costElemVal
+    return (<Avatar>this.entity).skillManager.costElemVal
   }
 
   private getCostElemType(): ElemTypeEnum {
-    return (this.entity as Avatar).skillManager.costElemType
+    return (<Avatar>this.entity).skillManager.costElemType
   }
 
   private getMaxEnergy(): number {
@@ -313,12 +336,18 @@ export default class FightProp {
     return this.get(ElemTypeFightPropCurEnergyMap[this.getCostElemType()])
   }
 
-  async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+  async drainEnergy(notify = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     await this.set(type, 0, notify, { changeEnergyReason }, seqId)
   }
 
-  async gainEnergy(val: number, flat: boolean = false, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+  async gainEnergy(
+    val: number,
+    flat = false,
+    notify = false,
+    changeEnergyReason?: ChangeEnergyReasonEnum,
+    seqId?: number
+  ): Promise<void> {
     const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     const gainAmount = Math.min(
       this.getCostElemVal() - this.get(type),
@@ -327,38 +356,49 @@ export default class FightProp {
     await this.add(type, gainAmount, notify, { changeEnergyReason }, seqId)
   }
 
-  async rechargeEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+  async rechargeEnergy(notify = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     const type = ElemTypeFightPropCurEnergyMap[this.getCostElemType()]
     await this.set(type, this.getCostElemVal(), notify, { changeEnergyReason }, seqId)
   }
 
-  async takeDamage(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<boolean> {
-    const damage = Math.min(
-      this.get(FightPropEnum.FIGHT_PROP_CUR_HP),
-      Math.max(0, val)
-    )
-    if (isFinite(damage) && damage > 0) this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason }, seqId)
+  async takeDamage(val: number, notify = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<boolean> {
+    const damage = Math.min(this.get(FightPropEnum.FIGHT_PROP_CUR_HP), Math.max(0, val))
+    if (isFinite(damage) && damage > 0)
+      this.add(FightPropEnum.FIGHT_PROP_CUR_HP, -damage, notify, { changeHpReason }, seqId)
 
     return this.get(FightPropEnum.FIGHT_PROP_CUR_HP) <= 0
   }
 
-  async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+  async heal(val: number, notify = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
     const healAmount = Math.min(
-      this.get(FightPropEnum.FIGHT_PROP_MAX_HP) - this.get(FightPropEnum.FIGHT_PROP_CUR_HP)
-      , Math.max(0, val)
+      this.get(FightPropEnum.FIGHT_PROP_MAX_HP) - this.get(FightPropEnum.FIGHT_PROP_CUR_HP),
+      Math.max(0, val)
     )
-    if (isFinite(healAmount) && healAmount > 0) this.add(FightPropEnum.FIGHT_PROP_CUR_HP, healAmount, notify, { changeHpReason }, seqId)
+    if (isFinite(healAmount) && healAmount > 0)
+      this.add(FightPropEnum.FIGHT_PROP_CUR_HP, healAmount, notify, { changeHpReason }, seqId)
   }
 
-  async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
-    this.set(FightPropEnum.FIGHT_PROP_CUR_HP, this.get(FightPropEnum.FIGHT_PROP_MAX_HP), notify, { changeHpReason }, seqId)
+  async fullHeal(notify = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+    this.set(
+      FightPropEnum.FIGHT_PROP_CUR_HP,
+      this.get(FightPropEnum.FIGHT_PROP_MAX_HP),
+      notify,
+      { changeHpReason },
+      seqId
+    )
   }
 
   get(type: number) {
     return this.propMap[type] || 0
   }
 
-  async set(type: number, val: number, notify: boolean = false, changeReason?: FightPropChangeReason, seqId?: number): Promise<void> {
+  async set(
+    type: number,
+    val: number,
+    notify = false,
+    changeReason?: FightPropChangeReason,
+    seqId?: number
+  ): Promise<void> {
     const oldVal = this.get(type)
     this.propMap[type] = val
 
@@ -372,7 +412,7 @@ export default class FightProp {
       entityId,
       propType: type,
       propDelta: val - oldVal,
-      paramList: []
+      paramList: [],
     }
 
     const { changeHpReason, changeEnergyReason } = changeReason
@@ -385,11 +425,17 @@ export default class FightProp {
     await EntityFightPropChangeReason.broadcastNotify(broadcastContextList, notifyData)
   }
 
-  async add(type: number, val: number, notify: boolean = false, changeReason?: FightPropChangeReason, seqId?: number): Promise<void> {
+  async add(
+    type: number,
+    val: number,
+    notify = false,
+    changeReason?: FightPropChangeReason,
+    seqId?: number
+  ): Promise<void> {
     await this.set(type, this.get(type) + val, notify, changeReason, seqId)
   }
 
-  clear(dynamic: boolean = false) {
+  clear(dynamic = false) {
     const { propMap } = this
     for (const type in propMap) {
       if (!dynamic || DYNAMIC_PROPS.includes(parseInt(type))) delete propMap[type]
@@ -405,12 +451,12 @@ export default class FightProp {
       for (const ctx of broadcastContextList) ctx.seqId = seqId
       await EntityFightPropUpdate.broadcastNotify(broadcastContextList, {
         entityId,
-        fightPropMap
+        fightPropMap,
       })
     } else if (entity.protEntityType === ProtEntityTypeEnum.PROT_ENTITY_AVATAR) {
-      await AvatarFightPropUpdate.sendNotify((entity as Avatar).player.context, {
-        avatarGuid: (entity as Avatar).guid.toString(),
-        fightPropMap
+      await AvatarFightPropUpdate.sendNotify((<Avatar>entity).player.context, {
+        avatarGuid: (<Avatar>entity).guid.toString(),
+        fightPropMap,
       })
     }
   }
@@ -422,7 +468,7 @@ export default class FightProp {
     for (const type in propMap) {
       list.push({
         propType: type,
-        propValue: propMap[type]
+        propValue: propMap[type],
       })
     }
 

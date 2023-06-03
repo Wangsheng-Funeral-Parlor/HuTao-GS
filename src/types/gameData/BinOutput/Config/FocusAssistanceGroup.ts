@@ -1,4 +1,4 @@
-import FocusAssistance from './FocusAssistance'
+import FocusAssistance from "./FocusAssistance"
 
 export default interface FocusAssistanceGroup {
   Ps4: FocusAssistance

@@ -1,6 +1,6 @@
-import ConfigBaseTalentMixin from '.'
+import ConfigBaseTalentMixin from "."
 
 export default interface UnlockControllerConditions extends ConfigBaseTalentMixin {
-  $type: 'UnlockControllerConditions'
+  $type: "UnlockControllerConditions"
   ConditionName: string
 }

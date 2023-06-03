@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import PrivateChatChannel from '$/chat/privateChatChannel'
-import { ClientStateEnum } from '@/types/enum'
-import { ChatInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import PrivateChatChannel from "$/chat/privateChatChannel"
+import { ClientStateEnum } from "@/types/enum"
+import { ChatInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PrivateChatReq {
   text?: string
@@ -22,9 +22,9 @@ export interface PrivateChatNotify {
 
 class PrivateChatPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PrivateChat', {
+    super("PrivateChat", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -34,7 +34,7 @@ class PrivateChatPacket extends Packet implements PacketInterface {
     const chatInfo = PrivateChatChannel.createChatInfo(player, data)
     chatInfo.uid = player.uid
 
-    if (!await game.chatManager.sendPrivate(chatInfo)) {
+    if (!(await game.chatManager.sendPrivate(chatInfo))) {
       await this.response(context, { retcode: RetcodeEnum.RET_PLAYER_NOT_EXIST })
       return
     }
@@ -58,4 +58,4 @@ class PrivateChatPacket extends Packet implements PacketInterface {
 }
 
 let packet: PrivateChatPacket
-export default (() => packet = packet || new PrivateChatPacket())()
+export default (() => (packet = packet || new PrivateChatPacket()))()

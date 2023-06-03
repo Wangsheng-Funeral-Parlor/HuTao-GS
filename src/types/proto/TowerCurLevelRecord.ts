@@ -1,4 +1,4 @@
-import { TowerTeam } from '.'
+import { TowerTeam } from "."
 
 export interface TowerCurLevelRecord {
   curFloorId?: number

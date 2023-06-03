@@ -1,4 +1,4 @@
-import { AbilitySyncStateInfo, ServerBuff } from './'
+import { AbilitySyncStateInfo, ServerBuff } from "./"
 
 export interface AvatarEnterSceneInfo {
   avatarGuid?: string

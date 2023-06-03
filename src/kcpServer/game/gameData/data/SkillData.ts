@@ -1,33 +1,33 @@
-import Loader from '$/gameData/loader'
-import SkillDataGroup, { ProudSkillData, SkillData, SkillDepotData } from '@/types/gameData/SkillData'
+import Loader from "$/gameData/loader"
+import SkillDataGroup, { ProudSkillData, SkillData, SkillDepotData } from "@/types/gameData/SkillData"
 
 class SkillDataLoader extends Loader {
   declare data: SkillDataGroup
 
   constructor() {
-    super('SkillData')
+    super("SkillData", "message.cache.debug.skill")
   }
 
-  async getData(): Promise<SkillDataGroup> {
-    return super.getData()
+  async getData(): Promise<void> {
+    await super.getData()
   }
 
-  async getSkillDepot(id: number): Promise<SkillDepotData> {
-    return (await this.getData())?.Depot?.find(data => data.Id === id)
+  getSkillDepot(id: number): SkillDepotData {
+    return this.data?.Depot?.find((data) => data.Id === id)
   }
 
-  async getSkill(id: number): Promise<SkillData> {
-    return (await this.getData())?.Skill?.find(data => data.Id === id)
+  getSkill(id: number): SkillData {
+    return this.data?.Skill?.find((data) => data.Id === id)
   }
 
-  async getProudSkill(id: number): Promise<ProudSkillData> {
-    return (await this.getData())?.ProudSkill?.find(data => data.Id === id)
+  getProudSkill(id: number): ProudSkillData {
+    return this.data?.ProudSkill?.find((data) => data.Id === id)
   }
 
-  async getProudSkillByGroup(groupId: number, level?: number): Promise<ProudSkillData> {
-    return (await this.getData())?.ProudSkill?.find(data => data.GroupId === groupId && (level == null || data.Level === level))
+  getProudSkillByGroup(groupId: number, level?: number): ProudSkillData {
+    return this.data?.ProudSkill?.find((data) => data.GroupId === groupId && (level == null || data.Level === level))
   }
 }
 
 let loader: SkillDataLoader
-export default (() => loader = loader || new SkillDataLoader())()
+export default (() => (loader = loader || new SkillDataLoader()))()

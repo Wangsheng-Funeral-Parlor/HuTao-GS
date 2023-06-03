@@ -5,5 +5,5 @@ export enum AbilityScalarTypeEnum {
   BOOL = 3,
   TRIGGER = 4,
   STRING = 5,
-  UINT = 6
+  UINT = 6,
 }

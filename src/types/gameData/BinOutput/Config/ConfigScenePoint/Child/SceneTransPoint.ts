@@ -1,7 +1,7 @@
-import ConfigBaseScenePoint from '.'
+import ConfigBaseScenePoint from "."
 
 export default interface SceneTransPoint extends ConfigBaseScenePoint {
-  $type: 'SceneTransPoint'
+  $type: "SceneTransPoint"
   MaxSpringVolume: number
   CutsceneList: number[]
   NpcId: number

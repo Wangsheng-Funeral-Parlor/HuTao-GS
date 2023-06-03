@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ActivityInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { ActivityInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface GetActivityInfoReq {
   activityIdList: number[]
@@ -11,14 +11,14 @@ export interface GetActivityInfoRsp {
   retcode: RetcodeEnum
   activityInfoList: ActivityInfo[]
   activatedSaleIdList: number[]
-  disableTransferPointInteractionList: { key: number, value: number }[]
+  disableTransferPointInteractionList: { key: number; value: number }[]
 }
 
 class GetActivityInfoPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetActivityInfo', {
+    super("GetActivityInfo", {
       reqWaitState: ClientStateEnum.POST_LOGIN,
-      reqWaitStatePass: true
+      reqWaitStatePass: true,
     })
   }
 
@@ -30,7 +30,7 @@ class GetActivityInfoPacket extends Packet implements PacketInterface {
       retcode: RetcodeEnum.RET_SUCC,
       activityInfoList: game.activityManager.exportActivityInfoList(player, activityIdList),
       activatedSaleIdList: [],
-      disableTransferPointInteractionList: []
+      disableTransferPointInteractionList: [],
     })
   }
 
@@ -40,4 +40,4 @@ class GetActivityInfoPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetActivityInfoPacket
-export default (() => packet = packet || new GetActivityInfoPacket())()
+export default (() => (packet = packet || new GetActivityInfoPacket()))()

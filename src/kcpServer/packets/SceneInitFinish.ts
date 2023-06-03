@@ -1,23 +1,24 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import ChatChannel from '$/chat/chatChannel'
-import { ClientStateEnum, PlayerPropEnum, SystemHintTypeEnum } from '@/types/enum'
-import { RetcodeEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
-import AllMarkPoint from './AllMarkPoint'
-import HostPlayer from './HostPlayer'
-import PlayerEnterSceneInfo from './PlayerEnterSceneInfo'
-import PlayerGameTime from './PlayerGameTime'
-import PlayerProp from './PlayerProp'
-import PlayerWorldSceneInfoList from './PlayerWorldSceneInfoList'
-import SceneForceUnlock from './SceneForceUnlock'
-import ScenePlayBattleInfoList from './ScenePlayBattleInfoList'
-import ScenePlayerInfo from './ScenePlayerInfo'
-import SceneTeamUpdate from './SceneTeamUpdate'
-import SceneTime from './SceneTime'
-import ServerTime from './ServerTime'
-import SyncScenePlayTeamEntity from './SyncScenePlayTeamEntity'
-import SyncTeamEntity from './SyncTeamEntity'
-import WorldData from './WorldData'
-import WorldPlayerInfo from './WorldPlayerInfo'
+import AllMarkPoint from "./AllMarkPoint"
+import HostPlayer from "./HostPlayer"
+import PlayerEnterSceneInfo from "./PlayerEnterSceneInfo"
+import PlayerGameTime from "./PlayerGameTime"
+import PlayerProp from "./PlayerProp"
+import PlayerWorldSceneInfoList from "./PlayerWorldSceneInfoList"
+import SceneForceUnlock from "./SceneForceUnlock"
+import ScenePlayBattleInfoList from "./ScenePlayBattleInfoList"
+import ScenePlayerInfo from "./ScenePlayerInfo"
+import SceneTeamUpdate from "./SceneTeamUpdate"
+import SceneTime from "./SceneTime"
+import ServerTime from "./ServerTime"
+import SyncScenePlayTeamEntity from "./SyncScenePlayTeamEntity"
+import SyncTeamEntity from "./SyncTeamEntity"
+import WorldData from "./WorldData"
+import WorldPlayerInfo from "./WorldPlayerInfo"
+
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import ChatChannel from "$/chat/chatChannel"
+import { ClientStateEnum, PlayerPropEnum, SystemHintTypeEnum } from "@/types/enum"
+import { RetcodeEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
 
 export interface SceneInitFinishReq {
   enterSceneToken: number
@@ -30,9 +31,9 @@ export interface SceneInitFinishRsp {
 
 class SceneInitFinishPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneInitFinish', {
+    super("SceneInitFinish", {
       reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_READY,
-      reqWaitStateMask: 0xF0FF
+      reqWaitStateMask: 0xf0ff,
     })
   }
 
@@ -50,7 +51,7 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
     for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_SCENE_INIT_FINISH
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.PRE_SCENE_INIT_FINISH
 
     await ServerTime.sendNotify(context)
     await WorldPlayerInfo.broadcastNotify(broadcastContextList)
@@ -62,7 +63,12 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
 
     // Send mp join system hint
     if (!player.isHost() && player.sceneEnterType === SceneEnterTypeEnum.ENTER_OTHER) {
-      await game.chatManager.sendPublic(currentWorld, 0, ChatChannel.createSystemHint(player, SystemHintTypeEnum.CHAT_ENTER_WORLD), seqId)
+      await game.chatManager.sendPublic(
+        currentWorld,
+        0,
+        ChatChannel.createSystemHint(player, SystemHintTypeEnum.CHAT_ENTER_WORLD),
+        seqId
+      )
     }
 
     await SceneTime.broadcastNotify(broadcastContextList)
@@ -80,11 +86,11 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      enterSceneToken
+      enterSceneToken,
     })
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.SCENE_INIT_FINISH
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.SCENE_INIT_FINISH
   }
 
   async response(context: PacketContext, data: SceneInitFinishRsp): Promise<void> {
@@ -93,4 +99,4 @@ class SceneInitFinishPacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneInitFinishPacket
-export default (() => packet = packet || new SceneInitFinishPacket())()
+export default (() => (packet = packet || new SceneInitFinishPacket()))()

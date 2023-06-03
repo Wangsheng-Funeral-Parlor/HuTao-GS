@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Vector from '$/utils/vector'
-import { ClientStateEnum } from '@/types/enum'
-import { MapMarkPoint } from '@/types/proto'
-import { MarkMapOperationEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { MapMarkPoint } from "@/types/proto"
+import { MarkMapOperationEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
 
 export interface MarkMapReq {
   op: MarkMapOperationEnum
@@ -17,9 +17,9 @@ export interface MarkMapRsp {
 
 class MarkMapPacket extends Packet implements PacketInterface {
   constructor() {
-    super('MarkMap', {
+    super("MarkMap", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -31,28 +31,33 @@ class MarkMapPacket extends Packet implements PacketInterface {
     if (op === MarkMapOperationEnum.GET) {
       await this.response(context, {
         retcode: RetcodeEnum.RET_SUCC,
-        markList: []
+        markList: [],
       })
       return
     }
 
     const { sceneId, name, pos } = mark
 
-    if (op === MarkMapOperationEnum.ADD && name.indexOf('tp:') === 0) {
+    if (op === MarkMapOperationEnum.ADD) {
       const scene = await currentWorld.getScene(sceneId)
       if (!scene || Date.now() - lastTpReq < 5e3) return
 
       player.lastTpReq = Date.now()
 
-      let posY = parseInt(name.split(':')[1])
-      if (isNaN(posY)) posY = 512
+      let posY = parseInt(name) || 512
 
-      await scene.join(context, new Vector(pos.x, posY, pos.z), new Vector(), currentScene === scene ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
+      await scene.join(
+        context,
+        new Vector(pos.x, posY, pos.z),
+        new Vector(),
+        currentScene === scene ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP,
+        SceneEnterReasonEnum.TRANS_POINT
+      )
     }
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      markList: []
+      markList: [],
     })
   }
 
@@ -62,4 +67,4 @@ class MarkMapPacket extends Packet implements PacketInterface {
 }
 
 let packet: MarkMapPacket
-export default (() => packet = packet || new MarkMapPacket())()
+export default (() => (packet = packet || new MarkMapPacket()))()

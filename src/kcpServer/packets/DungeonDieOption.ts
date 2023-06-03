@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayerDieOptionEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayerDieOptionEnum, RetcodeEnum, SceneEnterReasonEnum, SceneEnterTypeEnum } from "@/types/proto/enum"
 
 export interface DungeonDieOptionReq {
   dieOption: PlayerDieOptionEnum
@@ -15,9 +15,9 @@ export interface DungeonDieOptionRsp {
 
 class DungeonDieOptionPacket extends Packet implements PacketInterface {
   constructor() {
-    super('DungeonDieOption', {
+    super("DungeonDieOption", {
       reqState: ClientStateEnum.IN_GAME | ClientStateEnum.SCENE_DUNGEON,
-      reqStateMask: 0xFF00
+      reqStateMask: 0xff00,
     })
   }
 
@@ -28,20 +28,36 @@ class DungeonDieOptionPacket extends Packet implements PacketInterface {
 
     switch (dieOption) {
       case PlayerDieOptionEnum.DIE_OPT_CANCEL:
-        if (!await player.returnToPrevScene(SceneEnterReasonEnum.DUNGEON_QUIT)) {
+        if (!(await player.returnToPrevScene(SceneEnterReasonEnum.DUNGEON_QUIT))) {
           await this.response(context, { retcode: RetcodeEnum.RET_DUNGEON_QUIT_FAIL })
           return
         }
         break
       case PlayerDieOptionEnum.DIE_OPT_REPLAY:
-        if (!await currentScene.join(context, pos.clone(), rot.clone(), SceneEnterTypeEnum.ENTER_DUNGEON_REPLAY, SceneEnterReasonEnum.DUNGEON_REPLAY)) {
+        if (
+          !(await currentScene.join(
+            context,
+            pos.clone(),
+            rot.clone(),
+            SceneEnterTypeEnum.ENTER_DUNGEON_REPLAY,
+            SceneEnterReasonEnum.DUNGEON_REPLAY
+          ))
+        ) {
           await this.response(context, { retcode: RetcodeEnum.RET_ENTER_SCENE_FAIL })
           return
         }
         break
       case PlayerDieOptionEnum.DIE_OPT_REVIVE:
         await teamManager.getTeam()?.reviveAllAvatar()
-        if (!await currentScene.join(context, pos.clone(), rot.clone(), SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.DUNGEON_REVIVE_ON_WAYPOINT)) {
+        if (
+          !(await currentScene.join(
+            context,
+            pos.clone(),
+            rot.clone(),
+            SceneEnterTypeEnum.ENTER_JUMP,
+            SceneEnterReasonEnum.DUNGEON_REVIVE_ON_WAYPOINT
+          ))
+        ) {
           await this.response(context, { retcode: RetcodeEnum.RET_ENTER_SCENE_FAIL })
           return
         }
@@ -54,7 +70,7 @@ class DungeonDieOptionPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       dieOption,
-      reviveCount: 0
+      reviveCount: 0,
     })
   }
 
@@ -64,4 +80,4 @@ class DungeonDieOptionPacket extends Packet implements PacketInterface {
 }
 
 let packet: DungeonDieOptionPacket
-export default (() => packet = packet || new DungeonDieOptionPacket())()
+export default (() => (packet = packet || new DungeonDieOptionPacket()))()

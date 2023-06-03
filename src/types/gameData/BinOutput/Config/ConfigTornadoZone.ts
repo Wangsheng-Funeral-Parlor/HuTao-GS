@@ -1,4 +1,4 @@
-import { DynamicFloat, DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
+import { DynamicFloat, DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigTornadoZone {
   ShapeName: string

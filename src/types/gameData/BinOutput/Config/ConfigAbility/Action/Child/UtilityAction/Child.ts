@@ -1,11 +1,12 @@
-import ConfigAbilityPredicate from '$DT/BinOutput/Config/ConfigAbility/Predicate'
-import ConfigBaseAbilityAction from '..'
-import ConfigAbilityAction from '../..'
+import ConfigBaseAbilityAction from ".."
+import ConfigAbilityAction from "../.."
 
-export default interface BaseUtilityAction extends ConfigBaseAbilityAction { }
+import ConfigAbilityPredicate from "$DT/BinOutput/Config/ConfigAbility/Predicate"
+
+export default interface BaseUtilityAction extends ConfigBaseAbilityAction {}
 
 export interface Predicated extends BaseUtilityAction {
-  $type: 'Predicated'
+  $type: "Predicated"
   TargetPredicates: ConfigAbilityPredicate[]
   SuccessActions: ConfigAbilityAction[]
   FailActions: ConfigAbilityAction[]

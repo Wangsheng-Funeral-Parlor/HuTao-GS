@@ -1,7 +1,7 @@
-import ConfigBaseAttackPattern from '.'
+import ConfigBaseAttackPattern from "."
 
 export default interface ConfigAttackUsePrefab extends ConfigBaseAttackPattern {
-  $type: 'ConfigAttackUsePrefab'
+  $type: "ConfigAttackUsePrefab"
   PrefabPathName: string
   IsConnect: boolean
   DurationRawNum: number

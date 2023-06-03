@@ -1,8 +1,8 @@
-import BaseClass from '#/baseClass'
-import AbilityData from '$/gameData/data/AbilityData'
-import AbilityManager from '$/manager/abilityManager'
-import { DynamicFloat } from '$DT/BinOutput/Common/DynamicNumber'
-import { AbilityAppliedModifier, AbilityString } from '@/types/proto'
+import BaseClass from "#/baseClass"
+import AbilityData from "$/gameData/data/AbilityData"
+import AbilityManager from "$/manager/abilityManager"
+import { DynamicFloat } from "$DT/BinOutput/Common/DynamicNumber"
+import { AbilityAppliedModifier, AbilityString } from "@/types/proto"
 
 export default class AppliedModifier extends BaseClass {
   manager: AbilityManager
@@ -95,7 +95,18 @@ export default class AppliedModifier extends BaseClass {
   }
 
   export(): AbilityAppliedModifier {
-    const { id, abilityId, parentAbilityName, parentAbilityOverride, localId, applyEntityId, attachedParent, existsTime, reduceRatio, remainingDurabilityEval } = this
+    const {
+      id,
+      abilityId,
+      parentAbilityName,
+      parentAbilityOverride,
+      localId,
+      applyEntityId,
+      attachedParent,
+      existsTime,
+      reduceRatio,
+      remainingDurabilityEval,
+    } = this
     return {
       modifierLocalId: localId,
       parentAbilityName,
@@ -107,8 +118,8 @@ export default class AppliedModifier extends BaseClass {
       applyEntityId,
       modifierDurability: {
         reduceRatio,
-        remainingDurability: remainingDurabilityEval
-      }
+        remainingDurability: remainingDurabilityEval,
+      },
     }
   }
 

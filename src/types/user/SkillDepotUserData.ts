@@ -1,4 +1,4 @@
-import SkillUserData from './SkillUserData'
+import SkillUserData from "./SkillUserData"
 
 export default interface SkillDepotUserData {
   id: number

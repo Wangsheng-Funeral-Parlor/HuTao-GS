@@ -1,11 +1,11 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PropValue } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PropValue } from "@/types/proto"
 
 export enum DataType {
   DATA_NONE = 0,
   WORLD_LEVEL = 1,
-  IS_IN_MP_MODE = 2
+  IS_IN_MP_MODE = 2,
 }
 
 export interface WorldDataNotify {
@@ -14,11 +14,11 @@ export interface WorldDataNotify {
 
 class WorldDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WorldData')
+    super("WorldData")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE, false, 0xF000)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE, false, 0xf000)) return
 
     const { level, mpMode } = context.player.currentWorld
     const isInMpMode = Number(mpMode)
@@ -28,14 +28,14 @@ class WorldDataPacket extends Packet implements PacketInterface {
         [DataType.WORLD_LEVEL]: {
           type: DataType.WORLD_LEVEL,
           ival: level,
-          val: level
+          val: level,
         },
         [DataType.IS_IN_MP_MODE]: {
           type: DataType.IS_IN_MP_MODE,
           ival: isInMpMode,
-          val: isInMpMode
-        }
-      }
+          val: isInMpMode,
+        },
+      },
     }
 
     await super.sendNotify(context, notifyData)
@@ -43,4 +43,4 @@ class WorldDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: WorldDataPacket
-export default (() => packet = packet || new WorldDataPacket())()
+export default (() => (packet = packet || new WorldDataPacket()))()

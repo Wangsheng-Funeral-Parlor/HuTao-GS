@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import SceneData from '$/gameData/data/SceneData'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import SceneData from "$/gameData/data/SceneData"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface EnterTransPointRegionNotify {
   sceneId: number
@@ -9,9 +9,9 @@ export interface EnterTransPointRegionNotify {
 
 class EnterTransPointRegionPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EnterTransPointRegion', {
+    super("EnterTransPointRegion", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStateMask: 0xF000
+      reqStateMask: 0xf000,
     })
   }
 
@@ -20,11 +20,11 @@ class EnterTransPointRegionPacket extends Packet implements PacketInterface {
     const { sceneId, pointId } = data
 
     const scenePointData = await SceneData.getScenePoint(sceneId, pointId)
-    if (scenePointData?.Type !== 'TOWER') return
+    if (scenePointData?.Type !== "TOWER") return
 
     player.teamManager.getTeam()?.reviveAllAvatar()
   }
 }
 
 let packet: EnterTransPointRegionPacket
-export default (() => packet = packet || new EnterTransPointRegionPacket())()
+export default (() => (packet = packet || new EnterTransPointRegionPacket()))()

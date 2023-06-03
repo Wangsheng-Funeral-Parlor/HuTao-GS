@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SetPlayerSignatureReq {
   signature: string
@@ -13,9 +13,9 @@ export interface SetPlayerSignatureRsp {
 
 class SetPlayerSignaturePacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetPlayerSignature', {
+    super("SetPlayerSignature", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -27,7 +27,7 @@ class SetPlayerSignaturePacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      signature: profile.signature
+      signature: profile.signature,
     })
   }
 
@@ -37,4 +37,4 @@ class SetPlayerSignaturePacket extends Packet implements PacketInterface {
 }
 
 let packet: SetPlayerSignaturePacket
-export default (() => packet = packet || new SetPlayerSignaturePacket())()
+export default (() => (packet = packet || new SetPlayerSignaturePacket()))()

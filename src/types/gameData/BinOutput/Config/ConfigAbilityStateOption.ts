@@ -1,1 +1,1 @@
-export default interface ConfigAbilityStateOption { }
+export default interface ConfigAbilityStateOption {}

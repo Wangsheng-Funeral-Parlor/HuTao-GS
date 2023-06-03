@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Player from '$/player'
-import { PreEnterMpStateEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Player from "$/player"
+import { PreEnterMpStateEnum } from "@/types/proto/enum"
 
 export interface PlayerPreEnterMpNotify {
   uid: number
@@ -10,7 +10,7 @@ export interface PlayerPreEnterMpNotify {
 
 class PlayerPreEnterMpPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerPreEnterMp')
+    super("PlayerPreEnterMp")
   }
 
   async sendNotify(context: PacketContext, player: Player): Promise<void> {
@@ -19,7 +19,7 @@ class PlayerPreEnterMpPacket extends Packet implements PacketInterface {
     const notifyData: PlayerPreEnterMpNotify = {
       uid,
       state: PreEnterMpStateEnum.START,
-      nickname: profile.nickname
+      nickname: profile.nickname,
     }
 
     await super.sendNotify(context, notifyData)
@@ -27,4 +27,4 @@ class PlayerPreEnterMpPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerPreEnterMpPacket
-export default (() => packet = packet || new PlayerPreEnterMpPacket())()
+export default (() => (packet = packet || new PlayerPreEnterMpPacket()))()

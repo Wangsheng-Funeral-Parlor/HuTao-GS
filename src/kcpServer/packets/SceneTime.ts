@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface SceneTimeNotify {
   sceneId: number
@@ -9,7 +9,7 @@ export interface SceneTimeNotify {
 
 class SceneTimePacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneTime')
+    super("SceneTime")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
@@ -20,7 +20,7 @@ class SceneTimePacket extends Packet implements PacketInterface {
     const notifyData: SceneTimeNotify = {
       sceneId: id,
       isPaused: paused,
-      sceneTime
+      sceneTime,
     }
 
     await super.sendNotify(context, notifyData)
@@ -32,4 +32,4 @@ class SceneTimePacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneTimePacket
-export default (() => packet = packet || new SceneTimePacket())()
+export default (() => (packet = packet || new SceneTimePacket()))()

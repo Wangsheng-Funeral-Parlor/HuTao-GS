@@ -1,4 +1,4 @@
-import { AbilityString } from './AbilityString'
+import { AbilityString } from "./AbilityString"
 
 export interface ModifierProperty {
   key: AbilityString

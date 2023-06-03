@@ -1,29 +1,36 @@
-import Loader from '$/gameData/loader'
-import DungeonDataGroup, { DungeonData } from '@/types/gameData/DungeonData'
+import Loader from "$/gameData/loader"
+import DungeonDataGroup, { DungeonChallengeData, DungeonData } from "@/types/gameData/DungeonData"
 
 class DungeonDataLoader extends Loader {
   declare data: DungeonDataGroup
 
   constructor() {
-    super('DungeonData')
+    super("DungeonData", "message.cache.debug.dungeon")
   }
 
-  async getData(): Promise<DungeonDataGroup> {
-    return super.getData()
+  async getData(): Promise<void> {
+    await super.getData()
   }
 
-  async getDungeon(id: number): Promise<DungeonData> {
-    return (await this.getDungeonList()).find(data => data.Id === id)
+  getDungeon(id: number): DungeonData {
+    return this.getDungeonList().find((data) => data.Id === id)
   }
 
-  async getDungeonByScene(sceneId: number): Promise<DungeonData> {
-    return (await this.getDungeonList()).find(data => data.SceneId === sceneId)
+  getDungeonByScene(sceneId: number): DungeonData {
+    return this.getDungeonList().find((data) => data.SceneId === sceneId)
   }
 
-  async getDungeonList(): Promise<DungeonData[]> {
-    return (await this.getData())?.Dungeon || []
+  getDungeonList(): DungeonData[] {
+    return this.data?.Dungeon || []
+  }
+
+  getDungeonChallenge(id: number): DungeonChallengeData {
+    return this.getDungeonChallengeList().find((data) => data.Id === id)
+  }
+  getDungeonChallengeList(): DungeonChallengeData[] {
+    return this.data?.Challenge || []
   }
 }
 
 let loader: DungeonDataLoader
-export default (() => loader = loader || new DungeonDataLoader())()
+export default (() => (loader = loader || new DungeonDataLoader()))()

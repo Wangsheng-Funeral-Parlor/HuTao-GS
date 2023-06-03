@@ -1,5 +1,4 @@
 /buildDev
-/buildRel
 /cache
 /captures
 /config.json
@@ -11,4 +10,8 @@
 /package-lock.json
 /ssl
 /webstaticSea
+/Genshin Impact game
+/handbook.txt
+**.code-workspace
 .vscode/settings.json
+.DS_Store

@@ -1,7 +1,7 @@
-import ConfigBaseBulletMove from '.'
+import ConfigBaseBulletMove from "."
 
 export default interface ConfigItanoCircusBulletMove extends ConfigBaseBulletMove {
-  $type: 'ConfigItanoCircusBulletMove'
+  $type: "ConfigItanoCircusBulletMove"
   ItanoCircusStartAngler: number
   DestroyWhenTargetDie: boolean
   GuidanceDelay: number

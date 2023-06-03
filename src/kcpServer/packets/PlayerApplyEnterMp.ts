@@ -1,9 +1,10 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Player from '$/player'
-import { ClientStateEnum, PlayerPropEnum } from '@/types/enum'
-import { OnlinePlayerInfo } from '@/types/proto'
-import { ApplyEnterResultReasonEnum, MpSettingTypeEnum, RetcodeEnum } from '@/types/proto/enum'
-import PlayerApplyEnterMpResult from './PlayerApplyEnterMpResult'
+import PlayerApplyEnterMpResult from "./PlayerApplyEnterMpResult"
+
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Player from "$/player"
+import { ClientStateEnum, PlayerPropEnum } from "@/types/enum"
+import { OnlinePlayerInfo } from "@/types/proto"
+import { ApplyEnterResultReasonEnum, MpSettingTypeEnum, RetcodeEnum } from "@/types/proto/enum"
 
 export interface PlayerApplyEnterMpReq {
   targetUid: number
@@ -23,9 +24,9 @@ export interface PlayerApplyEnterMpNotify {
 
 class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerApplyEnterMp', {
+    super("PlayerApplyEnterMp", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -35,7 +36,7 @@ class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      targetUid
+      targetUid,
     })
 
     const targetPlayer = game.getPlayerByUid(targetUid)
@@ -43,11 +44,21 @@ class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
 
     const targetWorld = targetPlayer.currentWorld
     if (targetWorld !== targetPlayer.hostWorld) {
-      await PlayerApplyEnterMpResult.sendNotify(context, targetPlayer, false, ApplyEnterResultReasonEnum.PLAYER_NOT_IN_PLAYER_WORLD)
+      await PlayerApplyEnterMpResult.sendNotify(
+        context,
+        targetPlayer,
+        false,
+        ApplyEnterResultReasonEnum.PLAYER_NOT_IN_PLAYER_WORLD
+      )
       return
     }
     if (targetWorld.playerList.length >= 4) {
-      await PlayerApplyEnterMpResult.sendNotify(context, targetPlayer, false, ApplyEnterResultReasonEnum.ALLOW_ENTER_PLAYER_FULL)
+      await PlayerApplyEnterMpResult.sendNotify(
+        context,
+        targetPlayer,
+        false,
+        ApplyEnterResultReasonEnum.ALLOW_ENTER_PLAYER_FULL
+      )
       return
     }
 
@@ -70,7 +81,7 @@ class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
 
   async sendNotify(context: PacketContext, player: Player): Promise<void> {
     const notifyData: PlayerApplyEnterMpNotify = {
-      srcPlayerInfo: player.exportOnlinePlayerInfo()
+      srcPlayerInfo: player.exportOnlinePlayerInfo(),
     }
 
     await super.sendNotify(context, notifyData)
@@ -78,4 +89,4 @@ class PlayerApplyEnterMpPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerApplyEnterMpPacket
-export default (() => packet = packet || new PlayerApplyEnterMpPacket())()
+export default (() => (packet = packet || new PlayerApplyEnterMpPacket()))()

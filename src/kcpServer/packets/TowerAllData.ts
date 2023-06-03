@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { TowerCurLevelRecord, TowerFloorRecord, TowerMonthlyBrief } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { getTimeSeconds } from '@/utils/time'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { TowerCurLevelRecord, TowerFloorRecord, TowerMonthlyBrief } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
+import { getTimeSeconds } from "@/utils/time"
 
 export interface TowerAllDataReq {
   isInteract?: boolean
@@ -29,7 +29,7 @@ export interface TowerAllDataRsp {
 
 class TowerAllDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('TowerAllData')
+    super("TowerAllData")
   }
 
   async request(context: PacketContext, _data: TowerAllDataReq): Promise<void> {
@@ -40,11 +40,11 @@ class TowerAllDataPacket extends Packet implements PacketInterface {
       towerScheduleId: 0,
       towerFloorRecordList: [],
       curLevelRecord: {
-        isEmpty: true
+        isEmpty: true,
       },
-      nextScheduleChangeTime: now + (86400 * 31),
+      nextScheduleChangeTime: now + 86400 * 31,
       floorOpenTimeMap: {},
-      scheduleStartTime: now
+      scheduleStartTime: now,
     })
   }
 
@@ -54,4 +54,4 @@ class TowerAllDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: TowerAllDataPacket
-export default (() => packet = packet || new TowerAllDataPacket())()
+export default (() => (packet = packet || new TowerAllDataPacket()))()

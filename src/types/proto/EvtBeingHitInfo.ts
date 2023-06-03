@@ -1,4 +1,4 @@
-import { AttackResult } from '.'
+import { AttackResult } from "."
 
 export interface EvtBeingHitInfo {
   peerId: number

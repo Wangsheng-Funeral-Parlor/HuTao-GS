@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetShopmallDataReq { }
+export interface GetShopmallDataReq {}
 
 export interface GetShopmallDataRsp {
   retcode: RetcodeEnum
@@ -10,18 +10,13 @@ export interface GetShopmallDataRsp {
 
 class GetShopmallDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetShopmallData')
+    super("GetShopmallData")
   }
 
   async request(context: PacketContext, _data: GetShopmallDataReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      shopTypeList: [
-        900,
-        1052,
-        902,
-        1001
-      ]
+      shopTypeList: [900, 1052, 902, 1001],
     })
   }
 
@@ -31,4 +26,4 @@ class GetShopmallDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetShopmallDataPacket
-export default (() => packet = packet || new GetShopmallDataPacket())()
+export default (() => (packet = packet || new GetShopmallDataPacket()))()

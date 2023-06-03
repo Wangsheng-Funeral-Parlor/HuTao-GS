@@ -1,4 +1,6 @@
-import { DynamicVector } from '../BinOutput/Common/DynamicNumber'
+import { DynamicVector } from "../BinOutput/Common/DynamicNumber"
+
+import { EventTypeEnum, GadgetStateEnum } from "@/types/enum"
 
 export interface SceneGroupScriptConfig {
   Monsters: SceneMonsterScriptConfig[]
@@ -48,6 +50,7 @@ export interface SceneGadgetScriptConfig {
   Rot: DynamicVector
   Level: number
   DropTag: string
+  State?: GadgetStateEnum
   IsOneoff?: boolean
   Persistent?: boolean
   InteractId?: number
@@ -69,7 +72,7 @@ export interface SceneRegionScriptConfig {
 export interface SceneTriggerScriptConfig {
   ConfigId: number
   Name: string
-  Event: {}
+  Event: EventTypeEnum
   Source: string
   Condition: string
   Action: string
@@ -99,7 +102,7 @@ export interface SceneSuiteScriptConfig {
   Npcs: number[]
   Gadgets: number[]
   Regions: number[]
-  Triggers: number[]
+  Triggers: string[]
   RandWeight: number
 }
 
@@ -156,4 +159,6 @@ export interface SceneScriptConfig {
   Block: { [blockId: number]: SceneBlockScriptConfig }
 }
 
-export default interface SceneScriptConfigMap { [sceneId: number]: SceneScriptConfig }
+export default interface SceneScriptConfigMap {
+  [sceneId: number]: SceneScriptConfig
+}

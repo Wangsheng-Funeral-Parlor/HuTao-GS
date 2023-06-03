@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface NpcTalkReq {
   npcEntityId?: number
@@ -17,21 +17,21 @@ export interface NpcTalkRsp {
 
 class NpcTalkPacket extends Packet implements PacketInterface {
   constructor() {
-    super('NpcTalk', {
+    super("NpcTalk", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
   async request(context: PacketContext, data: NpcTalkReq): Promise<void> {
     const { talkId, entityId } = data
 
-    await context.player.emit('NpcTalkReq', data)
+    await context.player.emit("NpcTalkReq", data)
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       curTalkId: talkId,
-      entityId
+      entityId,
     })
   }
 
@@ -41,4 +41,4 @@ class NpcTalkPacket extends Packet implements PacketInterface {
 }
 
 let packet: NpcTalkPacket
-export default (() => packet = packet || new NpcTalkPacket())()
+export default (() => (packet = packet || new NpcTalkPacket()))()

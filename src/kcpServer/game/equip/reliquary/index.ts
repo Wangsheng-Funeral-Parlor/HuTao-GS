@@ -1,9 +1,9 @@
-import Equip from '$/equip'
-import ReliquaryData from '$/gameData/data/ReliquaryData'
-import Player from '$/player'
-import { EquipTypeEnum, FightPropEnum, ItemTypeEnum } from '@/types/enum'
-import { EquipInfo, SceneReliquaryInfo } from '@/types/proto'
-import ReliquaryUserData from '@/types/user/ReliquaryUserData'
+import Equip from "$/equip"
+import ReliquaryData from "$/gameData/data/ReliquaryData"
+import Player from "$/player"
+import { EquipTypeEnum, FightPropEnum, ItemTypeEnum } from "@/types/enum"
+import { EquipInfo, SceneReliquaryInfo } from "@/types/proto"
+import ReliquaryUserData from "@/types/user/ReliquaryUserData"
 
 export default class Reliquary extends Equip {
   level: number
@@ -64,7 +64,7 @@ export default class Reliquary extends Equip {
 
   private async randomMainProp() {
     const { mainDepotId } = this
-    const candidateList = (await ReliquaryData.getMainPropsByDepot(mainDepotId))
+    const candidateList = await ReliquaryData.getMainPropsByDepot(mainDepotId)
     const candidate = candidateList[Math.floor(Math.random() * candidateList.length)]
 
     await this.setMainProp(candidate?.Id)
@@ -85,8 +85,8 @@ export default class Reliquary extends Equip {
     }
 
     const candidateList = (await ReliquaryData.getAffixsByDepot(appendDepotId))
-      .filter(data => !blackList.includes(data.PropType))
-      .map(data => data.Id)
+      .filter((data) => !blackList.includes(data.PropType))
+      .map((data) => data.Id)
 
     const candidate = candidateList[Math.floor(Math.random() * candidateList.length)]
     if (candidate == null) return
@@ -106,8 +106,8 @@ export default class Reliquary extends Equip {
     }
 
     const candidateList = (await ReliquaryData.getAffixsByDepot(appendDepotId))
-      .filter(data => whitelist.includes(data.PropType))
-      .map(data => data.Id)
+      .filter((data) => whitelist.includes(data.PropType))
+      .map((data) => data.Id)
 
     const candidate = candidateList[Math.floor(Math.random() * candidateList.length)]
     if (candidate == null) return
@@ -129,7 +129,7 @@ export default class Reliquary extends Equip {
     const levelData = await ReliquaryData.getLevel(level, rank)
     if (levelData == null) return
 
-    const prop = levelData.AddProps?.find(p => p?.PropType === FightPropEnum[mainPropType])
+    const prop = levelData.AddProps?.find((p) => p?.PropType === FightPropEnum[mainPropType])
 
     this.mainPropValue = prop?.Value || 0
   }
@@ -167,7 +167,7 @@ export default class Reliquary extends Equip {
 
     appendPropIdList.splice(0)
 
-    const filteredAppendPropList = appendPropList.map(id => parseInt(id?.toString())).filter(id => !isNaN(id))
+    const filteredAppendPropList = appendPropList.map((id) => parseInt(id?.toString())).filter((id) => !isNaN(id))
     if (filteredAppendPropList.length === 0) {
       for (let i = 0; i < appendNum; i++) await this.addAppendProp()
     } else {
@@ -195,7 +195,7 @@ export default class Reliquary extends Equip {
     return {
       itemId,
       guid: guid.toString(),
-      level
+      level,
     }
   }
 
@@ -206,20 +206,23 @@ export default class Reliquary extends Equip {
         level,
         exp,
         mainPropId,
-        appendPropIdList
+        appendPropIdList,
       },
-      isLocked
+      isLocked,
     }
   }
 
   exportUserData(): ReliquaryUserData {
     const { level, exp, mainPropId, appendPropIdList } = this
 
-    return Object.assign({
-      level,
-      exp,
-      mainProp: mainPropId,
-      appendPropList: appendPropIdList
-    }, super.exportUserData())
+    return Object.assign(
+      {
+        level,
+        exp,
+        mainProp: mainPropId,
+        appendPropList: appendPropIdList,
+      },
+      super.exportUserData()
+    )
   }
 }

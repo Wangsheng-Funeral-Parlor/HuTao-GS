@@ -1,25 +1,25 @@
-import Loader from '$/gameData/loader'
-import MapAreaDataList, { MapAreaData } from '@/types/gameData/MapAreaData'
+import Loader from "$/gameData/loader"
+import MapAreaDataList, { MapAreaData } from "@/types/gameData/MapAreaData"
 
 class MapAreaDataLoader extends Loader {
   declare data: MapAreaDataList
 
   constructor() {
-    super('MapAreaData', [])
+    super("MapAreaData", "message.cache.debug.mapArea", [])
   }
 
-  async getData(): Promise<MapAreaDataList> {
-    return super.getData()
+  async getData(): Promise<void> {
+    await super.getData()
   }
 
   async getMapArea(id: number): Promise<MapAreaData> {
-    return (await this.getMapAreaList()).find(data => data.Id === id)
+    return this.getMapAreaList().find((data) => data.Id === id)
   }
 
-  async getMapAreaList(): Promise<MapAreaData[]> {
-    return (await this.getData()) || []
+  getMapAreaList(): MapAreaData[] {
+    return this.data || []
   }
 }
 
 let loader: MapAreaDataLoader
-export default (() => loader = loader || new MapAreaDataLoader())()
+export default (() => (loader = loader || new MapAreaDataLoader()))()

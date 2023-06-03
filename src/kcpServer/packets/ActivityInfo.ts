@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ActivityInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { ActivityInfo } from "@/types/proto"
 
 export interface ActivityInfoNotify {
   activityInfo: ActivityInfo
@@ -8,7 +8,7 @@ export interface ActivityInfoNotify {
 
 class ActivityInfoPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ActivityInfo')
+    super("ActivityInfo")
   }
 
   async sendNotify(context: PacketContext, id: number): Promise<void> {
@@ -21,7 +21,7 @@ class ActivityInfoPacket extends Packet implements PacketInterface {
     if (activityInfo == null) return
 
     const notifyData: ActivityInfoNotify = {
-      activityInfo
+      activityInfo,
     }
 
     await super.sendNotify(context, notifyData)
@@ -29,4 +29,4 @@ class ActivityInfoPacket extends Packet implements PacketInterface {
 }
 
 let packet: ActivityInfoPacket
-export default (() => packet = packet || new ActivityInfoPacket())()
+export default (() => (packet = packet || new ActivityInfoPacket()))()

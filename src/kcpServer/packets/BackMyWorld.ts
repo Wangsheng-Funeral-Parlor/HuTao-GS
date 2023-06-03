@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { ClientReconnectReasonEnum, QuitReasonEnum, RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { ClientReconnectReasonEnum, QuitReasonEnum, RetcodeEnum } from "@/types/proto/enum"
 
-export interface BackMyWorldReq { }
+export interface BackMyWorldReq {}
 
 export interface BackMyWorldRsp {
   retcode: RetcodeEnum
@@ -10,9 +10,9 @@ export interface BackMyWorldRsp {
 
 class BackMyWorldPacket extends Packet implements PacketInterface {
   constructor() {
-    super('BackMyWorld', {
+    super("BackMyWorld", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -32,7 +32,11 @@ class BackMyWorldPacket extends Packet implements PacketInterface {
 
     await this.response(context, { retcode: RetcodeEnum.RET_SUCC })
 
-    await currentWorld.leave(context, QuitReasonEnum.BACK_TO_MY_WORLD, ClientReconnectReasonEnum.CLIENT_RECONNNECT_QUIT_MP)
+    await currentWorld.leave(
+      context,
+      QuitReasonEnum.BACK_TO_MY_WORLD,
+      ClientReconnectReasonEnum.CLIENT_RECONNNECT_QUIT_MP
+    )
   }
 
   async response(context: PacketContext, data: BackMyWorldRsp): Promise<void> {
@@ -41,4 +45,4 @@ class BackMyWorldPacket extends Packet implements PacketInterface {
 }
 
 let packet: BackMyWorldPacket
-export default (() => packet = packet || new BackMyWorldPacket())()
+export default (() => (packet = packet || new BackMyWorldPacket()))()

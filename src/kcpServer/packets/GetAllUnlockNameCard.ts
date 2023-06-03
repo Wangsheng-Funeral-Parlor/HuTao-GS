@@ -1,8 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetAllUnlockNameCardReq { }
+export interface GetAllUnlockNameCardReq {}
 
 export interface GetAllUnlockNameCardRsp {
   retcode: RetcodeEnum
@@ -11,16 +11,16 @@ export interface GetAllUnlockNameCardRsp {
 
 class GetAllUnlockNameCardPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetAllUnlockNameCard', {
+    super("GetAllUnlockNameCard", {
       reqWaitState: ClientStateEnum.POST_LOGIN,
-      reqWaitStatePass: true
+      reqWaitStatePass: true,
     })
   }
 
   async request(context: PacketContext, _data: GetAllUnlockNameCardReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      nameCardList: context.player.profile.unlockedNameCardIdList
+      nameCardList: context.player.profile.unlockedNameCardIdList,
     })
   }
 
@@ -30,4 +30,4 @@ class GetAllUnlockNameCardPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetAllUnlockNameCardPacket
-export default (() => packet = packet || new GetAllUnlockNameCardPacket())()
+export default (() => (packet = packet || new GetAllUnlockNameCardPacket()))()

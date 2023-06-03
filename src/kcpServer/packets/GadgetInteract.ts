@@ -1,7 +1,20 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Gadget from '$/entity/gadget'
-import { ClientStateEnum } from '@/types/enum'
-import { InteractTypeEnum, InterOpTypeEnum, ProtEntityTypeEnum, ResinCostTypeEnum, RetcodeEnum } from '@/types/proto/enum'
+import GadgetState from "./GadgetState"
+import LifeStateChange from "./LifeStateChange"
+import SceneEntityDisappear from "./SceneEntityDisappear"
+import WorldChestOpen from "./WorldChestOpen"
+
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Gadget from "$/entity/gadget"
+import { ClientStateEnum, EntityTypeEnum, GadgetStateEnum } from "@/types/enum"
+import {
+  InteractTypeEnum,
+  InterOpTypeEnum,
+  LifeStateEnum,
+  ProtEntityTypeEnum,
+  ResinCostTypeEnum,
+  RetcodeEnum,
+  VisionTypeEnum,
+} from "@/types/proto/enum"
 
 export interface GadgetInteractReq {
   gadgetEntityId: number
@@ -21,9 +34,9 @@ export interface GadgetInteractRsp {
 
 class GadgetInteractPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GadgetInteract', {
+    super("GadgetInteract", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -39,7 +52,29 @@ class GadgetInteractPacket extends Packet implements PacketInterface {
       return
     }
 
-    await this.response(context, await entity.interact(player, opType, gadgetId, !!isUseCondenseResin, resinCostType))
+    switch (entity.entityType) {
+      case EntityTypeEnum.Chest: {
+        WorldChestOpen.sendNotify(context, entity)
+        GadgetState.sendNotify(context, entity, GadgetStateEnum.ChestOpened)
+        LifeStateChange.sendNotify(context, entity, LifeStateEnum.LIFE_DEAD)
+        SceneEntityDisappear.sendNotify(context, [entity.entityId], VisionTypeEnum.VISION_DIE)
+
+        await this.response(context, {
+          retcode: RetcodeEnum.RET_SUCC,
+          gadgetEntityId: entity.entityId,
+          gadgetId: entity.gadgetId,
+          interactType: InteractTypeEnum.INTERACT_TYPE_OPEN_CHEST,
+        })
+      }
+      default: {
+        await this.response(context, {
+          retcode: RetcodeEnum.RET_SUCC,
+          gadgetEntityId: entity.entityId,
+          gadgetId: entity.gadgetId,
+          interactType: InteractTypeEnum.INTERACT_TYPE_NONE,
+        })
+      }
+    }
   }
 
   async response(context: PacketContext, data: GadgetInteractRsp): Promise<void> {
@@ -48,4 +83,4 @@ class GadgetInteractPacket extends Packet implements PacketInterface {
 }
 
 let packet: GadgetInteractPacket
-export default (() => packet = packet || new GadgetInteractPacket())()
+export default (() => (packet = packet || new GadgetInteractPacket()))()

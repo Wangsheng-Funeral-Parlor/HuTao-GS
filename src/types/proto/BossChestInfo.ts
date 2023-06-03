@@ -1,4 +1,4 @@
-import { WeeklyBossResinDiscountInfo } from '.'
+import { WeeklyBossResinDiscountInfo } from "."
 
 export interface BossChestInfo {
   monsterConfigId: number

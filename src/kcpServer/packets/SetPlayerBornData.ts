@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SetPlayerBornDataReq {
   avatarId: number
@@ -13,8 +13,8 @@ export interface SetPlayerBornDataRsp {
 
 class SetPlayerBornDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetPlayerBornData', {
-      reqState: ClientStateEnum.PICK_TWIN
+    super("SetPlayerBornData", {
+      reqState: ClientStateEnum.PICK_TWIN,
     })
   }
 
@@ -33,4 +33,4 @@ class SetPlayerBornDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: SetPlayerBornDataPacket
-export default (() => packet = packet || new SetPlayerBornDataPacket())()
+export default (() => (packet = packet || new SetPlayerBornDataPacket()))()

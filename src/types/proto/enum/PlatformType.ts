@@ -9,5 +9,5 @@ export enum PlatformTypeEnum {
   CLOUD_IOS = 7,
   PS5 = 8,
   CLOUD_WEB = 9,
-  CLOUD_TV = 10
+  CLOUD_TV = 10,
 }

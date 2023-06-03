@@ -1,1 +1,1 @@
-export default interface ConfigBaseGadgetPredicate { }
+export default interface ConfigBaseGadgetPredicate {}

@@ -1,5 +1,6 @@
-import { AbilityString } from '.'
-import { AbilityScalarTypeEnum } from './enum'
+import { AbilityScalarTypeEnum } from "./enum"
+
+import { AbilityString } from "."
 
 export interface AbilityScalarValueEntry {
   floatValue?: number

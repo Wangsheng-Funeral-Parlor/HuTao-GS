@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { QuitReasonEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { QuitReasonEnum } from "@/types/proto/enum"
 
 export interface PlayerQuitFromMpNotify {
   reason: QuitReasonEnum
@@ -8,14 +8,14 @@ export interface PlayerQuitFromMpNotify {
 
 class PlayerQuitFromMpPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PlayerQuitFromMp')
+    super("PlayerQuitFromMp")
   }
 
   async sendNotify(context: PacketContext, reason: QuitReasonEnum): Promise<void> {
     if (!this.checkState(context, ClientStateEnum.IN_GAME, true)) return
 
     const notifyData: PlayerQuitFromMpNotify = {
-      reason
+      reason,
     }
 
     await super.sendNotify(context, notifyData)
@@ -23,4 +23,4 @@ class PlayerQuitFromMpPacket extends Packet implements PacketInterface {
 }
 
 let packet: PlayerQuitFromMpPacket
-export default (() => packet = packet || new PlayerQuitFromMpPacket())()
+export default (() => (packet = packet || new PlayerQuitFromMpPacket()))()

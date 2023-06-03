@@ -1,15 +1,26 @@
-import Entity from '$/entity'
-import Gadget from '$/entity/gadget'
-import Monster from '$/entity/monster'
-import Npc from '$/entity/npc'
-import SceneData from '$/gameData/data/SceneData'
-import WorldData from '$/gameData/data/WorldData'
-import Vector from '$/utils/vector'
-import Logger from '@/logger'
-import { SceneGadgetScriptConfig, SceneMonsterScriptConfig, SceneNpcScriptConfig, SceneSuiteScriptConfig } from '@/types/gameData/Script/SceneScriptConfig'
-import { VisionTypeEnum } from '@/types/proto/enum'
-import { WaitOnBlock } from '@/utils/asyncWait'
-import SceneBlock from './sceneBlock'
+import SceneBlock from "./sceneBlock"
+
+import Scene from "."
+
+import Entity from "$/entity"
+import Gadget from "$/entity/gadget"
+import Monster from "$/entity/monster"
+import Npc from "$/entity/npc"
+import SceneData from "$/gameData/data/SceneData"
+import WorldData from "$/gameData/data/WorldData"
+import Vector from "$/utils/vector"
+import Logger from "@/logger"
+import { EventTypeEnum, GadgetStateEnum } from "@/types/enum"
+import {
+  SceneGadgetScriptConfig,
+  SceneMonsterScriptConfig,
+  SceneNpcScriptConfig,
+  SceneSuiteScriptConfig,
+  SceneTriggerScriptConfig,
+  SceneVariableScriptConfig,
+} from "@/types/gameData/Script/SceneScriptConfig"
+import { VisionTypeEnum } from "@/types/proto/enum"
+import { WaitOnBlock } from "@/utils/asyncWait"
 
 export default class SceneGroup {
   block: SceneBlock
@@ -24,6 +35,9 @@ export default class SceneGroup {
 
   loaded: boolean
 
+  trigger: SceneTriggerScriptConfig[]
+  Variables: SceneVariableScriptConfig[]
+
   constructor(block: SceneBlock, id: number, pos: Vector, dynamicLoad: boolean) {
     this.block = block
 
@@ -34,8 +48,18 @@ export default class SceneGroup {
     this.monsterList = []
     this.npcList = []
     this.gadgetList = []
+    this.trigger = []
+    this.Variables = []
 
     this.loaded = false
+  }
+
+  get scene(): Scene {
+    return this.block.scene
+  }
+
+  get aliveMonsterCount(): number {
+    return this.monsterList.filter((monster) => monster.isAlive()).length
   }
 
   private async reloadList(entityList: Entity[]) {
@@ -53,15 +77,15 @@ export default class SceneGroup {
     return true
   }
 
-  private async loadMonsters(monsters: SceneMonsterScriptConfig[]) {
+  async loadMonsters(monsters: SceneMonsterScriptConfig[], force = false) {
     const { block, id: groupId, monsterList } = this
     const { id: blockId, scene } = block
     const { world, entityManager } = scene
 
-    if (await this.reloadList(monsterList)) return
+    if ((await this.reloadList(monsterList)) && !force) return
 
     const worldLevelData = await WorldData.getWorldLevel(world.level)
-    const levelOffset = worldLevelData == null ? 0 : (worldLevelData.MonsterLevel - 22)
+    const levelOffset = worldLevelData == null ? 0 : worldLevelData.MonsterLevel - 22
 
     for (const monster of monsters) {
       const { MonsterId, ConfigId, PoseId, IsElite, Level, Pos, Rot } = monster
@@ -85,9 +109,16 @@ export default class SceneGroup {
       monsterList.push(entity)
       await entityManager.add(entity, undefined, undefined, undefined, true)
     }
+
+    if (scene.EnableScript)
+      await this.scene.scriptManager.emit(
+        EventTypeEnum.EVENT_ANY_MONSTER_LIVE,
+        this.id,
+        monsterList.map((monster) => monster.configId)
+      )
   }
 
-  private async loadNpcs(npcs: SceneNpcScriptConfig[], suites: SceneSuiteScriptConfig[]) {
+  async loadNpcs(npcs: SceneNpcScriptConfig[], suites: SceneSuiteScriptConfig[]) {
     const { block, id: groupId, npcList } = this
     const { id: blockId, scene } = block
     const { entityManager } = scene
@@ -103,8 +134,8 @@ export default class SceneGroup {
       entity.blockId = blockId
       entity.suitIdList = suites
         .map((suite, index) => ({ index, suite }))
-        .filter(e => e.suite?.Npcs?.includes(ConfigId))
-        .map(e => e.index + 1)
+        .filter((e) => e.suite?.Npcs?.includes(ConfigId))
+        .map((e) => e.index + 1)
 
       const { motion, bornPos } = entity
       const { pos, rot } = motion
@@ -120,21 +151,22 @@ export default class SceneGroup {
     }
   }
 
-  private async loadGadgets(gadgets: SceneGadgetScriptConfig[]) {
+  async loadGadgets(gadgets: SceneGadgetScriptConfig[], force = false) {
     const { block, id: groupId, gadgetList } = this
     const { id: blockId, scene } = block
     const { entityManager } = scene
 
-    if (await this.reloadList(gadgetList)) return
+    if ((await this.reloadList(gadgetList)) && !force) return
 
     for (const gadget of gadgets) {
-      const { GadgetId, ConfigId, Level, Pos, Rot, InteractId } = gadget
+      const { GadgetId, ConfigId, Level, Pos, Rot, InteractId, State } = gadget
       const entity = new Gadget(GadgetId)
 
       entity.groupId = groupId
       entity.configId = ConfigId || 0
       entity.blockId = blockId
       entity.interactId = InteractId || null
+      entity.gadgetState = State || GadgetStateEnum.Default
 
       const { motion, bornPos } = entity
       const { pos, rot } = motion
@@ -148,6 +180,13 @@ export default class SceneGroup {
       gadgetList.push(entity)
       await entityManager.add(entity, undefined, undefined, undefined, true)
     }
+
+    if (scene.EnableScript)
+      await this.scene.scriptManager.emit(
+        EventTypeEnum.EVENT_GADGET_CREATE,
+        this.id,
+        gadgetList.map((gadget) => gadget.configId)
+      )
   }
 
   private async unloadList(entityList: Entity[]) {
@@ -162,7 +201,7 @@ export default class SceneGroup {
     }
   }
 
-  async load(wob: WaitOnBlock) {
+  async load(wob: WaitOnBlock, Overridesuite?: number) {
     const { block, id: groupId, loaded } = this
     const { id: sceneId } = block.scene
 
@@ -172,17 +211,42 @@ export default class SceneGroup {
     const groupData = await SceneData.getGroup(sceneId, groupId)
     if (!groupData) return
 
+    this.scene.scriptManager.setGroup(this)
+
     const grpLoadPerfMark = `GroupLoad-${sceneId}-${groupId}`
     Logger.mark(grpLoadPerfMark)
 
     await wob.waitTick()
-    await this.loadMonsters(Object.values(groupData.Monsters || {}))
+
+    this.trigger =
+      groupData.Triggers.filter((trigger) =>
+        groupData.Suites?.[Overridesuite ?? groupData?.InitConfig?.[0] - 1]?.Triggers?.includes(trigger.Name)
+      ) || []
+
+    this.Variables = groupData.Variables ?? []
+
+    await this.loadMonsters(
+      Object.values(
+        groupData.Monsters?.filter((monster) =>
+          groupData.Suites?.[Overridesuite ?? groupData?.InitConfig?.[0] - 1]?.Monsters?.includes(monster.ConfigId)
+        ) || {}
+      )
+    )
+
     await wob.waitTick()
     await this.loadNpcs(Object.values(groupData.Npcs || {}), Object.values(groupData.Suites || {}))
     await wob.waitTick()
-    await this.loadGadgets(Object.values(groupData.Gadgets || {}))
+    await this.loadGadgets(
+      Object.values(
+        groupData.Gadgets?.filter((gadget) =>
+          groupData.Suites?.[Overridesuite ?? groupData?.InitConfig?.[0] - 1]?.Gadgets?.includes(gadget.ConfigId)
+        ) || {}
+      )
+    )
 
-    Logger.measure('Group load', grpLoadPerfMark)
+    await this.scene.scriptManager.emit(EventTypeEnum.EVENT_GROUP_LOAD, this.id)
+
+    Logger.measure("Group load", grpLoadPerfMark)
     Logger.clearMarks(grpLoadPerfMark)
   }
 
@@ -199,7 +263,7 @@ export default class SceneGroup {
     await this.unloadList(npcList)
     await this.unloadList(gadgetList)
 
-    Logger.measure('Group unload', grpUnloadPerfMark)
+    Logger.measure("Group unload", grpUnloadPerfMark)
     Logger.clearMarks(grpUnloadPerfMark)
   }
 }

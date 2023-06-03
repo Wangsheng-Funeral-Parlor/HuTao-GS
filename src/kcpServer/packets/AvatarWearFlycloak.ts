@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface AvatarWearFlycloakReq {
   avatarGuid: string
@@ -15,9 +15,9 @@ export interface AvatarWearFlycloakRsp {
 
 class AvatarWearFlycloakPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarWearFlycloak', {
+    super("AvatarWearFlycloak", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStateMask: 0xF0FF
+      reqStateMask: 0xf0ff,
     })
   }
 
@@ -30,7 +30,7 @@ class AvatarWearFlycloakPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode,
       avatarGuid,
-      flycloakId
+      flycloakId,
     })
   }
 
@@ -40,4 +40,4 @@ class AvatarWearFlycloakPacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarWearFlycloakPacket
-export default (() => packet = packet || new AvatarWearFlycloakPacket())()
+export default (() => (packet = packet || new AvatarWearFlycloakPacket()))()

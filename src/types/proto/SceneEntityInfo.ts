@@ -1,3 +1,5 @@
+import { LifeStateEnum, ProtEntityTypeEnum } from "./enum"
+
 import {
   AnimatorParameterValueInfoPair,
   EntityAuthorityInfo,
@@ -10,9 +12,8 @@ import {
   SceneGadgetInfo,
   SceneMonsterInfo,
   SceneNpcInfo,
-  ServerBuff
-} from '.'
-import { LifeStateEnum, ProtEntityTypeEnum } from './enum'
+  ServerBuff,
+} from "."
 
 export interface SceneEntityInfo {
   avatar?: SceneAvatarInfo

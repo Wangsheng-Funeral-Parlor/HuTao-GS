@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
 
 export interface EvtAvatarSitDownNotify {
   entityId: number
@@ -10,9 +10,9 @@ export interface EvtAvatarSitDownNotify {
 
 class EvtAvatarSitDownPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtAvatarSitDown', {
+    super("EvtAvatarSitDown", {
       notifyState: ClientStateEnum.IN_GAME,
-      notifyStatePass: true
+      notifyStatePass: true,
     })
   }
 
@@ -30,4 +30,4 @@ class EvtAvatarSitDownPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtAvatarSitDownPacket
-export default (() => packet = packet || new EvtAvatarSitDownPacket())()
+export default (() => (packet = packet || new EvtAvatarSitDownPacket()))()

@@ -1,4 +1,4 @@
-import ConfigGadgetStateAction from './ConfigGadgetStateAction'
+import ConfigGadgetStateAction from "./ConfigGadgetStateAction"
 
 export default interface ConfigGadgetAction {
   TriggerEnterActionList: ConfigGadgetStateAction[]

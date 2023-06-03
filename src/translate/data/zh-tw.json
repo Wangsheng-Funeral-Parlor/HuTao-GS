@@ -32,6 +32,7 @@
         "name": "名稱: %0",
         "build": "編譯: %0",
         "gameVersion": "遊戲版本: %0",
+        "protoVersion": "協議版本: %0",
         "dispatchRegion": "Dispatch region: %0",
         "dispatchSeed": "Dispatch seed: %0",
         "dispatchKey": "Dispatch key: %0",
@@ -261,20 +262,6 @@
       }
     },
     "loader": {
-      "avatarData": {
-        "warn": {
-          "noData": "沒有角色数据: %0",
-          "noConfig": "缺少角色的配置: %0",
-          "noFightPropConfig": "无法获取角色的fight prop配置: %0"
-        }
-      },
-      "monsterData": {
-        "warn": {
-          "noData": "沒有动物数据: %0",
-          "noConfig": "缺少动物配置: %0",
-          "noFightPropConfig": "无法获取动物的fight prop配置: %0"
-        }
-      },
       "warn": {
         "noData": "缺少數據: %0"
       }
@@ -338,31 +325,6 @@
       "debug": {
         "register": "註冊: %0 -> %1[%2]",
         "unregister": "註銷: %0 -> %1[%2]"
-      }
-    },
-    "cache": {
-      "debug": {
-        "ability": "成功緩存能力數據",
-        "avatar": "成功緩存頭像數據",
-        "dungeon": "成功緩存地下城數據",
-        "gadget": "成功緩存小工具數據",
-        "growCurve": "成功緩存成長曲線數據",
-        "mapArea": "成功緩存地圖區域數據",
-        "material": "成功緩存材料數據",
-        "monster": "成功緩存怪物數據",
-        "quest": "成功緩存任務數據",
-        "reliquary": "成功緩存聖物數據",
-        "scene": "成功緩存場景數據",
-        "shop": "成功緩存商店數據",
-        "skill": "成功緩存技能數據",
-        "talent": "成功緩存天賦數據",
-        "weapon": "成功緩存武器數據",
-        "weather": "成功緩存天氣數據",
-        "world": "成功緩存世界數據"
-      },
-      "info": {
-        "start": "開始緩存資源",
-        "success": "成功緩存資源"
       }
     }
   },
@@ -644,12 +606,6 @@
           "killMonsters": "殺死怪物中..."
         }
       },
-      "ability": {
-        "desc": "Ability debug",
-        "error": {
-          "entityNotFound": "Entity not found."
-        }
-      },
       "god": {
         "desc": "切換上帝模式",
         "usage": {
@@ -725,24 +681,6 @@
         },
         "error": {
           "invalidFightProp": "無效的 fight prop."
-        }
-      },
-      "talent": {
-        "desc": "編輯/列出當前角色天賦",
-        "usage": {
-          "0": "talent unlock <uid> - 解鎖玩家当前角色的天賦",
-          "1": "talent unlock       - (遊戲中) 解锁当前角色天賦",
-          "2": "talent lock <uid>   - 鎖定玩家当前角色的天賦",
-          "3": "talent lock         - (遊戲中) 鎖定当前角色天賦",
-          "4": "talent list <uid>   - 列出玩家当前角色已解鎖的天賦",
-          "5": "talent list         - (遊戲中) 列出当前角色已解鎖的天賦"
-        },
-        "info": {
-          "unlocked": "已解鎖的天賦: %0",
-          "locked": "已鎖定的天賦: %0"
-        },
-        "error": {
-          "talentNotFound": "天賦未找到."
         }
       },
       "ar": {

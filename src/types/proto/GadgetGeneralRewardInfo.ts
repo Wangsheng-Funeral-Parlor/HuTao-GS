@@ -1,4 +1,4 @@
-import { ItemParam } from '.'
+import { ItemParam } from "."
 
 export interface GadgetGeneralRewardInfo {
   resin: number

@@ -1,7 +1,7 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyTakePhoto extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyTakePhoto'
+  $type: "ConfigWidgetToyTakePhoto"
   HasCameraEffect: boolean
   CameraUIEffect: string
   CameraScreenEffect: string

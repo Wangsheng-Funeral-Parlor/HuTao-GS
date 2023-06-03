@@ -1,6 +1,527 @@
 {
+  "cli": {
+    "commands": {
+      "ability": {
+        "desc": "Ability debug",
+        "error": {
+          "entityNotFound": "Entity not found."
+        }
+      },
+      "ar": {
+        "desc": "Set adventure rank",
+        "info": {
+          "setAR": "Adventure rank set to: %0"
+        },
+        "usage": {
+          "0": "ar <level> <uid> - Set adventure rank for player",
+          "1": "ar <level>       - (In game) Set adventure rank for yourself"
+        }
+      },
+      "artSet": {
+        "desc": "Give artifact set",
+        "error": {
+          "setNotFound": "Artifact set not found."
+        },
+        "info": {
+          "give": "Give artifact set: (%0)x%1"
+        },
+        "usage": {
+          "0": "artSet <id> <uid>         - Give artifact sets to player",
+          "1": "artSet <id>               - (In game) Give artifact sets to yourself",
+          "2": "artSet <id>               - (In game) Give 1 artifact set to yourself"
+        }
+      },
+      "artifact": {
+        "desc": "Give artifact",
+        "info": {
+          "give": "Give artifact: (%0)x%1"
+        },
+        "usage": {
+          "0": "artifact <id> <count> <uid> - Give artifacts to player",
+          "1": "artifact <id> <count>       - (In game) Give artifacts to yourself",
+          "2": "artifact <id>               - (In game) Give 1 artifact to yourself"
+        }
+      },
+      "autopatch": {
+        "desc": "Fetch autopatch data"
+      },
+      "const": {
+        "desc": "Edit/List current avatar consts",
+        "error": {
+          "constNotFound": "const not found."
+        },
+        "info": {
+          "locked": "Locked const: %0",
+          "unlocked": "Unlocked const: %0"
+        },
+        "usage": {
+          "0": "const unlock <uid> - Unlock const for player's current avatar",
+          "1": "const unlock       - (In game) Unlock const for current avatar",
+          "2": "const lock <uid>   - Lock const for player's current avatar",
+          "3": "const lock         - (In game) Lock const for current avatar",
+          "4": "const list <uid>   - List unlocked consts of player's current avatar",
+          "5": "const list         - (In game) List unlocked consts of current avatar"
+        }
+      },
+      "coop": {
+        "desc": "Change to coop world",
+        "error": {
+          "inCoop": "Player already in a coop world."
+        },
+        "info": {
+          "changeToCoop": "Changing to coop world..."
+        },
+        "usage": {
+          "0": "coop <uid> - Change to coop world for player",
+          "1": "coop       - (In game) Change to coop world for yourself"
+        }
+      },
+      "createConfig": {
+        "desc": "Create new config with default values if it doesn't exist",
+        "error": {
+          "exists": "Config already exists: %0",
+          "invalidName": "Invalid name: %0"
+        },
+        "info": {
+          "create": "Creating config: %0",
+          "created": "Created config."
+        },
+        "usage": {
+          "0": "createConfig <name> - Create new config",
+          "1": "createConfig        - Same except name is set to \"default\""
+        }
+      },
+      "deleteConfig": {
+        "desc": "Delete config if it exists",
+        "error": {
+          "invalidName": "Invalid name: %0",
+          "notFound": "Config not found: %0"
+        },
+        "info": {
+          "delete": "Deleting config: %0",
+          "deleted": "Deleted config."
+        },
+        "usage": {
+          "0": "deleteConfig <name> - Delete config",
+          "1": "deleteConfig        - Same except name is set to \"default\""
+        }
+      },
+      "disconnect": {
+        "desc": "Disconnect client",
+        "info": {
+          "disconnect": "Attempt to disconnect: %0"
+        },
+        "usage": {
+          "0": "disconnect <UID|ID> <reason> - Disconnect client",
+          "1": "disconnect <UID|ID>          - Same except reason is set to ENET_SERVER_KICK"
+        }
+      },
+      "ec2b": {
+        "desc": "Dump ec2b key"
+      },
+      "equip": {
+        "desc": "Equip weapon or artifact",
+        "error": {
+          "noEquip": "Equip not found."
+        },
+        "info": {
+          "equip": "Equipped %0 to current avatar."
+        },
+        "usage": {
+          "0": "equip <guid> <uid> - Equip weapon or artifact to player's current avatar",
+          "1": "equip <guid>       - (In game) Equip weapon or artifact to current avatar"
+        }
+      },
+      "gadget": {
+        "desc": "Spawn gadget",
+        "info": {
+          "spawn": "Spawning gadget: %0"
+        },
+        "usage": {
+          "0": "gadget <id> <lv> <uid> - Spawn gadget at player's current avatar position",
+          "1": "gadget <id> <lv>       - (In game) Spawn gadget at current avatar position"
+        }
+      },
+      "god": {
+        "desc": "Toggle god mode",
+        "info": {
+          "disable": "God mode disabled.",
+          "enable": "God mode enabled."
+        },
+        "usage": {
+          "0": "god <uid> - Toggle god mode for player",
+          "1": "god       - (In game) Toggle god mode for yourself"
+        }
+      },
+      "gpatch": {
+        "desc": "Game patching tools",
+        "info": {
+          "success": "Success."
+        },
+        "usage": {
+          "0": "gpatch patch <gameDir>   - Patch metadata & ua in game directory & create backup, For example,'E:\\Genshin Impact\\Genshin Impact Game'",
+          "1": "gpatch patch             - Same except gameDir is set to config.gameDir",
+          "2": "gpatch unpatch <gameDir> - Unpatch metadata & ua from backup in game directory The game directory is the same as above",
+          "3": "gpatch unpatch           - Same except gameDir is set to config.gameDir"
+        }
+      },
+      "gs": {
+        "desc": "Set/Toggle/List global state",
+        "usage": {
+          "0": "gs set <name> <value> - Set global state to value",
+          "1": "gs toggle <name>      - Toggle global state",
+          "2": "gs list               - List global state"
+        }
+      },
+      "guid": {
+        "desc": "Show current avatar guid & equips guid",
+        "usage": {
+          "0": "guid <uid> - Show player's current avatar guid & equips guid",
+          "1": "guid       - (In game) Show current avatar guid & equips guid"
+        }
+      },
+      "hcoin": {
+        "desc": "Give primogem",
+        "info": {
+          "give": "Give primogem: %0"
+        },
+        "usage": {
+          "0": "hcoin <amount> <uid> - Give primogem to player",
+          "1": "hcoin <amount>       - (In game) Give primogem to yourself"
+        }
+      },
+      "heal": {
+        "desc": "Heal all avatar in current team",
+        "info": {
+          "heal": "Healed all avatar."
+        },
+        "usage": {
+          "0": "heal <uid> - Heal all avatar in player's current team",
+          "1": "heal       - (In game) Heal all avatar in current team"
+        }
+      },
+      "help": {
+        "desc": "Show help messages",
+        "error": {
+          "inGame": "Please visit announcement for list of commands.",
+          "invalidCategory": "Unknown category: %0"
+        },
+        "page": {
+          "commandInfo": {
+            "desc": "Description: %0",
+            "syntax": "Syntax: %0",
+            "title": "Command info:",
+            "usage": "Usage:"
+          },
+          "commandList": {
+            "title": "Command list:"
+          },
+          "console": {
+            "controls": {
+              "0": "Page up/Page down   - Scroll up/down",
+              "1": "Up arrow/Down arrow - Previous/Next command",
+              "2": "Tab/Right arrow     - Auto complete",
+              "3": "Escape              - Cancel input"
+            },
+            "title": "Console controls:"
+          }
+        },
+        "usage": {
+          "0": "help command           - Command list",
+          "1": "help command <command> - Command info",
+          "2": "help console           - Console controls"
+        }
+      },
+      "keygen": {
+        "desc": "Attempt to generate key from packet dumps"
+      },
+      "killall": {
+        "desc": "Kill all nearby monsters (32 Max)",
+        "info": {
+          "killMonsters": "Killing monsters..."
+        },
+        "usage": {
+          "0": "killall <uid> - Kill all nearby monsters for player",
+          "1": "killall       - (In game) Kill all nearby monsters"
+        }
+      },
+      "lightning": {
+        "desc": "Spawn lightning at player continuously",
+        "info": {
+          "start": "Started lightning.",
+          "stop": "Stopped lightning."
+        }
+      },
+      "list": {
+        "desc": "List connected clients",
+        "info": {
+          "empty": "Empty."
+        }
+      },
+      "loadConfig": {
+        "desc": "Change current config",
+        "error": {
+          "invalidName": "Invalid name: %0",
+          "notFound": "Config not found: %0"
+        },
+        "info": {
+          "load": "Loading config: %0"
+        },
+        "usage": {
+          "0": "loadConfig <name> - Change current config & restart",
+          "1": "loadConfig        - Same except name is set to \"default\""
+        }
+      },
+      "logLevel": {
+        "desc": "Set log level",
+        "usage": "logLevel %0 - Set log level to %1"
+      },
+      "material": {
+        "desc": "Give material",
+        "info": {
+          "give": "Give material: (%0)x%1"
+        },
+        "usage": {
+          "0": "material <id> <count> <uid> - Give materials to player",
+          "1": "material <id> <count>       - (In game) Give materials to yourself",
+          "2": "material <id>               - (In game) Give 1 material to yourself"
+        }
+      },
+      "mcoin": {
+        "desc": "Give genesis crystal",
+        "info": {
+          "give": "Give genesis crystal: %0"
+        },
+        "usage": {
+          "0": "mcoin <amount> <uid> - Give genesis crystal to player",
+          "1": "mcoin <amount>       - (In game) Give genesis crystal to yourself"
+        }
+      },
+      "meta": {
+        "desc": "Metadata patching tools",
+        "info": {
+          "success": "Success."
+        },
+        "usage": {
+          "0": "meta patch <input file> <output file> - Patch metadata",
+          "1": "meta dump <input file> <output file>  - Dump metadata strings",
+          "2": "meta dec <input file> <output file>   - Decrypt metadata",
+          "3": "meta enc <input file> <output file>   - Encrypt metadata"
+        }
+      },
+      "nocd": {
+        "desc": "set nocd",
+        "info": {
+          "disable": "nocd disabled.",
+          "enable": "nocd enabled."
+        },
+        "usage": {
+          "0": "nocd [true|false] <uid> - Toggle nocd for player",
+          "1": "nocd [true|false]       - (In game) Toggle nocd for yourself"
+        }
+      },
+      "pos": {
+        "desc": "Print current position",
+        "info": {
+          "posInfo": "Scene: %0 X: %1 Y: %2 Z: %3"
+        },
+        "usage": {
+          "0": "pos <uid> - Print player current position",
+          "1": "pos       - (In game) Print your current position"
+        }
+      },
+      "quest": {
+        "desc": "quest Manager",
+        "error": {
+          "alreadyMainQuest": "MainQuest already list.",
+          "mainQuestNotAdded": "Quest not added.",
+          "mainQuestNotFound": "MainQuest not found."
+        },
+        "info": {
+          "subQuestAccept": "Accept SubQuest: %0",
+          "mainQuestAdd": "Added MainQuest: %0",
+          "mainQuestRemove": "Removed Quest: %0"
+        }
+      },
+      "recharge": {
+        "desc": "Recharge all avatar in current team",
+        "info": {
+          "recharge": "Recharged energy."
+        },
+        "usage": {
+          "0": "recharge <uid> - Recharge all avatar in player's current team",
+          "1": "recharge       - (In game) Recharge all avatar in current team"
+        }
+      },
+      "register": {
+        "desc": "Register account",
+        "error": {
+          "mismatch": "Password mismatch."
+        },
+        "info": {
+          "success": "Account registered successfully."
+        },
+        "prompt": {
+          "name": "Enter Username",
+          "pass": "Enter Password",
+          "retypePass": "Retype Password"
+        }
+      },
+      "restart": {
+        "desc": "Restart server"
+      },
+      "scene": {
+        "desc": "Change scene",
+        "error": {
+          "sameScene": "Same scene.",
+          "sceneNotFound": "Scene not found."
+        },
+        "info": {
+          "changeScene": "Change scene to: %0"
+        },
+        "usage": {
+          "0": "scene <id> <uid> - Change scene for player",
+          "1": "scene <id>       - (In game) Change scene for yourself"
+        },
+        "warn": {
+          "noData": "No scene data"
+        }
+      },
+      "scoin": {
+        "desc": "Give mora",
+        "info": {
+          "give": "Give mora: %0"
+        },
+        "usage": {
+          "0": "scoin <amount> <uid> - Give mora to player",
+          "1": "scoin <amount>       - (In game) Give mora to yourself"
+        }
+      },
+      "setcs": {
+        "desc": "Set candidate skill for current avatar",
+        "error": {
+          "noSkill": "Skill not found."
+        },
+        "info": {
+          "setSkill": "Set candidate skill to %0"
+        },
+        "usage": {
+          "0": "setcs <id> <uid> - Set candidate skill for player's current avatar",
+          "1": "setcs <id>       - (In game) Set candidate skill for current avatar"
+        }
+      },
+      "setfp": {
+        "desc": "Set fight prop for current avatar",
+        "error": {
+          "invalidFightProp": "Invalid fight prop."
+        },
+        "info": {
+          "set": "Set %0(%1) to %2."
+        },
+        "usage": {
+          "0": "setfp <prop> <value> <uid> - Set fight prop for player's current avatar",
+          "1": "setfp <prop> <value>       - (In game) Set fight prop for current avatar"
+        }
+      },
+      "spawn": {
+        "desc": "Spawn monster",
+        "info": {
+          "spawn": "Spawning monster: %0"
+        },
+        "usage": {
+          "0": "spawn <id> <lv> <uid> - Spawn monster at player's current avatar position",
+          "1": "spawn <id> <lv>       - (In game) Spawn monster at current avatar position"
+        }
+      },
+      "stop": {
+        "desc": "Stop server"
+      },
+      "switchelement": {
+        "desc": "Change element traveler",
+        "error": {
+          "notElementName": "The name of the element is incorrect.",
+          "notTravelerAvatar": "Current avatar is not a traveler"
+        },
+        "info": {
+          "changeElement": "Change element to: %0"
+        },
+        "usage": {
+          "0": "switchelement <elementName> <uid> - Change element traveler for player",
+          "1": "switchelement <elementName> - (In game) Change element traveler for yourself"
+        }
+      },
+      "tp": {
+        "desc": "Teleport to location",
+        "info": {
+          "tp": "Teleport to: %0 %1 %2"
+        },
+        "usage": {
+          "0": "tp <x> <y> <z> <uid> - Teleport player to location",
+          "1": "tp <x> <y> <z>       - (In game) Teleport yourself to location"
+        }
+      },
+      "ua": {
+        "desc": "UA patching tools",
+        "info": {
+          "success": "Success."
+        },
+        "usage": {
+          "0": "ua patch <input file> <output file> - Patch UA RSA keys",
+          "1": "ua dump <input file>                - Print UA RSA keys to console"
+        }
+      },
+      "update": {
+        "desc": "Update server"
+      },
+      "vehicle": {
+        "desc": "Spawn vehicle",
+        "info": {
+          "spawn": "Spawning vehicle..."
+        },
+        "usage": {
+          "0": "vehicle <uid> - Spawn vehicle at player's current avatar position",
+          "1": "vehicle       - (In game) Spawn vehicle at current avatar position"
+        }
+      },
+      "weapon": {
+        "desc": "Give weapon",
+        "info": {
+          "give": "Give weapon: (%0)x%1"
+        },
+        "usage": {
+          "0": "weapon <id> <count> <uid> - Give weapons to player",
+          "1": "weapon <id> <count>       - (In game) Give weapons to yourself",
+          "2": "weapon <id>               - (In game) Give 1 weapon to yourself"
+        }
+      },
+      "windy": {
+        "desc": "Windy!!",
+        "error": {
+          "windyfileNotFound": "Windy file not found."
+        }
+      }
+    },
+    "error": {
+      "consoleOnly": "This command can only be used in console.",
+      "defUnexpectedArg": "Definition error: Cannot have any argument after dynamic argument.",
+      "defUnexpectedOptional": "Definition error: Cannot have required argument after optional argument.",
+      "defUnexpectedType": "Definition error: Unknown argument type (%0).",
+      "execFail": "Failed to execute command: %0",
+      "invalidValue": "Invalid value: %0, must be one of: %1",
+      "missing": "Missing %0",
+      "parseFail": "Failed to parse command: %0",
+      "playerOnly": "This command can only be used in game.",
+      "typeError": "Type error: (%0) must be a %1.",
+      "unknownCommand": "Unknown command: %0"
+    }
+  },
   "generic": {
+    "fileNotFound": "File not found: %0",
+    "inventoryFull": "Inventory full.",
+    "notInScene": "Not in scene.",
+    "notInWorld": "Not in world.",
     "param1": "%0",
+    "param10": "%0 %1 %2 %3 %4 %5 %6 %7 %8 %9",
     "param2": "%0 %1",
     "param3": "%0 %1 %2",
     "param4": "%0 %1 %2 %3",
@@ -9,239 +530,19 @@
     "param7": "%0 %1 %2 %3 %4 %5 %6",
     "param8": "%0 %1 %2 %3 %4 %5 %6 %7",
     "param9": "%0 %1 %2 %3 %4 %5 %6 %7 %8",
-    "param10": "%0 %1 %2 %3 %4 %5 %6 %7 %8 %9",
-    "fileNotFound": "File not found: %0",
-    "playerNotFound": "Player not found.",
-    "playerNoPos": "Unable to get player position.",
     "playerNoCurAvatar": "Unable to get player current avatar",
-    "notInWorld": "Not in world.",
-    "notInScene": "Not in scene.",
-    "inventoryFull": "Inventory full."
+    "playerNoPos": "Unable to get player position.",
+    "playerNotFound": "Player not found."
   },
   "message": {
-    "server": {
+    "ability": {
       "debug": {
-        "setHost": "Setting hosts...",
-        "setHostSuccess": "Set hosts success.",
-        "removeHost": "Removing hosts...",
-        "removeHostSuccess": "Remove hosts success.",
-        "flushDns": "Flushing dns...",
-        "flushDnsSuccess": "Flush dns success."
-      },
-      "info": {
-        "name": "Name: %0",
-        "build": "Build: %0",
-        "gameVersion": "Game version: %0",
-        "dispatchRegion": "Dispatch region: %0",
-        "dispatchSeed": "Dispatch seed: %0",
-        "dispatchKey": "Dispatch key: %0",
-        "autoPatch": "Auto patch: %0",
-        "logLevel": "Log level: %0",
-        "starting": "Starting...",
-        "started": "Started. For help, type 'help'",
-        "restart": "Restarting... Delay: %0ms",
-        "stop": "Stopping... Delay: %0ms",
-        "mkdir": "Creating directory: %0"
-      },
-      "error": {
-        "invalidRegion": "Unsupported region.",
-        "invalidVersion": "Unsupported version.",
-        "patchGame": "Error patching game: %0",
-        "unpatchGame": "Error unpatching game: %0",
-        "setHost": "Set hosts failed: %0",
-        "removeHost": "Remove hosts failed: %0",
-        "flushDns": "Flush dns failed: %0",
-        "start": "Error while starting: %0",
-        "mkdir": "Error while creating directory: %0"
-      }
-    },
-    "update": {
-      "info": {
-        "stop": "Stopping...",
-        "restart": "Restarting...",
-        "exit": "Exiting...",
-        "compare": "Comparing version...",
-        "noDiff": "Same version, stop update.",
-        "download": "Mismatch version, downloading update...",
-        "copy": "Copying exe...",
-        "clean": "Cleaning up...",
-        "cleanSuccess": "Cleanup complete.",
-        "updateAvailable": "New update available, type 'update' to update."
-      },
-      "error": {
-        "invalidBuildType": "Not executable, cannot update.",
-        "missingURL": "No update url.",
-        "missingArg": "Missing argument.",
-        "invalidState": "Invalid update state: %0",
-        "invalidContent": "Invalid content data.",
-        "invalidSignature": "Invalid signature.",
-        "invalidJson": "Invalid json.",
-        "noData": "No data."
-      }
-    },
-    "openssl": {
-      "debug": {
-        "check": "Checking OpenSSL installation..."
-      },
-      "error": {
-        "notInstalled": "OpenSSL not installed.",
-        "invalidPrivateKey": "Invalid private key.",
-        "invalidPublicKey": "Invalid public key."
-      }
-    },
-    "ssl": {
-      "info": {
-        "checkCA": "Validating ca files...",
-        "checkSRV": "Validating srv files...",
-        "checkSuccess": "Validation success.",
-        "mkdir": "Creating ssl directory...",
-        "generateCA": "Generating ca files...",
-        "generateSRV": "Generating srv files...",
-        "create": "Creating %0...",
-        "generate": "Generating %0...",
-        "found": "Found %0."
+        "indexWrong": "%0 %1 index wrong",
+        "register": "Register: %0 -> %1[%2]",
+        "unregister": "Unregister: %0 -> %1[%2]"
       },
       "warn": {
-        "checkCAFail": "Missing ca files.",
-        "checkSRVFail": "Missing srv files."
-      }
-    },
-    "tools": {
-      "keyGen": {
-        "debug": {
-          "dump": "O: %0 K: %1 DV: %2 KV: %3"
-        },
-        "info": {
-          "generate": "Generating key...",
-          "notModified": "No change.",
-          "save": "Saving changes...",
-          "success": "KeyGen success."
-        },
-        "error": {
-          "dump": "Skip dump (%0): %1",
-          "unknown": "KeyGen Error: %0"
-        }
-      },
-      "autoPatch": {
-        "debug": {
-          "reqInfo": "(%0) Host: %1 Path: %2",
-          "write": "Writing to: %0",
-          "resolve": "(%0) Resolved: %1"
-        },
-        "info": {
-          "check": "Checking for updates...",
-          "update": "Updating...",
-          "success": "Update complete."
-        },
-        "error": {
-          "invalidRegion": "Auto patch not supported for this version.",
-          "noProto": "Missing proto file.",
-          "noSeed": "Missing dispatch seed.",
-          "reqFail": "IP: %0 Host: %1 Error: %2",
-          "queryFail": "Query failed: %0"
-        }
-      },
-      "meta": {
-        "info": {
-          "replacePasswordPublicKey": "Replacing password public key...",
-          "replaceServerPublicKey": "Replacing server public key..."
-        },
-        "error": {
-          "noRSAKeys": "Unable to find rsa keys.",
-          "noPasswordPublicKey": "Unable to find password public key.",
-          "noServerPublicKey": "Unable to find server public key."
-        }
-      },
-      "ua": {
-        "error": {
-          "unknownOperand": "Unknown operand: %0",
-          "unknownInstruction": "Unknown instruction: %0",
-          "noReturn": "Unable to locate return instructions.",
-          "noServerPublicKey": "Unable to find server public key."
-        }
-      },
-      "patcher": {
-        "info": {
-          "patchMeta": "Patching metadata...",
-          "patchUA": "Patching UA...",
-          "unpatchMeta": "Unpatching metadata...",
-          "unpatchUA": "Unpatching UA..."
-        },
-        "error": {
-          "noDataDir": "Unable to find Data directory.",
-          "patched": "Already patched."
-        }
-      }
-    },
-    "worker": {
-      "debug": {
-        "start": "Starting: %0",
-        "spawn": "Worker spawn: %0 ISocket port: %1",
-        "stdout": "stdout: %0 %1",
-        "stderr": "stderr: %0 %1",
-        "stop": "Stopping: %0",
-        "ready": "Ready",
-        "shutdown": "Shutdown",
-        "initKcpSuccess": "Init kcp complete: %0",
-        "setISocketPort": "Set ISocket port: %0 %1",
-        "removeConv": "Remove conv: %0"
-      },
-      "info": {
-        "exit": "Worker exit: %0 Code: %1 Signal: %2",
-        "restart": "Restarting worker: %0",
-        "started": "Worker started.",
-        "listen": "Listening on port %0",
-        "blockAddr": "Blocked address: %0"
-      },
-      "warn": {
-        "invalidPacket": "Invalid packet received, xor decrypt failed?"
-      },
-      "error": {
-        "invalidOpcode": "Invalid opcode: %0",
-        "restartFail": "Worker failed to restart: %0",
-        "invalidId": "Mismatch id: %0",
-        "initKcpFail": "Init kcp error: %0",
-        "UDPError": "UDP error: %0",
-        "sendPacketError": "Send packet error: %0",
-        "invalidPort": "Invalid port: %0"
-      }
-    },
-    "webServer": {
-      "debug": {
-        "handle": "Handled: (%0)%1",
-        "noHandler": "Unhandled: %0"
-      },
-      "info": {
-        "listen": "Listening on port %0"
-      },
-      "error": {
-        "noSSL": "Unable to generate ssl config, abort.",
-        "handler": "Error handling request: %0"
-      }
-    },
-    "kcpServer": {
-      "info": {
-        "connect": "Client connect: %0",
-        "disconnect": "Client disconnect: %0 Reason: %1"
-      }
-    },
-    "dnsServer": {
-      "info": {
-        "TCPListen": "[TCP] Listening on port %0",
-        "UDPListen": "[UDP] Listening on port %0"
-      },
-      "error": {
-        "TCPError": "TCP error: %0",
-        "UDPError": "UDP error: %0",
-        "socketError": "Socket error: %0"
-      }
-    },
-    "dispatch": {
-      "debug": {
-        "reqInfo": "Search params: %0"
-      },
-      "error": {
-        "updateFail": "Update failed."
+        "noProto": "No proto for argument type: %0 %1 %2"
       }
     },
     "authenticator": {
@@ -253,92 +554,6 @@
       },
       "error": {
         "generateUidFail": "Failed to generate uid."
-      }
-    },
-    "guid": {
-      "error": {
-        "full": "guid list is full."
-      }
-    },
-    "loader": {
-      "avatarData": {
-        "warn": {
-          "noData": "No data for avatar: %0",
-          "noConfig": "Missing config for avatar: %0",
-          "noFightPropConfig": "Unable to get fight prop config for avatar: %0"
-        }
-      },
-      "monsterData": {
-        "warn": {
-          "noData": "No data for monster: %0",
-          "noConfig": "Missing config for monster: %0",
-          "noFightPropConfig": "Unable to get fight prop config for monster: %0"
-        }
-      },
-      "warn": {
-        "noData": "Missing data: %0"
-      }
-    },
-    "protoUtils": {
-      "warn": {
-        "noProto": "Missing proto: %0"
-      }
-    },
-    "packet": {
-      "debug": {
-        "noHandler": "No handler for packet: %0 %1"
-      },
-      "warn": {
-        "unknownPacket": "Unknown packet: %0"
-      },
-      "error": {
-        "handler": "Error handling packet: %0"
-      }
-    },
-    "client": {
-      "debug": {
-        "stateChange": "State change: %0 %1 %2",
-        "seed": "Set seed: %0 %1",
-        "uid": "Set UID: %0"
-      }
-    },
-    "scene": {
-      "debug": {
-        "loadBlock": "Load block: %0",
-        "unloadBlock": "Unload block: %0",
-        "abilityInvokeNoEntity": "Ability invoke to null entity: %0",
-        "join": "JOIN",
-        "joinInfo": "%0 UID: %1 ID: %2 Pos: [%3,%4,%5] Type: %6 Reason: %7",
-        "quit": "QUIT",
-        "quitInfo": "%0 UID: %1 ID: %2"
-      }
-    },
-    "entity": {
-      "debug": {
-        "register": "Register: %0",
-        "unregister": "Unregister: %0",
-        "add": "Add: %0",
-        "remove": "Remove: %0",
-        "replace": "Replace: %0 -> %1",
-        "updateEntity": "Update EntityID: %0"
-      }
-    },
-    "combat": {
-      "debug": {
-        "fall": "[FALL] Type: %0 Speed: %1 Mul: %2"
-      },
-      "warn": {
-        "noProto": "No proto for argument type: %0 %1 %2"
-      }
-    },
-    "ability": {
-      "warn": {
-        "noProto": "No proto for argument type: %0 %1 %2"
-      },
-      "debug": {
-        "register": "Register: %0 -> %1[%2]",
-        "unregister": "Unregister: %0 -> %1[%2]",
-        "indexWrong": "%0 %1 index wrong"
       }
     },
     "cache": {
@@ -365,480 +580,309 @@
         "start": "Start caching resources",
         "success": "Success caching resources"
       }
-    }
-  },
-  "cli": {
-    "error": {
-      "parseFail": "Failed to parse command: %0",
-      "unknownCommand": "Unknown command: %0",
-      "consoleOnly": "This command can only be used in console.",
-      "playerOnly": "This command can only be used in game.",
-      "execFail": "Failed to execute command: %0",
-      "typeError": "Type error: (%0) must be a %1.",
-      "defUnexpectedType": "Definition error: Unknown argument type (%0).",
-      "defUnexpectedOptional": "Definition error: Cannot have required argument after optional argument.",
-      "defUnexpectedArg": "Definition error: Cannot have any argument after dynamic argument.",
-      "invalidValue": "Invalid value: %0, must be one of: %1",
-      "missing": "Missing %0"
     },
-    "commands": {
-      "help": {
-        "desc": "Show help messages",
-        "usage": {
-          "0": "help command           - Command list",
-          "1": "help command <command> - Command info",
-          "2": "help console           - Console controls"
-        },
-        "page": {
-          "console": {
-            "title": "Console controls:",
-            "controls": {
-              "0": "Page up/Page down   - Scroll up/down",
-              "1": "Up arrow/Down arrow - Previous/Next command",
-              "2": "Tab/Right arrow     - Auto complete",
-              "3": "Escape              - Cancel input"
-            }
-          },
-          "commandList": {
-            "title": "Command list:"
-          },
-          "commandInfo": {
-            "title": "Command info:",
-            "syntax": "Syntax: %0",
-            "desc": "Description: %0",
-            "usage": "Usage:"
-          }
+    "client": {
+      "debug": {
+        "seed": "Set seed: %0 %1",
+        "stateChange": "State change: %0 %1 %2",
+        "uid": "Set UID: %0"
+      }
+    },
+    "combat": {
+      "debug": {
+        "fall": "[FALL] Type: %0 Speed: %1 Mul: %2"
+      },
+      "warn": {
+        "noProto": "No proto for argument type: %0 %1 %2"
+      }
+    },
+    "dispatch": {
+      "debug": {
+        "reqInfo": "Search params: %0"
+      },
+      "error": {
+        "msg": "Connection Failed!",
+        "outdateClient": "Version mismatch outdated client! \n\nServer version: %0 \nClient version: %1",
+        "outdateServer": "Version mismatch outdated server! \n\nServer version: %0 \nClient version: %1",
+        "updateFail": "Update failed."
+      }
+    },
+    "dnsServer": {
+      "error": {
+        "TCPError": "TCP error: %0",
+        "UDPError": "UDP error: %0",
+        "socketError": "Socket error: %0"
+      },
+      "info": {
+        "TCPListen": "[TCP] Listening on port %0",
+        "UDPListen": "[UDP] Listening on port %0"
+      }
+    },
+    "entity": {
+      "debug": {
+        "add": "Add: %0",
+        "register": "Register: %0",
+        "remove": "Remove: %0",
+        "replace": "Replace: %0 -> %1",
+        "unregister": "Unregister: %0",
+        "updateEntity": "Update EntityID: %0"
+      }
+    },
+    "guid": {
+      "error": {
+        "full": "guid list is full."
+      }
+    },
+    "kcpServer": {
+      "info": {
+        "connect": "Client connect: %0",
+        "disconnect": "Client disconnect: %0 Reason: %1"
+      }
+    },
+    "loader": {
+      "avatarData": {
+        "warn": {
+          "noConfig": "Missing config for avatar: %0",
+          "noData": "No data for avatar: %0",
+          "noFightPropConfig": "Unable to get fight prop config for avatar: %0"
+        }
+      },
+      "monsterData": {
+        "warn": {
+          "noData": "No data for monster: %0",
+          "noFightPropConfig": "Unable to get fight prop config for monster: %0"
+        }
+      },
+      "warn": {
+        "noData": "Missing data: %0"
+      }
+    },
+    "openssl": {
+      "debug": {
+        "check": "Checking OpenSSL installation..."
+      },
+      "error": {
+        "invalidPrivateKey": "Invalid private key.",
+        "invalidPublicKey": "Invalid public key.",
+        "notInstalled": "OpenSSL not installed."
+      }
+    },
+    "packet": {
+      "debug": {
+        "noHandler": "No handler for packet: %0 %1"
+      },
+      "error": {
+        "handler": "Error handling packet: %0"
+      },
+      "warn": {
+        "unknownPacket": "Unknown packet: %0"
+      }
+    },
+    "protoUtils": {
+      "warn": {
+        "noProto": "Missing proto: %0"
+      }
+    },
+    "scene": {
+      "debug": {
+        "abilityInvokeNoEntity": "Ability invoke to null entity: %0",
+        "join": "JOIN",
+        "joinInfo": "%0 UID: %1 ID: %2 Pos: [%3,%4,%5] Type: %6 Reason: %7",
+        "loadBlock": "Load block: %0",
+        "quit": "QUIT",
+        "quitInfo": "%0 UID: %1 ID: %2",
+        "unloadBlock": "Unload block: %0"
+      }
+    },
+    "server": {
+      "debug": {
+        "flushDns": "Flushing dns...",
+        "flushDnsSuccess": "Flush dns success.",
+        "removeHost": "Removing hosts...",
+        "removeHostSuccess": "Remove hosts success.",
+        "setHost": "Setting hosts...",
+        "setHostSuccess": "Set hosts success."
+      },
+      "error": {
+        "flushDns": "Flush dns failed: %0",
+        "invalidRegion": "Unsupported region.",
+        "invalidVersion": "Unsupported version.",
+        "mkdir": "Error while creating directory: %0",
+        "patchGame": "Error patching game: %0",
+        "removeHost": "Remove hosts failed: %0",
+        "setHost": "Set hosts failed: %0",
+        "start": "Error while starting: %0",
+        "unpatchGame": "Error unpatching game: %0"
+      },
+      "info": {
+        "autoPatch": "Auto patch: %0",
+        "build": "Build: %0",
+        "dispatchKey": "Dispatch key: %0",
+        "dispatchRegion": "Dispatch region: %0",
+        "dispatchSeed": "Dispatch seed: %0",
+        "gameVersion": "Game version: %0",
+        "protoVersion": "Proto version: %0",
+        "logLevel": "Log level: %0",
+        "mkdir": "Creating directory: %0",
+        "name": "Name: %0",
+        "restart": "Restarting... Delay: %0ms",
+        "started": "Started. For help, type 'help'",
+        "starting": "Starting...",
+        "stop": "Stopping... Delay: %0ms"
+      }
+    },
+    "ssl": {
+      "info": {
+        "checkCA": "Validating ca files...",
+        "checkSRV": "Validating srv files...",
+        "checkSuccess": "Validation success.",
+        "create": "Creating %0...",
+        "found": "Found %0.",
+        "generate": "Generating %0...",
+        "generateCA": "Generating ca files...",
+        "generateSRV": "Generating srv files...",
+        "mkdir": "Creating ssl directory..."
+      },
+      "warn": {
+        "checkCAFail": "Missing ca files.",
+        "checkSRVFail": "Missing srv files."
+      }
+    },
+    "tools": {
+      "autoPatch": {
+        "debug": {
+          "reqInfo": "(%0) Host: %1 Path: %2",
+          "resolve": "(%0) Resolved: %1",
+          "write": "Writing to: %0"
         },
         "error": {
-          "inGame": "Please visit announcement for list of commands.",
-          "invalidCategory": "Unknown category: %0"
-        }
-      },
-      "stop": {
-        "desc": "Stop server"
-      },
-      "restart": {
-        "desc": "Restart server"
-      },
-      "logLevel": {
-        "desc": "Set log level",
-        "usage": "logLevel %0 - Set log level to %1"
-      },
-      "gs": {
-        "desc": "Set/Toggle/List global state",
-        "usage": {
-          "0": "gs set <name> <value> - Set global state to value",
-          "1": "gs toggle <name>      - Toggle global state",
-          "2": "gs list               - List global state"
-        }
-      },
-      "update": {
-        "desc": "Update server"
-      },
-      "list": {
-        "desc": "List connected clients",
-        "info": {
-          "empty": "Empty."
-        }
-      },
-      "disconnect": {
-        "desc": "Disconnect client",
-        "usage": {
-          "0": "disconnect <UID|ID> <reason> - Disconnect client",
-          "1": "disconnect <UID|ID>          - Same except reason is set to ENET_SERVER_KICK"
+          "invalidRegion": "Auto patch not supported for this version.",
+          "noProto": "Missing proto file.",
+          "noSeed": "Missing dispatch seed.",
+          "queryFail": "Query failed: %0",
+          "reqFail": "IP: %0 Host: %1 Error: %2"
         },
         "info": {
-          "disconnect": "Attempt to disconnect: %0"
+          "check": "Checking for updates...",
+          "success": "Update complete.",
+          "update": "Updating..."
         }
       },
-      "script": {
-        "desc": "Windy!!",
-        "error": {
-          "scriptNotFound": "Script not found."
-        }
-      },
-      "createConfig": {
-        "desc": "Create new config with default values if it doesn't exist",
-        "usage": {
-          "0": "createConfig <name> - Create new config",
-          "1": "createConfig        - Same except name is set to \"default\""
-        },
-        "info": {
-          "create": "Creating config: %0",
-          "created": "Created config."
+      "keyGen": {
+        "debug": {
+          "dump": "O: %0 K: %1 DV: %2 KV: %3"
         },
         "error": {
-          "invalidName": "Invalid name: %0",
-          "exists": "Config already exists: %0"
-        }
-      },
-      "deleteConfig": {
-        "desc": "Delete config if it exists",
-        "usage": {
-          "0": "deleteConfig <name> - Delete config",
-          "1": "deleteConfig        - Same except name is set to \"default\""
+          "dump": "Skip dump (%0): %1",
+          "unknown": "KeyGen Error: %0"
         },
         "info": {
-          "delete": "Deleting config: %0",
-          "deleted": "Deleted config."
-        },
-        "error": {
-          "invalidName": "Invalid name: %0",
-          "notFound": "Config not found: %0"
-        }
-      },
-      "loadConfig": {
-        "desc": "Change current config",
-        "usage": {
-          "0": "loadConfig <name> - Change current config & restart",
-          "1": "loadConfig        - Same except name is set to \"default\""
-        },
-        "info": {
-          "load": "Loading config: %0"
-        },
-        "error": {
-          "invalidName": "Invalid name: %0",
-          "notFound": "Config not found: %0"
-        }
-      },
-      "gpatch": {
-        "desc": "Game patching tools",
-        "usage": {
-          "0": "gpatch patch <gameDir>   - Patch metadata & ua in game directory & create backup, For example,'E:\\Genshin Impact\\Genshin Impact Game'",
-          "1": "gpatch patch             - Same except gameDir is set to config.gameDir",
-          "2": "gpatch unpatch <gameDir> - Unpatch metadata & ua from backup in game directory The game directory is the same as above",
-          "3": "gpatch unpatch           - Same except gameDir is set to config.gameDir"
-        },
-        "info": {
-          "success": "Success."
+          "generate": "Generating key...",
+          "notModified": "No change.",
+          "save": "Saving changes...",
+          "success": "KeyGen success."
         }
       },
       "meta": {
-        "desc": "Metadata patching tools",
-        "usage": {
-          "0": "meta patch <input file> <output file> - Patch metadata",
-          "1": "meta dump <input file> <output file>  - Dump metadata strings",
-          "2": "meta dec <input file> <output file>   - Decrypt metadata",
-          "3": "meta enc <input file> <output file>   - Encrypt metadata"
+        "error": {
+          "noPasswordPublicKey": "Unable to find password public key.",
+          "noRSAKeys": "Unable to find rsa keys.",
+          "noServerPublicKey": "Unable to find server public key."
         },
         "info": {
-          "success": "Success."
+          "replacePasswordPublicKey": "Replacing password public key...",
+          "replaceServerPublicKey": "Replacing server public key..."
+        }
+      },
+      "patcher": {
+        "error": {
+          "noDataDir": "Unable to find Data directory.",
+          "patched": "Already patched."
+        },
+        "info": {
+          "patchMeta": "Patching metadata...",
+          "patchUA": "Patching UA...",
+          "unpatchMeta": "Unpatching metadata...",
+          "unpatchUA": "Unpatching UA..."
         }
       },
       "ua": {
-        "desc": "UA patching tools",
-        "usage": {
-          "0": "ua patch <input file> <output file> - Patch UA RSA keys",
-          "1": "ua dump <input file>                - Print UA RSA keys to console"
-        },
-        "info": {
-          "success": "Success."
-        }
-      },
-      "autopatch": {
-        "desc": "Fetch autopatch data"
-      },
-      "ec2b": {
-        "desc": "Dump ec2b key"
-      },
-      "keygen": {
-        "desc": "Attempt to generate key from packet dumps"
-      },
-      "register": {
-        "desc": "Register account",
-        "prompt": {
-          "name": "Enter Username",
-          "pass": "Enter Password",
-          "retypePass": "Retype Password"
-        },
-        "info": {
-          "success": "Account registered successfully."
-        },
         "error": {
-          "mismatch": "Password mismatch."
+          "noReturn": "Unable to locate return instructions.",
+          "noServerPublicKey": "Unable to find server public key.",
+          "unknownInstruction": "Unknown instruction: %0",
+          "unknownOperand": "Unknown operand: %0"
         }
+      }
+    },
+    "update": {
+      "error": {
+        "invalidBuildType": "Not executable, cannot update.",
+        "invalidContent": "Invalid content data.",
+        "invalidJson": "Invalid json.",
+        "invalidSignature": "Invalid signature.",
+        "invalidState": "Invalid update state: %0",
+        "missingArg": "Missing argument.",
+        "missingURL": "No update url.",
+        "noData": "No data."
       },
-      "pos": {
-        "desc": "Print current position",
-        "usage": {
-          "0": "pos <uid> - Print player current position",
-          "1": "pos       - (In game) Print your current position"
-        },
-        "info": {
-          "posInfo": "Scene: %0 X: %1 Y: %2 Z: %3"
-        }
+      "info": {
+        "clean": "Cleaning up...",
+        "cleanSuccess": "Cleanup complete.",
+        "compare": "Comparing version...",
+        "copy": "Copying exe...",
+        "download": "Mismatch version, downloading update...",
+        "exit": "Exiting...",
+        "noDiff": "Same version, stop update.",
+        "restart": "Restarting...",
+        "stop": "Stopping...",
+        "updateAvailable": "New update available, type 'update' to update."
+      }
+    },
+    "webServer": {
+      "debug": {
+        "handle": "Handled: (%0)%1",
+        "noHandler": "Unhandled: %0"
       },
-      "scene": {
-        "desc": "Change scene",
-        "usage": {
-          "0": "scene <id> <uid> - Change scene for player",
-          "1": "scene <id>       - (In game) Change scene for yourself"
-        },
-        "info": {
-          "changeScene": "Change scene to: %0"
-        },
-        "error": {
-          "sceneNotFound": "Scene not found.",
-          "sameScene": "Same scene."
-        }
+      "error": {
+        "handler": "Error handling request: %0",
+        "noSSL": "Unable to generate ssl config, abort."
       },
-      "tp": {
-        "desc": "Teleport to location",
-        "usage": {
-          "0": "tp <x> <y> <z> <uid> - Teleport player to location",
-          "1": "tp <x> <y> <z>       - (In game) Teleport yourself to location"
-        },
-        "info": {
-          "tp": "Teleport to: %0 %1 %2"
-        }
+      "info": {
+        "listen": "Listening on port %0"
+      }
+    },
+    "worker": {
+      "debug": {
+        "initKcpSuccess": "Init kcp complete: %0",
+        "ready": "Ready",
+        "removeConv": "Remove conv: %0",
+        "setISocketPort": "Set ISocket port: %0 %1",
+        "shutdown": "Shutdown",
+        "spawn": "Worker spawn: %0 ISocket port: %1",
+        "start": "Starting: %0",
+        "stderr": "stderr: %0 %1",
+        "stdout": "stdout: %0 %1",
+        "stop": "Stopping: %0"
       },
-      "coop": {
-        "desc": "Change to coop world",
-        "usage": {
-          "0": "coop <uid> - Change to coop world for player",
-          "1": "coop       - (In game) Change to coop world for yourself"
-        },
-        "info": {
-          "changeToCoop": "Changing to coop world..."
-        },
-        "error": {
-          "inCoop": "Player already in a coop world."
-        }
+      "error": {
+        "UDPError": "UDP error: %0",
+        "initKcpFail": "Init kcp error: %0",
+        "invalidId": "Mismatch id: %0",
+        "invalidOpcode": "Invalid opcode: %0",
+        "invalidPort": "Invalid port: %0",
+        "restartFail": "Worker failed to restart: %0",
+        "sendPacketError": "Send packet error: %0"
       },
-      "monster": {
-        "desc": "Spawn monster",
-        "usage": {
-          "0": "monster <id> <lv> <uid> - Spawn monster at player's current avatar position",
-          "1": "monster <id> <lv>       - (In game) Spawn monster at current avatar position"
-        },
-        "info": {
-          "spawn": "Spawning monster: %0"
-        }
+      "info": {
+        "blockAddr": "Blocked address: %0",
+        "exit": "Worker exit: %0 Code: %1 Signal: %2",
+        "listen": "Listening on port %0",
+        "restart": "Restarting worker: %0",
+        "started": "Worker started."
       },
-      "gadget": {
-        "desc": "Spawn gadget",
-        "usage": {
-          "0": "gadget <id> <lv> <uid> - Spawn gadget at player's current avatar position",
-          "1": "gadget <id> <lv>       - (In game) Spawn gadget at current avatar position"
-        },
-        "info": {
-          "spawn": "Spawning gadget: %0"
-        }
-      },
-      "vehicle": {
-        "desc": "Spawn vehicle",
-        "usage": {
-          "0": "vehicle <uid> - Spawn vehicle at player's current avatar position",
-          "1": "vehicle       - (In game) Spawn vehicle at current avatar position"
-        },
-        "info": {
-          "spawn": "Spawning vehicle..."
-        }
-      },
-      "killall": {
-        "desc": "Kill all nearby monsters (32 Max)",
-        "usage": {
-          "0": "killall <uid> - Kill all nearby monsters for player",
-          "1": "killall       - (In game) Kill all nearby monsters"
-        },
-        "info": {
-          "killMonsters": "Killing monsters..."
-        }
-      },
-      "ability": {
-        "desc": "Ability debug",
-        "error": {
-          "entityNotFound": "Entity not found."
-        }
-      },
-      "god": {
-        "desc": "Toggle god mode",
-        "usage": {
-          "0": "god <uid> - Toggle god mode for player",
-          "1": "god       - (In game) Toggle god mode for yourself"
-        },
-        "info": {
-          "enable": "God mode enabled.",
-          "disable": "God mode disabled."
-        }
-      },
-      "heal": {
-        "desc": "Heal all avatar in current team",
-        "usage": {
-          "0": "heal <uid> - Heal all avatar in player's current team",
-          "1": "heal       - (In game) Heal all avatar in current team"
-        },
-        "info": {
-          "heal": "Healed all avatar."
-        }
-      },
-      "recharge": {
-        "desc": "Recharge all avatar in current team",
-        "usage": {
-          "0": "recharge <uid> - Recharge all avatar in player's current team",
-          "1": "recharge       - (In game) Recharge all avatar in current team"
-        },
-        "info": {
-          "recharge": "Recharged energy."
-        }
-      },
-      "guid": {
-        "desc": "Show current avatar guid & equips guid",
-        "usage": {
-          "0": "guid <uid> - Show player's current avatar guid & equips guid",
-          "1": "guid       - (In game) Show current avatar guid & equips guid"
-        }
-      },
-      "equip": {
-        "desc": "Equip weapon or artifact",
-        "usage": {
-          "0": "equip <guid> <uid> - Equip weapon or artifact to player's current avatar",
-          "1": "equip <guid>       - (In game) Equip weapon or artifact to current avatar"
-        },
-        "info": {
-          "equip": "Equipped %0 to current avatar."
-        },
-        "error": {
-          "noEquip": "Equip not found."
-        }
-      },
-      "setcs": {
-        "desc": "Set candidate skill for current avatar",
-        "usage": {
-          "0": "setcs <id> <uid> - Set candidate skill for player's current avatar",
-          "1": "setcs <id>       - (In game) Set candidate skill for current avatar"
-        },
-        "info": {
-          "setSkill": "Set candidate skill to %0"
-        },
-        "error": {
-          "noSkill": "Skill not found."
-        }
-      },
-      "setfp": {
-        "desc": "Set fight prop for current avatar",
-        "usage": {
-          "0": "setfp <prop> <value> <uid> - Set fight prop for player's current avatar",
-          "1": "setfp <prop> <value>       - (In game) Set fight prop for current avatar"
-        },
-        "info": {
-          "set": "Set %0(%1) to %2."
-        },
-        "error": {
-          "invalidFightProp": "Invalid fight prop."
-        }
-      },
-      "talent": {
-        "desc": "Edit/List current avatar talents",
-        "usage": {
-          "0": "talent unlock <uid> - Unlock talent for player's current avatar",
-          "1": "talent unlock       - (In game) Unlock talent for current avatar",
-          "2": "talent lock <uid>   - Lock talent for player's current avatar",
-          "3": "talent lock         - (In game) Lock talent for current avatar",
-          "4": "talent list <uid>   - List unlocked talents of player's current avatar",
-          "5": "talent list         - (In game) List unlocked talents of current avatar"
-        },
-        "info": {
-          "unlocked": "Unlocked talent: %0",
-          "locked": "Locked talent: %0"
-        },
-        "error": {
-          "talentNotFound": "Talent not found."
-        }
-      },
-      "ar": {
-        "desc": "Set adventure rank",
-        "usage": {
-          "0": "ar <level> <uid> - Set adventure rank for player",
-          "1": "ar <level>       - (In game) Set adventure rank for yourself"
-        },
-        "info": {
-          "setAR": "Adventure rank set to: %0"
-        }
-      },
-      "hcoin": {
-        "desc": "Give primogem",
-        "usage": {
-          "0": "hcoin <amount> <uid> - Give primogem to player",
-          "1": "hcoin <amount>       - (In game) Give primogem to yourself"
-        },
-        "info": {
-          "give": "Give primogem: %0"
-        }
-      },
-      "mcoin": {
-        "desc": "Give genesis crystal",
-        "usage": {
-          "0": "mcoin <amount> <uid> - Give genesis crystal to player",
-          "1": "mcoin <amount>       - (In game) Give genesis crystal to yourself"
-        },
-        "info": {
-          "give": "Give genesis crystal: %0"
-        }
-      },
-      "scoin": {
-        "desc": "Give mora",
-        "usage": {
-          "0": "scoin <amount> <uid> - Give mora to player",
-          "1": "scoin <amount>       - (In game) Give mora to yourself"
-        },
-        "info": {
-          "give": "Give mora: %0"
-        }
-      },
-      "lightning": {
-        "desc": "Spawn lightning at player continuously",
-        "info": {
-          "start": "Started lightning.",
-          "stop": "Stopped lightning."
-        }
-      },
-      "material": {
-        "desc": "Give material",
-        "usage": {
-          "0": "material <id> <count> <uid> - Give materials to player",
-          "1": "material <id> <count>       - (In game) Give materials to yourself",
-          "2": "material <id>               - (In game) Give 1 material to yourself"
-        },
-        "info": {
-          "give": "Give material: (%0)x%1"
-        }
-      },
-      "weapon": {
-        "desc": "Give weapon",
-        "usage": {
-          "0": "weapon <id> <count> <uid> - Give weapons to player",
-          "1": "weapon <id> <count>       - (In game) Give weapons to yourself",
-          "2": "weapon <id>               - (In game) Give 1 weapon to yourself"
-        },
-        "info": {
-          "give": "Give weapon: (%0)x%1"
-        }
-      },
-      "artifact": {
-        "desc": "Give artifact",
-        "usage": {
-          "0": "artifact <id> <count> <uid> - Give artifacts to player",
-          "1": "artifact <id> <count>       - (In game) Give artifacts to yourself",
-          "2": "artifact <id>               - (In game) Give 1 artifact to yourself"
-        },
-        "info": {
-          "give": "Give artifact: (%0)x%1"
-        }
-      },
-      "artSet": {
-        "desc": "Give artifact set",
-        "usage": {
-          "0": "artSet <id> <count> <uid> - Give artifact sets to player",
-          "1": "artSet <id> <count>       - (In game) Give artifact sets to yourself",
-          "2": "artSet <id>               - (In game) Give 1 artifact set to yourself"
-        },
-        "info": {
-          "give": "Give artifact set: (%0)x%1"
-        },
-        "error": {
-          "setNotFound": "Artifact set not found."
-        }
+      "warn": {
+        "invalidPacket": "Invalid packet received, xor decrypt failed?"
       }
     }
   }

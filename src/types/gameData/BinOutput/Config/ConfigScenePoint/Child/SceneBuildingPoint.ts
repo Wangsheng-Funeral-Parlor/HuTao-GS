@@ -1,7 +1,7 @@
-import ConfigBaseScenePoint from '.'
+import ConfigBaseScenePoint from "."
 
 export default interface SceneBuildingPoint extends ConfigBaseScenePoint {
-  $type: 'SceneBuildingPoint'
+  $type: "SceneBuildingPoint"
   BuildingType: string
   FogId: number
 }

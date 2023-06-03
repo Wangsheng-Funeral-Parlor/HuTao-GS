@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Talent from '$/entity/avatar/talent'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Talent from "$/entity/avatar/talent"
 
 export interface AvatarUnlockTalentNotify {
   avatarGuid: string
@@ -10,7 +10,7 @@ export interface AvatarUnlockTalentNotify {
 
 class AvatarUnlockTalentPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AvatarUnlockTalent')
+    super("AvatarUnlockTalent")
   }
 
   async sendNotify(context: PacketContext, talent: Talent): Promise<void> {
@@ -23,7 +23,7 @@ class AvatarUnlockTalentPacket extends Packet implements PacketInterface {
       avatarGuid: guid.toString(),
       entityId,
       talentId: id,
-      skillDepotId: currentDepot?.id || 0
+      skillDepotId: currentDepot?.id || 0,
     }
 
     await super.sendNotify(context, notifyData)
@@ -35,4 +35,4 @@ class AvatarUnlockTalentPacket extends Packet implements PacketInterface {
 }
 
 let packet: AvatarUnlockTalentPacket
-export default (() => packet = packet || new AvatarUnlockTalentPacket())()
+export default (() => (packet = packet || new AvatarUnlockTalentPacket()))()

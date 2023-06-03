@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { MapMarkPoint } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { MapMarkPoint } from "@/types/proto"
 
 export interface AllMarkPointNotify {
   markList: MapMarkPoint[]
@@ -7,12 +7,12 @@ export interface AllMarkPointNotify {
 
 class AllMarkPointPacket extends Packet implements PacketInterface {
   constructor() {
-    super('AllMarkPoint')
+    super("AllMarkPoint")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
     const notifyData: AllMarkPointNotify = {
-      markList: []
+      markList: [],
     }
 
     await super.sendNotify(context, notifyData)
@@ -20,4 +20,4 @@ class AllMarkPointPacket extends Packet implements PacketInterface {
 }
 
 let packet: AllMarkPointPacket
-export default (() => packet = packet || new AllMarkPointPacket())()
+export default (() => (packet = packet || new AllMarkPointPacket()))()

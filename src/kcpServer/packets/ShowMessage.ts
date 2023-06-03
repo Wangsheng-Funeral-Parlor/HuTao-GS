@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { MsgParam } from '@/types/proto'
-import { SvrMsgIdEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { MsgParam } from "@/types/proto"
+import { SvrMsgIdEnum } from "@/types/proto/enum"
 
 export interface ShowMessageNotify {
   msgId: SvrMsgIdEnum
@@ -9,7 +9,7 @@ export interface ShowMessageNotify {
 
 class ShowMessagePacket extends Packet implements PacketInterface {
   constructor() {
-    super('ShowMessage')
+    super("ShowMessage")
   }
 
   async sendNotify(context: PacketContext, data: ShowMessageNotify): Promise<void> {
@@ -22,4 +22,4 @@ class ShowMessagePacket extends Packet implements PacketInterface {
 }
 
 let packet: ShowMessagePacket
-export default (() => packet = packet || new ShowMessagePacket())()
+export default (() => (packet = packet || new ShowMessagePacket()))()

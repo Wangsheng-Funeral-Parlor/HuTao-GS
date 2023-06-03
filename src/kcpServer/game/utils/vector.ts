@@ -1,5 +1,5 @@
-import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import { VectorInfo } from '@/types/proto'
+import { DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
+import { VectorInfo } from "@/types/proto"
 
 export default class Vector {
   x: number
@@ -76,9 +76,9 @@ export default class Vector {
     const z = (<VectorInfo | Vector>v).z || (<DynamicVector>v).Z
 
     this.set(
-      typeof x === 'number' ? x : Number(x?.[1]),
-      typeof y === 'number' ? y : Number(y?.[1]),
-      typeof z === 'number' ? z : Number(z?.[1])
+      typeof x === "number" ? x : Number(x?.[1]),
+      typeof y === "number" ? y : Number(y?.[1]),
+      typeof z === "number" ? z : Number(z?.[1])
     )
 
     return this
@@ -86,21 +86,17 @@ export default class Vector {
 
   distanceTo(vec: Vector): number {
     const { x, y, z } = this
-    return Math.sqrt(((vec.x - x) ** 2) + ((vec.y - y) ** 2) + ((vec.z - z) ** 2))
+    return Math.sqrt((vec.x - x) ** 2 + (vec.y - y) ** 2 + (vec.z - z) ** 2)
   }
 
   distanceTo2D(vec: Vector): number {
     const { x, z } = this
-    return Math.sqrt(((vec.x - x) ** 2) + ((vec.z - z) ** 2))
+    return Math.sqrt((vec.x - x) ** 2 + (vec.z - z) ** 2)
   }
 
   hasChanged(): boolean {
     const { x, y, z, lastX, lastY, lastZ } = this
-    return (
-      x !== lastX ||
-      y !== lastY ||
-      z !== lastZ
-    )
+    return x !== lastX || y !== lastY || z !== lastZ
   }
 
   equal(vec: Vector): boolean {
@@ -166,7 +162,7 @@ export default class Vector {
   }
 
   export(): VectorInfo {
-    const props = ['x', 'y', 'z']
+    const props = ["x", "y", "z"]
     const ret = {}
 
     for (const prop of props) {

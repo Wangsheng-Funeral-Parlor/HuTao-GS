@@ -1,11 +1,11 @@
-import ConfigAutoDool from './ConfigAutoDool'
-import ConfigChest from './ConfigChest'
-import ConfigCrystal from './ConfigCrystal'
-import ConfigGear from './ConfigGear'
-import ConfigPickup from './ConfigPickup'
-import ConfigConstForceField from './ConfigScenePoint/Child/ConfigForceField/Child/ConfigConstForceField'
-import ConfigSeal from './ConfigSeal'
-import ConfigWindSeed from './ConfigWindSeed'
+import ConfigAutoDool from "./ConfigAutoDool"
+import ConfigChest from "./ConfigChest"
+import ConfigCrystal from "./ConfigCrystal"
+import ConfigGear from "./ConfigGear"
+import ConfigPickup from "./ConfigPickup"
+import ConfigConstForceField from "./ConfigScenePoint/Child/ConfigForceField/Child/ConfigConstForceField"
+import ConfigSeal from "./ConfigSeal"
+import ConfigWindSeed from "./ConfigWindSeed"
 
 export default interface ConfigGadgetMisc {
   Chest: ConfigChest

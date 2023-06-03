@@ -1,6 +1,5 @@
-import ConfigWidgetToyAdeptiAbode from './Child/ConfigWidgetToyAdeptiAbode'
+import ConfigWidgetToyAdeptiAbode from "./Child/ConfigWidgetToyAdeptiAbode"
 
-type ConfigWidgetToyCreateGadget =
-  ConfigWidgetToyAdeptiAbode
+type ConfigWidgetToyCreateGadget = ConfigWidgetToyAdeptiAbode
 
 export default ConfigWidgetToyCreateGadget

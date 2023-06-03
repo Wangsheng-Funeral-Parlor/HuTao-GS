@@ -1,4 +1,4 @@
-import { AbilityAttachedModifier, AbilityString, ModifierDurability } from '.'
+import { AbilityAttachedModifier, AbilityString, ModifierDurability } from "."
 
 export interface AbilityAppliedModifier {
   modifierLocalId?: number

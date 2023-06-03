@@ -1,4 +1,4 @@
-import ConfigFootprint from './ConfigFootprint'
+import ConfigFootprint from "./ConfigFootprint"
 
 export default interface ConfigMoveStateEffect {
   Footprint: ConfigFootprint

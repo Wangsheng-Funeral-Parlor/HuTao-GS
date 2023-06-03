@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Entity from '$/entity'
-import { AbilityString } from '@/types/proto'
-import { getStringHash } from '@/utils/hash'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Entity from "$/entity"
+import { AbilityString } from "@/types/proto"
+import { getStringHash } from "@/utils/hash"
 
 export interface ServerGlobalValueChangeNotify {
   entityId: number
@@ -11,7 +11,7 @@ export interface ServerGlobalValueChangeNotify {
 
 class ServerGlobalValueChangePacket extends Packet implements PacketInterface {
   constructor() {
-    super('ServerGlobalValueChange')
+    super("ServerGlobalValueChange")
   }
 
   async sendNotify(context: PacketContext, entity: Entity, key: AbilityString): Promise<void> {
@@ -21,7 +21,7 @@ class ServerGlobalValueChangePacket extends Packet implements PacketInterface {
     const notifyData: ServerGlobalValueChangeNotify = {
       entityId,
       value: sgvDynamicValueMapContainer.getValue(key).val,
-      keyHash: key.hash || getStringHash(key.str)
+      keyHash: key.hash || getStringHash(key.str),
     }
 
     await super.sendNotify(context, notifyData)
@@ -33,4 +33,4 @@ class ServerGlobalValueChangePacket extends Packet implements PacketInterface {
 }
 
 let packet: ServerGlobalValueChangePacket
-export default (() => packet = packet || new ServerGlobalValueChangePacket())()
+export default (() => (packet = packet || new ServerGlobalValueChangePacket()))()

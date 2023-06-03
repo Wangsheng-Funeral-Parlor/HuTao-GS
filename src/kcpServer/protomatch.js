@@ -1,31 +1,31 @@
-const { readdirSync, readFileSync } = require('fs')
-const { join } = require('path')
-const { cwd } = require('process')
-const { cmdIds } = require('./cmdIds')
-const { default: config } = require('../config')
+const { readdirSync, readFileSync } = require("fs")
+const { join } = require("path")
+const { cwd } = require("process")
+const { cmdIds } = require("./cmdIds")
+const { default: config } = require("../config")
 
 const TYPE_NAMES = {
-  0: ['int32', 'int64', 'uint32', 'uint64', 'sint32', 'sint64', 'bool', 'enum'],
-  1: ['fixed64', 'sfixed64', 'double'],
+  0: ["int32", "int64", "uint32", "uint64", "sint32", "sint64", "bool", "enum"],
+  1: ["fixed64", "sfixed64", "double"],
   //2: 'length-delimited',
   //3: 'start group',
   //4: 'end group',
-  5: ['fixed32', 'sfixed32', 'float']
+  5: ["fixed32", "sfixed32", "float"],
 }
 
 const TYPES = {
   VARINT: 0,
   FIXED64: 1,
   STRING: 2,
-  FIXED32: 5
+  FIXED32: 5,
 }
 
-const protoDir = join(cwd(), `data/proto/${config.version}`)
-const ignoreProtos = Object.keys(cmdIds)
+const protoDir = join(cwd(), `data/proto/${cmdIds.version}`)
+const ignoreProtos = Object.keys(cmdIds.proto)
 
 function readUntil(ref, end, include = false) {
   const { data, offset } = ref
-  let buf = ''
+  let buf = ""
   let i = 0
   let j = 0
 
@@ -43,7 +43,7 @@ function readUntil(ref, end, include = false) {
 function decodeFloat(buf, offset) {
   const uint = buf.readUInt32LE(offset)
   const sign = (uint >> 31) * 2 + 1
-  const exponent = uint >>> 23 & 255
+  const exponent = (uint >>> 23) & 255
   const mantissa = uint & 8388607
 
   if (exponent === 255) return mantissa ? NaN : sign * Infinity
@@ -57,7 +57,7 @@ function decodeDouble(buf, offset) {
   const lo = buf.readUInt32LE(offset)
   const hi = buf.readUInt32LE(offset + 4)
   const sign = (hi >> 31) * 2 + 1
-  const exponent = hi >>> 20 & 2047
+  const exponent = (hi >>> 20) & 2047
   const mantissa = 4294967296 * (hi & 1048575) + lo
 
   if (exponent === 2047) return mantissa ? NaN : sign * Infinity
@@ -76,7 +76,7 @@ function decodeVarint(data, offset, bits = 64, signed = false) {
     if (offset >= data.length) throw new Error(`Out of range decoding varint. ${offset} out of ${data.length}`)
     const byte = data.readInt8(offset++)
 
-    bytes.push(byte & 0x7F)
+    bytes.push(byte & 0x7f)
     if ((byte & 0x80) === 0) break
   }
 
@@ -87,8 +87,8 @@ function decodeVarint(data, offset, bits = 64, signed = false) {
   if (signed) value = (value ^ signbit) - signbit
 
   return {
-    value: (value >>> 0),
-    length: bytes.length
+    value: value >>> 0,
+    length: bytes.length,
   }
 }
 
@@ -190,7 +190,7 @@ class ProtoMatch {
 
     return {
       count: ret.length,
-      array: ret.length > 10 ? sorted.slice(0, 3) : sorted
+      array: ret.length > 10 ? sorted.slice(0, 3) : sorted,
     }
   }
 
@@ -203,7 +203,7 @@ class ProtoMatch {
     const ret = {}
 
     for (const field of data) {
-      const propEntry = propEntries.find(e => field.fieldId === e[1].id)
+      const propEntry = propEntries.find((e) => field.fieldId === e[1].id)
 
       // field not found
       if (!propEntry) return false
@@ -221,7 +221,6 @@ class ProtoMatch {
       }
 
       ret[key] = result
-
     }
 
     return ret
@@ -232,7 +231,7 @@ class ProtoMatch {
     const { wireType, value, repeat } = field
 
     const isPackedRepeated = repeated && type === TYPES.VARINT
-    const isMistmatchType = (type !== wireType && !(isPackedRepeated && wireType === TYPES.STRING))
+    const isMistmatchType = type !== wireType && !(isPackedRepeated && wireType === TYPES.STRING)
     const isMistmatchRepeat = !repeated && repeat
 
     if (isMistmatchType || isMistmatchRepeat) return false
@@ -248,7 +247,7 @@ class ProtoMatch {
       default:
         return {
           type: wireType,
-          data: value
+          data: value,
         }
     }
   }
@@ -256,18 +255,18 @@ class ProtoMatch {
   compareVarintField(_prop, field, propKey) {
     const { wireType, value } = field
 
-    if (propKey.indexOf('is_') === 0 && value > 1) return false
+    if (propKey.indexOf("is_") === 0 && value > 1) return false
 
     return {
       type: wireType,
-      data: value
+      data: value,
     }
   }
 
   compareStringField(prop, field, isPackedRepeated) {
     const { type, props, proto } = prop
     const { wireType, value } = field
-    const isValueString = typeof value === 'string'
+    const isValueString = typeof value === "string"
 
     if (isPackedRepeated && isValueString) this.unpackRepeated(type, value)
 
@@ -280,16 +279,16 @@ class ProtoMatch {
 
       return {
         type: wireType,
-        data: result
+        data: result,
       }
     }
 
     // string
-    if (proto !== 'bytes' && typeof value === 'object' && value.length > 0) return false
+    if (proto !== "bytes" && typeof value === "object" && value.length > 0) return false
 
     return {
       type: wireType,
-      data: value.toString('ascii')
+      data: value.toString("ascii"),
     }
   }
 
@@ -322,13 +321,13 @@ class ProtoMatch {
     return {
       type,
       packed: true,
-      data: unpacked
+      data: unpacked,
     }
   }
 
   regex(data, regex) {
     const match = data.match(regex)
-    return match ? match[0] : ''
+    return match ? match[0] : ""
   }
 
   // Parse proto file
@@ -341,17 +340,17 @@ class ProtoMatch {
 
       while (filenames.length > 0) {
         const filename = filenames.shift()
-        const protoname = filename.split('.')[0]
+        const protoname = filename.split(".")[0]
 
         if (ignoreProtos.includes(protoname)) continue
-        if (!filename.includes('Notify') && !filename.includes('Req') && !filename.includes('Rsp')) continue
+        if (!filename.includes("Notify") && !filename.includes("Req") && !filename.includes("Rsp")) continue
 
-        const data = readFileSync(join(protoDir, filename), 'utf8')
+        const data = readFileSync(join(protoDir, filename), "utf8")
         Object.assign(ret, this.parseProto(data))
       }
 
       this.replaceProto(ret, ret)
-    } catch (err) { }
+    } catch (err) {}
 
     return ret
   }
@@ -359,8 +358,8 @@ class ProtoMatch {
   replaceProto(obj, protos) {
     for (const key in obj) {
       const value = obj[key]
-      if (typeof value === 'object') this.replaceProto(value, protos)
-      if (key !== 'proto' || typeof value !== 'string') continue
+      if (typeof value === "object") this.replaceProto(value, protos)
+      if (key !== "proto" || typeof value !== "string") continue
 
       const proto = protos[value]
       if (!proto) return
@@ -381,29 +380,29 @@ class ProtoMatch {
     const ret = {}
 
     // remove comments and spaces
-    data = data.replace(/(\/\/.*?$)|(\/\*.*?\*\/)/gms, '').trim()
+    data = data.replace(/(\/\/.*?$)|(\/\*.*?\*\/)/gms, "").trim()
 
     const ref = {
       data: data,
-      offset: 0
+      offset: 0,
     }
 
     while (ref.offset < data.length) {
-      const cmd = readUntil(ref, ' ').trim()
+      const cmd = readUntil(ref, " ").trim()
 
       switch (cmd) {
-        case 'syntax':
-        case 'option':
-        case 'import':
-          readUntil(ref, ';', true)
+        case "syntax":
+        case "option":
+        case "import":
+          readUntil(ref, ";", true)
           break
-        case 'message': {
+        case "message": {
           const { name, block } = this.parseBlock(ref)
 
           ret[name] = this.parseMessageBlock(block)
           break
         }
-        case 'enum': {
+        case "enum": {
           const { name, block } = this.parseBlock(ref)
 
           ret[name] = ret[name] || { enum: {} }
@@ -419,40 +418,40 @@ class ProtoMatch {
   parseMessageBlock(data) {
     const ret = {
       enum: {},
-      props: {}
+      props: {},
     }
     const ref = {
       data: data,
-      offset: 0
+      offset: 0,
     }
 
     // remove spaces
     data = data.trim()
 
     while (ref.offset < data.length) {
-      let type = readUntil(ref, ' ').trim()
+      let type = readUntil(ref, " ").trim()
       ref.offset++
 
-      const repeated = type === 'repeated'
+      const repeated = type === "repeated"
       if (repeated) {
-        type = readUntil(ref, ' ')
+        type = readUntil(ref, " ")
         ref.offset++
       }
 
       switch (type) {
-        case 'message': {
+        case "message": {
           const { name, block } = this.parseBlock(ref)
 
           ret[name] = this.parseMessageBlock(block)
           break
         }
-        case 'enum': {
+        case "enum": {
           const { name, block } = this.parseBlock(ref)
 
           ret.enum[name] = this.parseEnum(block)
           break
         }
-        case 'oneof': {
+        case "oneof": {
           const { block } = this.parseBlock(ref)
 
           /*ret.props[name] = {
@@ -471,13 +470,13 @@ class ProtoMatch {
   }
 
   parseBlock(ref) {
-    const name = readUntil(ref, '{').trim()
+    const name = readUntil(ref, "{").trim()
     ref.offset++
 
-    let block = ''
+    let block = ""
     let chunk = null
-    while (chunk == null || chunk.indexOf('{') > 0) {
-      chunk = readUntil(ref, '}', true)
+    while (chunk == null || chunk.indexOf("{") > 0) {
+      chunk = readUntil(ref, "}", true)
       block += chunk
     }
 
@@ -485,16 +484,17 @@ class ProtoMatch {
 
     return {
       name,
-      block
+      block,
     }
   }
 
   parseEnum(data) {
     return Object.fromEntries(
-      data.split(';')
-        .filter(l => l.trim().length > 0)
-        .map(l => [l.split('=')[0].trim(), parseInt(l.split('=').slice(-1)[0].trim())])
-        .filter(e => e[0].indexOf('option ') === -1)
+      data
+        .split(";")
+        .filter((l) => l.trim().length > 0)
+        .map((l) => [l.split("=")[0].trim(), parseInt(l.split("=").slice(-1)[0].trim())])
+        .filter((e) => e[0].indexOf("option ") === -1)
     )
   }
 
@@ -507,48 +507,48 @@ class ProtoMatch {
       const types = TYPE_NAMES[tid]
       if (!types.includes(type)) continue
 
-      name = readUntil(ref, '=').trim()
+      name = readUntil(ref, "=").trim()
       ref.offset++
 
       ret.props[name] = {
         type: tid,
-        id: parseInt(readUntil(ref, ';').trim()),
-        repeated
+        id: parseInt(readUntil(ref, ";").trim()),
+        repeated,
       }
       ref.offset++
 
-      if (tid === 0 && type.indexOf('uint') === 0) {
+      if (tid === 0 && type.indexOf("uint") === 0) {
         ret.props[name].unsigned = true
       }
 
       return
     }
 
-    if (type.indexOf('map<') === 0) {
-      if (type.indexOf('>') === -1) type += readUntil(ref, '>', true).trim()
+    if (type.indexOf("map<") === 0) {
+      if (type.indexOf(">") === -1) type += readUntil(ref, ">", true).trim()
 
-      name = readUntil(ref, '=').trim()
+      name = readUntil(ref, "=").trim()
       ref.offset++
 
       ret.props[name] = {
         type: 2,
-        id: parseInt(readUntil(ref, ';').trim()),
+        id: parseInt(readUntil(ref, ";").trim()),
         map: type.match(/(?<=<).*?(?=>)/)[0],
-        repeated
+        repeated,
       }
       ref.offset++
 
       return
     }
 
-    name = readUntil(ref, '=').trim()
+    name = readUntil(ref, "=").trim()
     ref.offset++
 
     ret.props[name] = {
       type: 2,
-      id: parseInt(readUntil(ref, ';').trim()),
+      id: parseInt(readUntil(ref, ";").trim()),
       proto: type,
-      repeated
+      repeated,
     }
     ref.offset++
   }
@@ -592,20 +592,20 @@ class ProtoMatch {
             if (value.length > 0 && parsed.leftOver.length === 0) {
               value = parsed.parts
             } else {
-              value = value.toString('utf8')
+              value = value.toString("utf8")
             }
             break
           }
 
           // unknown type
           default:
-            value = reader.read(reader.readVarint()).toString('hex')
+            value = reader.read(reader.readVarint()).toString("hex")
         }
 
         parts.push({
           fieldId,
           wireType,
-          value
+          value,
         })
 
         reader.unsave()
@@ -614,11 +614,11 @@ class ProtoMatch {
       reader.restore()
     }
 
-    for (const field of parts) field.repeat = parts.filter(f => f.fieldId === field.fieldId).length > 1
+    for (const field of parts) field.repeat = parts.filter((f) => f.fieldId === field.fieldId).length > 1
 
     return {
       parts,
-      leftOver: reader.read(reader.availableBytes())
+      leftOver: reader.read(reader.availableBytes()),
     }
   }
 }

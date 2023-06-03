@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { OnlinePlayerInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { OnlinePlayerInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface GetOnlinePlayerListReq { }
+export interface GetOnlinePlayerListReq {}
 
 export interface GetOnlinePlayerListRsp {
   retcode: RetcodeEnum
@@ -12,13 +12,13 @@ export interface GetOnlinePlayerListRsp {
 
 class GetOnlinePlayerListPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetOnlinePlayerList')
+    super("GetOnlinePlayerList")
   }
 
   async request(context: PacketContext, _data: GetOnlinePlayerListReq): Promise<void> {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      playerInfoList: context.game.getOnlinePlayerList(context.player)
+      playerInfoList: context.game.getOnlinePlayerList(context.player),
     })
   }
 
@@ -28,4 +28,4 @@ class GetOnlinePlayerListPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetOnlinePlayerListPacket
-export default (() => packet = packet || new GetOnlinePlayerListPacket())()
+export default (() => (packet = packet || new GetOnlinePlayerListPacket()))()

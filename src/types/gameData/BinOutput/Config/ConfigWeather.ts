@@ -1,4 +1,4 @@
-import ConfigElemBall from './ConfigElemBall'
+import ConfigElemBall from "./ConfigElemBall"
 
 export default interface ConfigWeather {
   DropElemBalls: ConfigElemBall[]

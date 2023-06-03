@@ -1,4 +1,4 @@
-import ConfigShoot from './ConfigShoot'
+import ConfigShoot from "./ConfigShoot"
 
 export default interface ConfigAvatarShoot {
   NormalShoot: ConfigShoot

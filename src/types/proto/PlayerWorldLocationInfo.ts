@@ -1,4 +1,4 @@
-import { PlayerLocationInfo } from '.'
+import { PlayerLocationInfo } from "."
 
 export interface PlayerWorldLocationInfo {
   sceneId: number

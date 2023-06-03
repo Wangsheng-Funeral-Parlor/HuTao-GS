@@ -1,25 +1,27 @@
-import KcpServer from './'
-import EnterSceneReady from './packets/EnterSceneReady'
-import SceneInitFinish from './packets/SceneInitFinish'
-import EnterSceneDone from './packets/EnterSceneDone'
-import { PlayerEnterSceneNotify } from './packets/PlayerEnterScene'
-import SetUpAvatarTeam from './packets/SetUpAvatarTeam'
-import PostEnterScene from './packets/PostEnterScene'
-import { ClientStateEnum } from '@/types/enum'
-import Client from './client'
-import { PacketHead } from '@/types/kcp'
+import Client from "./client"
+import EnterSceneDone from "./packets/EnterSceneDone"
+import EnterSceneReady from "./packets/EnterSceneReady"
+import { PlayerEnterSceneNotify } from "./packets/PlayerEnterScene"
+import PostEnterScene from "./packets/PostEnterScene"
+import SceneInitFinish from "./packets/SceneInitFinish"
+import SetUpAvatarTeam from "./packets/SetUpAvatarTeam"
+
+import KcpServer from "./"
+
+import { ClientStateEnum } from "@/types/enum"
+import { PacketHead } from "@/types/kcp"
 
 export default class DummyClient extends Client {
   private loop: NodeJS.Timer
 
   constructor(server: KcpServer) {
-    super(server, 0xFFFFFFFF, null)
+    super(server, 0xffffffff, null)
 
     this.loop = setInterval(this.update.bind(this), 1e3 / 30)
   }
 
   // Destroy client
-  async destroy(_reason: number = 5) {
+  async destroy(_reason = 5) {
     const { server, player, loop } = this
 
     if (player) await server.game.playerLogout(this)
@@ -33,8 +35,8 @@ export default class DummyClient extends Client {
   update() {
     const { player } = this
 
-    this.emit('update')
-    if (player) player.emit('Update')
+    this.emit("update")
+    if (player) player.emit("Update")
   }
 
   // Send packet
@@ -44,12 +46,12 @@ export default class DummyClient extends Client {
 
     const { teamManager, avatarList, context } = player
 
-    if (packetName === 'PlayerEnterSceneNotify') {
+    if (packetName === "PlayerEnterSceneNotify") {
       // Response to enter scene request
-      const { enterSceneToken } = data as PlayerEnterSceneNotify
+      const { enterSceneToken } = <PlayerEnterSceneNotify>data
 
       // Wait until state change
-      await EnterSceneReady.waitState(context, ClientStateEnum.ENTER_SCENE, false, 0xF0FF)
+      await EnterSceneReady.waitState(context, ClientStateEnum.ENTER_SCENE, false, 0xf0ff)
 
       await EnterSceneReady.request(context, { enterSceneToken })
       await SceneInitFinish.request(context, { enterSceneToken })
@@ -58,11 +60,11 @@ export default class DummyClient extends Client {
 
       if (!player.isInMp()) {
         // setup team
-        const huTao = avatarList.find(avatar => avatar.avatarId === 10000046)
+        const huTao = avatarList.find((avatar) => avatar.avatarId === 10000046)
         await SetUpAvatarTeam.request(context, {
           teamId: teamManager.getTeam().id,
           avatarTeamGuidList: [huTao.guid.toString()],
-          curAvatarGuid: huTao.guid.toString()
+          curAvatarGuid: huTao.guid.toString(),
         })
       }
     }

@@ -1,4 +1,4 @@
-import { MathQuaternionInfo, VectorInfo } from '.'
+import { MathQuaternionInfo, VectorInfo } from "."
 
 export interface RoutePoint {
   velocity: number

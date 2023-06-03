@@ -1,19 +1,25 @@
-import BufferCursor from './buffercursor'
-import { EDNS_TO_NAME, NAME_TO_EDNS, NAME_TO_QCLASS, NAME_TO_QTYPE, QTYPE_TO_NAME } from './consts'
+import BufferCursor from "./buffercursor"
+import { EDNS_TO_NAME, NAME_TO_EDNS, NAME_TO_QCLASS, NAME_TO_QTYPE, QTYPE_TO_NAME } from "./consts"
 
-export interface LableIndex { [str: string]: number }
+export interface LableIndex {
+  [str: string]: number
+}
 export type ResData = string | Buffer | (string | Buffer)[]
 
 export class EDNSData {
   ednsCode: number
 
-  constructor(ednsCode: number = 0xFF) {
+  constructor(ednsCode = 0xff) {
     this.ednsCode = ednsCode
   }
 
   // dummy
-  static decode(_buf: BufferCursor, _len: number): EDNSData { return }
-  encode(_buf?: BufferCursor, _index?: LableIndex): BufferCursor { return }
+  static decode(_buf: BufferCursor, _len: number): EDNSData {
+    return
+  }
+  encode(_buf?: BufferCursor, _index?: LableIndex): BufferCursor {
+    return
+  }
 }
 
 export class OptECS extends EDNSData {
@@ -22,7 +28,7 @@ export class OptECS extends EDNSData {
   scopePrefixLength: number
   ip: string
 
-  constructor(family: number = 0, sourcePrefixLength: number = 0, scopePrefixLength: number = 0, ip: string = '') {
+  constructor(family = 0, sourcePrefixLength = 0, scopePrefixLength = 0, ip = "") {
     super(NAME_TO_EDNS.ECS)
 
     this.family = family
@@ -35,13 +41,13 @@ export class OptECS extends EDNSData {
     const family = buf.readUInt16BE()
     const sourcePrefixLength = buf.readUInt8()
     const scopePrefixLength = buf.readUInt8()
-    let ip = ''
+    let ip = ""
 
     if (family === 1) {
       const ipv4Octets: number[] = []
       for (let i = 4; i < len; i++) ipv4Octets.push(buf.readUInt8())
       while (ipv4Octets.length < 4) ipv4Octets.push(0)
-      ip = ipv4Octets.join('.')
+      ip = ipv4Octets.join(".")
     } else {
       buf.seek(buf.tell() + (len - 4))
     }
@@ -56,7 +62,7 @@ export class OptECS extends EDNSData {
     buf.writeUInt8(sourcePrefixLength)
     buf.writeUInt8(scopePrefixLength)
 
-    const splitIp = ip.split('.').map(s => parseInt(s))
+    const splitIp = ip.split(".").map((s) => parseInt(s))
     for (let i = 0; i < 4; i++) buf.writeUInt8(splitIp[i])
 
     return buf
@@ -112,7 +118,7 @@ export class PacketHeader {
     header.rd = (val & 0x100) >> 8
     header.ra = (val & 0x80) >> 7
     header.z = (val & 0x70) >> 4
-    header.rcode = (val & 0xF)
+    header.rcode = val & 0xf
     header.qdcount = buf.readUInt16BE()
     header.ancount = buf.readUInt16BE()
     header.nscount = buf.readUInt16BE()
@@ -124,7 +130,7 @@ export class PacketHeader {
   toBuffer(buf: BufferCursor | Buffer): BufferCursor {
     if (buf instanceof Buffer) buf = new BufferCursor(buf)
 
-    buf.writeUInt16BE(this.id & 0xFFFF)
+    buf.writeUInt16BE(this.id & 0xffff)
 
     let val = 0
     val += (this.qr << 15) & 0x8000
@@ -134,13 +140,13 @@ export class PacketHeader {
     val += (this.rd << 8) & 0x100
     val += (this.ra << 7) & 0x80
     val += (this.z << 4) & 0x70
-    val += this.rcode & 0xF
+    val += this.rcode & 0xf
 
-    buf.writeUInt16BE(val & 0xFFFF)
-    buf.writeUInt16BE(this.qdcount & 0xFFFF)
-    buf.writeUInt16BE(this.ancount & 0xFFFF)
-    buf.writeUInt16BE(this.nscount & 0xFFFF)
-    buf.writeUInt16BE(this.arcount & 0xFFFF)
+    buf.writeUInt16BE(val & 0xffff)
+    buf.writeUInt16BE(this.qdcount & 0xffff)
+    buf.writeUInt16BE(this.ancount & 0xffff)
+    buf.writeUInt16BE(this.nscount & 0xffff)
+    buf.writeUInt16BE(this.arcount & 0xffff)
 
     return buf
   }
@@ -160,11 +166,7 @@ export class PacketQuestion {
   static parse(buf: BufferCursor | Buffer): PacketQuestion {
     if (buf instanceof Buffer) buf = new BufferCursor(buf)
 
-    return new PacketQuestion(
-      nameUnpack(buf),
-      buf.readUInt16BE(),
-      buf.readUInt16BE()
-    )
+    return new PacketQuestion(nameUnpack(buf), buf.readUInt16BE(), buf.readUInt16BE())
   }
 
   toBuffer(buf: BufferCursor | Buffer, index?: LableIndex): BufferCursor {
@@ -188,7 +190,7 @@ export class PacketResource {
   data?: ResData
 
   constructor(...args: any[])
-  constructor(name: string = '', type: number = NAME_TO_QTYPE.ANY, cls: number = NAME_TO_QCLASS.ANY, ttl = 300) {
+  constructor(name = "", type: number = NAME_TO_QTYPE.ANY, cls: number = NAME_TO_QCLASS.ANY, ttl = 300) {
     this.name = name
     this.type = type
     this.class = cls
@@ -247,26 +249,30 @@ export class PacketResource {
   }
 
   // dummy
-  static decode(_buf: BufferCursor, _len: number): PacketResource { return }
-  encode(_buf: BufferCursor, _index?: LableIndex): BufferCursor { return }
+  static decode(_buf: BufferCursor, _len: number): PacketResource {
+    return
+  }
+  encode(_buf: BufferCursor, _index?: LableIndex): BufferCursor {
+    return
+  }
 }
 
 export class ResA extends PacketResource {
   address: string
 
-  constructor(address: string = '') {
-    super('', NAME_TO_QTYPE.A, NAME_TO_QCLASS.IN)
+  constructor(address = "") {
+    super("", NAME_TO_QTYPE.A, NAME_TO_QCLASS.IN)
     this.address = address
   }
 
   static decode(buf: BufferCursor, len: number): ResA {
     const parts = []
     for (let i = 0; i < len; i++) parts.push(buf.readUInt8())
-    return new ResA(parts.join('.'))
+    return new ResA(parts.join("."))
   }
 
   encode(buf: BufferCursor): BufferCursor {
-    const parts = this.address.split('.')
+    const parts = this.address.split(".")
     buf.writeUInt16BE(parts.length)
     for (const part of parts) buf.writeUInt8(parseInt(part))
     return buf
@@ -277,8 +283,8 @@ export class ResMX extends PacketResource {
   exchange: string
   priority: number
 
-  constructor(exchange: string = '', priority: number = 0) {
-    super('', NAME_TO_QTYPE.MX, NAME_TO_QCLASS.IN)
+  constructor(exchange = "", priority = 0) {
+    super("", NAME_TO_QTYPE.MX, NAME_TO_QCLASS.IN)
 
     this.exchange = exchange
     this.priority = priority
@@ -302,19 +308,19 @@ export class ResMX extends PacketResource {
 export class ResAAAA extends PacketResource {
   address: string
 
-  constructor(address: string = '') {
-    super('', NAME_TO_QTYPE.AAAA, NAME_TO_QCLASS.IN)
+  constructor(address = "") {
+    super("", NAME_TO_QTYPE.AAAA, NAME_TO_QCLASS.IN)
     this.address = address
   }
 
   static decode(buf: BufferCursor, len: number): ResAAAA {
     const parts = []
     for (let i = 0; i < len; i += 2) parts.push(buf.readUInt16BE())
-    return new ResAAAA(parts.map(p => p > 0 ? p.toString(16) : '').join(':'))
+    return new ResAAAA(parts.map((p) => (p > 0 ? p.toString(16) : "")).join(":"))
   }
 
   encode(buf: BufferCursor): BufferCursor {
-    const parts = this.address.split(':')
+    const parts = this.address.split(":")
     buf.writeUInt16BE(parts.length * 2)
     for (const part of parts) buf.writeUInt16BE(parseInt(part, 16))
     return buf
@@ -324,8 +330,8 @@ export class ResAAAA extends PacketResource {
 export class ResNS extends PacketResource {
   ns: string
 
-  constructor(ns: string = '') {
-    super('', NAME_TO_QTYPE.NS, NAME_TO_QCLASS.IN)
+  constructor(ns = "") {
+    super("", NAME_TO_QTYPE.NS, NAME_TO_QCLASS.IN)
     this.ns = ns
   }
 
@@ -344,8 +350,8 @@ export class ResNS extends PacketResource {
 export class ResCNAME extends PacketResource {
   domain: string
 
-  constructor(domain: string = '') {
-    super('', NAME_TO_QTYPE.CNAME, NAME_TO_QCLASS.IN)
+  constructor(domain = "") {
+    super("", NAME_TO_QTYPE.CNAME, NAME_TO_QCLASS.IN)
     this.domain = domain
   }
 
@@ -362,7 +368,7 @@ export class ResCNAME extends PacketResource {
 }
 
 export class ResPTR extends ResCNAME {
-  constructor(domain: string = '') {
+  constructor(domain = "") {
     super(domain)
     this.type = NAME_TO_QTYPE.PTR
   }
@@ -374,7 +380,7 @@ export class ResPTR extends ResCNAME {
 
 export class ResTXT extends PacketResource {
   constructor(data: ResData) {
-    super('', NAME_TO_QTYPE.TXT, NAME_TO_QCLASS.IN)
+    super("", NAME_TO_QTYPE.TXT, NAME_TO_QCLASS.IN)
     this.data = data
   }
 
@@ -384,7 +390,7 @@ export class ResTXT extends PacketResource {
     let i = 0
     while (i < len) {
       const chkLen = buf.readUInt8()
-      chunks.push(buf.toString('utf8', chkLen))
+      chunks.push(buf.toString("utf8", chkLen))
       i += chkLen + 1
     }
 
@@ -395,11 +401,13 @@ export class ResTXT extends PacketResource {
     const { data } = this
 
     const characterStrings = Array.isArray(data) ? data : [data]
-    const characterStringBuffers = <Buffer[]>characterStrings.map(cs => {
-      if (Buffer.isBuffer(cs)) return cs
-      if (typeof cs === 'string') return Buffer.from(cs, 'utf8')
-      return false
-    }).filter(cs => cs)
+    const characterStringBuffers = <Buffer[]>characterStrings
+      .map((cs) => {
+        if (Buffer.isBuffer(cs)) return cs
+        if (typeof cs === "string") return Buffer.from(cs, "utf8")
+        return false
+      })
+      .filter((cs) => cs)
 
     const len = characterStringBuffers.reduce((sum, csBuf) => sum + csBuf.length, 0)
 
@@ -434,16 +442,8 @@ export class ResSOA extends PacketResource {
   expiration: number
   minimum: number
 
-  constructor(
-    primary: string = '',
-    admin: string = '',
-    serial: number = 0,
-    refresh: number = 0,
-    retry: number = 0,
-    expiration: number = 0,
-    minimum: number = 0
-  ) {
-    super('', NAME_TO_QTYPE.SOA, NAME_TO_QCLASS.IN)
+  constructor(primary = "", admin = "", serial = 0, refresh = 0, retry = 0, expiration = 0, minimum = 0) {
+    super("", NAME_TO_QTYPE.SOA, NAME_TO_QCLASS.IN)
 
     this.primary = primary
     this.admin = admin
@@ -488,8 +488,8 @@ export class ResSRV extends PacketResource {
   port: number
   target: string
 
-  constructor(priority: number = 0, weight: number = 0, port: number = 0, target: string = '') {
-    super('', NAME_TO_QTYPE.SRV, NAME_TO_QCLASS.IN)
+  constructor(priority = 0, weight = 0, port = 0, target = "") {
+    super("", NAME_TO_QTYPE.SRV, NAME_TO_QCLASS.IN)
 
     this.priority = priority
     this.weight = weight
@@ -518,7 +518,7 @@ export class ResEDNS extends PacketResource {
   rdata: EDNSData[]
 
   constructor(rdata: EDNSData[] = []) {
-    super('', NAME_TO_QTYPE.EDNS, 0x200, 0)
+    super("", NAME_TO_QTYPE.EDNS, 0x200, 0)
     this.rdata = rdata
   }
 
@@ -574,8 +574,8 @@ export class ResNAPTR extends PacketResource {
   regexp: string
   replacement: string
 
-  constructor(order: number = 0, preference: number = 0, flags: string = '', service: string = '', regexp: string = '', replacement: string = '') {
-    super('', NAME_TO_QTYPE.NAPTR, NAME_TO_QCLASS.IN)
+  constructor(order = 0, preference = 0, flags = "", service = "", regexp = "", replacement = "") {
+    super("", NAME_TO_QTYPE.NAPTR, NAME_TO_QCLASS.IN)
 
     this.order = order
     this.preference = preference
@@ -589,9 +589,9 @@ export class ResNAPTR extends PacketResource {
     return new ResNAPTR(
       buf.readUInt16BE(),
       buf.readUInt16BE(),
-      buf.toString('ascii', buf.readUInt8()),
-      buf.toString('ascii', buf.readUInt8()),
-      buf.toString('ascii', buf.readUInt8()),
+      buf.toString("ascii", buf.readUInt8()),
+      buf.toString("ascii", buf.readUInt8()),
+      buf.toString("ascii", buf.readUInt8()),
       nameUnpack(buf)
     )
   }
@@ -599,16 +599,18 @@ export class ResNAPTR extends PacketResource {
   encode(buf: BufferCursor, index?: LableIndex): BufferCursor {
     const { order, preference, flags, service, regexp, replacement } = this
 
-    buf.writeUInt16BE(7 + flags.length + service.length + regexp.length + namePack(replacement, null, index, true).length)
+    buf.writeUInt16BE(
+      7 + flags.length + service.length + regexp.length + namePack(replacement, null, index, true).length
+    )
 
     buf.writeUInt16BE(order)
     buf.writeUInt16BE(preference)
     buf.writeUInt8(flags.length)
-    buf.write(flags, flags.length, 'ascii')
+    buf.write(flags, flags.length, "ascii")
     buf.writeUInt8(service.length)
-    buf.write(service, service.length, 'ascii')
+    buf.write(service, service.length, "ascii")
     buf.writeUInt8(regexp.length)
-    buf.write(regexp, regexp.length, 'ascii')
+    buf.write(regexp, regexp.length, "ascii")
     namePack(replacement, buf, index)
 
     return buf
@@ -621,8 +623,8 @@ export class ResTLSA extends PacketResource {
   matchingtype: number
   buf: Buffer
 
-  constructor(usage: number = 0, selector: number = 0, matchingtype: number = 0, buf: Buffer = Buffer.alloc(0)) {
-    super('', NAME_TO_QTYPE.TLSA, NAME_TO_QCLASS.IN)
+  constructor(usage = 0, selector = 0, matchingtype = 0, buf: Buffer = Buffer.alloc(0)) {
+    super("", NAME_TO_QTYPE.TLSA, NAME_TO_QCLASS.IN)
 
     this.usage = usage
     this.selector = selector
@@ -631,12 +633,7 @@ export class ResTLSA extends PacketResource {
   }
 
   static decode(buf: BufferCursor, len: number): ResTLSA {
-    return new ResTLSA(
-      buf.readUInt8(),
-      buf.readUInt8(),
-      buf.readUInt8(),
-      buf.slice(len - 3).buffer
-    )
+    return new ResTLSA(buf.readUInt8(), buf.readUInt8(), buf.readUInt8(), buf.slice(len - 3).buffer)
   }
 
   encode(buf: BufferCursor): BufferCursor {
@@ -658,8 +655,8 @@ export class ResSVCB extends PacketResource {
   target: string
   fields: { [key: number]: Buffer }
 
-  constructor(priority: number = 0, target: string = '', fields: { [key: number]: Buffer } = {}) {
-    super('', NAME_TO_QTYPE.SVCB, NAME_TO_QCLASS.IN)
+  constructor(priority = 0, target = "", fields: { [key: number]: Buffer } = {}) {
+    super("", NAME_TO_QTYPE.SVCB, NAME_TO_QCLASS.IN)
 
     this.priority = priority
     this.target = target
@@ -686,7 +683,9 @@ export class ResSVCB extends PacketResource {
   encode(buf: BufferCursor, index?: LableIndex): BufferCursor {
     const { priority, target, fields } = this
 
-    buf.writeUInt16BE(2 + namePack(target, null, index, true).length + Object.values(fields).reduce((s, v) => s + 4 + v.length, 0))
+    buf.writeUInt16BE(
+      2 + namePack(target, null, index, true).length + Object.values(fields).reduce((s, v) => s + 4 + v.length, 0)
+    )
 
     buf.writeUInt16BE(priority)
     namePack(target, buf, index)
@@ -701,7 +700,7 @@ export class ResSVCB extends PacketResource {
 }
 
 export class ResHTTPS extends ResSVCB {
-  constructor(priority: number = 0, target: string = '', fields: { [key: number]: Buffer } = {}) {
+  constructor(priority = 0, target = "", fields: { [key: number]: Buffer } = {}) {
     super(priority, target, fields)
     this.type = NAME_TO_QTYPE.HTTPS
   }
@@ -739,30 +738,30 @@ PacketResource.encoders = {
   ResSRV,
   ResSVCB,
   ResTLSA,
-  ResTXT
+  ResTXT,
 }
 
-const parsers: { prop: string, parser: typeof PacketQuestion | typeof PacketResource, headerProp: string }[] = [
+const parsers: { prop: string; parser: typeof PacketQuestion | typeof PacketResource; headerProp: string }[] = [
   {
-    prop: 'question',
+    prop: "question",
     parser: PacketQuestion,
-    headerProp: 'qdcount'
+    headerProp: "qdcount",
   },
   {
-    prop: 'answer',
+    prop: "answer",
     parser: PacketResource,
-    headerProp: 'ancount'
+    headerProp: "ancount",
   },
   {
-    prop: 'authority',
+    prop: "authority",
     parser: PacketResource,
-    headerProp: 'nscount'
+    headerProp: "nscount",
   },
   {
-    prop: 'additional',
+    prop: "additional",
     parser: PacketResource,
-    headerProp: 'arcount'
-  }
+    headerProp: "arcount",
+  },
 ]
 
 export default class DnsPacket {
@@ -827,7 +826,7 @@ export default class DnsPacket {
   }
 }
 
-const LABEL_POINTER = 0xC0
+const LABEL_POINTER = 0xc0
 
 function isPointer(len: number): boolean {
   return (len & LABEL_POINTER) === LABEL_POINTER
@@ -839,7 +838,7 @@ function nameUnpack(buf: BufferCursor): string {
   let end: number
   let pos: number
   let part: string
-  let combine = ''
+  let combine = ""
 
   len = buf.readUInt8()
   comp = false
@@ -857,9 +856,9 @@ function nameUnpack(buf: BufferCursor): string {
       continue
     }
 
-    part = buf.toString('ascii', len)
+    part = buf.toString("ascii", len)
 
-    if (combine.length) combine = combine + '.' + part
+    if (combine.length) combine = combine + "." + part
     else combine = part
 
     len = buf.readUInt8()
@@ -872,7 +871,7 @@ function nameUnpack(buf: BufferCursor): string {
   return combine
 }
 
-function namePack(str: string, buf?: BufferCursor | Buffer, index: LableIndex = {}, indexReadOnly: boolean = false): Buffer {
+function namePack(str: string, buf?: BufferCursor | Buffer, index: LableIndex = {}, indexReadOnly = false): Buffer {
   buf = buf || Buffer.alloc(1024)
   if (buf instanceof Buffer) buf = new BufferCursor(buf)
 
@@ -887,7 +886,7 @@ function namePack(str: string, buf?: BufferCursor | Buffer, index: LableIndex = 
       break
     } else {
       if (!indexReadOnly) index[str] = buf.tell()
-      dot = str.indexOf('.')
+      dot = str.indexOf(".")
 
       if (dot > -1) {
         part = str.slice(0, dot)
@@ -898,7 +897,7 @@ function namePack(str: string, buf?: BufferCursor | Buffer, index: LableIndex = 
       }
 
       buf.writeUInt8(part.length)
-      buf.write(part, part.length, 'ascii')
+      buf.write(part, part.length, "ascii")
     }
   }
 

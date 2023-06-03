@@ -1,4 +1,4 @@
-import ConfigBaseWidgetToy from '../..'
+import ConfigBaseWidgetToy from "../.."
 
 export default interface ConfigBaseWidgetToyCreateGadget extends ConfigBaseWidgetToy {
   GadgetId: number

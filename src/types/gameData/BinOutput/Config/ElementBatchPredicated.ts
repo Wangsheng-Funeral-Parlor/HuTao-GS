@@ -1,4 +1,4 @@
-import ConfigAbilityAction from './ConfigAbility/Action'
+import ConfigAbilityAction from "./ConfigAbility/Action"
 
 export default interface ElementBatchPredicated {
   ElementTypeArr: string[]

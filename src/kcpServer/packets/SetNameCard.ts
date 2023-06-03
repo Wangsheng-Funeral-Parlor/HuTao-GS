@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SetNameCardReq {
   nameCardId: number
@@ -13,9 +13,9 @@ export interface SetNameCardRsp {
 
 class SetNameCardPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetNameCard', {
+    super("SetNameCard", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -32,7 +32,7 @@ class SetNameCardPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      nameCardId: profile.nameCardId
+      nameCardId: profile.nameCardId,
     })
   }
 
@@ -42,4 +42,4 @@ class SetNameCardPacket extends Packet implements PacketInterface {
 }
 
 let packet: SetNameCardPacket
-export default (() => packet = packet || new SetNameCardPacket())()
+export default (() => (packet = packet || new SetNameCardPacket()))()

@@ -1,7 +1,7 @@
-import Packet, { PacketContext } from '#/packet'
-import Player from '$/player'
-import { ClientStateEnum } from '@/types/enum'
-import { ForwardTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext } from "#/packet"
+import Player from "$/player"
+import { ClientStateEnum } from "@/types/enum"
+import { ForwardTypeEnum } from "@/types/proto/enum"
 
 export interface ForwardEntry {
   forwardType: ForwardTypeEnum
@@ -31,19 +31,15 @@ export default class ForwardBuffer {
     if (!entryList) return ret
 
     for (let i = 0; i < packetList.length; i++) {
-      if (!entryList.find(e => e[0] === i)) continue
+      if (!entryList.find((e) => e[0] === i)) continue
 
       const seqIds = entryList
-        .filter(e => e[0] === i)
-        .map(e => e[2])
+        .filter((e) => e[0] === i)
+        .map((e) => e[2])
         .filter((seqId, j, self) => self.indexOf(seqId) === j)
 
       for (const seqId of seqIds) {
-        ret.push([
-          packetList[i],
-          entryList.filter(e => e[0] === i && e[2] === seqId).map(e => e[1]),
-          seqId
-        ])
+        ret.push([packetList[i], entryList.filter((e) => e[0] === i && e[2] === seqId).map((e) => e[1]), seqId])
       }
     }
 
@@ -59,16 +55,18 @@ export default class ForwardBuffer {
     const { world, broadcastContextList } = currentScene
     const { host } = world
 
-    const contextList = broadcastContextList.filter(ctx => (ctx.client.state & 0xF0FF) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE))
+    const contextList = broadcastContextList.filter(
+      (ctx) => (ctx.client.state & 0xf0ff) >= (ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE)
+    )
 
     switch (type) {
       case ForwardTypeEnum.FORWARD_TO_ALL:
         return contextList
       case ForwardTypeEnum.FORWARD_TO_ALL_EXCEPT_CUR:
       case ForwardTypeEnum.FORWARD_TO_ALL_EXIST_EXCEPT_CUR:
-        return contextList.filter(ctx => ctx.player !== player)
+        return contextList.filter((ctx) => ctx.player !== player)
       case ForwardTypeEnum.FORWARD_TO_ALL_GUEST:
-        return contextList.filter(ctx => ctx.player !== host)
+        return contextList.filter((ctx) => ctx.player !== host)
       case ForwardTypeEnum.FORWARD_TO_HOST:
         return [host.context]
       default:
@@ -86,11 +84,7 @@ export default class ForwardBuffer {
 
       for (const ctx of contextList) ctx.seqId = seqId
 
-      await packet.broadcastNotify(
-        contextList,
-        entries,
-        ...(additionalDataMap[seqId] || [])
-      )
+      await packet.broadcastNotify(contextList, entries, ...(additionalDataMap[seqId] || []))
     }
   }
 

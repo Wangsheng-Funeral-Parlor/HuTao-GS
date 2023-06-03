@@ -1,10 +1,12 @@
-import { AllWidgetDataNotify } from '#/packets/AllWidgetData'
-import WidgetSlotChange from '#/packets/WidgetSlotChange'
-import { WidgetSlotData } from '@/types/proto'
-import { WidgetSlotOpEnum, WidgetSlotTagEnum } from '@/types/proto/enum'
-import WidgetUserData from '@/types/user/WidgetUserData'
-import Player from '..'
-import WidgetData from './widgetData'
+import Player from ".."
+
+import WidgetData from "./widgetData"
+
+import { AllWidgetDataNotify } from "#/packets/AllWidgetData"
+import WidgetSlotChange from "#/packets/WidgetSlotChange"
+import { WidgetSlotData } from "@/types/proto"
+import { WidgetSlotOpEnum, WidgetSlotTagEnum } from "@/types/proto/enum"
+import WidgetUserData from "@/types/user/WidgetUserData"
 
 export default class Widget {
   player: Player
@@ -35,7 +37,7 @@ export default class Widget {
 
     await WidgetSlotChange.sendNotify(player.context, {
       op: WidgetSlotOpEnum.ATTACH,
-      slot: this.exportSlot(tag)
+      slot: this.exportSlot(tag),
     })
   }
 
@@ -47,7 +49,7 @@ export default class Widget {
 
     await WidgetSlotChange.sendNotify(player.context, {
       op: WidgetSlotOpEnum.DETACH,
-      slot: this.exportSlot(tag)
+      slot: this.exportSlot(tag),
     })
   }
 
@@ -55,7 +57,7 @@ export default class Widget {
     const { slotMap } = this
     const slotData: WidgetSlotData = {
       tag,
-      isActive: tag === WidgetSlotTagEnum.WIDGET_SLOT_QUICK_USE
+      isActive: tag === WidgetSlotTagEnum.WIDGET_SLOT_QUICK_USE,
     }
 
     if (slotMap[tag] != null) {
@@ -69,8 +71,7 @@ export default class Widget {
   exportSlotList(): WidgetSlotData[] {
     const { slotMap } = this
 
-    return Object.keys(slotMap)
-      .map(k => this.exportSlot(parseInt(k)))
+    return Object.keys(slotMap).map((k) => this.exportSlot(parseInt(k)))
   }
 
   exportAll(): AllWidgetDataNotify {
@@ -84,7 +85,7 @@ export default class Widget {
       clientCollectorDataList: [],
       coolDownGroupDataList: [],
       normalCoolDownDataList: [],
-      slotList: this.exportSlotList()
+      slotList: this.exportSlotList(),
     }
   }
 
@@ -93,7 +94,7 @@ export default class Widget {
 
     return {
       data: widgetData.exportUserData(),
-      slot: slotMap
+      slot: slotMap,
     }
   }
 }

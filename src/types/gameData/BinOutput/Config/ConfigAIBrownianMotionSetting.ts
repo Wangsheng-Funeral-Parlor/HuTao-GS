@@ -1,8 +1,8 @@
-import ConfigAIBrownianMotionData from './ConfigAIBrownianMotionData'
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
+import ConfigAIBrownianMotionData from "./ConfigAIBrownianMotionData"
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
 
 export default interface ConfigAIBrownianMotionSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAIBrownianMotionSetting'
+  $type: "ConfigAIBrownianMotionSetting"
   DefaultSetting: ConfigAIBrownianMotionData
   Specification: { [id: number]: ConfigAIBrownianMotionData }
 }

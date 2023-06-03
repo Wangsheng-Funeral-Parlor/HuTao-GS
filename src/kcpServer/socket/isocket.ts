@@ -1,24 +1,26 @@
-import BaseClass from '#/baseClass'
-import { waitUntil } from '@/utils/asyncWait'
-import * as dgram from 'dgram'
-import { AcceptTypes, encodeData } from './worker/utils/data'
+import * as dgram from "dgram"
+
+import { AcceptTypes, encodeData } from "./worker/utils/data"
+
+import BaseClass from "#/baseClass"
+import { waitUntil } from "@/utils/asyncWait"
 
 const ISocketBufferTTL = 10e3 // 10 seconds
-const ISocketMessageChunkSize = 65280
+const ISocketMessageChunkSize = 8192
 const ISocketMaxNum = 0x10000
 
-const ISocketPacketMagic1 = 0x89AB
-const ISocketPacketMagic2 = 0xCDEF
+const ISocketPacketMagic1 = 0x89ab
+const ISocketPacketMagic2 = 0xcdef
 enum ISocketPacketOpcode {
   Message = 0,
-  Resend = 1
+  Resend = 1,
 }
 
 class ISocketChannel {
   is: ISocket
   port: number
 
-  sendBuf: { buf: Buffer, ts: number }[]
+  sendBuf: { buf: Buffer; ts: number }[]
   recvBuf: { [idx: number]: Buffer }
   msgBuf: Buffer
 
@@ -38,11 +40,9 @@ class ISocketChannel {
   }
 
   private calcDiff(current: number, target: number): number {
-    return [
-      (target - current),
-      (target - (current + ISocketMaxNum)),
-      (target - (current - ISocketMaxNum))
-    ].map(v => [v, Math.abs(v)]).sort((a, b) => a[1] - b[1])[0][0]
+    return [target - current, target - (current + ISocketMaxNum), target - (current - ISocketMaxNum)]
+      .map((v) => [v, Math.abs(v)])
+      .sort((a, b) => a[1] - b[1])[0][0]
   }
 
   private incIdx(): number {
@@ -55,7 +55,7 @@ class ISocketChannel {
     const { sendIdx, sendBuf } = this
 
     const diff = this.calcDiff(sendIdx, idx)
-    const index = (sendBuf.length - 1) + diff
+    const index = sendBuf.length - 1 + diff
 
     const msg = sendBuf[index]
     if (msg == null || this.calcDiff(ts, msg.ts) < 0) return null
@@ -66,7 +66,7 @@ class ISocketChannel {
 
   private async send(opcode: ISocketPacketOpcode, sndIdx: number, data: Buffer = Buffer.alloc(0)) {
     const { is, port } = this
-    if (!await is.createISocket()) return
+    if (!(await is.createISocket())) return
 
     const magic1 = Buffer.alloc(2)
     magic1.writeUInt16LE(ISocketPacketMagic1)
@@ -79,14 +79,7 @@ class ISocketChannel {
     const magic2 = Buffer.alloc(2)
     magic2.writeUInt16LE(ISocketPacketMagic2)
 
-    const packet = Buffer.concat([
-      magic1,
-      opc,
-      idx,
-      size,
-      data,
-      magic2
-    ])
+    const packet = Buffer.concat([magic1, opc, idx, size, data, magic2])
 
     is.iSocket.send(packet, port)
   }
@@ -121,7 +114,7 @@ class ISocketChannel {
       await this.send(ISocketPacketOpcode.Message, this.incIdx(), chunk)
     }
 
-    sendBuf.push(...sendBuf.splice(0).filter(b => now - b.ts <= ISocketBufferTTL))
+    sendBuf.push(...sendBuf.splice(0).filter((b) => now - b.ts <= ISocketBufferTTL))
   }
 
   async recv(packet: Buffer) {
@@ -144,7 +137,7 @@ class ISocketChannel {
         await this.resendMessage(sndIdx, packet.readUInt16LE(10))
         break
       default:
-        console.log('Invalid opcode:', opcode)
+        console.log("Invalid opcode:", opcode)
     }
   }
 
@@ -183,7 +176,7 @@ class ISocketChannel {
     const msg = msgBuf.subarray(4, 4 + len)
     this.msgBuf = msgBuf.subarray(4 + len)
 
-    await is.emit('Message', msg)
+    await is.emit("Message", msg)
   }
 }
 
@@ -222,16 +215,17 @@ export default class ISocket extends BaseClass {
       this.creatingSocket = true
 
       await new Promise<void>((resolve, reject) => {
-        const socket = dgram.createSocket('udp4')
-        socket.on('message', (data, rinfo) => this.emit('ISocketMessage', data, rinfo))
-        socket.on('error', reject)
+        const socket = dgram.createSocket("udp4")
+        socket.on("message", (data, rinfo) => this.emit("ISocketMessage", data, rinfo))
+        socket.on("error", reject)
         socket.bind(() => {
           this.iSocket = socket
-          socket.off('error', reject)
+          socket.off("error", reject)
           resolve()
         })
       })
-    } catch (err) { } finally {
+    } catch (err) {
+    } finally {
       this.creatingSocket = false
     }
 
@@ -245,12 +239,7 @@ export default class ISocket extends BaseClass {
   async sendToSocket(port: number, opcode: number, ...args: AcceptTypes[]): Promise<void> {
     if (port == null) return
 
-    this.getChannel(port).sendMessage(
-      Buffer.concat([
-        Buffer.from([opcode]),
-        ...args.map(arg => encodeData(arg))]
-      )
-    )
+    this.getChannel(port).sendMessage(Buffer.concat([Buffer.from([opcode]), ...args.map((arg) => encodeData(arg))]))
   }
 
   /**Events**/

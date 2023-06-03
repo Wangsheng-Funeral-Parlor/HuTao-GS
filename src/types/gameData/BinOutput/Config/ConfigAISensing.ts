@@ -1,4 +1,4 @@
-import ConfigAISensingSetting from './ConfigAISensingSetting'
+import ConfigAISensingSetting from "./ConfigAISensingSetting"
 
 export default interface ConfigAISensing {
   Enable: boolean

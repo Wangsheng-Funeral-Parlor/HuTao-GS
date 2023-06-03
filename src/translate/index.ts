@@ -1,13 +1,14 @@
-import GlobalState from '@/globalState'
-import { getJson, setJson } from '@/utils/json'
-import LanguageData, { DEFAULT_LANG } from './data'
+import LanguageData, { DEFAULT_LANG } from "./data"
 
-const lcachePath = 'data/lcache.json'
+import GlobalState from "@/globalState"
+import { getJson, setJson } from "@/utils/json"
+
+const lcachePath = "data/lcache.json"
 const lcache = getJson(lcachePath, {})
 let lcacheModified = false
 
 function getNestedValue(key: string, obj: object): string | null {
-  const keySegments = key.split('.')
+  const keySegments = key.split(".")
   let value: string | object | null = obj
 
   while (keySegments.length > 0) {
@@ -15,23 +16,23 @@ function getNestedValue(key: string, obj: object): string | null {
     value = value?.[segment]
   }
 
-  if (typeof value !== 'string') return null
+  if (typeof value !== "string") return null
   return value
 }
 
 function applyParams(str: string, params: (string | number)[]): string {
-  return str.replace(/%\d+/g, id => params[parseInt(id.slice(1))]?.toString())
+  return str.replace(/%\d+/g, (id) => params[parseInt(id.slice(1))]?.toString())
 }
 
 export default function translate(key: string, ...params: (string | number)[]): string {
-  const curLang = GlobalState.get('Language')?.toString()
-  const cache = lcache[curLang] = lcache[curLang] || {}
+  const curLang = GlobalState.get("Language")?.toString()
+  const cache = (lcache[curLang] = lcache[curLang] || {})
 
   if (cache[key] != null) return applyParams(cache[key], params)
 
   let str = getNestedValue(key, LanguageData[curLang])
   if (str == null) str = getNestedValue(key, LanguageData[DEFAULT_LANG])
-  if (str == null) str = 'E_NO_TRANSLATION'
+  if (str == null) str = "E_NO_TRANSLATION"
 
   cache[key] = str
   lcacheModified = true

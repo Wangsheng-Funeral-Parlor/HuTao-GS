@@ -1,4 +1,4 @@
-import FetterConfig from './ExcelBinOutput/Common/FetterConfig'
+import FetterConfig from "./ExcelBinOutput/Common/FetterConfig"
 
 type FetterDataList = FetterConfig[]
 

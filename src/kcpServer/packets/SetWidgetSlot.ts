@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet';
-import { ClientStateEnum } from '@/types/enum';
-import { RetcodeEnum, WidgetSlotOpEnum, WidgetSlotTagEnum } from '@/types/proto/enum';
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum, WidgetSlotOpEnum, WidgetSlotTagEnum } from "@/types/proto/enum"
 
 export interface SetWidgetSlotReq {
   op: WidgetSlotOpEnum
@@ -17,9 +17,9 @@ export interface SetWidgetSlotRsp {
 
 class SetWidgetSlotPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetWidgetSlot', {
+    super("SetWidgetSlot", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStateMask: 0xF0FF
+      reqStateMask: 0xf0ff,
     })
   }
 
@@ -47,7 +47,7 @@ class SetWidgetSlotPacket extends Packet implements PacketInterface {
       retcode: RetcodeEnum.RET_SUCC,
       op,
       tagList,
-      materialId
+      materialId,
     })
   }
 
@@ -57,4 +57,4 @@ class SetWidgetSlotPacket extends Packet implements PacketInterface {
 }
 
 let packet: SetWidgetSlotPacket
-export default (() => packet = packet || new SetWidgetSlotPacket())()
+export default (() => (packet = packet || new SetWidgetSlotPacket()))()

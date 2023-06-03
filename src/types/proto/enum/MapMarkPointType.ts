@@ -5,5 +5,5 @@ export enum MapMarkPointTypeEnum {
   MINE = 3,
   COLLECTION = 4,
   MONSTER = 5,
-  FISH_POOL = 6
+  FISH_POOL = 6,
 }

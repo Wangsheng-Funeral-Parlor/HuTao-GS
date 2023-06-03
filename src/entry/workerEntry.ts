@@ -1,15 +1,17 @@
-import Worker from '#/socket/worker'
-import parseArgs, { ParsedArgs } from '@/utils/parseArgs'
+import sourceMapSupport from "source-map-support"
 
-(async (args: ParsedArgs) => {
+sourceMapSupport.install()
+import Worker from "#/socket/worker"
+import parseArgs, { ParsedArgs } from "@/utils/parseArgs"
+;(async (args: ParsedArgs) => {
   let worker: typeof Worker
 
   switch (args.lm) {
-    case 'kcp':
-      worker = (await import('#/socket/worker/kcpWorker')).default
+    case "kcp":
+      worker = (await import("#/socket/worker/kcpWorker")).default
       break
-    case 'recv':
-      worker = (await import('#/socket/worker/recvWorker')).default
+    case "recv":
+      worker = (await import("#/socket/worker/recvWorker")).default
       break
     default:
       return

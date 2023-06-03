@@ -1,12 +1,14 @@
-import translate from '@/translate'
-import { CommandDefinition } from '..'
+import { CommandDefinition } from ".."
+
+import translate from "@/translate"
 
 const talentCommand: CommandDefinition = {
-  name: 'talent',
+  name: "talent",
+  alias: ["const"],
   usage: 6,
   args: [
-    { name: 'mode', type: 'str', values: ['unlock', 'lock', 'list'] },
-    { name: 'uid', type: 'int', optional: true }
+    { name: "mode", type: "str", values: ["unlock", "lock", "list"] },
+    { name: "uid", type: "int", optional: true },
   ],
   allowPlayer: true,
   exec: async (cmdInfo) => {
@@ -15,32 +17,32 @@ const talentCommand: CommandDefinition = {
     const [mode, uid] = args
 
     const player = kcpServer.game.getPlayerByUid(uid || sender?.uid)
-    if (!player) return printError(translate('generic.playerNotFound'))
+    if (!player) return printError(translate("generic.playerNotFound"))
 
     const { currentAvatar } = player
-    if (!currentAvatar) return printError(translate('generic.playerNoCurAvatar'))
+    if (!currentAvatar) return printError(translate("generic.playerNoCurAvatar"))
 
     const { talentManager } = currentAvatar
 
     switch (mode) {
-      case 'unlock': {
+      case "unlock": {
         const talent = await talentManager.unlockTalent()
-        if (talent) print(translate('cli.commands.talent.info.unlocked', talent.id))
-        else printError(translate('cli.commands.talent.error.talentNotFound'))
+        if (talent) print(translate("cli.commands.const.info.unlocked", talent.id))
+        else printError(translate("cli.commands.const.error.constNotFound"))
         break
       }
-      case 'lock': {
+      case "lock": {
         const talent = await talentManager.lockTalent()
-        if (talent) print(translate('cli.commands.talent.info.locked', talent.id))
-        else printError(translate('cli.commands.talent.error.talentNotFound'))
+        if (talent) print(translate("cli.commands.const.info.locked", talent.id))
+        else printError(translate("cli.commands.const.error.constNotFound"))
         break
       }
-      case 'list': {
-        print(`[${talentManager.unlockedTalents.map(t => t.id).join(', ')}]`)
+      case "list": {
+        print(`[${talentManager.unlockedTalents.map((t) => t.id).join(", ")}]`)
         break
       }
     }
-  }
+  },
 }
 
 export default talentCommand

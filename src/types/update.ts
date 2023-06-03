@@ -1,4 +1,4 @@
-import { UpdateApiRetcodeEnum } from './enum'
+import { UpdateApiRetcodeEnum } from "./enum"
 
 export interface UpdateApiResponse {
   code: UpdateApiRetcodeEnum

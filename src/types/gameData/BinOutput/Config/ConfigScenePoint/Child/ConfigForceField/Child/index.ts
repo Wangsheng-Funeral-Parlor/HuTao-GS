@@ -1,3 +1,3 @@
-import ConfigBaseScenePoint from '../../'
+import ConfigBaseScenePoint from "../../"
 
-export default interface ConfigBaseForceField extends ConfigBaseScenePoint { }
+export default interface ConfigBaseForceField extends ConfigBaseScenePoint {}

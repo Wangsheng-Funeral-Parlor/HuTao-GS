@@ -1,7 +1,12 @@
-import MT19937 from '../mt19937'
-import { initialPrevXor } from './magic'
-import { memecryptoDecrypt, memecryptoEncrypt, memecryptoPrepareKey } from './memecrypto'
-import { generateKeyForGlobalMetadataHeaderString, recryptGlobalMetadataHeaderStringFields, recryptGlobalMetadataHeaderStringLiterals } from './metadatastring'
+import MT19937 from "../mt19937"
+
+import { initialPrevXor } from "./magic"
+import { memecryptoDecrypt, memecryptoEncrypt, memecryptoPrepareKey } from "./memecrypto"
+import {
+  generateKeyForGlobalMetadataHeaderString,
+  recryptGlobalMetadataHeaderStringFields,
+  recryptGlobalMetadataHeaderStringLiterals,
+} from "./metadatastring"
 
 export const getGlobalMetadataKeys = (src: Buffer, srcn: number, longkey: Buffer, shortkey: Buffer): boolean => {
   if (srcn != 0x4000) return false
@@ -27,7 +32,7 @@ export const genGlobalMetadataKey = (src: Buffer, srcn: number): boolean => {
   if (src.readUInt16LE(0xc8) === 0xfc2e && src.readUInt16LE(0xca) === 0x2cfe) return true
 
   const mt = new MT19937()
-  mt.seed(0xDEADBEEFn)
+  mt.seed(0xdeadbeefn)
 
   for (let i = 0; i < srcn >> 3; i++) {
     src.writeBigUInt64LE(mt.int64(), i << 3)
@@ -35,7 +40,7 @@ export const genGlobalMetadataKey = (src: Buffer, srcn: number): boolean => {
 
   src.writeUInt16LE(0xfc2e, 0xc8) // Magic
   src.writeUInt16LE(0x2cfe, 0xca) // Magic
-  src.writeUInt16LE(Number(mt.int64() & 0x1FFFn), 0xd2) // Just some random value
+  src.writeUInt16LE(Number(mt.int64() & 0x1fffn), 0xd2) // Just some random value
 
   return true
 }
@@ -43,8 +48,8 @@ export const genGlobalMetadataKey = (src: Buffer, srcn: number): boolean => {
 export const decryptGlobalMetadata = (data: Buffer): void => {
   const size = data.length
 
-  const longkey = Buffer.alloc(0xB00)
-  const longkeyp = Buffer.alloc(0xB0)
+  const longkey = Buffer.alloc(0xb00)
+  const longkeyp = Buffer.alloc(0xb0)
   const shortkey = Buffer.alloc(16)
 
   getGlobalMetadataKeys(data.subarray(-0x4000), 0x4000, longkey, shortkey)
@@ -55,7 +60,7 @@ export const decryptGlobalMetadata = (data: Buffer): void => {
 
   const perentry = Math.floor(size / 0x100 / 0x40)
   for (let i = 0; i < 0x100; i++) {
-    const off = Math.floor((0x40 * perentry) * i)
+    const off = Math.floor(0x40 * perentry * i)
 
     const prev = Buffer.alloc(16)
     shortkey.copy(prev)
@@ -89,8 +94,8 @@ export const encryptGlobalMetadata = (data: Buffer): void => {
   recryptGlobalMetadataHeaderStringLiterals(data, size, literalDecKey)
   recryptGlobalMetadataHeaderStringFields(data, size, literalDecKey)
 
-  const longkey = Buffer.alloc(0xB00)
-  const longkeyp = Buffer.alloc(0xB0)
+  const longkey = Buffer.alloc(0xb00)
+  const longkeyp = Buffer.alloc(0xb0)
   const shortkey = Buffer.alloc(16)
 
   getGlobalMetadataKeys(data.subarray(-0x4000), 0x4000, longkey, shortkey)
@@ -101,7 +106,7 @@ export const encryptGlobalMetadata = (data: Buffer): void => {
 
   const perentry = Math.floor(size / 0x100 / 0x40)
   for (let i = 0; i < 0x100; i++) {
-    const off = Math.floor((0x40 * perentry) * i)
+    const off = Math.floor(0x40 * perentry * i)
 
     const prev = Buffer.alloc(16)
     shortkey.copy(prev)

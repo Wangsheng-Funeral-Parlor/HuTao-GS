@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Scene from '$/scene'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import Scene from "$/scene"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface DelTeamEntityNotify {
   sceneId: number
@@ -9,7 +9,7 @@ export interface DelTeamEntityNotify {
 
 class DelTeamEntityPacket extends Packet implements PacketInterface {
   constructor() {
-    super('DelTeamEntity')
+    super("DelTeamEntity")
   }
 
   async sendNotify(context: PacketContext, scene: Scene, entityIdList: number[]): Promise<void> {
@@ -17,7 +17,7 @@ class DelTeamEntityPacket extends Packet implements PacketInterface {
 
     const notifyData: DelTeamEntityNotify = {
       sceneId: scene.id,
-      delEntityIdList: entityIdList
+      delEntityIdList: entityIdList,
     }
 
     await super.sendNotify(context, notifyData)
@@ -25,4 +25,4 @@ class DelTeamEntityPacket extends Packet implements PacketInterface {
 }
 
 let packet: DelTeamEntityPacket
-export default (() => packet = packet || new DelTeamEntityPacket())()
+export default (() => (packet = packet || new DelTeamEntityPacket()))()

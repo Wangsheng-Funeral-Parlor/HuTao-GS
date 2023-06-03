@@ -1,5 +1,5 @@
-import ConfigDynamicTalent from './ConfigDynamicTalent'
-import ConfigEntityAbilityEntry from './ConfigEntityAbilityEntry'
+import ConfigDynamicTalent from "./ConfigDynamicTalent"
+import ConfigEntityAbilityEntry from "./ConfigEntityAbilityEntry"
 
 export default interface ConfigAbilityGroup {
   AbilityGroupSourceType: string

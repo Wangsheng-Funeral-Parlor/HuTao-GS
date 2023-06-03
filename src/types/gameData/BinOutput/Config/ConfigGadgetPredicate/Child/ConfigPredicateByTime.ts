@@ -1,6 +1,6 @@
-import ConfigBaseGadgetPredicate from '.'
+import ConfigBaseGadgetPredicate from "."
 
 export default interface ConfigPredicateByTime extends ConfigBaseGadgetPredicate {
-  $type: 'ConfigPredicateByTime'
+  $type: "ConfigPredicateByTime"
   IsNight: boolean
 }

@@ -1,4 +1,4 @@
-import { hrtime } from 'process'
+import { hrtime } from "process"
 
 type WaitCondition = (...any: any[]) => boolean
 
@@ -14,8 +14,8 @@ setInterval(() => {
     try {
       const { cond, resolve, time } = taskList[i++]
 
-      if (typeof cond === 'number' && Date.now() - time < cond) continue
-      if (typeof cond === 'function' && !cond()) continue
+      if (typeof cond === "number" && Date.now() - time < cond) continue
+      if (typeof cond === "function" && !cond()) continue
 
       // Remove and resolve task
       taskList.splice(--i, 1)
@@ -39,7 +39,7 @@ export class WaitOnBlock {
 
   private checkIsBlocking(): boolean {
     const { timestamp, maxNs } = this
-    return (getTimeNs() - timestamp >= maxNs)
+    return getTimeNs() - timestamp >= maxNs
   }
 
   async waitTick() {
@@ -62,13 +62,13 @@ export class WaitOnBlock {
 }
 
 export const waitTick = (): Promise<void> => {
-  return new Promise(resolve => taskList.push({ cond: 20, resolve, time: Date.now() }))
+  return new Promise((resolve) => taskList.push({ cond: 20, resolve, time: Date.now() }))
 }
 
 export const waitMs = (ms: number): Promise<void> => {
-  return new Promise(resolve => taskList.push({ cond: ms, resolve, time: Date.now() }))
+  return new Promise((resolve) => taskList.push({ cond: ms, resolve, time: Date.now() }))
 }
 
 export const waitUntil = (cond: WaitCondition): Promise<void> => {
-  return new Promise(resolve => taskList.push({ cond, resolve }))
+  return new Promise((resolve) => taskList.push({ cond, resolve }))
 }

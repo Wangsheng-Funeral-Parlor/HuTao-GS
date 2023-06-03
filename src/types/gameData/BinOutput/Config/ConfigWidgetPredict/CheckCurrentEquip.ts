@@ -1,1 +1,1 @@
-export default interface CheckCurrentEquip { }
+export default interface CheckCurrentEquip {}

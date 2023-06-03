@@ -1,8 +1,6 @@
-import ConfigConstForceField from './Child/ConfigConstForceField'
-import ConfigRiseField from './Child/ConfigRiseField'
+import ConfigConstForceField from "./Child/ConfigConstForceField"
+import ConfigRiseField from "./Child/ConfigRiseField"
 
-type ConfigForceField =
-  ConfigConstForceField |
-  ConfigRiseField
+type ConfigForceField = ConfigConstForceField | ConfigRiseField
 
 export default ConfigForceField

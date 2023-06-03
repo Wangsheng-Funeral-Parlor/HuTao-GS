@@ -1,5 +1,5 @@
-import ConfigAbility from './BinOutput/Config/ConfigAbility'
-import ConfigAbilityGroup from './BinOutput/Config/ConfigAbilityGroup'
+import ConfigAbility from "./BinOutput/Config/ConfigAbility"
+import ConfigAbilityGroup from "./BinOutput/Config/ConfigAbilityGroup"
 
 export default interface AbilityDataGroup {
   Animal: {

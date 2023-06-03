@@ -1,6 +1,6 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { PlayerLocationInfo, VehicleLocationInfo } from '@/types/proto'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { PlayerLocationInfo, VehicleLocationInfo } from "@/types/proto"
 
 export interface ScenePlayerLocationNotify {
   sceneId: number
@@ -10,7 +10,7 @@ export interface ScenePlayerLocationNotify {
 
 class ScenePlayerLocationPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ScenePlayerLocation')
+    super("ScenePlayerLocation")
   }
 
   async sendNotify(context: PacketContext, data: ScenePlayerLocationNotify): Promise<void> {
@@ -25,4 +25,4 @@ class ScenePlayerLocationPacket extends Packet implements PacketInterface {
 }
 
 let packet: ScenePlayerLocationPacket
-export default (() => packet = packet || new ScenePlayerLocationPacket())()
+export default (() => (packet = packet || new ScenePlayerLocationPacket()))()

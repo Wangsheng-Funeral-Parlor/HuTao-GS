@@ -1,4 +1,4 @@
-import { VehicleMember } from '.'
+import { VehicleMember } from "."
 
 export interface VehicleInfo {
   memberList: VehicleMember[]

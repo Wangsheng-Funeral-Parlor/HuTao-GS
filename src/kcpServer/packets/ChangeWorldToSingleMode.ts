@@ -1,21 +1,21 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface ChangeWorldToSingleModeReq { }
+export interface ChangeWorldToSingleModeReq {}
 
 export interface ChangeWorldToSingleModeRsp {
   retcode: RetcodeEnum
   quitMpValidTime?: number
 }
 
-export interface ChangeWorldToSingleModeNotify { }
+export interface ChangeWorldToSingleModeNotify {}
 
 class ChangeWorldToSingleModePacket extends Packet implements PacketInterface {
   constructor() {
-    super('ChangeWorldToSingleMode', {
+    super("ChangeWorldToSingleMode", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -44,4 +44,4 @@ class ChangeWorldToSingleModePacket extends Packet implements PacketInterface {
 }
 
 let packet: ChangeWorldToSingleModePacket
-export default (() => packet = packet || new ChangeWorldToSingleModePacket())()
+export default (() => (packet = packet || new ChangeWorldToSingleModePacket()))()

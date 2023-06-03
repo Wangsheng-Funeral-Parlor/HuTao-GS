@@ -1,8 +1,8 @@
-import Vehicle from '$/entity/gadget/vehicle'
-import Player from '$/player'
-import Scene from '$/scene'
-import Vector from '$/utils/vector'
-import { VehicleLocationInfo } from '@/types/proto'
+import Vehicle from "$/entity/gadget/vehicle"
+import Player from "$/player"
+import Scene from "$/scene"
+import Vector from "$/utils/vector"
+import { VehicleLocationInfo } from "@/types/proto"
 
 export default class VehicleManager {
   scene: Scene
@@ -20,11 +20,11 @@ export default class VehicleManager {
   }
 
   getVehicle(entityId: number): Vehicle {
-    return this.vehicleList.find(v => v.entityId === entityId)
+    return this.vehicleList.find((v) => v.entityId === entityId)
   }
 
   getVehicleByOwner(player: Player): Vehicle {
-    return this.vehicleList.find(v => v.player === player)
+    return this.vehicleList.find((v) => v.player === player)
   }
 
   async createVehicle(player: Player, vehicleId: number, pointId: number, pos: Vector, rot: Vector): Promise<Vehicle> {
@@ -60,6 +60,6 @@ export default class VehicleManager {
   }
 
   exportVehicleLocationInfoList(): VehicleLocationInfo[] {
-    return this.vehicleList.map(v => v.exportVehicleLocationInfo())
+    return this.vehicleList.map((v) => v.exportVehicleLocationInfo())
   }
 }

@@ -1,4 +1,4 @@
-import { FetterStateEnum } from './enum'
+import { FetterStateEnum } from "./enum"
 
 export interface FetterInfo {
   fetterId?: number

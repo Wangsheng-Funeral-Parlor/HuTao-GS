@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Player from '$/player'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import Player from "$/player"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SceneKickPlayerReq {
   targetUid: number
@@ -19,9 +19,9 @@ export interface SceneKickPlayerNotify {
 
 class SceneKickPlayerPacket extends Packet implements PacketInterface {
   constructor() {
-    super('SceneKickPlayer', {
+    super("SceneKickPlayer", {
       reqState: ClientStateEnum.ENTER_SCENE,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -35,14 +35,14 @@ class SceneKickPlayerPacket extends Packet implements PacketInterface {
       return
     }
 
-    if (!await currentWorld.kick(targetUid)) {
+    if (!(await currentWorld.kick(targetUid))) {
       await this.response(context, { retcode: RetcodeEnum.RET_PLAYER_NOT_EXIST })
       return
     }
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      targetUid
+      targetUid,
     })
   }
 
@@ -53,7 +53,7 @@ class SceneKickPlayerPacket extends Packet implements PacketInterface {
   async sendNotify(context: PacketContext, kickerPlayer: Player, targetPlayer: Player): Promise<void> {
     const notifyData: SceneKickPlayerNotify = {
       kickerUid: kickerPlayer.uid,
-      targetUid: targetPlayer.uid
+      targetUid: targetPlayer.uid,
     }
 
     await super.sendNotify(context, notifyData)
@@ -65,4 +65,4 @@ class SceneKickPlayerPacket extends Packet implements PacketInterface {
 }
 
 let packet: SceneKickPlayerPacket
-export default (() => packet = packet || new SceneKickPlayerPacket())()
+export default (() => (packet = packet || new SceneKickPlayerPacket()))()

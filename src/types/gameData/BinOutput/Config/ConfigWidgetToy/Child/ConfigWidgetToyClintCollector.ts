@@ -1,7 +1,7 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyClintCollector extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyClintCollector'
+  $type: "ConfigWidgetToyClintCollector"
   TargetType: string | number
   ElementType: string | number
   RechargePoints: number

@@ -1,7 +1,7 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { VehicleMember } from '@/types/proto'
-import { RetcodeEnum, VehicleInteractTypeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { VehicleMember } from "@/types/proto"
+import { RetcodeEnum, VehicleInteractTypeEnum } from "@/types/proto/enum"
 
 export interface VehicleInteractReq {
   entityId: number
@@ -18,9 +18,9 @@ export interface VehicleInteractRsp {
 
 class VehicleInteractPacket extends Packet implements PacketInterface {
   constructor() {
-    super('VehicleInteract', {
+    super("VehicleInteract", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -54,4 +54,4 @@ class VehicleInteractPacket extends Packet implements PacketInterface {
 }
 
 let packet: VehicleInteractPacket
-export default (() => packet = packet || new VehicleInteractPacket())()
+export default (() => (packet = packet || new VehicleInteractPacket()))()

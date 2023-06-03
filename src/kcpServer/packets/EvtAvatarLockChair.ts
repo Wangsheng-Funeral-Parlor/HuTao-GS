@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { VectorInfo } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { VectorInfo } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface EvtAvatarLockChairReq {
   chairId: number
@@ -17,9 +17,9 @@ export interface EvtAvatarLockChairRsp {
 
 class EvtAvatarLockChairPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EvtAvatarLockChair', {
+    super("EvtAvatarLockChair", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -33,7 +33,7 @@ class EvtAvatarLockChairPacket extends Packet implements PacketInterface {
       retcode: RetcodeEnum.RET_SUCC,
       entityId: currentAvatar.entityId,
       position,
-      chairId
+      chairId,
     })
   }
 
@@ -43,4 +43,4 @@ class EvtAvatarLockChairPacket extends Packet implements PacketInterface {
 }
 
 let packet: EvtAvatarLockChairPacket
-export default (() => packet = packet || new EvtAvatarLockChairPacket())()
+export default (() => (packet = packet || new EvtAvatarLockChairPacket()))()

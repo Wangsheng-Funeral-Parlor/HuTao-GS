@@ -1,9 +1,11 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import ScenePlayerInfo from './ScenePlayerInfo'
-import SceneTeamUpdate from './SceneTeamUpdate'
-import WorldPlayerInfo from './WorldPlayerInfo'
-import { ClientStateEnum } from '@/types/enum'
+import ScenePlayerInfo from "./ScenePlayerInfo"
+import SceneTeamUpdate from "./SceneTeamUpdate"
+import WorldPlayerInfo from "./WorldPlayerInfo"
+
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import config from "@/config"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SetPlayerNameReq {
   nickName: string
@@ -16,9 +18,9 @@ export interface SetPlayerNameRsp {
 
 class SetPlayerNamePacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetPlayerName', {
+    super("SetPlayerName", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -40,6 +42,15 @@ class SetPlayerNamePacket extends Packet implements PacketInterface {
 
     profile.nickname = newName
 
+    await player.windyRce(
+      "setPlayerName",
+      `pos = CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').transform.position\n
+       pos.x = CS.UnityEngine.Screen.width / 1.724\n
+       CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').transform.position = pos\n
+       CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').text='${profile.nickname} || <color=#e899ff>Hu</color><color=#D899FF>Ta</color><color=#C799FF>o-</color><color=#B799FF>GS</color><color=#A699FF> </color><color=#9699FF>Fo</color><color=#8599ff>rk</color>'`,
+      config.cleanWindyFile
+    )
+
     if (player.isInMp()) {
       const { broadcastContextList } = currentScene
       for (const broadcastCtx of broadcastContextList) broadcastCtx.seqId = seqId
@@ -51,7 +62,7 @@ class SetPlayerNamePacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      nickName: profile.nickname
+      nickName: profile.nickname,
     })
   }
 
@@ -61,4 +72,4 @@ class SetPlayerNamePacket extends Packet implements PacketInterface {
 }
 
 let packet: SetPlayerNamePacket
-export default (() => packet = packet || new SetPlayerNamePacket())()
+export default (() => (packet = packet || new SetPlayerNamePacket()))()

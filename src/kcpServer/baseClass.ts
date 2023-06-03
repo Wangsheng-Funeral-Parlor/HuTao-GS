@@ -1,4 +1,4 @@
-import EventEmitter from 'promise-events'
+import EventEmitter from "promise-events"
 
 function getPropNames(proto: any): string[] {
   if (proto.__proto__ == null) return []
@@ -20,7 +20,7 @@ export default class BaseClass extends EventEmitter {
     const ownPropNames = getPropNames(this.constructor.prototype)
 
     for (const name of ownPropNames) {
-      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
+      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== "function") continue
       target.on(name.slice(6), this[name])
     }
   }
@@ -31,7 +31,7 @@ export default class BaseClass extends EventEmitter {
     const ownPropNames = getPropNames(this.constructor.prototype)
 
     for (const name of ownPropNames) {
-      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
+      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== "function") continue
       target.off(name.slice(6), this[name])
     }
   }
@@ -54,7 +54,7 @@ export default class BaseClass extends EventEmitter {
     const ownPropNames = getPropNames(this.constructor.prototype)
 
     for (const name of ownPropNames) {
-      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== 'function') continue
+      if (!name.match(/^handle[A-Z]/) || typeof this[name] !== "function") continue
       this[name] = this[name].bind(this)
     }
   }

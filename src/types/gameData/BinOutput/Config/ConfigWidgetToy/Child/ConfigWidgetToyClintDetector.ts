@@ -1,7 +1,7 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyClintDetector extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyClintDetector'
+  $type: "ConfigWidgetToyClintDetector"
   GadgetId: number
   AllowCityId: number
   HintGroup: number

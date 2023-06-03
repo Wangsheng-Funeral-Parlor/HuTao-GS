@@ -1,4 +1,4 @@
-import { OnlinePlayerInfo } from '.'
+import { OnlinePlayerInfo } from "."
 
 export interface ScenePlayerInfo {
   uid: number

@@ -1,4 +1,4 @@
-import { AnimatorParameterValueInfo } from '.'
+import { AnimatorParameterValueInfo } from "."
 
 export interface AnimatorParameterValueInfoPair {
   nameId?: number

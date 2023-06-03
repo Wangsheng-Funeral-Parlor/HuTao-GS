@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface SetOpenStateReq {
   key: number
@@ -14,7 +14,7 @@ export interface SetOpenStateRsp {
 
 class SetOpenStatePacket extends Packet implements PacketInterface {
   constructor() {
-    super('SetOpenState')
+    super("SetOpenState")
   }
 
   async request(context: PacketContext, data: SetOpenStateReq): Promise<void> {
@@ -26,7 +26,7 @@ class SetOpenStatePacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       key,
-      value
+      value,
     })
   }
 
@@ -36,4 +36,4 @@ class SetOpenStatePacket extends Packet implements PacketInterface {
 }
 
 let packet: SetOpenStatePacket
-export default (() => packet = packet || new SetOpenStatePacket())()
+export default (() => (packet = packet || new SetOpenStatePacket()))()

@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
 
 export interface HostPlayerNotify {
   hostUid: number
@@ -8,17 +8,18 @@ export interface HostPlayerNotify {
 
 class HostPlayerPacket extends Packet implements PacketInterface {
   constructor() {
-    super('HostPlayer')
+    super("HostPlayer")
   }
 
   async sendNotify(context: PacketContext): Promise<void> {
-    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH, false, 0xF0FF)) return
+    if (!this.checkState(context, ClientStateEnum.ENTER_SCENE | ClientStateEnum.PRE_SCENE_INIT_FINISH, false, 0xf0ff))
+      return
 
     const { uid, peerId } = context.player.currentWorld.host
 
     const notifyData: HostPlayerNotify = {
       hostUid: uid,
-      hostPeerId: peerId
+      hostPeerId: peerId,
     }
 
     await super.sendNotify(context, notifyData)
@@ -26,4 +27,4 @@ class HostPlayerPacket extends Packet implements PacketInterface {
 }
 
 let packet: HostPlayerPacket
-export default (() => packet = packet || new HostPlayerPacket())()
+export default (() => (packet = packet || new HostPlayerPacket()))()

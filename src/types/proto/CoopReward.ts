@@ -1,4 +1,4 @@
-import { CoopRewardStateEnum } from './enum'
+import { CoopRewardStateEnum } from "./enum"
 
 export interface CoopReward {
   id?: number

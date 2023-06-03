@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { LockedPersonallineData } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { LockedPersonallineData } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
-export interface PersonalLineAllDataReq { }
+export interface PersonalLineAllDataReq {}
 
 export interface PersonalLineAllDataRsp {
   retcode: RetcodeEnum
@@ -15,7 +15,7 @@ export interface PersonalLineAllDataRsp {
 
 class PersonalLineAllDataPacket extends Packet implements PacketInterface {
   constructor() {
-    super('PersonalLineAllData')
+    super("PersonalLineAllData")
   }
 
   async request(context: PacketContext, _data: PersonalLineAllDataReq): Promise<void> {
@@ -25,7 +25,7 @@ class PersonalLineAllDataPacket extends Packet implements PacketInterface {
       legendaryKeyCount: 0,
       ongoingPersonalLineList: [],
       canBeUnlockedPersonalLineList: [],
-      lockedPersonalLineList: []
+      lockedPersonalLineList: [],
     })
   }
 
@@ -35,4 +35,4 @@ class PersonalLineAllDataPacket extends Packet implements PacketInterface {
 }
 
 let packet: PersonalLineAllDataPacket
-export default (() => packet = packet || new PersonalLineAllDataPacket())()
+export default (() => (packet = packet || new PersonalLineAllDataPacket()))()

@@ -1,4 +1,4 @@
-import { FetterInfo } from './'
+import { FetterInfo } from "./"
 
 export interface AvatarFetterInfo {
   expNumber?: number

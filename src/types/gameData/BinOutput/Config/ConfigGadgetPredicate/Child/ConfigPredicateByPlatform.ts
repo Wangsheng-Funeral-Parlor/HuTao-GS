@@ -1,6 +1,6 @@
-import ConfigBaseGadgetPredicate from '.'
+import ConfigBaseGadgetPredicate from "."
 
 export default interface ConfigPredicateByPlatform extends ConfigBaseGadgetPredicate {
-  $type: 'ConfigPredicateByPlatform'
+  $type: "ConfigPredicateByPlatform"
   IsStart: boolean
 }

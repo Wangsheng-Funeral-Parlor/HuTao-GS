@@ -1,6 +1,6 @@
-import ConfigBaseGadgetTriggerAction from '.'
+import ConfigBaseGadgetTriggerAction from "."
 
 export default interface ConfigGadgetDoAttackEvent extends ConfigBaseGadgetTriggerAction {
-  $type: 'ConfigGadgetDoAttackEvent'
+  $type: "ConfigGadgetDoAttackEvent"
   AttackEvent: string
 }

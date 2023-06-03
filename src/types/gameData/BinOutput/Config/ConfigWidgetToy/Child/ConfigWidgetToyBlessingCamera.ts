@@ -1,6 +1,6 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyBlessingCamera extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyBlessingCamera'
+  $type: "ConfigWidgetToyBlessingCamera"
   IsFixed: boolean
 }

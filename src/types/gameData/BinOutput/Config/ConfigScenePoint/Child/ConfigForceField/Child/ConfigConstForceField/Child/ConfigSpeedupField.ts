@@ -1,7 +1,7 @@
-import ConfigBaseConstForceField from '.'
+import ConfigBaseConstForceField from "."
 
 export default interface ConfigSpeedupField extends ConfigBaseConstForceField {
-  $type: 'ConfigSpeedupField'
+  $type: "ConfigSpeedupField"
   Attenuation: number
   SingleDir: boolean
 }

@@ -1,8 +1,6 @@
-import ConfigBulletPattern from './Child/ConfigBulletPattern'
-import ConfigGadgetCollidedPattern from './Child/ConfigGadgetCollidedPattern'
+import ConfigBulletPattern from "./Child/ConfigBulletPattern"
+import ConfigGadgetCollidedPattern from "./Child/ConfigGadgetCollidedPattern"
 
-type ConfigGadgetPattern =
-  ConfigBulletPattern |
-  ConfigGadgetCollidedPattern
+type ConfigGadgetPattern = ConfigBulletPattern | ConfigGadgetCollidedPattern
 
 export default ConfigGadgetPattern

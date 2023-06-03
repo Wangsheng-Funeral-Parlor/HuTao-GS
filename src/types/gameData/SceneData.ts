@@ -1,6 +1,6 @@
-import { DynamicVector } from './BinOutput/Common/DynamicNumber'
-import ConfigScene from './BinOutput/Config/ConfigScene'
-import { SceneBlockScriptConfig, SceneGroupScriptConfig } from './Script/SceneScriptConfig'
+import { DynamicVector } from "./BinOutput/Common/DynamicNumber"
+import ConfigScene from "./BinOutput/Config/ConfigScene"
+import { SceneBlockScriptConfig, SceneGroupScriptConfig } from "./Script/SceneScriptConfig"
 
 export interface CityData {
   Id: number

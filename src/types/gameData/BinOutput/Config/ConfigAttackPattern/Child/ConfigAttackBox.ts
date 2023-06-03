@@ -1,8 +1,9 @@
-import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigSimpleAttackPattern from './ConfigSimpleAttackPattern'
+import ConfigSimpleAttackPattern from "./ConfigSimpleAttackPattern"
+
+import { DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigAttackBox extends ConfigSimpleAttackPattern {
-  $type: 'ConfigAttackBox'
+  $type: "ConfigAttackBox"
   Size: DynamicVector
   MuteHitBehindScene: boolean
 }

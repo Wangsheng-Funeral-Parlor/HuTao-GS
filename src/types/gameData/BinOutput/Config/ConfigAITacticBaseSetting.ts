@@ -1,4 +1,4 @@
-import ConfigAITacticCondition from './ConfigAITacticCondition'
+import ConfigAITacticCondition from "./ConfigAITacticCondition"
 
 export default interface ConfigAITacticBaseSetting {
   Enable: boolean

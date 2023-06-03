@@ -1,4 +1,4 @@
-import { TowerLevelRecord } from '.'
+import { TowerLevelRecord } from "."
 
 export interface TowerFloorRecord {
   floorId: number

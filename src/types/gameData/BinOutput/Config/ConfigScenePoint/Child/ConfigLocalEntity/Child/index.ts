@@ -1,4 +1,4 @@
-import ConfigBaseScenePoint from '../..'
+import ConfigBaseScenePoint from "../.."
 
 export default interface ConfigBaseLocalEntity extends ConfigBaseScenePoint {
   CheckDist: number

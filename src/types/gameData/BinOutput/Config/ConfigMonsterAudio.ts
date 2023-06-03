@@ -1,8 +1,8 @@
-import ConfigCharacterAudio from './ConfigCharacterAudio'
-import ConfigWwiseString from './ConfigWwiseString'
+import ConfigCharacterAudio from "./ConfigCharacterAudio"
+import ConfigWwiseString from "./ConfigWwiseString"
 
 export default interface ConfigMonsterAudio extends ConfigCharacterAudio {
-  $type: 'ConfigMonsterAudio'
+  $type: "ConfigMonsterAudio"
   RandomVariantSwitchGroup: ConfigWwiseString
   RandomVariantSwitchValues: ConfigWwiseString[]
 }

@@ -1,4 +1,4 @@
-import Player from '.'
+import Player from "."
 
 export default class ShopHistory {
   player: Player

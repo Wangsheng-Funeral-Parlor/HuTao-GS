@@ -1,4 +1,4 @@
-import { DynamicFloat } from '$DT/BinOutput/Common/DynamicNumber'
+import { DynamicFloat } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface GlobalValuePair {
   Key: string

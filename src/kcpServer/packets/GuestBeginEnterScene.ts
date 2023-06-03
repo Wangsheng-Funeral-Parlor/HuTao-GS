@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import Player from '$/player'
-import Scene from '$/scene'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import Player from "$/player"
+import Scene from "$/scene"
 
 export interface GuestBeginEnterSceneNotify {
   uid: number
@@ -9,13 +9,13 @@ export interface GuestBeginEnterSceneNotify {
 
 class GuestBeginEnterScenePacket extends Packet implements PacketInterface {
   constructor() {
-    super('GuestBeginEnterScene')
+    super("GuestBeginEnterScene")
   }
 
   async sendNotify(context: PacketContext, scene: Scene, player: Player): Promise<void> {
     const notifyData: GuestBeginEnterSceneNotify = {
       uid: player.uid,
-      sceneId: scene.id
+      sceneId: scene.id,
     }
 
     await super.sendNotify(context, notifyData)
@@ -23,4 +23,4 @@ class GuestBeginEnterScenePacket extends Packet implements PacketInterface {
 }
 
 let packet: GuestBeginEnterScenePacket
-export default (() => packet = packet || new GuestBeginEnterScenePacket())()
+export default (() => (packet = packet || new GuestBeginEnterScenePacket()))()

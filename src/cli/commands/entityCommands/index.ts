@@ -1,16 +1,17 @@
-import { CommandDefinition } from '..'
-import abilityCommand from './abilityCommand'
-import gadgetCommand from './gadgetCommand'
-import killallCommand from './killallCommand'
-import monsterCommand from './monsterCommand'
-import vehicleCommand from './vehicleCommand'
+import { CommandDefinition } from ".."
+
+import abilityCommand from "./abilityCommand"
+import gadgetCommand from "./gadgetCommand"
+import killallCommand from "./killallCommand"
+import spawnCommand from "./spawnCommand"
+import vehicleCommand from "./vehicleCommand"
 
 const entityCommands: CommandDefinition[] = [
-  monsterCommand,
+  spawnCommand,
   gadgetCommand,
   vehicleCommand,
   killallCommand,
-  abilityCommand
+  abilityCommand,
 ]
 
 export default entityCommands

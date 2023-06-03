@@ -1,4 +1,4 @@
-import { AvatarExcelInfo, CurVehicleInfo, SceneReliquaryInfo, SceneWeaponInfo, ServerBuff } from '.'
+import { AvatarExcelInfo, CurVehicleInfo, SceneReliquaryInfo, SceneWeaponInfo, ServerBuff } from "."
 
 export interface SceneAvatarInfo {
   uid?: number

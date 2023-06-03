@@ -1,8 +1,8 @@
-import ConfigAIInvestigateData from './ConfigAIInvestigateData'
-import ConfigAITacticBaseSetting from './ConfigAITacticBaseSetting'
+import ConfigAIInvestigateData from "./ConfigAIInvestigateData"
+import ConfigAITacticBaseSetting from "./ConfigAITacticBaseSetting"
 
 export default interface ConfigAIInvestigateSetting extends ConfigAITacticBaseSetting {
-  $type: 'ConfigAIInvestigateSetting'
+  $type: "ConfigAIInvestigateSetting"
   DefaultSetting: ConfigAIInvestigateData
   Specification: { [id: number]: ConfigAIInvestigateData }
 }

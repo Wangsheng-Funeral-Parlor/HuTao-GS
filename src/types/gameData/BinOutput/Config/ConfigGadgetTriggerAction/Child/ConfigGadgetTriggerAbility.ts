@@ -1,6 +1,6 @@
-import ConfigBaseGadgetTriggerAction from '.'
+import ConfigBaseGadgetTriggerAction from "."
 
 export default interface ConfigGadgetTriggerAbility extends ConfigBaseGadgetTriggerAction {
-  $type: 'ConfigGadgetTriggerAbility'
+  $type: "ConfigGadgetTriggerAbility"
   AbilityName: string
 }

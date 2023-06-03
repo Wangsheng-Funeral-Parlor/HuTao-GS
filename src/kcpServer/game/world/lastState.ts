@@ -1,8 +1,9 @@
-import Vector from '$/utils/vector'
-import { SceneData } from '@/types/gameData/SceneData'
-import { ClientStateEnum } from '@/types/enum'
-import { LastStateUserData } from '@/types/user/WorldUserData'
-import World from '.'
+import World from "."
+
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { SceneData } from "@/types/gameData/SceneData"
+import { LastStateUserData } from "@/types/user/WorldUserData"
 
 export default class LastState {
   world: World
@@ -39,7 +40,7 @@ export default class LastState {
   saveState() {
     const { host } = this.world
     const { currentScene, pos, rot, hasLastSafeState, lastSafePos, lastSafeRot } = host
-    if ((host.state & 0xF000) !== ClientStateEnum.IN_GAME || !host.isHost() || !currentScene) return false
+    if ((host.state & 0xf000) !== ClientStateEnum.IN_GAME || !host.isHost() || !currentScene) return false
 
     this.sceneId = currentScene.id
 
@@ -62,7 +63,7 @@ export default class LastState {
     return {
       sceneId,
       pos: pos.export(),
-      rot: rot.export()
+      rot: rot.export(),
     }
   }
 }

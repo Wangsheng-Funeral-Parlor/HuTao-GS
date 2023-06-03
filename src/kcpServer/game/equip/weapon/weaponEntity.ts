@@ -1,10 +1,11 @@
-import Entity from '$/entity'
-import GrowCurveData from '$/gameData/data/GrowCurveData'
-import WeaponData from '$/gameData/data/WeaponData'
-import { EntityTypeEnum } from '@/types/enum'
-import { ProtEntityTypeEnum } from '@/types/proto/enum'
-import EntityUserData from '@/types/user/EntityUserData'
-import Weapon from '.'
+import Weapon from "."
+
+import Entity from "$/entity"
+import GrowCurveData from "$/gameData/data/GrowCurveData"
+import WeaponData from "$/gameData/data/WeaponData"
+import { EntityTypeEnum } from "@/types/enum"
+import { ProtEntityTypeEnum } from "@/types/proto/enum"
+import EntityUserData from "@/types/user/EntityUserData"
 
 export default class WeaponEntity extends Entity {
   weapon: Weapon
@@ -20,7 +21,7 @@ export default class WeaponEntity extends Entity {
 
   private async loadWeaponData() {
     this.config = await WeaponData.getFightPropConfig(this.weapon.itemId)
-    this.growCurve = await GrowCurveData.getGrowCurve('Weapon')
+    this.growCurve = await GrowCurveData.getGrowCurve("Weapon")
   }
 
   async init(userData: EntityUserData): Promise<void> {

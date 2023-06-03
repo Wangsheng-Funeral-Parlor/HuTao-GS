@@ -1,4 +1,4 @@
-import ConfigWaypoint from './ConfigWaypoint'
+import ConfigWaypoint from "./ConfigWaypoint"
 
 export default interface ConfigRoute {
   LocalId: number

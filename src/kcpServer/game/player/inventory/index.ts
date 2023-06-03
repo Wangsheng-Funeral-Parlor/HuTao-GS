@@ -1,19 +1,21 @@
-import StoreItemChange from '#/packets/StoreItemChange'
-import StoreItemDel from '#/packets/StoreItemDel'
-import { ItemTypeEnum } from '@/types/enum'
-import { ItemInfo } from '@/types/proto'
-import InventoryUserData from '@/types/user/InventoryUserData'
-import Player from '..'
-import Equip from '../../equip'
-import Material from '../../material'
-import Item from './item'
+import Player from ".."
+import Equip from "../../equip"
+import Material from "../../material"
+
+import Item from "./item"
+
+import StoreItemChange from "#/packets/StoreItemChange"
+import StoreItemDel from "#/packets/StoreItemDel"
+import { ItemTypeEnum } from "@/types/enum"
+import { ItemInfo } from "@/types/proto"
+import InventoryUserData from "@/types/user/InventoryUserData"
 
 export const STORE_LIMIT = {
   ALL: 30000,
   MATERIAL: 2000,
   WEAPON: 2000,
   RELIQUARY: 1500,
-  FURNITURE: 2000
+  FURNITURE: 2000,
 }
 
 export default class Inventory {
@@ -40,7 +42,7 @@ export default class Inventory {
         break
       case 106: // Resin
         break
-      case 107:  // Legendary Key
+      case 107: // Legendary Key
         break
       case 201: // Primogem
         await player.addPrimogem(count)
@@ -60,7 +62,7 @@ export default class Inventory {
     return true
   }
 
-  private async removeItem(item: Item, commit: boolean = true, notify: boolean = true) {
+  private async removeItem(item: Item, commit = true, notify = true) {
     const { player, itemList } = this
     const index = itemList.indexOf(item)
 
@@ -75,7 +77,7 @@ export default class Inventory {
     return 0
   }
 
-  private async removeItemId(itemId: number, amount: number = 1, commit: boolean = true, notify: boolean = true) {
+  private async removeItemId(itemId: number, amount = 1, commit = true, notify = true) {
     const { player, itemList } = this
     const changedItemList = []
 
@@ -95,11 +97,17 @@ export default class Inventory {
 
     if (commit) {
       if (notify) {
-        await StoreItemChange.sendNotify(player.context, changedItemList.filter(item => item.count > 0))
-        await StoreItemDel.sendNotify(player.context, changedItemList.filter(item => item.count <= 0))
+        await StoreItemChange.sendNotify(
+          player.context,
+          changedItemList.filter((item) => item.count > 0)
+        )
+        await StoreItemDel.sendNotify(
+          player.context,
+          changedItemList.filter((item) => item.count <= 0)
+        )
       }
 
-      this.itemList = itemList.filter(item => item.count > 0)
+      this.itemList = itemList.filter((item) => item.count > 0)
     }
 
     return remaining
@@ -118,18 +126,16 @@ export default class Inventory {
     }
   }
 
-  async add(obj: Material | Equip, notify: boolean = true, forceAdd: boolean = false): Promise<boolean> {
-    return this.addItem(new Item(obj), notify, forceAdd)
+  async add(obj: Material | Equip, notify = true): Promise<boolean> {
+    return this.addItem(new Item(obj), notify)
   }
 
-  async addItem(item: Item, notify: boolean = true, forceAdd: boolean = false): Promise<boolean> {
+  async addItem(item: Item, notify = true): Promise<boolean> {
     const { player, itemList } = this
     const { itemType, material } = item
 
     if (material?.useOnGain) return this.useItem(item)
-    if (itemType === ItemTypeEnum.ITEM_VIRTUAL && await this.addVirtualItem(item)) return true
-
-    if (!forceAdd && this.isFull(item)) return false
+    if (itemType === ItemTypeEnum.ITEM_VIRTUAL && (await this.addVirtualItem(item))) return true
 
     const changedItemList = []
 
@@ -148,8 +154,8 @@ export default class Inventory {
     return true
   }
 
-  async remove(item: Item | number, amount: number = 1, commit: boolean = true, notify: boolean = true): Promise<number> {
-    if (typeof item === 'number') {
+  async remove(item: Item | number, amount = 1, commit = true, notify = true): Promise<number> {
+    if (typeof item === "number") {
       // item id
       return this.removeItemId(item, amount, commit, notify)
     } else {
@@ -158,7 +164,7 @@ export default class Inventory {
     }
   }
 
-  async removeGuid(guid: bigint, notify: boolean = true) {
+  async removeGuid(guid: bigint, notify = true) {
     const { player, itemList } = this
     const { guidManager } = player
     const deletedItemList = []
@@ -174,7 +180,7 @@ export default class Inventory {
 
     if (notify) await StoreItemDel.sendNotify(player.context, deletedItemList)
 
-    this.itemList = itemList.filter(item => !deletedItemList.includes(item))
+    this.itemList = itemList.filter((item) => !deletedItemList.includes(item))
   }
 
   async useItem(item: Item, count?: number): Promise<boolean> {
@@ -194,12 +200,12 @@ export default class Inventory {
     if (!guidManager.isValidGuid(guid)) return null
     guid = guidManager.getGuid(guid)
 
-    return itemList.find(item => item.guid === guid)
+    return itemList.find((item) => item.guid === guid)
   }
 
   getItemByItemId(itemId: number): Item {
     const { itemList } = this
-    return itemList.find(item => item.itemId === itemId)
+    return itemList.find((item) => item.itemId === itemId)
   }
 
   countItems(itemType?: ItemTypeEnum): number {
@@ -234,14 +240,14 @@ export default class Inventory {
   }
 
   exportItemList(): ItemInfo[] {
-    return this.itemList.map(item => item.export())
+    return this.itemList.map((item) => item.export())
   }
 
   exportUserData(): InventoryUserData {
     const { itemList } = this
 
     return {
-      itemDataList: itemList.map(item => item.exportUserData())
+      itemDataList: itemList.map((item) => item.exportUserData()),
     }
   }
 }

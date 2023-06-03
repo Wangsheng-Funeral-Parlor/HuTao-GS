@@ -1,4 +1,4 @@
-import { Birthday, ProfilePicture } from '../proto'
+import { Birthday, ProfilePicture } from "../proto"
 
 export default interface ProfileUserData {
   nickname: string

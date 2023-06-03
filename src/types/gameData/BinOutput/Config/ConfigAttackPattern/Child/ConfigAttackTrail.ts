@@ -1,7 +1,7 @@
-import ConfigSimpleAttackPattern from './ConfigSimpleAttackPattern'
+import ConfigSimpleAttackPattern from "./ConfigSimpleAttackPattern"
 
 export default interface ConfigAttackTrail extends ConfigSimpleAttackPattern {
-  $type: 'ConfigAttackTrail'
+  $type: "ConfigAttackTrail"
   TrailName: string
   TrailStartName: string
 }

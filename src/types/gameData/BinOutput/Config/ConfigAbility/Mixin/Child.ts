@@ -1,23 +1,24 @@
-import { DynamicFloat, DynamicInt, DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigAbilityStateToActions from '../../ConfigAbilityStateToActions'
-import ConfigAttackInfo from '../../ConfigAttackInfo'
-import ConfigBornType from '../../ConfigBornType'
-import ConfigCameraRadialBlur from '../../ConfigCameraRadialBlur'
-import ConfigCollision from '../../ConfigCollision'
-import ConfigTornadoZone from '../../ConfigTornadoZone'
-import DvalinS01PathEffsInfo from '../../DvalinS01PathEffsInfo'
-import ElementBatchPredicated from '../../ElementBatchPredicated'
-import ElementTypeModifier from '../../ElementTypeModifier'
-import TileShapeInfo from '../../TileShapeInfo'
-import ConfigAbilityAction from '../Action'
-import ConfigAbilityPredicate from '../Predicate'
+import ConfigAbilityStateToActions from "../../ConfigAbilityStateToActions"
+import ConfigAttackInfo from "../../ConfigAttackInfo"
+import ConfigBornType from "../../ConfigBornType"
+import ConfigCameraRadialBlur from "../../ConfigCameraRadialBlur"
+import ConfigCollision from "../../ConfigCollision"
+import ConfigTornadoZone from "../../ConfigTornadoZone"
+import DvalinS01PathEffsInfo from "../../DvalinS01PathEffsInfo"
+import ElementBatchPredicated from "../../ElementBatchPredicated"
+import ElementTypeModifier from "../../ElementTypeModifier"
+import TileShapeInfo from "../../TileShapeInfo"
+import ConfigAbilityAction from "../Action"
+import ConfigAbilityPredicate from "../Predicate"
+
+import { DynamicFloat, DynamicInt, DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigBaseAbilityMixin {
   IsUnique?: boolean
 }
 
 export interface AirFlowMixin extends ConfigBaseAbilityMixin {
-  $type: 'AirFlowMixin'
+  $type: "AirFlowMixin"
   GadgetID: number
   CampID: number
   CampTargetType: string
@@ -25,44 +26,44 @@ export interface AirFlowMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AnimatorRotationCompensateMixin extends ConfigBaseAbilityMixin {
-  $type: 'AnimatorRotationCompensateMixin'
+  $type: "AnimatorRotationCompensateMixin"
   AnimatorStateIDs: string[]
   AnimationRotate: number
   AngleLimit: number
 }
 
 export interface ApplyInertiaVelocityMixin extends ConfigBaseAbilityMixin {
-  $type: 'ApplyInertiaVelocityMixin'
+  $type: "ApplyInertiaVelocityMixin"
   Damping: number
   UseXZ: boolean
   UseY: boolean
 }
 
 export interface ApplyModifierWithSharedDurabilityMixin extends ConfigBaseAbilityMixin {
-  $type: 'ApplyModifierWithSharedDurabilityMixin'
+  $type: "ApplyModifierWithSharedDurabilityMixin"
   ModifierName: string
 }
 
 export interface AttachModifierByStackingMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachModifierByStackingMixin'
+  $type: "AttachModifierByStackingMixin"
   ActionQueue: ConfigAbilityAction[]
   StackingModifier: string
 }
 
 export interface AttachModifierToElementDurabilityMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachModifierToElementDurabilityMixin'
+  $type: "AttachModifierToElementDurabilityMixin"
   ValueSteps: DynamicFloat[]
   ModifierNameSteps: string[]
 }
 
 export interface AttachModifierToHPPercentMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachModifierToHPPercentMixin'
+  $type: "AttachModifierToHPPercentMixin"
   ValueSteps: DynamicFloat[]
   ModifierNameSteps: string[]
 }
 
 export interface AttachModifierToPredicateMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachModifierToPredicateMixin'
+  $type: "AttachModifierToPredicateMixin"
   Type: string
   OnEvent: string
   Predicates: ConfigAbilityPredicate[]
@@ -72,7 +73,7 @@ export interface AttachModifierToPredicateMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AttachModifierToSelfGlobalValueMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachModifierToSelfGlobalValueMixin'
+  $type: "AttachModifierToSelfGlobalValueMixin"
   GlobalValueTarget: string
   GlobalValueKey: string
   AddAction: string
@@ -84,7 +85,7 @@ export interface AttachModifierToSelfGlobalValueMixin extends ConfigBaseAbilityM
 }
 
 export interface AttachModifierToTargetDistanceMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachModifierToTargetDistanceMixin'
+  $type: "AttachModifierToTargetDistanceMixin"
   TargetIDs: number[]
   Byserver: boolean
   ValueSteps: DynamicFloat[]
@@ -96,55 +97,55 @@ export interface AttachModifierToTargetDistanceMixin extends ConfigBaseAbilityMi
 }
 
 export interface AttachToAbilityStateMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToAbilityStateMixin'
+  $type: "AttachToAbilityStateMixin"
   AbilityStates: string[]
   Reject: boolean
   ModifierName: string
 }
 
 export interface AttachToAIAlertnessMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToAIAlertnessMixin'
+  $type: "AttachToAIAlertnessMixin"
   Alertness: number[]
   ModifierName: string
 }
 
-export interface AttachToAnimatorStateIDMixin extends Omit<AttachToStateIDMixin, '$type'> {
-  $type: 'AttachToAnimatorStateIDMixin'
+export interface AttachToAnimatorStateIDMixin extends Omit<AttachToStateIDMixin, "$type"> {
+  $type: "AttachToAnimatorStateIDMixin"
 }
 
 export interface AttachToDayNightMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToDayNightMixin'
+  $type: "AttachToDayNightMixin"
   Time: string
   ModifierName: string
 }
 
 export interface AttachToElementTypeMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToElementTypeMixin'
+  $type: "AttachToElementTypeMixin"
   ElementTypes: string[]
   Reject: boolean
   ModifierName: string
 }
 
 export interface AttachToGadgetStateMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToGadgetStateMixin'
+  $type: "AttachToGadgetStateMixin"
   GadgetState: number
   ModifierName: string
 }
 
 export interface AttachToGadgetStateMutexMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToGadgetStateMutexMixin'
+  $type: "AttachToGadgetStateMutexMixin"
   GadgetStates: number[]
   ModifierNames: string[]
 }
 
 export interface AttachToMonsterAirStateMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToMonsterAirStateMixin'
+  $type: "AttachToMonsterAirStateMixin"
   ModifierName: string
   IsAirMove: boolean
 }
 
 export interface AttachToNormalizedTimeMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToNormalizedTimeMixin'
+  $type: "AttachToNormalizedTimeMixin"
   StateID: string
   ModifierName: string
   Target: string
@@ -154,19 +155,19 @@ export interface AttachToNormalizedTimeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AttachToPlayStageMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToPlayStageMixin'
+  $type: "AttachToPlayStageMixin"
   Stage: number
   Actions: ConfigAbilityAction[]
 }
 
 export interface AttachToPoseIDMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToPoseIDMixin'
+  $type: "AttachToPoseIDMixin"
   PoseIDs: number[]
   ModifierName: string
 }
 
 export interface AttachToStateIDMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttachToStateIDMixin'
+  $type: "AttachToStateIDMixin"
   StateIDs: string[]
   ModifierName: string
   Target: string
@@ -175,7 +176,7 @@ export interface AttachToStateIDMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AttackCostElementMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttackCostElementMixin'
+  $type: "AttackCostElementMixin"
   StrikeType: string
   ElementType: string
   AttackType: string
@@ -187,13 +188,13 @@ export interface AttackCostElementMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AttackHittingSceneMixin extends ConfigBaseAbilityMixin {
-  $type: 'AttackHittingSceneMixin'
+  $type: "AttackHittingSceneMixin"
   OnHittingScene: ConfigAbilityAction[]
   AnimEventIDs?: string[]
 }
 
 export interface AvatarChangeSkillMixin extends ConfigBaseAbilityMixin {
-  $type: 'AvatarChangeSkillMixin'
+  $type: "AvatarChangeSkillMixin"
   Index: number
   Priority: string
   AimSkillID: number
@@ -203,13 +204,13 @@ export interface AvatarChangeSkillMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AvatarLevelSkillMixin extends ConfigBaseAbilityMixin {
-  $type: 'AvatarLevelSkillMixin'
+  $type: "AvatarLevelSkillMixin"
   SkillID: number
   SkillIndex: number
 }
 
 export interface AvatarLockForwardFlyMixin extends ConfigBaseAbilityMixin {
-  $type: 'AvatarLockForwardFlyMixin'
+  $type: "AvatarLockForwardFlyMixin"
   WorldForward: DynamicVector
   FlySpeedScale: number
   FlyBackSpeedScale: number
@@ -217,30 +218,30 @@ export interface AvatarLockForwardFlyMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface AvatarSteerByCameraMixin extends ConfigBaseAbilityMixin {
-  $type: 'AvatarSteerByCameraMixin'
+  $type: "AvatarSteerByCameraMixin"
   StateIDs: string[]
   AngularSpeed: number
 }
 
 export interface BanEntityMarkMixin extends ConfigBaseAbilityMixin {
-  $type: 'BanEntityMarkMixin'
+  $type: "BanEntityMarkMixin"
 }
 
 export interface BeingHitMixin extends ConfigBaseAbilityMixin {
-  $type: 'BeingHitMixin'
+  $type: "BeingHitMixin"
   ToAttacker: ConfigAbilityAction[]
   ToAttackerOwner: ConfigAbilityAction[]
   ToAttackerOriginOwner: ConfigAbilityAction[]
 }
 
 export interface BillboardMarkMixin extends ConfigBaseAbilityMixin {
-  $type: 'BillboardMarkMixin'
+  $type: "BillboardMarkMixin"
   IconName: string
   ShowDistance: number
 }
 
 export interface BoxClampWindZoneMixin extends ConfigBaseAbilityMixin {
-  $type: 'BoxClampWindZoneMixin'
+  $type: "BoxClampWindZoneMixin"
   Size: DynamicVector
   Born: ConfigBornType
   AttracForceStrength: number
@@ -248,7 +249,7 @@ export interface BoxClampWindZoneMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ButtonHoldChargeMixin extends ConfigBaseAbilityMixin {
-  $type: 'ButtonHoldChargeMixin'
+  $type: "ButtonHoldChargeMixin"
   SkillID: number
   ChargeTime: number
   SecondChargeTime: DynamicFloat
@@ -262,36 +263,36 @@ export interface ButtonHoldChargeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface CameraBlurMixin extends ConfigBaseAbilityMixin {
-  $type: 'CameraBlurMixin'
+  $type: "CameraBlurMixin"
   CameraRadialBlur: ConfigCameraRadialBlur
 }
 
 export interface CameraLockMixin extends ConfigBaseAbilityMixin {
-  $type: 'CameraLockMixin'
+  $type: "CameraLockMixin"
   TransName: string
   CfgPath: string
 }
 
 export interface ChangeFieldMixin extends ConfigBaseAbilityMixin {
-  $type: 'ChangeFieldMixin'
+  $type: "ChangeFieldMixin"
   Type: string
   TargetRadius: number
   Time: number
 }
 
 export interface ChangePropTypeValueMixin extends ConfigBaseAbilityMixin {
-  $type: 'ChangePropTypeValueMixin'
+  $type: "ChangePropTypeValueMixin"
   PropType: string
   EnergyCostDelta: DynamicFloat
 }
 
 export interface ChargeBarMixin extends ConfigBaseAbilityMixin {
-  $type: 'ChargeBarMixin'
+  $type: "ChargeBarMixin"
   ChargeState: string | number
 }
 
 export interface CircleBarrageMixin extends ConfigBaseAbilityMixin {
-  $type: 'CircleBarrageMixin'
+  $type: "CircleBarrageMixin"
   BulletID: number
   InnerRadius: number
   CutNum: number
@@ -304,7 +305,7 @@ export interface CircleBarrageMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ClusterTriggerMixin extends ConfigBaseAbilityMixin {
-  $type: 'ClusterTriggerMixin'
+  $type: "ClusterTriggerMixin"
   Born: ConfigBornType
   ConfigID: number
   Radius: number
@@ -314,7 +315,7 @@ export interface ClusterTriggerMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface CollisionMixin extends ConfigBaseAbilityMixin {
-  $type: 'CollisionMixin'
+  $type: "CollisionMixin"
   Collision: ConfigCollision
   MinShockSpeed: number
   Cd: number
@@ -322,23 +323,23 @@ export interface CollisionMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface CostStaminaMixin extends ConfigBaseAbilityMixin {
-  $type: 'CostStaminaMixin'
+  $type: "CostStaminaMixin"
   CostStaminaDelta: DynamicFloat
   CostStaminaRatio: DynamicFloat
   OnStaminaEmpty: ConfigAbilityAction[]
 }
 
 export interface CurLocalAvatarMixin extends ConfigBaseAbilityMixin {
-  $type: 'CurLocalAvatarMixin'
+  $type: "CurLocalAvatarMixin"
   ModifierName: string
 }
 
 export interface DebugMixin extends ConfigBaseAbilityMixin {
-  $type: 'DebugMixin'
+  $type: "DebugMixin"
 }
 
 export interface DoActionByAnimatorStateIDMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByAnimatorStateIDMixin'
+  $type: "DoActionByAnimatorStateIDMixin"
   StateIDs: string[]
   EnterPredicates: ConfigAbilityPredicate[]
   ExitPredicates: ConfigAbilityPredicate[]
@@ -347,13 +348,13 @@ export interface DoActionByAnimatorStateIDMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoActionByCreateGadgetMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByCreateGadgetMixin'
+  $type: "DoActionByCreateGadgetMixin"
   Type: string
   ActionQueue: ConfigAbilityAction[]
 }
 
 export interface DoActionByElementReactionMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByElementReactionMixin'
+  $type: "DoActionByElementReactionMixin"
   Range: number
   EntityTypes: string[]
   EeactionTypes: string[]
@@ -361,7 +362,7 @@ export interface DoActionByElementReactionMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoActionByEnergyChangeMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByEnergyChangeMixin'
+  $type: "DoActionByEnergyChangeMixin"
   Type: string
   ElementTypes: string[]
   DoWhenEnergyMax: boolean
@@ -372,7 +373,7 @@ export interface DoActionByEnergyChangeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoActionByEventMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByEventMixin'
+  $type: "DoActionByEventMixin"
   Type: string
   OnEvent: string
   PickItemConfigIDs: number[]
@@ -383,20 +384,20 @@ export interface DoActionByEventMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoActionByGainCrystalSeedMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByGainCrystalSeedMixin'
+  $type: "DoActionByGainCrystalSeedMixin"
   ElementTypes: string[]
   Actions: ConfigAbilityAction[]
 }
 
 export interface DoActionByKillingMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByKillingMixin'
+  $type: "DoActionByKillingMixin"
   AttackTags: string[]
   DetectWindow: number
   OnKill: ConfigAbilityAction[]
 }
 
 export interface DoActionByPoseIDMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByPoseIDMixin'
+  $type: "DoActionByPoseIDMixin"
   PoseIDs: number[]
   EnterPredicates: ConfigAbilityPredicate[]
   ExitPredicates: ConfigAbilityPredicate[]
@@ -405,7 +406,7 @@ export interface DoActionByPoseIDMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoActionByStateIDMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByStateIDMixin'
+  $type: "DoActionByStateIDMixin"
   StateIDs: string[]
   EnterPredicates: ConfigAbilityPredicate[]
   ExitPredicates: ConfigAbilityPredicate[]
@@ -414,13 +415,13 @@ export interface DoActionByStateIDMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoActionByTeamStatusMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoActionByTeamStatusMixin'
+  $type: "DoActionByTeamStatusMixin"
   Actions: ConfigAbilityAction[]
   Predicates: ConfigAbilityPredicate[]
 }
 
 export interface DoReviveMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoReviveMixin'
+  $type: "DoReviveMixin"
   Type: string
   IgnoreDieAbyss: boolean
   IgnoreDieDrawn: boolean
@@ -429,7 +430,7 @@ export interface DoReviveMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DoTileActionManagerMixin extends ConfigBaseAbilityMixin {
-  $type: 'DoTileActionManagerMixin'
+  $type: "DoTileActionManagerMixin"
   Duration: number
   ActionID: string
   ActionPosKey: string
@@ -438,39 +439,39 @@ export interface DoTileActionManagerMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface DummyMixin extends ConfigBaseAbilityMixin {
-  $type: 'DummyMixin'
+  $type: "DummyMixin"
   ActionList: ConfigAbilityAction[][]
 }
 
 export interface DvalinS01BoxMoxeMixin extends ConfigBaseAbilityMixin {
-  $type: 'DvalinS01BoxMoxeMixin'
+  $type: "DvalinS01BoxMoxeMixin"
 }
 
 export interface DvalinS01PathEffsMixin extends ConfigBaseAbilityMixin {
-  $type: 'DvalinS01PathEffsMixin'
+  $type: "DvalinS01PathEffsMixin"
   EffectStart: number
   EffectEnd: number
   EffInfos: DvalinS01PathEffsInfo[]
 }
 
 export interface ElementAdjustMixin extends ConfigBaseAbilityMixin {
-  $type: 'ElementAdjustMixin'
+  $type: "ElementAdjustMixin"
   ChangeInterval: number
   ElementModifies: { [elemType: string]: string }
 }
 
 export interface ElementHittingOtherPredicatedMixin extends ConfigBaseAbilityMixin {
-  $type: 'ElementHittingOtherPredicatedMixin'
+  $type: "ElementHittingOtherPredicatedMixin"
   PrePredicates: ConfigAbilityPredicate[]
   ElementBatchPredicateds: ElementBatchPredicated[]
 }
 
 export interface ElementOuterGlowEffectMixin extends ConfigBaseAbilityMixin {
-  $type: 'ElementOuterGlowEffectMixin'
+  $type: "ElementOuterGlowEffectMixin"
 }
 
 export interface ElementReactionShockMixin extends ConfigBaseAbilityMixin {
-  $type: 'ElementReactionShockMixin'
+  $type: "ElementReactionShockMixin"
   ThinkInterval: number
   CampGlobalKey: string
   AttackAction: ConfigAbilityAction
@@ -478,7 +479,7 @@ export interface ElementReactionShockMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ElementShieldMixin extends ConfigBaseAbilityMixin {
-  $type: 'ElementShieldMixin'
+  $type: "ElementShieldMixin"
   ElementType: string
   ShowDamageText: string
   ShieldAngle: DynamicFloat
@@ -492,7 +493,7 @@ export interface ElementShieldMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface EliteShieldMixin extends ConfigBaseAbilityMixin {
-  $type: 'EliteShieldMixin'
+  $type: "EliteShieldMixin"
   ShieldType: string
   ShieldAngle: DynamicFloat
   ShieldHPRatio: DynamicFloat
@@ -507,7 +508,7 @@ export interface EliteShieldMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface EntityDefenceMixin extends ConfigBaseAbilityMixin {
-  $type: 'EntityDefenceMixin'
+  $type: "EntityDefenceMixin"
   StateIDs: string[]
   DefendTriggerID: string
   DefendAngle: number
@@ -519,7 +520,7 @@ export interface EntityDefenceMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface EntityDitherMixin extends ConfigBaseAbilityMixin {
-  $type: 'EntityDitherMixin'
+  $type: "EntityDitherMixin"
   Predicates: ConfigAbilityPredicate[]
   DitherValue: number
   CutInTime: number
@@ -527,31 +528,31 @@ export interface EntityDitherMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface EntityInVisibleMixin extends ConfigBaseAbilityMixin {
-  $type: 'EntityInVisibleMixin'
+  $type: "EntityInVisibleMixin"
   Predicates: ConfigAbilityPredicate[]
   Reason: string
 }
 
 export interface EntityMarkShowTypeMixin extends ConfigBaseAbilityMixin {
-  $type: 'EntityMarkShowTypeMixin'
+  $type: "EntityMarkShowTypeMixin"
   MarkType: string
 }
 
 export interface EnviroFollowRotateMixin extends ConfigBaseAbilityMixin {
-  $type: 'EnviroFollowRotateMixin'
+  $type: "EnviroFollowRotateMixin"
   SelfRotateOffSet: DynamicVector
   DeactiveOnCutsecneName: string
 }
 
 export interface ExtendLifetimeByPickedGadgetMixin extends ConfigBaseAbilityMixin {
-  $type: 'ExtendLifetimeByPickedGadgetMixin'
+  $type: "ExtendLifetimeByPickedGadgetMixin"
   PickedConfigIDs: number[]
   ExtendLifeTime: DynamicFloat
   MaxExtendLifeTime: DynamicFloat
 }
 
 export interface FieldEntityCountChangeMixin extends ConfigBaseAbilityMixin {
-  $type: 'FieldEntityCountChangeMixin'
+  $type: "FieldEntityCountChangeMixin"
   CampTargetType: string
   ForceTriggerWhenChangeAuthority: boolean
   TargetPredicates: ConfigAbilityPredicate[]
@@ -560,11 +561,11 @@ export interface FieldEntityCountChangeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface FixDvalinS04MoveMixin extends ConfigBaseAbilityMixin {
-  $type: 'FixDvalinS04MoveMixin'
+  $type: "FixDvalinS04MoveMixin"
 }
 
 export interface GlobalMainShieldMixin extends ConfigBaseAbilityMixin {
-  $type: 'GlobalMainShieldMixin'
+  $type: "GlobalMainShieldMixin"
   ShieldType: string
   ShieldAngle: DynamicFloat
   ShieldHPRatio: DynamicFloat
@@ -582,13 +583,13 @@ export interface GlobalMainShieldMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface GlobalSubShieldMixin extends ConfigBaseAbilityMixin {
-  $type: 'GlobalSubShieldMixin'
+  $type: "GlobalSubShieldMixin"
   MainShieldModifierName: string
   NotifyMainshieldWhenHit: boolean
 }
 
 export interface HitLevelGaugeMixin extends ConfigBaseAbilityMixin {
-  $type: 'HitLevelGaugeMixin'
+  $type: "HitLevelGaugeMixin"
   FromHitLevel: string
   ToHitLevel: string
   MaxCharge: number
@@ -598,13 +599,13 @@ export interface HitLevelGaugeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface HomeworldEnterEditorMixin extends ConfigBaseAbilityMixin {
-  $type: 'HomeworldEnterEditorMixin'
+  $type: "HomeworldEnterEditorMixin"
   EditorModifierNames: string[]
   WorldModifierNames: string[]
 }
 
 export interface IceFloorMixin extends ConfigBaseAbilityMixin {
-  $type: 'IceFloorMixin'
+  $type: "IceFloorMixin"
   Width: number
   Height: number
   MoveDistance: number
@@ -613,7 +614,7 @@ export interface IceFloorMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ModifyDamageMixin extends ConfigBaseAbilityMixin {
-  $type: 'ModifyDamageMixin'
+  $type: "ModifyDamageMixin"
   AnimEventNames: string[]
   AttackTags: string[]
   AttackType: string
@@ -629,12 +630,12 @@ export interface ModifyDamageMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ModifyElementDecrateMixin extends ConfigBaseAbilityMixin {
-  $type: 'ModifyElementDecrateMixin'
+  $type: "ModifyElementDecrateMixin"
   Group: string
 }
 
 export interface ModifySkillCDByModifierCountMixin extends ConfigBaseAbilityMixin {
-  $type: 'ModifySkillCDByModifierCountMixin'
+  $type: "ModifySkillCDByModifierCountMixin"
   TargetType: string
   ModifierName: string
   SkillID: number
@@ -642,34 +643,34 @@ export interface ModifySkillCDByModifierCountMixin extends ConfigBaseAbilityMixi
 }
 
 export interface MonsterReadyMixin extends ConfigBaseAbilityMixin {
-  $type: 'MonsterReadyMixin'
+  $type: "MonsterReadyMixin"
   OnMonsterReady: ConfigAbilityAction[]
 }
 
 export interface MoveStateMixin extends ConfigBaseAbilityMixin {
-  $type: 'MoveStateMixin'
+  $type: "MoveStateMixin"
   Type: string
 }
 
 export interface OnAvatarUseSkillMixin extends ConfigBaseAbilityMixin {
-  $type: 'OnAvatarUseSkillMixin'
+  $type: "OnAvatarUseSkillMixin"
   OnTriggerNormalAttack: ConfigAbilityAction[]
   OnTriggerSkill: ConfigAbilityAction[]
   OnTriggerUltimateSkill: ConfigAbilityAction[]
 }
 
 export interface OverrideAttackEventMixin extends ConfigBaseAbilityMixin {
-  $type: 'OverrideAttackEventMixin'
+  $type: "OverrideAttackEventMixin"
   OverrideAttackEvent: string
 }
 
 export interface OverrideStickElemUIMixin extends ConfigBaseAbilityMixin {
-  $type: 'OverrideStickElemUIMixin'
+  $type: "OverrideStickElemUIMixin"
   EffName: string
 }
 
 export interface PlayerUidNotifyMixin extends ConfigBaseAbilityMixin {
-  $type: 'PlayerUidNotifyMixin'
+  $type: "PlayerUidNotifyMixin"
   OpParam: string
   OpType: number
   Logic: string
@@ -677,32 +678,32 @@ export interface PlayerUidNotifyMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface RecycleModifierMixin extends ConfigBaseAbilityMixin {
-  $type: 'RecycleModifierMixin'
+  $type: "RecycleModifierMixin"
   ModifierName: string
   Cd: number
   InitialCD: number
 }
 
 export interface RejectAttackMixin extends ConfigBaseAbilityMixin {
-  $type: 'RejectAttackMixin'
+  $type: "RejectAttackMixin"
   AttackTag: string
   LimitTime: number
   Type: string
 }
 
 export interface RelyOnElementMixin extends ConfigBaseAbilityMixin {
-  $type: 'RelyOnElementMixin'
+  $type: "RelyOnElementMixin"
   ElementType: string
 }
 
 export interface ReplaceEventPatternMixin extends ConfigBaseAbilityMixin {
-  $type: 'ReplaceEventPatternMixin'
+  $type: "ReplaceEventPatternMixin"
   OldPatterns: string[]
   NewPatterns: string[]
 }
 
 export interface ResistClimateMixin extends ConfigBaseAbilityMixin {
-  $type: 'ResistClimateMixin'
+  $type: "ResistClimateMixin"
   ClimateTypes: string[]
   Source: string
   Trend: string
@@ -711,7 +712,7 @@ export interface ResistClimateMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ReviveElemEnergyMixin extends ConfigBaseAbilityMixin {
-  $type: 'ReviveElemEnergyMixin'
+  $type: "ReviveElemEnergyMixin"
   Type: string
   Period: DynamicFloat
   BaseEnergy: DynamicFloat
@@ -719,11 +720,11 @@ export interface ReviveElemEnergyMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ScenePropSyncMixin extends ConfigBaseAbilityMixin {
-  $type: 'ScenePropSyncMixin'
+  $type: "ScenePropSyncMixin"
 }
 
 export interface ServerCreateGadgetOnKillMixin extends ConfigBaseAbilityMixin {
-  $type: 'ServerCreateGadgetOnKillMixin'
+  $type: "ServerCreateGadgetOnKillMixin"
   GadgetIDList: number[]
   CampID: number
   CampTargetType: string
@@ -732,13 +733,13 @@ export interface ServerCreateGadgetOnKillMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface ServerFinishWatcherMixin extends ConfigBaseAbilityMixin {
-  $type: 'ServerFinishWatcherMixin'
+  $type: "ServerFinishWatcherMixin"
   WatcherId: number
   Predicates: ConfigAbilityPredicate[]
 }
 
 export interface ServerUpdateGlobalValueMixin extends ConfigBaseAbilityMixin {
-  $type: 'ServerUpdateGlobalValueMixin'
+  $type: "ServerUpdateGlobalValueMixin"
   Key: string
   UseLimitRange: boolean
   MaxValue: DynamicFloat
@@ -746,18 +747,18 @@ export interface ServerUpdateGlobalValueMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface SetSkillCanUseInStateMixin extends ConfigBaseAbilityMixin {
-  $type: 'SetSkillCanUseInStateMixin'
+  $type: "SetSkillCanUseInStateMixin"
   SkillList: number[]
   StateList: string[]
 }
 
 export interface ShaderLerpMixin extends ConfigBaseAbilityMixin {
-  $type: 'ShaderLerpMixin'
+  $type: "ShaderLerpMixin"
   Type: string
 }
 
 export interface ShieldBarMixin extends ConfigBaseAbilityMixin {
-  $type: 'ShieldBarMixin'
+  $type: "ShieldBarMixin"
   OnShieldBroken: ConfigAbilityAction[]
   Revert: boolean
   ShowDamageText: string
@@ -765,7 +766,7 @@ export interface ShieldBarMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface SkillButtonHoldChargeMixin extends ConfigBaseAbilityMixin {
-  $type: 'SkillButtonHoldChargeMixin'
+  $type: "SkillButtonHoldChargeMixin"
   AllowHoldLockDirection: boolean
   SkillID: number
   NextLoopTriggerID: string
@@ -779,12 +780,12 @@ export interface SkillButtonHoldChargeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface StageReadyMixin extends ConfigBaseAbilityMixin {
-  $type: 'StageReadyMixin'
+  $type: "StageReadyMixin"
   OnStageReady: ConfigAbilityAction[]
 }
 
 export interface SteerAttackMixin extends ConfigBaseAbilityMixin {
-  $type: 'SteerAttackMixin'
+  $type: "SteerAttackMixin"
   SteerStateIDs: string[]
   StartNormalizedTime?: number
   EndNormalizedTime?: number
@@ -795,7 +796,7 @@ export interface SteerAttackMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface SwitchSkillIDMixin extends ConfigBaseAbilityMixin {
-  $type: 'SwitchSkillIDMixin'
+  $type: "SwitchSkillIDMixin"
   Priority: string
   SkillIndex: number
   SkillID: number
@@ -804,7 +805,7 @@ export interface SwitchSkillIDMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface TDPlayMixin extends ConfigBaseAbilityMixin {
-  $type: 'TDPlayMixin'
+  $type: "TDPlayMixin"
   TowerType: string
   BaseCD: number
   BaseAttackRange: number
@@ -817,19 +818,19 @@ export interface TDPlayMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface TileAttackManagerMixin extends ConfigBaseAbilityMixin {
-  $type: 'TileAttackManagerMixin'
+  $type: "TileAttackManagerMixin"
   AttackID: string
   Interval: number
   AttackInfo: ConfigAttackInfo
 }
 
 export interface TileAttackMixin extends ConfigBaseAbilityMixin {
-  $type: 'TileAttackMixin'
+  $type: "TileAttackMixin"
   AttackID: string
 }
 
 export interface TileComplexManagerMixin extends ConfigBaseAbilityMixin {
-  $type: 'TileComplexManagerMixin'
+  $type: "TileComplexManagerMixin"
   AttackID: string
   Interval: number
   SrcCamp: number
@@ -837,7 +838,7 @@ export interface TileComplexManagerMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface TileComplexMixin extends ConfigBaseAbilityMixin {
-  $type: 'TileComplexMixin'
+  $type: "TileComplexMixin"
   AttackID: string
   AttachPointName: string
   Offset: DynamicVector
@@ -845,7 +846,7 @@ export interface TileComplexMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface TornadoMixin extends ConfigBaseAbilityMixin {
-  $type: 'TornadoMixin'
+  $type: "TornadoMixin"
   StageZone: ConfigTornadoZone[]
   Predicates: ConfigAbilityPredicate[]
   TargetType: string
@@ -855,25 +856,25 @@ export interface TornadoMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface TriggerPostProcessEffectMixin extends ConfigBaseAbilityMixin {
-  $type: 'TriggerPostProcessEffectMixin'
+  $type: "TriggerPostProcessEffectMixin"
   PostEffectAssetName: string
   Duration: number
   IsStageEffect: boolean
 }
 
 export interface TriggerResistDamageTextMixin extends ConfigBaseAbilityMixin {
-  $type: 'TriggerResistDamageTextMixin'
+  $type: "TriggerResistDamageTextMixin"
   ElementTypes: string[]
 }
 
 export interface TriggerTypeSupportMixin extends ConfigBaseAbilityMixin {
-  $type: 'TriggerTypeSupportMixin'
+  $type: "TriggerTypeSupportMixin"
   Duration: number
   Radius: number
 }
 
 export interface TriggerWeatherMixin extends ConfigBaseAbilityMixin {
-  $type: 'TriggerWeatherMixin'
+  $type: "TriggerWeatherMixin"
   Type: string
   AreaId: number
   WeatherPattern: string
@@ -882,7 +883,7 @@ export interface TriggerWeatherMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface TriggerWitchTimeMixin extends ConfigBaseAbilityMixin {
-  $type: 'TriggerWitchTimeMixin'
+  $type: "TriggerWitchTimeMixin"
   IgnoreTargetType: string
   Timescale: number
   Duration: number
@@ -897,14 +898,14 @@ export interface TriggerWitchTimeMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface UrgentHotFixMixin extends ConfigBaseAbilityMixin {
-  $type: 'UrgentHotFixMixin'
+  $type: "UrgentHotFixMixin"
   LogicId: number
   ThinkInterval: number
   ActionList: ConfigAbilityAction[]
 }
 
 export interface VelocityDetectMixin extends ConfigBaseAbilityMixin {
-  $type: 'VelocityDetectMixin'
+  $type: "VelocityDetectMixin"
   MinSpeed: number
   MaxSpeed: number
   DetectOnStart: boolean
@@ -913,7 +914,7 @@ export interface VelocityDetectMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface VelocityForceMixin extends ConfigBaseAbilityMixin {
-  $type: 'VelocityForceMixin'
+  $type: "VelocityForceMixin"
   MuteAll: boolean
   UseAll: boolean
   IncludeForces: string[]
@@ -921,7 +922,7 @@ export interface VelocityForceMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface WatcherSystemMixin extends ConfigBaseAbilityMixin {
-  $type: 'WatcherSystemMixin'
+  $type: "WatcherSystemMixin"
   WatcherId: number
   MixinType: string
   ListenEntityType: string
@@ -930,13 +931,13 @@ export interface WatcherSystemMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface WeightDetectRegionMixin extends ConfigBaseAbilityMixin {
-  $type: 'WeightDetectRegionMixin'
+  $type: "WeightDetectRegionMixin"
   GlobalValueKey: string
   OnWeightChanged: ConfigAbilityAction[]
 }
 
 export interface WindSeedSpawnerMixin extends ConfigBaseAbilityMixin {
-  $type: 'WindSeedSpawnerMixin'
+  $type: "WindSeedSpawnerMixin"
   RefreshEnable: boolean
   SpawnerRadius: number
   SpawnerHeightAngle: number
@@ -969,7 +970,7 @@ export interface WindSeedSpawnerMixin extends ConfigBaseAbilityMixin {
 }
 
 export interface WindZoneMixin extends ConfigBaseAbilityMixin {
-  $type: 'WindZoneMixin'
+  $type: "WindZoneMixin"
   ShapeName: string
   Born: ConfigBornType
   Strength: DynamicFloat

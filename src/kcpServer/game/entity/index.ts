@@ -1,23 +1,41 @@
-import BaseClass from '#/baseClass'
-import LifeStateChange from '#/packets/LifeStateChange'
-import AbilityManager from '$/manager/abilityManager'
-import EntityManager from '$/manager/entityManager'
-import Vector from '$/utils/vector'
-import ConfigEntityAbilityEntry from '$DT/BinOutput/Config/ConfigEntityAbilityEntry'
-import ConfigGlobalValue from '$DT/BinOutput/Config/ConfigGlobalValue'
-import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from '@/types/enum'
-import { EntityFightPropConfig } from '@/types/game'
-import { CurveExcelConfig } from '@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig'
-import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo, SceneMonsterInfo, SceneNpcInfo } from '@/types/proto'
-import { AbilityScalarTypeEnum, ChangeEnergyReasonEnum, ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
-import EntityUserData from '@/types/user/EntityUserData'
-import { getStringHash } from '@/utils/hash'
-import EntityProps from './entityProps'
-import FightProp, { FightPropChangeReason } from './fightProps'
-import Motion from './motion'
+import Avatar from "./avatar"
+import EntityProps from "./entityProps"
+import FightProp, { FightPropChangeReason } from "./fightProps"
+import Gadget from "./gadget"
+import Monster from "./monster"
+import Motion from "./motion"
+import Npc from "./npc"
+
+import BaseClass from "#/baseClass"
+import LifeStateChange from "#/packets/LifeStateChange"
+import AbilityManager from "$/manager/abilityManager"
+import EntityManager from "$/manager/entityManager"
+import Vector from "$/utils/vector"
+import ConfigEntityAbilityEntry from "$DT/BinOutput/Config/ConfigEntityAbilityEntry"
+import ConfigGlobalValue from "$DT/BinOutput/Config/ConfigGlobalValue"
+import { EntityTypeEnum, FightPropEnum, PlayerPropEnum } from "@/types/enum"
+import { EntityFightPropConfig } from "@/types/game"
+import { CurveExcelConfig } from "@/types/gameData/ExcelBinOutput/Common/CurveExcelConfig"
+import { EntityAuthorityInfo, SceneEntityInfo } from "@/types/proto"
+import {
+  AbilityScalarTypeEnum,
+  ChangeEnergyReasonEnum,
+  ChangeHpReasonEnum,
+  LifeStateEnum,
+  PlayerDieTypeEnum,
+  ProtEntityTypeEnum,
+  VisionTypeEnum,
+} from "@/types/proto/enum"
+import EntityUserData from "@/types/user/EntityUserData"
+import { getStringHash } from "@/utils/hash"
 
 export default class Entity extends BaseClass {
   manager?: EntityManager
+
+  avatar?: Avatar
+  monster?: Monster
+  npc?: Npc
+  gadget?: Gadget
 
   entityId: number
   entityType: EntityTypeEnum
@@ -52,7 +70,7 @@ export default class Entity extends BaseClass {
   isOnScene: boolean
   gridHash: number
 
-  constructor(offScene: boolean = false) {
+  constructor(offScene = false) {
     super()
 
     this.props = new EntityProps(this)
@@ -77,7 +95,7 @@ export default class Entity extends BaseClass {
     this.isOnScene = false
   }
 
-  protected loadAbilities(abilities: ConfigEntityAbilityEntry[], init: boolean = false) {
+  protected loadAbilities(abilities: ConfigEntityAbilityEntry[], init = false) {
     const { abilityManager } = this
     if (abilityManager == null || !Array.isArray(abilities)) return
 
@@ -99,10 +117,10 @@ export default class Entity extends BaseClass {
     if (!Array.isArray(ServerGlobalValues)) return
 
     sgvDynamicValueMapContainer.setValues(
-      ServerGlobalValues.map(name => ({
+      ServerGlobalValues.map((name) => ({
         key: { hash: getStringHash(name), str: name },
         valueType: AbilityScalarTypeEnum.FLOAT,
-        floatValue: InitServerGlobalValues?.[name] || 0
+        floatValue: InitServerGlobalValues?.[name] || 0,
       }))
     )
   }
@@ -111,7 +129,7 @@ export default class Entity extends BaseClass {
     const { props, fightProps } = this
     const { lifeState, propsData, fightPropsData } = userData
 
-    this.lifeState = typeof lifeState === 'number' ? lifeState : LifeStateEnum.LIFE_ALIVE
+    this.lifeState = typeof lifeState === "number" ? lifeState : LifeStateEnum.LIFE_ALIVE
 
     props.init(propsData)
     fightProps.init(fightPropsData)
@@ -119,7 +137,7 @@ export default class Entity extends BaseClass {
     await fightProps.update()
   }
 
-  async initNew(level: number = 1) {
+  async initNew(level = 1) {
     const { props, fightProps } = this
 
     this.lifeState = LifeStateEnum.LIFE_ALIVE
@@ -158,6 +176,16 @@ export default class Entity extends BaseClass {
     this.props.set(PlayerPropEnum.PROP_BREAK_LEVEL, v)
   }
 
+  get sceneBlock() {
+    return this.manager?.scene.sceneBlockList.find((b) => b.id === this.blockId)
+  }
+
+  get sceneGroup() {
+    return this.manager?.scene.sceneBlockList
+      .find((b) => b.id === this.blockId)
+      ?.groupList.find((g) => g.id === this.groupId)
+  }
+
   distanceTo(entity: Entity) {
     return this.motion.distanceTo(entity.motion)
   }
@@ -177,9 +205,12 @@ export default class Entity extends BaseClass {
     if (
       protEntityType !== ProtEntityTypeEnum.PROT_ENTITY_MONSTER ||
       world?.getPeer(authorityPeerId)?.loadedEntityIdList?.includes(entityId)
-    ) return false
+    )
+      return false
 
-    const peerId = playerList?.find(player => !player.noAuthority && player.loadedEntityIdList.includes(entityId))?.peerId
+    const peerId = playerList?.find(
+      (player) => !player.noAuthority && player.loadedEntityIdList.includes(entityId)
+    )?.peerId
     if (peerId == null) return false
 
     this.authorityPeerId = peerId
@@ -191,25 +222,43 @@ export default class Entity extends BaseClass {
     return this.fightProps.get(type)
   }
 
-  async setProp(type: FightPropEnum, val: number, notify?: boolean, changeReason?: FightPropChangeReason, seqId?: number) {
+  async setProp(
+    type: FightPropEnum,
+    val: number,
+    notify?: boolean,
+    changeReason?: FightPropChangeReason,
+    seqId?: number
+  ) {
     await this.fightProps.set(type, val, notify, changeReason, seqId)
   }
 
-  async drainEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+  async drainEnergy(notify = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     if (this.godMode) return
 
     await this.fightProps.drainEnergy(notify, changeEnergyReason, seqId)
   }
 
-  async gainEnergy(val: number, flat: boolean = false, notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+  async gainEnergy(
+    val: number,
+    flat = false,
+    notify = false,
+    changeEnergyReason?: ChangeEnergyReasonEnum,
+    seqId?: number
+  ): Promise<void> {
     await this.fightProps.gainEnergy(val, flat, notify, changeEnergyReason, seqId)
   }
 
-  async rechargeEnergy(notify: boolean = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
+  async rechargeEnergy(notify = false, changeEnergyReason?: ChangeEnergyReasonEnum, seqId?: number): Promise<void> {
     await this.fightProps.rechargeEnergy(notify, changeEnergyReason, seqId)
   }
 
-  async takeDamage(attackerId: number, val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+  async takeDamage(
+    attackerId: number,
+    val: number,
+    notify = false,
+    changeHpReason?: ChangeHpReasonEnum,
+    seqId?: number
+  ): Promise<void> {
     const { isInvincible, isLockHP, godMode } = this
     if (isInvincible || isLockHP || godMode || !this.isAlive()) return
 
@@ -250,19 +299,19 @@ export default class Entity extends BaseClass {
     await this.kill(attackerId, dieType, seqId)
   }
 
-  async heal(val: number, notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+  async heal(val: number, notify = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
     if (this.isLockHP || !this.isAlive()) return
 
     await this.fightProps.heal(val, notify, changeHpReason, seqId)
   }
 
-  async fullHeal(notify: boolean = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
+  async fullHeal(notify = false, changeHpReason?: ChangeHpReasonEnum, seqId?: number): Promise<void> {
     if (this.isLockHP || !this.isAlive()) return
 
     await this.fightProps.fullHeal(notify, changeHpReason, seqId)
   }
 
-  async kill(attackerId: number, dieType: PlayerDieTypeEnum, seqId?: number, batch: boolean = false): Promise<void> {
+  async kill(attackerId: number, dieType: PlayerDieTypeEnum, seqId?: number, batch = false): Promise<void> {
     // Can't die again if you are dead
     if (this.isDead()) return
 
@@ -274,7 +323,7 @@ export default class Entity extends BaseClass {
     this.attackerId = attackerId
 
     // Emit death event
-    await this.emit('Death', seqId, batch)
+    await this.emit("Death", seqId, batch)
   }
 
   async revive(val?: number): Promise<void> {
@@ -290,10 +339,14 @@ export default class Entity extends BaseClass {
 
     // Update cur hp
     const maxHp = this.getProp(FightPropEnum.FIGHT_PROP_MAX_HP)
-    await this.setProp(FightPropEnum.FIGHT_PROP_CUR_HP, val != null ? Math.min(maxHp, Math.max(1, val)) : (maxHp * 0.4), true)
+    await this.setProp(
+      FightPropEnum.FIGHT_PROP_CUR_HP,
+      val != null ? Math.min(maxHp, Math.max(1, val)) : maxHp * 0.4,
+      true
+    )
 
     // Emit revive event
-    await this.emit('Revive')
+    await this.emit("Revive")
   }
 
   exportEntityAuthorityInfo(): EntityAuthorityInfo {
@@ -304,20 +357,14 @@ export default class Entity extends BaseClass {
       rendererChangedInfo: {},
       aiInfo: {
         isAiOpen: true,
-        bornPos: bornPos.export()
+        bornPos: bornPos.export(),
       },
       bornPos: bornPos.export(),
       unknown1: {
-        unknown1: {}
-      }
+        unknown1: {},
+      },
     }
   }
-
-  // placeholder
-  exportSceneAvatarInfo(): SceneAvatarInfo { return null }
-  exportSceneMonsterInfo(): SceneMonsterInfo { return null }
-  exportSceneNpcInfo(): SceneNpcInfo { return null }
-  exportSceneGadgetInfo(): SceneGadgetInfo { return null }
 
   exportSceneEntityInfo(): SceneEntityInfo {
     const { entityId, protEntityType, motion, props, fightProps, lifeState } = this
@@ -327,14 +374,12 @@ export default class Entity extends BaseClass {
       entityType: protEntityType,
       entityId,
       motionInfo: motion.export(),
-      propList: [
-        props.exportPropPair(PlayerPropEnum.PROP_LEVEL)
-      ],
+      propList: [props.exportPropPair(PlayerPropEnum.PROP_LEVEL)],
       fightPropList: fightProps.exportPropList(),
       lifeState,
       animatorParaList: [{}],
       entityClientData: {},
-      entityAuthorityInfo: this.exportEntityAuthorityInfo()
+      entityAuthorityInfo: this.exportEntityAuthorityInfo(),
     }
 
     if (sceneTime != null) sceneEntityInfo.lastMoveSceneTimeMs = sceneTime
@@ -342,19 +387,19 @@ export default class Entity extends BaseClass {
 
     switch (protEntityType) {
       case ProtEntityTypeEnum.PROT_ENTITY_AVATAR:
-        sceneEntityInfo.avatar = this.exportSceneAvatarInfo()
+        sceneEntityInfo.avatar = this?.avatar.exportSceneAvatarInfo() || null
         break
       case ProtEntityTypeEnum.PROT_ENTITY_MONSTER:
-        sceneEntityInfo.monster = this.exportSceneMonsterInfo()
+        sceneEntityInfo.monster = this?.monster.exportSceneMonsterInfo() || null
         break
       case ProtEntityTypeEnum.PROT_ENTITY_NPC:
-        sceneEntityInfo.npc = this.exportSceneNpcInfo()
+        sceneEntityInfo.npc = this?.npc.exportSceneNpcInfo() || null
         sceneEntityInfo.propList = []
         delete sceneEntityInfo.lifeState
         delete sceneEntityInfo.entityAuthorityInfo.abilityInfo
         break
       case ProtEntityTypeEnum.PROT_ENTITY_GADGET:
-        sceneEntityInfo.gadget = this.exportSceneGadgetInfo()
+        sceneEntityInfo.gadget = this?.gadget.exportSceneGadgetInfo() || null
         break
     }
 
@@ -367,14 +412,14 @@ export default class Entity extends BaseClass {
     return {
       lifeState,
       propsData: props.exportUserData(),
-      fightPropsData: fightProps.exportUserData()
+      fightPropsData: fightProps.exportUserData(),
     }
   }
 
   /**Events**/
 
   // Death
-  async handleDeath(seqId?: number, batch: boolean = false) {
+  async handleDeath(seqId?: number, batch = false) {
     const { manager } = this
 
     // Broadcast life state change if on scene

@@ -1,4 +1,4 @@
-import { ItemInfo, TrialAvatarGrantRecord } from '.'
+import { ItemInfo, TrialAvatarGrantRecord } from "."
 
 export interface TrialAvatarInfo {
   trialAvatarId?: number

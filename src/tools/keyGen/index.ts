@@ -1,12 +1,13 @@
-import { getCmdIdByName } from '#/cmdIds'
-import TLogger from '@/translate/tlogger'
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-import { cwd } from 'process'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs"
+import { join } from "path"
+import { cwd } from "process"
 
-const logger = new TLogger('KEYGEN', 0xfcba03)
+import { getCmdIdByName } from "#/cmdIds"
+import TLogger from "@/translate/tlogger"
 
-const KNOWN_VALUES = [0x45, 0x67, 0, 0, 0, 0x89, 0xAB]
+const logger = new TLogger("KEYGEN", 0xfcba03)
+
+const KNOWN_VALUES = [0x45, 0x67, 0, 0, 0, 0x89, 0xab]
 
 function parseDump(keyGenBuf: Buffer, progressBuf: Buffer, dumpBuf: Buffer, packet?: string): boolean {
   const len = dumpBuf.length
@@ -14,12 +15,12 @@ function parseDump(keyGenBuf: Buffer, progressBuf: Buffer, dumpBuf: Buffer, pack
   const knownValues = Array.from(KNOWN_VALUES) // clone array
 
   const cmdId = getCmdIdByName(packet)
-  if (typeof cmdId === 'number') {
+  if (typeof cmdId === "number") {
     offsets.push(2, 3)
-    knownValues.push(cmdId >> 8, cmdId & 0xFF)
+    knownValues.push(cmdId >> 8, cmdId & 0xff)
   }
 
-  let modified: boolean = false
+  let modified = false
 
   for (let i = 0; i < offsets.length; i++) {
     const offset = offsets[i] % 4096
@@ -36,11 +37,11 @@ function parseDump(keyGenBuf: Buffer, progressBuf: Buffer, dumpBuf: Buffer, pack
     const key = dumpValue ^ knownValue
 
     logger.debug(
-      'message.tools.keyGen.debug.dump',
+      "message.tools.keyGen.debug.dump",
       offset,
-      key.toString(16).toUpperCase().padStart(2, '0'),
-      dumpValue.toString(16).toUpperCase().padStart(2, '0'),
-      knownValue.toString(16).toUpperCase().padStart(2, '0')
+      key.toString(16).toUpperCase().padStart(2, "0"),
+      dumpValue.toString(16).toUpperCase().padStart(2, "0"),
+      knownValue.toString(16).toUpperCase().padStart(2, "0")
     )
 
     keyGenBuf.writeUInt8(key, offset)
@@ -54,15 +55,15 @@ function parseDump(keyGenBuf: Buffer, progressBuf: Buffer, dumpBuf: Buffer, pack
 
 export default function keyGen() {
   try {
-    logger.info('message.tools.keyGen.info.generate')
+    logger.info("message.tools.keyGen.info.generate")
 
-    const dumpDirPath = join(cwd(), 'data/log/dump')
-    const keyGenPath = join(cwd(), 'data/bin/keyGen.bin')
-    const progressPath = join(cwd(), 'data/bin/keyGenP.bin')
+    const dumpDirPath = join(cwd(), "data/log/dump")
+    const keyGenPath = join(cwd(), "data/bin/keyGen.bin")
+    const progressPath = join(cwd(), "data/bin/keyGenP.bin")
 
     let keyGenBuf: Buffer
     let progressBuf: Buffer
-    let modified: boolean = false
+    let modified = false
 
     if (existsSync(keyGenPath)) keyGenBuf = readFileSync(keyGenPath)
     else keyGenBuf = Buffer.alloc(4096)
@@ -71,30 +72,30 @@ export default function keyGen() {
     else progressBuf = Buffer.alloc(512)
 
     for (const dumpFile of readdirSync(dumpDirPath)) {
-      if (dumpFile.indexOf('raw-') !== 0) continue
+      if (dumpFile.indexOf("raw-") !== 0) continue
 
       try {
         const dumpFilePath = join(dumpDirPath, dumpFile)
         const dumpBuf = readFileSync(dumpFilePath)
 
-        modified = parseDump(keyGenBuf, progressBuf, dumpBuf, dumpFile.slice(0, -4).split('-')[2]) || modified
+        modified = parseDump(keyGenBuf, progressBuf, dumpBuf, dumpFile.slice(0, -4).split("-")[2]) || modified
       } catch (err) {
-        logger.error('message.tools.keyGen.error.dump', dumpFile, err)
+        logger.error("message.tools.keyGen.error.dump", dumpFile, err)
       }
     }
 
     if (!modified) {
-      logger.info('message.tools.keyGen.info.notModified')
+      logger.info("message.tools.keyGen.info.notModified")
       return
     }
 
-    logger.info('message.tools.keyGen.info.save')
+    logger.info("message.tools.keyGen.info.save")
 
     writeFileSync(keyGenPath, keyGenBuf)
     writeFileSync(progressPath, progressBuf)
 
-    logger.info('message.tools.keyGen.info.success')
+    logger.info("message.tools.keyGen.info.success")
   } catch (err) {
-    logger.error('message.tools.keyGen.error.unknown', err)
+    logger.error("message.tools.keyGen.error.unknown", err)
   }
 }

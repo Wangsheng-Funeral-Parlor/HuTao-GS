@@ -1,8 +1,8 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import Monster from '$/entity/monster'
-import Vector from '$/utils/vector'
-import { ClientStateEnum } from '@/types/enum'
-import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import Monster from "$/entity/monster"
+import Vector from "$/utils/vector"
+import { ClientStateEnum } from "@/types/enum"
+import { ChangeHpReasonEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, RetcodeEnum } from "@/types/proto/enum"
 
 export interface GmTalkReq {
   msg: string
@@ -16,9 +16,9 @@ export interface GmTalkRsp {
 
 class GmTalkPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GmTalk', {
+    super("GmTalk", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -29,12 +29,20 @@ class GmTalkPacket extends Packet implements PacketInterface {
     else await currentAvatar.takeDamage(0, -amount, true, ChangeHpReasonEnum.CHANGE_HP_SUB_GM, seqId)
   }
 
-  private async gmtMonster(context: PacketContext, id: number, count: number, lvl: number, x?: number, y?: number, z?: number) {
+  private async gmtMonster(
+    context: PacketContext,
+    id: number,
+    count: number,
+    lvl: number,
+    x?: number,
+    y?: number,
+    z?: number
+  ) {
     const { player } = context
     const { currentScene, pos: playerPos } = player
     const { entityManager } = currentScene
 
-    const pos = (x == null || y == null || z == null) ? playerPos.clone() : new Vector(x, y, z)
+    const pos = x == null || y == null || z == null ? playerPos.clone() : new Vector(x, y, z)
 
     for (let i = 0; i < count; i++) {
       const entity = new Monster(id, player)
@@ -53,8 +61,10 @@ class GmTalkPacket extends Packet implements PacketInterface {
     const { entityManager } = currentScene
 
     let entityType: ProtEntityTypeEnum
-    switch (type) { // NOSONAR
-      case 'MONSTER':
+    switch (
+      type // NOSONAR
+    ) {
+      case "MONSTER":
         entityType = ProtEntityTypeEnum.PROT_ENTITY_MONSTER
         break
       default:
@@ -64,8 +74,8 @@ class GmTalkPacket extends Packet implements PacketInterface {
     if (!all) return
 
     const entityList = loadedEntityIdList
-      .map(id => entityManager.getEntity(id, true))
-      .filter(e => e != null && e.protEntityType === entityType && e.isAlive())
+      .map((id) => entityManager.getEntity(id, true))
+      .filter((e) => e != null && e.protEntityType === entityType && e.isAlive())
       .sort((a, b) => Math.sign(a.distanceTo2D(currentAvatar) - b.distanceTo2D(currentAvatar)))
 
     let i = 0
@@ -84,31 +94,31 @@ class GmTalkPacket extends Packet implements PacketInterface {
 
   async request(context: PacketContext, data: GmTalkReq): Promise<void> {
     const { msg } = data
-    const cmd = msg?.split(' ')?.[0]?.toLowerCase()
-    const args = msg?.split(' ')?.slice(1) || []
+    const cmd = msg?.split(" ")?.[0]?.toLowerCase()
+    const args = msg?.split(" ")?.slice(1) || []
 
     switch (cmd) {
-      case 'hp':
+      case "hp":
         await this.gmtHp(context, Number(args[0]))
         break
-      case 'monster':
-        await this.gmtMonster.call(this, context, ...args.map(arg => Number(arg)))
+      case "monster":
+        await this.gmtMonster.call(this, context, ...args.map((arg) => Number(arg)))
         break
-      case 'kill':
-        await this.gmtKill(context, args[0], args[1] === 'ALL')
+      case "kill":
+        await this.gmtKill(context, args[0], args[1] === "ALL")
         break
-      case 'wudi':
-        await this.gmtGod(context, args.slice(-1)[0] === 'ON', args.length > 1 ? args[0] : undefined)
+      case "wudi":
+        await this.gmtGod(context, args.slice(-1)[0] === "ON", args.length > 1 ? args[0] : undefined)
         break
       default:
-        console.log('GmTalk:', msg)
+        console.log("GmTalk:", msg)
         await this.response(context, { retcode: RetcodeEnum.RET_UNKNOWN_ERROR })
         return
     }
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      msg
+      msg,
     })
   }
 
@@ -118,4 +128,4 @@ class GmTalkPacket extends Packet implements PacketInterface {
 }
 
 let packet: GmTalkPacket
-export default (() => packet = packet || new GmTalkPacket())()
+export default (() => (packet = packet || new GmTalkPacket()))()

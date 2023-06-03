@@ -1,1 +1,1 @@
-export default interface ConfigBeHitBlendShake { }
+export default interface ConfigBeHitBlendShake {}

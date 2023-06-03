@@ -1,5 +1,5 @@
-import ConfigAnimationAudio from './ConfigAnimationAudio'
-import ConfigWwiseString from './ConfigWwiseString'
+import ConfigAnimationAudio from "./ConfigAnimationAudio"
+import ConfigWwiseString from "./ConfigWwiseString"
 
 export default interface ConfigEntityAudio {
   AnimAudio: ConfigAnimationAudio

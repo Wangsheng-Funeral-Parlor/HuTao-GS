@@ -1,9 +1,9 @@
-import ConfigCharacter from './ConfigCharacter'
-import ConfigMoveStateEffect from './ConfigMoveStateEffect'
-import ConfigAvatarAudio from './ConfigAvatarAudio'
-import ConfigAvatarControllerAssembly from './ConfigAvatarControllerAssembly'
-import ConfigAvatarPerform from './ConfigAvatarPerform'
-import ConfigAvatarShoot from './ConfigAvatarShoot'
+import ConfigAvatarAudio from "./ConfigAvatarAudio"
+import ConfigAvatarControllerAssembly from "./ConfigAvatarControllerAssembly"
+import ConfigAvatarPerform from "./ConfigAvatarPerform"
+import ConfigAvatarShoot from "./ConfigAvatarShoot"
+import ConfigCharacter from "./ConfigCharacter"
+import ConfigMoveStateEffect from "./ConfigMoveStateEffect"
 
 export default interface ConfigAvatar extends ConfigCharacter {
   ShootConfig: ConfigAvatarShoot

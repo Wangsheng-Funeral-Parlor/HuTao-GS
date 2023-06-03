@@ -1,13 +1,14 @@
-import Equip from '$/equip'
-import Reliquary from '$/equip/reliquary'
-import Weapon from '$/equip/weapon'
-import Material from '$/material'
-import { EquipTypeEnum, ItemTypeEnum } from '@/types/enum'
-import { ItemInfo } from '@/types/proto'
-import EquipUserData from '@/types/user/EquipUserData'
-import { ItemDataTypeEnum, ItemUserData } from '@/types/user/InventoryUserData'
-import MaterialUserData from '@/types/user/MaterialUserData'
-import Player from '..'
+import Player from ".."
+
+import Equip from "$/equip"
+import Reliquary from "$/equip/reliquary"
+import Weapon from "$/equip/weapon"
+import Material from "$/material"
+import { EquipTypeEnum, ItemTypeEnum } from "@/types/enum"
+import { ItemInfo } from "@/types/proto"
+import EquipUserData from "@/types/user/EquipUserData"
+import { ItemDataTypeEnum, ItemUserData } from "@/types/user/InventoryUserData"
+import MaterialUserData from "@/types/user/MaterialUserData"
 
 export default class Item {
   itemId: number
@@ -99,7 +100,7 @@ export default class Item {
     return false
   }
 
-  unstack(amount: number, commit: boolean = true): false | number {
+  unstack(amount: number, commit = true): false | number {
     const { material } = this
     if (material) return material.unstack(amount, commit)
 
@@ -110,7 +111,7 @@ export default class Item {
     const { itemId, guid, material, equip, furniture } = this
     const ret: ItemInfo = {
       itemId,
-      guid: guid.toString()
+      guid: guid.toString(),
     }
 
     if (material) ret.material = material.export()
@@ -133,7 +134,7 @@ export default class Item {
       gadgetId,
       type,
 
-      data: (material || equip || furniture)?.exportUserData()
+      data: (material || equip || furniture)?.exportUserData(),
     }
   }
 }

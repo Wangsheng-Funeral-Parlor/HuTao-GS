@@ -1,5 +1,6 @@
-import ConfigBaseStateIDInfo from '.'
-import ConfigAnimatorBoolean from '../../ConfigAnimatorBoolean'
+import ConfigAnimatorBoolean from "../../ConfigAnimatorBoolean"
+
+import ConfigBaseStateIDInfo from "."
 
 export default interface ConfigNormalStateIDInfo extends ConfigBaseStateIDInfo {
   AnimatorStates: { [key: string]: string[] }

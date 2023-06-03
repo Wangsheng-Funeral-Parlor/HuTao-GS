@@ -1,7 +1,7 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyGadgetBuilder extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyGadgetBuilder'
+  $type: "ConfigWidgetToyGadgetBuilder"
   LastingTime: number
   GadgetId: number
   DistanceToAvatar: number

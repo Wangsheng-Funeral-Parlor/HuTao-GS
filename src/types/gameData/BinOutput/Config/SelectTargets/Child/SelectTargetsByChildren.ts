@@ -1,6 +1,6 @@
-import ConfigBaseSelectTargets from '.'
+import ConfigBaseSelectTargets from "."
 
 export default interface SelectTargetsByChildren extends ConfigBaseSelectTargets {
-  $type: 'SelectTargetsByChildren'
+  $type: "SelectTargetsByChildren"
   ConfigID: number
 }

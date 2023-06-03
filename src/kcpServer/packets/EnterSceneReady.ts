@@ -1,9 +1,10 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { RetcodeEnum, SceneEnterTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
-import EnterScenePeer from './EnterScenePeer'
-import PlayerPreEnterMp from './PlayerPreEnterMp'
-import SceneEntityDisappear from './SceneEntityDisappear'
+import EnterScenePeer from "./EnterScenePeer"
+import PlayerPreEnterMp from "./PlayerPreEnterMp"
+import SceneEntityDisappear from "./SceneEntityDisappear"
+
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum, SceneEnterTypeEnum, VisionTypeEnum } from "@/types/proto/enum"
 
 export interface EnterSceneReadyReq {
   enterSceneToken: number
@@ -16,9 +17,9 @@ export interface EnterSceneReadyRsp {
 
 class EnterSceneReadyPacket extends Packet implements PacketInterface {
   constructor() {
-    super('EnterSceneReady', {
+    super("EnterSceneReady", {
       reqWaitState: ClientStateEnum.ENTER_SCENE,
-      reqWaitStateMask: 0xF0FF
+      reqWaitStateMask: 0xf0ff,
     })
   }
 
@@ -34,7 +35,7 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
     }
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_ENTER_SCENE_READY
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.PRE_ENTER_SCENE_READY
 
     if (!player.isHost() && player.sceneEnterType === SceneEnterTypeEnum.ENTER_OTHER) {
       const hostCtx = host.context
@@ -48,11 +49,11 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      enterSceneToken
+      enterSceneToken,
     })
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.ENTER_SCENE_READY
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.ENTER_SCENE_READY
   }
 
   async response(context: PacketContext, data: EnterSceneReadyRsp): Promise<void> {
@@ -61,4 +62,4 @@ class EnterSceneReadyPacket extends Packet implements PacketInterface {
 }
 
 let packet: EnterSceneReadyPacket
-export default (() => packet = packet || new EnterSceneReadyPacket())()
+export default (() => (packet = packet || new EnterSceneReadyPacket()))()

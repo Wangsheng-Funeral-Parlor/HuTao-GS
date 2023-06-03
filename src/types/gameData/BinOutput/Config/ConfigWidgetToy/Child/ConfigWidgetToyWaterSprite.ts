@@ -1,7 +1,7 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyWaterSprite extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyWaterSprite'
+  $type: "ConfigWidgetToyWaterSprite"
   AbilityGroupName: string
   AbilityTriggerName: string
   AbilityTriggerNameSecond: string

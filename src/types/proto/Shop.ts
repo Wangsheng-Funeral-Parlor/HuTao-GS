@@ -1,4 +1,4 @@
-import { ShopCardProduct, ShopConcertProduct, ShopGoods, ShopMcoinProduct } from '.'
+import { ShopCardProduct, ShopConcertProduct, ShopGoods, ShopMcoinProduct } from "."
 
 export interface Shop {
   shopType: number

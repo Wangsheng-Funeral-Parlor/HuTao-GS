@@ -1,4 +1,4 @@
-import { VectorPlane } from '.'
+import { VectorPlane } from "."
 
 export interface PolygonRegionSize {
   pointList: VectorPlane[]

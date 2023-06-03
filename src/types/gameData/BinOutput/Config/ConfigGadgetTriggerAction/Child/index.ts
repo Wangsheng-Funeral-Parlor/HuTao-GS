@@ -1,1 +1,1 @@
-export default interface ConfigBaseGadgetTriggerAction { }
+export default interface ConfigBaseGadgetTriggerAction {}

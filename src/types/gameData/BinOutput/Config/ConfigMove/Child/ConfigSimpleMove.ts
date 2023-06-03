@@ -1,7 +1,7 @@
-import ConfigBaseMove from '.'
+import ConfigBaseMove from "."
 
 export default interface ConfigSimpleMove extends ConfigBaseMove {
-  $type: 'ConfigSimpleMove'
+  $type: "ConfigSimpleMove"
   ConstSpeedRatio: number
   FollowReferenceSystem: boolean
 }

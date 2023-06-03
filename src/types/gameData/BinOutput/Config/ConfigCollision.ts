@@ -1,4 +1,4 @@
-import ConfigCCD from './ConfigCCD'
+import ConfigCCD from "./ConfigCCD"
 
 export default interface ConfigCollision {
   Ccd: ConfigCCD

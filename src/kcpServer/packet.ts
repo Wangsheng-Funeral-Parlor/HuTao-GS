@@ -1,47 +1,48 @@
-import Logger from '@/logger'
-import { ClientStateEnum } from '@/types/enum'
-import { PacketHead } from '@/types/kcp'
-import { WaitOnBlock } from '@/utils/asyncWait'
-import { xor } from '@/utils/xor'
-import Client from './client'
-const logger = new Logger('PACKET', 0x8810cd)
+import Client from "./client"
+
+import Logger from "@/logger"
+import { ClientStateEnum } from "@/types/enum"
+import { PacketHead } from "@/types/kcp"
+import { WaitOnBlock } from "@/utils/asyncWait"
+import { xor } from "@/utils/xor"
+const logger = new Logger("PACKET", 0x8810cd)
 
 const WAIT_TIMEOUT = 1800
 
 export const verbosePackets = [
-  'AbilityInvocationsNotify',
-  'AvatarFightPropUpdateNotify',
-  'ClientAbilityChangeNotify',
-  'ClientAbilityInitFinishNotify',
-  'ClientReportNotify',
-  'CombatInvocationsNotify',
-  'EntityAiSyncNotify',
-  'EntityConfigHashNotify',
-  'EntityFightPropChangeReasonNotify',
-  'EntityFightPropUpdateNotify',
-  'EvtAiSyncCombatThreatInfoNotify',
-  'EvtAiSyncSkillCdNotify',
-  'EvtAvatarUpdateFocusNotify',
-  'EvtDoSkillSuccNotify',
-  'EvtEntityRenderersChangedNotify',
-  'MonsterAIConfigHashNotify',
-  'PingReq',
-  'PingRsp',
-  'PlayerPropChangeNotify',
-  'PlayerPropNotify',
-  'QueryPathReq',
-  'QueryPathRsp',
-  'SceneAudioNotify',
-  'SceneAvatarStaminaStepReq',
-  'SceneAvatarStaminaStepRsp',
-  'SceneEntityMoveNotify',
-  'ScenePlayerLocationNotify',
-  'SceneTimeNotify',
-  'SetEntityClientDataNotify',
-  'UnionCmdNotify',
-  'VehicleStaminaNotify',
-  'WorldPlayerLocationNotify',
-  'WorldPlayerRTTNotify'
+  "AbilityInvocationsNotify",
+  "AvatarFightPropUpdateNotify",
+  "ClientAbilityChangeNotify",
+  "ClientAbilityInitFinishNotify",
+  "ClientReportNotify",
+  "CombatInvocationsNotify",
+  "EntityAiSyncNotify",
+  "EntityConfigHashNotify",
+  "EntityFightPropChangeReasonNotify",
+  "EntityFightPropUpdateNotify",
+  "EvtAiSyncCombatThreatInfoNotify",
+  "EvtAiSyncSkillCdNotify",
+  "EvtAvatarUpdateFocusNotify",
+  "EvtDoSkillSuccNotify",
+  "EvtEntityRenderersChangedNotify",
+  "MonsterAIConfigHashNotify",
+  "PingReq",
+  "PingRsp",
+  "PlayerPropChangeNotify",
+  "PlayerPropNotify",
+  "QueryPathReq",
+  "QueryPathRsp",
+  "SceneAudioNotify",
+  "SceneAvatarStaminaStepReq",
+  "SceneAvatarStaminaStepRsp",
+  "SceneEntityMoveNotify",
+  "ScenePlayerLocationNotify",
+  "SceneTimeNotify",
+  "SetEntityClientDataNotify",
+  "UnionCmdNotify",
+  "VehicleStaminaNotify",
+  "WorldPlayerLocationNotify",
+  "WorldPlayerRTTNotify",
 ]
 
 export interface PacketInterface {
@@ -135,20 +136,20 @@ export default class Packet implements PacketInterface {
     this.notifyState = opts.notifyState || ClientStateEnum.NONE
     this.reqStatePass = opts.reqStatePass || false
     this.notifyStatePass = opts.notifyStatePass || false
-    this.reqStateMask = opts.reqStateMask || 0xFFFF
-    this.notifyStateMask = opts.notifyStateMask || 0xFFFF
+    this.reqStateMask = opts.reqStateMask || 0xffff
+    this.notifyStateMask = opts.notifyStateMask || 0xffff
 
     this.reqWaitState = opts.reqWaitState || ClientStateEnum.NONE
     this.notifyWaitState = opts.notifyWaitState || ClientStateEnum.NONE
     this.reqWaitStatePass = opts.reqWaitStatePass || false
     this.notifyWaitStatePass = opts.notifyWaitStatePass || false
-    this.reqWaitStateMask = opts.reqWaitStateMask || 0xFFFF
-    this.notifyWaitStateMask = opts.notifyWaitStateMask || 0xFFFF
+    this.reqWaitStateMask = opts.reqWaitStateMask || 0xffff
+    this.notifyWaitStateMask = opts.notifyWaitStateMask || 0xffff
   }
 
   private logState(state: string) {
     const { name } = this
-    const verbosePacketNames = verbosePackets.map(packet => packet.replace(/Req|Rsp|Notify/, ''))
+    const verbosePacketNames = verbosePackets.map((packet) => packet.replace(/Req|Rsp|Notify/, ""))
 
     if (verbosePacketNames.includes(name)) logger.verbose(`[${state}]`, name)
     else logger.debug(`[${state}]`, name)
@@ -164,23 +165,23 @@ export default class Packet implements PacketInterface {
   }
 
   static isPacket(buf: Buffer): boolean {
-    return buf.length > 5 && buf.readInt16BE(0) === 0x4567 && buf.readUInt16BE(buf.byteLength - 2) === 0x89AB
+    return buf.length > 5 && buf.readInt16BE(0) === 0x4567 && buf.readUInt16BE(buf.byteLength - 2) === 0x89ab
   }
 
-  static decode(buf: Buffer): { head: Buffer, data: Buffer } {
+  static decode(buf: Buffer): { head: Buffer; data: Buffer } {
     const headLen = buf.readUInt16BE(4)
     const dataLen = buf.readUInt32BE(6)
 
     let offset = 10
 
-    const head = buf.subarray(offset, (() => offset += headLen)())
-    const data = buf.subarray(offset, (() => offset += dataLen)())
+    const head = buf.subarray(offset, (() => (offset += headLen))())
+    const data = buf.subarray(offset, (() => (offset += dataLen))())
 
     return { head, data }
   }
 
   static encode(head: Buffer, data: Buffer, packetID: number, keyBuffer: Buffer): Buffer {
-    const magic2 = Buffer.from(0x89AB.toString(16), 'hex')
+    const magic2 = Buffer.from((0x89ab).toString(16), "hex")
     const part1 = Buffer.alloc(10)
 
     part1.writeUInt16BE(0x4567, 0)
@@ -204,25 +205,25 @@ export default class Packet implements PacketInterface {
   }
 
   async broadcastNotify(contextList: PacketContext[], ...data: any[]): Promise<void> {
-    for (const context of contextList) await this.sendNotify(context, ...(data as [any, ...any[]]))
+    for (const context of contextList) await this.sendNotify(context, ...(<[any, ...any[]]>data))
   }
 
-  checkState(context: PacketContext, state: ClientStateEnum, pass: boolean = false, mask: number = 0xFFFF, log: boolean = true): boolean {
+  checkState(context: PacketContext, state: ClientStateEnum, pass = false, mask = 0xffff, log = true): boolean {
     if (state === ClientStateEnum.NONE) return true
 
     const { state: curState } = context.client
-    const maskedState = (curState & mask)
+    const maskedState = curState & mask
     const check = maskedState === state || (pass && maskedState >= state)
 
-    if (!check && log) this.logState('SKIP')
+    if (!check && log) this.logState("SKIP")
 
     return check
   }
 
-  async waitState(context: PacketContext, state: ClientStateEnum, pass: boolean = false, mask: number = 0xFFFF): Promise<void> {
+  async waitState(context: PacketContext, state: ClientStateEnum, pass = false, mask = 0xffff): Promise<void> {
     if (this.checkState(context, state, pass, mask, false)) return
 
-    this.logState('WAIT')
+    this.logState("WAIT")
 
     return new Promise<void>((resolve, reject) => {
       const { client } = context
@@ -234,13 +235,13 @@ export default class Packet implements PacketInterface {
 
           if (!destroy && !this.checkState(context, state, pass, mask, false)) return
 
-          client.off('update', checkCond)
-          client.off('destroy', checkCond)
+          client.off("update", checkCond)
+          client.off("destroy", checkCond)
           client.maxListeners -= 1
 
           if (destroy) return
 
-          this.logState('CONT')
+          this.logState("CONT")
 
           resolve()
         } catch (err) {
@@ -249,8 +250,8 @@ export default class Packet implements PacketInterface {
       }
 
       client.maxListeners += 1
-      client.on('update', checkCond)
-      client.on('destroy', checkCond)
+      client.on("update", checkCond)
+      client.on("destroy", checkCond)
     })
   }
 }

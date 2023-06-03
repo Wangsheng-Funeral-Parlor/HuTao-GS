@@ -1,6 +1,6 @@
-import ConfigBaseSelectTargets from '.'
+import ConfigBaseSelectTargets from "."
 
 export default interface SelectTargetsByEquipParts extends ConfigBaseSelectTargets {
-  $type: 'SelectTargetsByEquipParts'
+  $type: "SelectTargetsByEquipParts"
   EquipPartNames: string[]
 }

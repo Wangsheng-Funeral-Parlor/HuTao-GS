@@ -24,7 +24,7 @@ export function generateSbox(p: number): Buffer {
     let x = t[255 - i]
     x |= x << 8
     x ^= (x >> 4) ^ (x >> 5) ^ (x >> 6) ^ (x >> 7)
-    sbox[t[i]] = (x ^ 0x63) & 0xFF
+    sbox[t[i]] = (x ^ 0x63) & 0xff
   }
 
   return sbox
@@ -51,7 +51,7 @@ export function generateGMul(mul: number): Buffer {
       if ((b & 1) != 0) p ^= a
       const hi = (a & 0x80) != 0
       a <<= 1
-      if (hi) a ^= 0x1B
+      if (hi) a ^= 0x1b
       b >>= 1
     }
 

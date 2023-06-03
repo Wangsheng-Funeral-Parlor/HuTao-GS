@@ -1,6 +1,6 @@
-import ConfigBaseTalentMixin from '.'
+import ConfigBaseTalentMixin from "."
 
 export default interface AddAbility extends ConfigBaseTalentMixin {
-  $type: 'AddAbility'
+  $type: "AddAbility"
   AbilityName: string
 }

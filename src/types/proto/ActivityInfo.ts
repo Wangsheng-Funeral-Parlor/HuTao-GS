@@ -1,4 +1,4 @@
-import { ActivityWatcherInfo, MusicGameActivityDetailInfo } from '.'
+import { ActivityWatcherInfo, MusicGameActivityDetailInfo } from "."
 
 export interface ActivityInfo {
   activityId: number

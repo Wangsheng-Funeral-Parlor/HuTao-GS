@@ -10,13 +10,13 @@ export const stringXorEncode = (str: string | Buffer, rand: number): Buffer => {
 
   const encoded = Buffer.alloc(len)
   for (let i = 0; i < len; i++) {
-    encoded[i] = input[i] ^ (i < (len - 1) ? input[i + 1] : rand)
+    encoded[i] = input[i] ^ (i < len - 1 ? input[i + 1] : rand)
   }
 
   return encoded
 }
 
-export const stringXorDecode = (encoded: Buffer, key: number, buf: boolean = false): string | Buffer => {
+export const stringXorDecode = (encoded: Buffer, key: number, buf = false): string | Buffer => {
   const len = encoded.length
   const decoded = Buffer.alloc(len)
 

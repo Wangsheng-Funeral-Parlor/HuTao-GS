@@ -1,7 +1,8 @@
-import AbilityManager from '$/manager/abilityManager'
-import { AbilityAppliedAbility, AbilityScalarValueEntry, AbilityString } from '@/types/proto'
-import { ProtEntityTypeEnum } from '@/types/proto/enum'
-import AbilityScalarValueContainer from './abilityScalarValueContainer'
+import AbilityScalarValueContainer from "./abilityScalarValueContainer"
+
+import AbilityManager from "$/manager/abilityManager"
+import { AbilityAppliedAbility, AbilityScalarValueEntry, AbilityString } from "@/types/proto"
+import { ProtEntityTypeEnum } from "@/types/proto/enum"
 
 export default class AppliedAbility {
   manager: AbilityManager
@@ -40,16 +41,16 @@ export default class AppliedAbility {
     this.overrideMapContainer.setValue(sval)
   }
 
-  getEntityInfo(): { type: string, name: string } {
+  getEntityInfo(): { type: string; name: string } {
     const { manager } = this
     const { entity } = manager
     const { protEntityType, name } = entity
-    const type = ProtEntityTypeEnum[protEntityType]?.split('_')?.slice(-1)?.[0]
+    const type = ProtEntityTypeEnum[protEntityType]?.split("_")?.slice(-1)?.[0]
     if (type == null) return null
 
     return {
       type: type[0] + type.slice(1).toLowerCase(),
-      name
+      name,
     }
   }
 
@@ -59,7 +60,7 @@ export default class AppliedAbility {
       instancedAbilityId: id,
       abilityName,
       abilityOverride,
-      overrideMap: overrideMapContainer.export()
+      overrideMap: overrideMapContainer.export(),
     }
   }
 }

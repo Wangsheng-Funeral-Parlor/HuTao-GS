@@ -1,8 +1,9 @@
-import translate from '@/translate'
-import { CommandDefinition } from '..'
+import { CommandDefinition } from ".."
+
+import translate from "@/translate"
 
 const listCommand: CommandDefinition = {
-  name: 'list',
+  name: "list",
   allowPlayer: true,
   exec: async (cmdInfo) => {
     const { cli, kcpServer } = cmdInfo
@@ -11,19 +12,24 @@ const listCommand: CommandDefinition = {
     const lines = []
 
     for (const client of clientList) {
-      lines.push(`${client.uid?.toString()?.padStart(6, '0') || '------'}|${client.state?.toString(16)?.padStart(4, '0')?.toUpperCase()}|${client.conv?.toString(16)?.padStart(8, '0')?.toUpperCase()}`)
+      lines.push(
+        `${client.uid?.toString()?.padStart(6, "0") || "------"}|${client.state
+          ?.toString(16)
+          ?.padStart(4, "0")
+          ?.toUpperCase()}|${client.conv?.toString(16)?.padStart(8, "0")?.toUpperCase()}`
+      )
     }
 
-    if (lines.length === 0) lines.push(translate('cli.commands.list.info.empty'))
+    if (lines.length === 0) lines.push(translate("cli.commands.list.info.empty"))
 
-    const maxLength = Math.max(...lines.map(line => line.length))
+    const maxLength = Math.max(...lines.map((line) => line.length))
 
-    print('='.repeat(maxLength))
-    print(' UID  | CS | ID')
-    print('='.repeat(maxLength))
+    print("=".repeat(maxLength))
+    print(" UID  | CS | ID")
+    print("=".repeat(maxLength))
     for (const line of lines) print(line)
-    print('='.repeat(maxLength))
-  }
+    print("=".repeat(maxLength))
+  },
 }
 
 export default listCommand

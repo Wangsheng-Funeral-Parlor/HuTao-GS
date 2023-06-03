@@ -1,5 +1,5 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface ReadPrivateChatReq {
   targetUid: number
@@ -11,7 +11,7 @@ export interface ReadPrivateChatRsp {
 
 class ReadPrivateChatPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ReadPrivateChat')
+    super("ReadPrivateChat")
   }
 
   async request(context: PacketContext, _data: ReadPrivateChatReq): Promise<void> {
@@ -24,4 +24,4 @@ class ReadPrivateChatPacket extends Packet implements PacketInterface {
 }
 
 let packet: ReadPrivateChatPacket
-export default (() => packet = packet || new ReadPrivateChatPacket())()
+export default (() => (packet = packet || new ReadPrivateChatPacket()))()

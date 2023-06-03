@@ -1,1 +1,1 @@
-export default interface BaseTileShapeInfo { }
+export default interface BaseTileShapeInfo {}

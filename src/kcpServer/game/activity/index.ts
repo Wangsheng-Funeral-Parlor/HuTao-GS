@@ -1,7 +1,7 @@
-import ActivityManager from '$/manager/activityManager'
-import Player from '$/player'
-import { ActivityInfo, ActivityScheduleInfo } from '@/types/proto'
-import { getTimeSeconds } from '@/utils/time'
+import ActivityManager from "$/manager/activityManager"
+import Player from "$/player"
+import { ActivityInfo, ActivityScheduleInfo } from "@/types/proto"
+import { getTimeSeconds } from "@/utils/time"
 
 export default class Activity {
   manager: ActivityManager
@@ -13,7 +13,14 @@ export default class Activity {
   beginDate: Date
   endDate: Date
 
-  constructor(manager: ActivityManager, id: number, type: number, schedule: number, beginTime: number, endTime: number) {
+  constructor(
+    manager: ActivityManager,
+    id: number,
+    type: number,
+    schedule: number,
+    beginTime: number,
+    endTime: number
+  ) {
     this.manager = manager
 
     this.id = id
@@ -26,7 +33,7 @@ export default class Activity {
 
   get scheduleId(): number {
     const { id, schedule } = this
-    return (id * 1e3) + schedule
+    return id * 1e3 + schedule
   }
 
   get beginTime(): number {
@@ -43,10 +50,10 @@ export default class Activity {
 
     return {
       activityId: id,
-      isOpen: (now >= beginTime && now < endTime),
+      isOpen: now >= beginTime && now < endTime,
       scheduleId,
       beginTime,
-      endTime
+      endTime,
     }
   }
 
@@ -63,7 +70,7 @@ export default class Activity {
       meetCondList: [],
       expireCondList: [],
       firstDayStartTime: manager.startTime,
-      takenRewardList: []
+      takenRewardList: [],
     }
   }
 }

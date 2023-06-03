@@ -1,6 +1,6 @@
-import ConfigBaseWidgetToy from '.'
+import ConfigBaseWidgetToy from "."
 
 export default interface ConfigWidgetToyAnchorPoint extends ConfigBaseWidgetToy {
-  $type: 'ConfigWidgetToyAnchorPoint'
+  $type: "ConfigWidgetToyAnchorPoint"
   MaxCountInScene: number
 }

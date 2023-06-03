@@ -1,6 +1,6 @@
-import ConfigAIThreatScoreBaseSetting from './ConfigAIThreatScoreBaseSetting'
+import ConfigAIThreatScoreBaseSetting from "./ConfigAIThreatScoreBaseSetting"
 
 export default interface ConfigAITSAbilityGlobalValueSetting extends ConfigAIThreatScoreBaseSetting {
-  $type: 'ConfigAITSAbilityGlobalValueSetting'
+  $type: "ConfigAITSAbilityGlobalValueSetting"
   CaredGlobalValueName: string
 }

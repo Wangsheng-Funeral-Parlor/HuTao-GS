@@ -1,10 +1,12 @@
-import EventEmitter from 'promise-events'
-import { ReadStream, WriteStream } from 'tty'
-import { formatWithOptions } from 'util'
-import TTYInfo from './module/ttyInfo'
-import TTYLog from './module/ttyLog'
-import TTYPrompt from './module/ttyPrompt'
-import { escSeqSplitString } from './utils'
+import { ReadStream, WriteStream } from "tty"
+import { formatWithOptions } from "util"
+
+import EventEmitter from "promise-events"
+
+import TTYInfo from "./module/ttyInfo"
+import TTYLog from "./module/ttyLog"
+import TTYPrompt from "./module/ttyPrompt"
+import { escSeqSplitString } from "./utils"
 
 const MAX_HISTORY_COUNT = 10
 
@@ -34,12 +36,12 @@ export class TTY extends EventEmitter {
 
     const ownPropNames = Object.getOwnPropertyNames(this.constructor.prototype)
     for (const name of ownPropNames) {
-      if (typeof this[name] === 'function') this[name] = this[name].bind(this)
+      if (typeof this[name] === "function") this[name] = this[name].bind(this)
     }
 
-    const defaultPrompt = new TTYPrompt(this, '>')
-    defaultPrompt.on('change', input => this.emit('change', input))
-    defaultPrompt.on('input', input => this.emit('line', input))
+    const defaultPrompt = new TTYPrompt(this, ">")
+    defaultPrompt.on("change", (input) => this.emit("change", input))
+    defaultPrompt.on("input", (input) => this.emit("line", input))
 
     this.addPrompt(defaultPrompt)
 
@@ -62,12 +64,12 @@ export class TTY extends EventEmitter {
 
     // update buffer
     const entry = history[index]
-    buffer.push(...entry.split(''))
+    buffer.push(...entry.split(""))
 
     // update cursor
     ttyp.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
 
-    ttyp.emit('change')
+    ttyp.emit("change")
   }
 
   private nextInput() {
@@ -85,13 +87,13 @@ export class TTY extends EventEmitter {
     ttyp.historyIndex = index >= history.length ? null : index
 
     // update buffer
-    const entry = index < history.length ? history[index] : ''
-    buffer.push(...entry.split(''))
+    const entry = index < history.length ? history[index] : ""
+    buffer.push(...entry.split(""))
 
     // update cursor
     ttyp.cursor = Math.min(entry.length, historyCursor == null ? Infinity : historyCursor)
 
-    ttyp.emit('change')
+    ttyp.emit("change")
   }
 
   update() {
@@ -114,14 +116,14 @@ export class TTY extends EventEmitter {
 
     stdin?.setRawMode(true)
     stdin?.resume()
-    stdin?.setEncoding('utf8')
+    stdin?.setEncoding("utf8")
 
-    stdin?.on('data', this.handleInput)
-    stdout?.on('resize', this.refresh)
+    stdin?.on("data", this.handleInput)
+    stdout?.on("resize", this.refresh)
 
-    stdin?.on('error', this.handleError)
-    stdout?.on('error', this.handleError)
-    stderr?.on('error', this.handleError)
+    stdin?.on("error", this.handleError)
+    stdout?.on("error", this.handleError)
+    stderr?.on("error", this.handleError)
 
     this.refresh()
   }
@@ -129,12 +131,12 @@ export class TTY extends EventEmitter {
   unsetIO() {
     const { stdin, stdout, stderr } = this
 
-    stdin?.off('data', this.handleInput)
-    stdout?.off('resize', this.refresh)
+    stdin?.off("data", this.handleInput)
+    stdout?.off("resize", this.refresh)
 
-    stdin?.off('error', this.handleError)
-    stdout?.off('error', this.handleError)
-    stderr?.off('error', this.handleError)
+    stdin?.off("error", this.handleError)
+    stdout?.off("error", this.handleError)
+    stderr?.off("error", this.handleError)
 
     this.stdin = null
     this.stdout = null
@@ -142,7 +144,7 @@ export class TTY extends EventEmitter {
   }
 
   addPrompt(prompt: TTYPrompt) {
-    if (prompt.tty !== this) throw new Error('Mismatch instance')
+    if (prompt.tty !== this) throw new Error("Mismatch instance")
 
     const { promptList } = this
     if (promptList.includes(prompt)) return
@@ -175,23 +177,23 @@ export class TTY extends EventEmitter {
     return formatted
   }
 
-  setCursor(x: number, y: number, hidden: boolean = false) {
+  setCursor(x: number, y: number, hidden = false) {
     this.cursorX = x
     this.cursorY = y
     this.cursorH = hidden
 
-    this.write(`\x1b[${y + 1};${x + 1}H\x1b[?25${hidden ? 'l' : 'h'}`)
+    this.write(`\x1b[${y + 1};${x + 1}H\x1b[?25${hidden ? "l" : "h"}`)
   }
 
-  clearLine(lines: number = 1) {
+  clearLine(lines = 1) {
     const { cursorX, cursorY, cursorH } = this
-    this.write('\x1b[2K\x1b[B'.repeat(Math.max(1, lines)))
+    this.write("\x1b[2K\x1b[B".repeat(Math.max(1, lines)))
     this.setCursor(cursorX, cursorY, cursorH)
   }
 
   refresh() {
     // clear screen
-    this.write('\x1b[3J')
+    this.write("\x1b[3J")
 
     this.info.render()
     this.log.render()
@@ -211,7 +213,7 @@ export class TTY extends EventEmitter {
   }
 
   handleError(err: Error) {
-    this.print('stdio error:', err)
+    this.print("stdio error:", err)
   }
 
   handleInput(data: string) {
@@ -229,49 +231,58 @@ export class TTY extends EventEmitter {
     let resetHistory = true
 
     switch (char) {
-      case '\x03': { // ctrl-c
-        this.emit('exit')
+      case "\x03": {
+        // ctrl-c
+        this.emit("exit")
         break
       }
-      case '\x08': { // backspace
+      case "\x08":
+      case "\x7f": {
+        // backspace delete
         if (buffer.length <= 0 || cursor <= 0) break
 
         buffer.splice(cursor - 1, 1)
         ttyp.cursor--
 
-        ttyp.emit('change')
+        ttyp.emit("change")
         break
       }
-      case '\x0d': { // carriage return
-        if (buffer.join('').trim().length <= 0) break
+      case "\x0d": {
+        // carriage return
+        if (buffer.join("").trim().length <= 0) break
 
-        const line = buffer.splice(0, buffer.length).join('')
+        const line = buffer.splice(0, buffer.length).join("")
         ttyp.cursor = 0
 
-        ttyp.emit('input', line)
+        ttyp.emit("input", line)
         this.pushHistory(line)
         break
       }
-      case '\x09': { // tab
+      case "\x09": {
+        // tab
         ttyp.fillAutocomplete()
         break
       }
-      case '\x1b': { // esc
+      case "\x1b": {
+        // esc
         resetHistory = false
-        ttyp.emit('cancel')
+        ttyp.emit("cancel")
         break
       }
-      case '\x1b[A': { // cursor up
+      case "\x1b[A": {
+        // cursor up
         resetHistory = false
         this.prevInput()
         break
       }
-      case '\x1b[B': { // cursor down
+      case "\x1b[B": {
+        // cursor down
         resetHistory = false
         this.nextInput()
         break
       }
-      case '\x1b[C': { // cursor forward
+      case "\x1b[C": {
+        // cursor forward
         resetHistory = false
         if (cursor >= buffer.length) {
           ttyp.fillAutocomplete()
@@ -282,7 +293,8 @@ export class TTY extends EventEmitter {
         ttyp.historyCursor = ttyp.cursor
         break
       }
-      case '\x1b[D': { // cursor back
+      case "\x1b[D": {
+        // cursor back
         resetHistory = false
         if (cursor <= 0) break
 
@@ -290,11 +302,13 @@ export class TTY extends EventEmitter {
         ttyp.historyCursor = ttyp.cursor
         break
       }
-      case '\x1b[5~': { // page up
+      case "\x1b[5~": {
+        // page up
         log.scrollUp()
         break
       }
-      case '\x1b[6~': { // page down
+      case "\x1b[6~": {
+        // page down
         log.scrollDown()
         break
       }
@@ -302,7 +316,7 @@ export class TTY extends EventEmitter {
         buffer.splice(cursor, 0, char)
         ttyp.cursor += char.length
 
-        ttyp.emit('change')
+        ttyp.emit("change")
       }
     }
 

@@ -1,15 +1,17 @@
-import Socket from '#/socket'
-import { ENetReasonEnum } from '@/types/proto/enum'
-import { ConnectionInfo } from './'
-import { WorkerOpcode } from '../'
-import { decodeDataList } from '../utils/data'
-import WorkerInterface from '../workerInterface'
+import { WorkerOpcode } from "../"
+import { decodeDataList } from "../utils/data"
+import WorkerInterface from "../workerInterface"
+
+import { ConnectionInfo } from "./"
+
+import Socket from "#/socket"
+import { ENetReasonEnum } from "@/types/proto/enum"
 
 export default class RecvWorkerInterface extends WorkerInterface {
   port: number
 
   constructor(socket: Socket, id: number) {
-    super(socket, id, 'recv')
+    super(socket, id, "recv")
 
     super.initHandlers(this)
   }
@@ -52,11 +54,11 @@ export default class RecvWorkerInterface extends WorkerInterface {
 
     switch (opcode) {
       case WorkerOpcode.ConnectReq:
-        await this.emit('Connect', this.id, this.iPort, <number>args[0], <ConnectionInfo>JSON.parse(<string>args[1]))
+        await this.emit("Connect", this.id, this.iPort, <number>args[0], <ConnectionInfo>JSON.parse(<string>args[1]))
         this.sendToWorker(WorkerOpcode.ConnectRsp, args[0])
         break
       case WorkerOpcode.DisconnectNotify:
-        await this.emit('Disconnect', <number>args[0], <ENetReasonEnum>args[1])
+        await this.emit("Disconnect", <number>args[0], <ENetReasonEnum>args[1])
         break
       default:
         await super.handleMessage(msg)

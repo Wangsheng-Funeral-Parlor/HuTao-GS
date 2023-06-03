@@ -1,0 +1,851 @@
+{
+	"cli": {
+		"commands": {
+			"ability": {
+				"desc": "アビリティのデバッグ",
+				"error": {
+					"entityNotFound": "エンティティが見つかりません。"
+				}
+			},
+			"ar": {
+				"desc": "冒険ランクを設定する",
+				"info": {
+					"setAR": "冒険ランクの設定: %0"
+				},
+				"usage": {
+					"0": "ar <level> <uid> - プレイヤーの冒険ランクを設定する",
+					"1": "ar <level> - (ゲーム内)自分の冒険ランクを設定する"
+				}
+			},
+			"artSet": {
+				"desc": "聖遺物セットを与える",
+				"error": {
+					"setNotFound": "聖遺物セットが見つかりません。"
+				},
+				"info": {
+					"give": "聖遺物セットを与えました: (%0)x%1"
+				},
+				"usage": {
+					"0": "artSet <id> <uid>          - 聖遺物セットをプレイヤーに渡す",
+					"1": "artSet <id>                - (ゲーム内)聖遺物セットを自分に渡す",
+					"2": "artSet <id>                - (ゲーム内)聖遺物セットを1つ自分に渡す"
+				}
+			},
+			"artifact": {
+				"desc": "聖遺物を与える",
+				"info": {
+					"give": "聖遺物を与える: (%0)x%1"
+				},
+				"usage": {
+					"0": "artifact <id> <count> <uid> - プレイヤーに聖遺物を与える",
+					"1": "artifact <id> <count> - (ゲーム内)自分に聖遺物を与える",
+					"2": "artifact <id> - (ゲーム内)自分に聖遺物を1つ与える"
+				}
+			},
+			"autopatch": {
+				"desc": "オートパッチデータの取得"
+			},
+			"const": {
+				"desc": "現在のアバターコンフィグの編集/一覧表示",
+				"error": {
+					"constNotFound": "星座が見つかりません。"
+				},
+				"info": {
+					"locked": "ロックされた星座: %0",
+					"unlocked": "ロック解除された星座: %0"
+				},
+				"usage": {
+					"0": "const unlock <uid> - プレイヤーの現在のアバターの星座のロックを解除します",
+					"1": "const unlock - (ゲーム内)現在のアバターの星座のロックを解除する",
+					"2": "const lock <uid> - プレイヤーの現在のアバターの星座をロックします",
+					"3": "const lock - (ゲーム内)現在のアバターの星座をロック",
+					"4": "const list <uid> - プレイヤーの現在のアバターのロック解除された星座を一覧表示します",
+					"5": "const list - (ゲーム内)現在のアバターのロック解除された星座を一覧表示します"
+				}
+			},
+			"coop": {
+				"desc": "マルチプレイへの変更",
+				"error": {
+					"inCoop": "すでにプレイヤーはマルチプレイの世界にいます"
+				},
+				"info": {
+					"changeToCoop": "マルチプレイに変更..."
+				},
+				"usage": {
+					"0": "coop <uid> - プレイヤーの世界をマルチプレイに変更",
+					"1": "coop - (ゲーム内)自分の世界をマルチプレイに変更"
+				}
+			},
+			"createConfig": {
+				"desc": "存在しない場合は、デフォルト値で新しいコンフィグを作成します",
+				"error": {
+					"exists": "コンフィグファイルは既に存在します: %0",
+					"invalidName": "無効な名前: %0"
+				},
+				"info": {
+					"create": "コンフィグを作成しています: %0",
+					"created": "コンフィグを作成しました。"
+				},
+				"usage": {
+					"0": "createConfig <name> - 新しいコンフィグを作成する",
+					"1": "createConfig - 名前が \"default\" に設定されている以外は同じです。"
+				}
+			},
+			"deleteConfig": {
+				"desc": "コンフィグが存在する場合は削除する",
+				"error": {
+					"invalidName": "無効な名前: %0",
+					"notFound": "コンフィグが見つかりません: %0"
+				},
+				"info": {
+					"delete": "コンフィグを削除しています: %0",
+					"deleted": "設定を削除しました。"
+				},
+				"usage": {
+					"0": "deleteConfig <name> - コンフィグの削除",
+					"1": "deleteConfig - 名前が \"default\" に設定されていることを除いて同じ"
+				}
+			},
+			"disconnect": {
+				"desc": "クライアントの切断",
+				"info": {
+					"disconnect": "切断を試行しています: %0"
+				},
+				"usage": {
+					"0": "disconnect <UID|ID> <reason> - クライアントを切断します",
+					"1": "disconnect <UID|ID> - 理由が ENET_SERVER_KICK に設定されている以外は同じ"
+				}
+			},
+			"ec2b": {
+				"desc": "ec2bキーをダンプする"
+			},
+			"equip": {
+				"desc": "武器や聖遺物を装備する",
+				"error": {
+					"noEquip": "装備が見つかりません。"
+				},
+				"info": {
+					"equip": "現在のアバターに%0を装備しました。"
+				},
+				"usage": {
+					"0": "equip <guid> <uid> - プレイヤーの現在のアバターに武器や聖遺物を装備する",
+					"1": "equip <guid> - (ゲーム内)現在のアバターに武器や聖遺物を装備する"
+				}
+			},
+			"gadget": {
+				"desc": "スポーンガジェット",
+				"info": {
+					"spawn": "スポーンガジェット: %0"
+				},
+				"usage": {
+					"0": "gadget <id> <lv> <uid> - プレイヤーの現在のアバター位置にガジェットをスポーンする",
+					"1": "gadget <id> <lv> - (ゲーム内)現在のアバター位置にガジェットをスポーンする"
+				}
+			},
+			"god": {
+				"desc": "godmodeを切り替える",
+				"info": {
+					"disable": "godmodeが無効になっています。",
+					"enable": "godmodeが有効になっています。"
+				},
+				"usage": {
+					"0": "god <uid> - プレイヤーのgodmodeを切り替えます",
+					"1": "god - (ゲーム内)自分のgodmodeを切り替えます"
+				}
+			},
+			"gpatch": {
+				"desc": "ゲームパッチ適用ツール",
+				"info": {
+					"success": "成功。"
+				},
+				"usage": {
+					"0": "gpatch patch <gameDir> - ゲームディレクトリ内のパッチメタデータとua、たとえば「E:\\Genshin Impact\\Genshin Impact Game」などのバックアップを作成します",
+					"1": "gpatch patch - gameDir が config.gameDir に設定されていること以外は同じです。",
+					"2": "gpatch unpatch - ゲームディレクトリ<gameDir>のバックアップからメタデータと ua のパッチを解除する ゲームディレクトリは上記と同じです",
+					"3": "gpatch unpatch - gameDir が config.gameDir に設定されていること以外は同じです。"
+				}
+			},
+			"gs": {
+				"desc": "グローバル状態の設定/切り替え/一覧表示",
+				"usage": {
+					"0": "gs set <name> <value> - グローバル状態を値に設定",
+					"1": "gs toggle <name> - グローバル状態の切り替え",
+					"2": "gs list - グローバル状態を一覧表示する"
+				}
+			},
+			"guid": {
+				"desc": "現在のアバターと装備のguidを表示する",
+				"usage": {
+					"0": "guid <uid> - プレイヤーの現在のアバターと装備のguidを表示する",
+					"1": "guid - (ゲーム内) 現在のアバターと装備のguidを表示する"
+				}
+			},
+			"hcoin": {
+				"desc": "原石を与える",
+				"info": {
+					"give": "原石を与える: %0"
+				},
+				"usage": {
+					"0": "hcoin <amount> <uid> - プレイヤーに原石を与える",
+					"1": "hcoin <amount> - (ゲーム内)原石を自分に与える"
+				}
+			},
+			"heal": {
+				"desc": "現在のチームのすべてのアバターのHPを回復する",
+				"info": {
+					"heal": "すべてのアバターを回復しました。"
+				},
+				"usage": {
+					"0": "heal <uid> - プレイヤーの現在のチームのすべてのアバターを回復します",
+					"1": "heal - (ゲーム内)現在のチームのすべてのアバターを回復"
+				}
+			},
+			"help": {
+				"desc": "ヘルプメッセージを表示する",
+				"error": {
+					"inGame": "コマンドのリストについては、アナウンスをご覧ください。",
+					"invalidCategory": "不明なカテゴリ: %0"
+				},
+				"page": {
+					"commandInfo": {
+						"desc": "説明: %0",
+						"syntax": "構文: %0",
+						"title": "コマンド情報:",
+						"usage": "使い方："
+					},
+					"commandList": {
+						"title": "コマンドリスト:"
+					},
+					"console": {
+						"controls": {
+							"0": "ページアップ/ページダウン - 上下にスクロール",
+							"1": "上矢印/下矢印 - 前/次コマンド",
+							"2": "タブ/右矢印 - オートコンプリート",
+							"3": "エスケープ - 入力の取り消し"
+						},
+						"title": "コンソールコントロール:"
+					}
+				},
+				"usage": {
+					"0": "help command - コマンド・リスト",
+					"1": "help command <command> - コマンド情報",
+					"2": "help console - コンソールコントロール"
+				}
+			},
+			"keygen": {
+				"desc": "パケットダンプからキーを生成しようとしました"
+			},
+			"killall": {
+				"desc": "近くのモンスターをすべて倒す(最大32)",
+				"info": {
+					"killMonsters": "モンスターを倒す..."
+				},
+				"usage": {
+					"0": "killall <uid> - プレイヤーのために近くのモンスターをすべて倒す",
+					"1": "killall - (ゲーム内)近くのモンスターをすべて倒す"
+				}
+			},
+			"lightning": {
+				"desc": "プレイヤーに継続的に雷をスポーンする",
+				"info": {
+					"start": "雷を開始しました。",
+					"stop": "雷を停止しました。"
+				}
+			},
+			"list": {
+				"desc": "接続されているクライアントの一覧表示",
+				"info": {
+					"empty": "クライアントがいません。"
+				}
+			},
+			"loadConfig": {
+				"desc": "現在の設定を変更する",
+				"error": {
+					"invalidName": "無効な名前: %0",
+					"notFound": "コンフィグが見つかりません: %0"
+				},
+				"info": {
+					"load": "コンフィグを読み込んでいます: %0"
+				},
+				"usage": {
+					"0": "loadConfig <name> - 現在の設定の変更と再起動",
+					"1": "loadConfig - 名前が \"default\" に設定されていることを除いて同じ"
+				}
+			},
+			"logLevel": {
+				"desc": "ログレベルを設定する",
+				"usage": "loglevel %0 - ログレベルを %1 に設定してください"
+			},
+			"material": {
+				"desc": "素材を与える",
+				"info": {
+					"give": "素材を与える: (%0)x%1"
+				},
+				"usage": {
+					"0": "material <id> <count> <uid> - プレイヤーに素材を渡す",
+					"1": "material <id> <count> - (ゲーム内)自分に素材を渡す",
+					"2": "material <id> - (ゲーム内)自分に素材を1つ渡す"
+				}
+			},
+			"mcoin": {
+				"desc": "創世結晶を与える",
+				"info": {
+					"give": "創世結晶を与える: %0"
+				},
+				"usage": {
+					"0": "mcoin <amount> <uid> - プレイヤーに創世結晶を与える",
+					"1": "mcoin <amount> - (ゲーム内)創世結晶を自分に与える"
+				}
+			},
+			"meta": {
+				"desc": "メタデータパッチ適用ツール",
+				"info": {
+					"success": "成功。"
+				},
+				"usage": {
+					"0": "meta patch <入力ファイル> <出力ファイル> - メタデータのパッチ",
+					"1": "meta dump <入力ファイル> <出力ファイル> - メタデータ文字列のダンプ",
+					"2": "meta dec <入力ファイル> <出力ファイル> - メタデータの復号化",
+					"3": "meta enc <入力ファイル> <出力ファイル> - メタデータを暗号化する"
+				}
+			},
+			"nocd": {
+				"desc": "nocdの設定",
+				"info": {
+					"disable": "nocdが無効になっています。",
+					"enable": "nocdが有効になっています。"
+				},
+				"usage": {
+					"0": "nocd [true|false] <uid> - プレーヤーのnocdを切り替えます",
+					"1": "nocd [true|false] - (ゲーム内)自分のnocdを切り替えます"
+				}
+			},
+			"pos": {
+				"desc": "現在位置を出力する",
+				"info": {
+					"posInfo": "scene: %0 X: %1 Y: %2 Z: %3"
+				},
+				"usage": {
+					"0": "pos <uid> - プレーヤーの現在位置を出力",
+					"1": "pos - (ゲーム内)現在位置を出力する"
+				}
+			},
+			"recharge": {
+				"desc": "現在のチームのすべてのアバターの元素エネルギーを回復する",
+				"info": {
+					"recharge": "元素エネルギーが回復しました。"
+				},
+				"usage": {
+					"0": "recharge <uid> - プレイヤーの現在のチームのすべてのアバターの元素エネルギーを回復します",
+					"1": "recharge       - (ゲーム内) 現在のチームのすべてのアバターの元素エネルギーを回復します"
+				}
+			},
+			"register": {
+				"desc": "アカウント登録",
+				"error": {
+					"mismatch": "パスワードの不一致。"
+				},
+				"info": {
+					"success": "アカウントが正常に登録されました。"
+				},
+				"prompt": {
+					"name": "ユーザー名を入力",
+					"pass": "パスワードを入力",
+					"retypePass": "パスワードの再入力"
+				}
+			},
+			"restart": {
+				"desc": "サーバーの再起動"
+			},
+			"scene": {
+				"desc": "シーンを変更する",
+				"error": {
+					"sameScene": "今と同じシーンにいます",
+					"sceneNotFound": "シーンが見つかりません。"
+				},
+				"info": {
+					"changeScene": "シーンを次のように変更してください: %0"
+				},
+				"usage": {
+					"0": "scene <id> <uid> - プレイヤーのシーンを変更",
+					"1": "scene <id> - (ゲーム内)自分のシーンを変更する"
+				},
+				"warn": {
+					"noData": "シーンデータが見つかりませんでした"
+				}
+			},
+			"scoin": {
+				"desc": "モラを与える",
+				"info": {
+					"give": "モラを与える: %0"
+				},
+				"usage": {
+					"0": "scoin <amount> <uid> - プレイヤーにモラを与える",
+					"1": "scoin <amount> - (ゲーム内)自分にモラを与える"
+				}
+			},
+			"setcs": {
+				"desc": "現在のアバターの候補スキルを設定する",
+				"error": {
+					"noSkill": "スキルが見つかりません。"
+				},
+				"info": {
+					"setSkill": "候補スキルを %0 に設定してください"
+				},
+				"usage": {
+					"0": "setcs <id> <uid> - プレイヤーの現在のアバターの候補スキルを設定する",
+					"1": "setcs <id> - (ゲーム内)現在のアバターの候補スキルを設定する"
+				}
+			},
+			"setfp": {
+				"desc": "現在のアバターのFightPropを設定する",
+				"error": {
+					"invalidFightProp": "無効なFightPropです。"
+				},
+				"info": {
+					"set": "%0(%1) を %2 に設定します。"
+				},
+				"usage": {
+					"0": "setfp <prop> <value> <uid> - プレイヤーの現在のアバターにFightPropを設定する",
+					"1": "setfp <prop> <value> - (ゲーム内)現在のアバターのFightPropを設定する"
+				}
+			},
+			"spawn": {
+				"desc": "モンスターをスポーンさせる",
+				"info": {
+					"spawn": "id: %0のモンスターをスポーンさせました"
+				},
+				"usage": {
+					"0": "spawn <id> <lv> <uid> - プレイヤーの現在のアバター位置にモンスターをスポーンする",
+					"1": "spawn <id> <lv> - (ゲーム内)現在のアバター位置にモンスターをスポーンさせる"
+				}
+			},
+			"stop": {
+				"desc": "サーバーの停止"
+			},
+			"switchelement": {
+				"desc": "旅人の元素を切り替える",
+				"error": {
+					"notElementName": "元素の名前が正しくありません。",
+					"notTravelerAvatar": "現在のアバターは旅人ではありません"
+				},
+				"info": {
+					"changeElement": "元素を%0に変更しました"
+				},
+				"usage": {
+					"0": "switchelement <elementName> <uid> - プレイヤーの旅人の元素を変更",
+					"1": "switchelement <elementName> - (ゲーム内)自分の旅人の元素を変更"
+				}
+			},
+			"tp": {
+				"desc": "場所へのテレポート",
+				"info": {
+					"tp": "テレポート先: %0 %1 %2"
+				},
+				"usage": {
+					"0": "tp <x> <y> <z> <uid> - プレイヤーをその場所にテレポート",
+					"1": "tp <x> <y> <z> - (ゲーム内)自分をその場所にテレポート"
+				}
+			},
+			"ua": {
+				"desc": "uaパッチ適用ツール",
+				"info": {
+					"success": "成功。"
+				},
+				"usage": {
+					"0": "ua patch <入力ファイル> <出力ファイル> - UAにRSAパッチを適用する",
+					"1": "ua patch <入力ファイル> - RSAキーをコンソールに出力する"
+				}
+			},
+			"update": {
+				"desc": "サーバーの更新"
+			},
+			"vehicle": {
+				"desc": "Spawn vehicle",
+				"info": {
+					"spawn": "産卵車両..."
+				},
+				"usage": {
+					"0": "vehicle <uid> - プレイヤーの現在のアバター位置にビークルをスポーンする",
+					"1": "vehicle - (ゲーム内)現在のアバター位置にビークルをスポーンする"
+				}
+			},
+			"weapon": {
+				"desc": "武器を与える",
+				"info": {
+					"give": "武器を与える: (%0)x%1"
+				},
+				"usage": {
+					"0": "weapon <id> <count> <uid> - プレイヤーに武器を与える",
+					"1": "weapon <id> <count> - (ゲーム内)自分に武器を与える",
+					"2": "weapon <id> - (ゲーム内)自分に武器を1つ与える"
+				}
+			},
+			"windy": {
+				"desc": "windy!!",
+				"error": {
+					"windyfileNotFound": "windyファイルが見つかりません。"
+				}
+			}
+		},
+		"error": {
+			"consoleOnly": "このコマンドはコンソールでのみ使用できます。",
+			"defUnexpectedArg": "定義エラー: 動的引数の後に引数を持つことはできません。",
+			"defUnexpectedOptional": "定義エラー: 省略可能な引数の後に必須の引数を指定することはできません。",
+			"defUnexpectedType": "定義エラー: 引数の型が不明です (%0)。",
+			"execFail": "コマンドを実行できませんでした: %0",
+			"invalidValue": "無効な値: %0、次のいずれかである必要があります: %1",
+			"missing": "%0 がありません",
+			"parseFail": "コマンドの解析に失敗しました: %0",
+			"playerOnly": "このコマンドはゲーム内でのみ使用できます。",
+			"typeError": "種類エラー: (%0) は %1 である必要があります。",
+			"unknownCommand": "不明なコマンド: %0"
+		}
+	},
+	"generic": {
+		"fileNotFound": "ファイルが見つかりません: %0",
+		"inventoryFull": "インベントリーがいっぱいです。",
+		"notInScene": "シーンにはいません",
+		"notInWorld": "ワールドにはいません",
+		"param1": "%0",
+		"param10": "%0 %1 %2 %3 %4 %5 %6 %7 %8 %9",
+		"param2": "%0 %1",
+		"param3": "%0 %1 %2",
+		"param4": "%0 %1 %2 %3",
+		"param5": "%0 %1 %2 %3 %4",
+		"param6": "%0 %1 %2 %3 %4 %5",
+		"param7": "%0 %1 %2 %3 %4 %5 %6",
+		"param8": "%0 %1 %2 %3 %4 %5 %6 %7",
+		"param9": "%0 %1 %2 %3 %4 %5 %6 %7 %8",
+		"playerNoCurAvatar": "プレイヤーの現在のアバターを取得できません",
+		"playerNoPos": "プレイヤーの位置を取得できません。",
+		"playerNotFound": "プレイヤーが見つかりません。"
+	},
+	"message": {
+		"ability": {
+			"debug": {
+				"indexWrong": "%0 %1 インデックスが間違っています",
+				"register": "登録: %0 -> %1[%2]",
+				"unregister": "登録解除: %0 -> %1[%2]"
+			},
+			"warn": {
+				"noProto": "プロトファイルがありません: %0 %1 %2"
+			}
+		},
+		"authenticator": {
+			"api": {
+				"accountExists": "アカウントは既に存在します。",
+				"decryptFail": "パスワードの暗号化解除に失敗しました。",
+				"invalidCredentials": "ユーザー名またはパスワードが正しくありません。",
+				"invalidToken": "トークンが無効です。"
+			},
+			"error": {
+				"generateUidFail": "uid を生成できませんでした。"
+			}
+		},
+		"client": {
+			"debug": {
+				"seed": "シードの設定: %0 %1",
+				"stateChange": "状態の変更: %0 %1 %2",
+				"uid": "UID の設定: %0"
+			}
+		},
+		"combat": {
+			"debug": {
+				"fall": "[落下]種類: %0 速度: %1 複数: %2"
+			},
+			"warn": {
+				"noProto": "プロトファイルがありません: %0 %1 %2"
+			}
+		},
+		"dispatch": {
+			"debug": {
+				"reqInfo": "パラメータ: %0"
+			},
+			"error": {
+				"msg": "接続に失敗しました",
+				"updateFail": "更新に失敗しました。",
+				"outdateServer": "バージョンの不一致、古いサーバーを使用しています \n\nサーバーバージョン: %0 \nクライアントバージョン: %1",
+        		"outdateClient": "バージョンの不一致、古いクライアントを使用しています \n\nサーバーバージョン: %0 \nnクライアントバージョン: %1"
+			}
+		},
+		"dnsServer": {
+			"error": {
+				"TCPError": "TCP エラー: %0",
+				"UDPError": "UDP エラー: %0",
+				"socketError": "ソケット エラー: %0"
+			},
+			"info": {
+				"TCPListen": "[TCP]ポート %0 でリッスンしています",
+				"UDPListen": "[UDP]ポート %0 でリッスンしています"
+			}
+		},
+		"entity": {
+			"debug": {
+				"add": "追加: %0",
+				"register": "登録: %0",
+				"remove": "削除: %0",
+				"replace": "置換: %0 -> %1",
+				"unregister": "登録解除: %0",
+				"updateEntity": "エンティティ ID の更新: %0"
+			}
+		},
+		"guid": {
+			"error": {
+				"full": "GUID リストがいっぱいです。"
+			}
+		},
+		"kcpServer": {
+			"info": {
+				"connect": "クライアント接続: %0",
+				"disconnect": "クライアントの切断: %0 理由: %1"
+			}
+		},
+		"loader": {
+			"avatarData": {
+				"warn": {
+					"noConfig": "アバターのコンフィグがありません: %0",
+					"noData": "アバターのデータがありません: %0",
+					"noFightPropConfig": "アバターのFightPropコンフィグを取得できません: %0"
+				}
+			},
+			"monsterData": {
+				"warn": {
+					"noData": "モンスターのデータがありません: %0",
+					"noFightPropConfig": "モンスターのFightProp設定を取得できません: %0"
+				}
+			},
+			"warn": {
+				"noData": "不足しているデータ: %0"
+			}
+		},
+		"openssl": {
+			"debug": {
+				"check": "OpenSSL のインストールを確認しています..."
+			},
+			"error": {
+				"invalidPrivateKey": "秘密キーが無効です。",
+				"invalidPublicKey": "公開キーが無効です。",
+				"notInstalled": "OpenSSL がインストールされていません。"
+			}
+		},
+		"packet": {
+			"debug": {
+				"noHandler": "パケットのハンドラーがありません: %0 %1"
+			},
+			"error": {
+				"handler": "パケット処理エラー: %0"
+			},
+			"warn": {
+				"unknownPacket": "不明なパケット: %0"
+			}
+		},
+		"protoUtils": {
+			"warn": {
+				"noProto": "プロトファイルがありません: %0"
+			}
+		},
+		"scene": {
+			"debug": {
+				"abilityInvokeNoEntity": "エンティティへのアビリティ呼び出しがnullです: %0",
+				"join": "接続",
+				"joinInfo": "%0 UID: %1 ID: %2 位置: [%3,%4,%5] 種類: %6 理由: %7",
+				"loadBlock": "blockをロードしました: %0",
+				"quit": "辞める",
+				"quitInfo": "%0 UID: %1 ID: %2",
+				"unloadBlock": "blockをアンロードしました: %0"
+			}
+		},
+		"server": {
+			"debug": {
+				"flushDns": "DNSをフラッシュしています...",
+				"flushDnsSuccess": "DNS のフラッシュ成功。",
+				"removeHost": "ホストを削除しています...",
+				"removeHostSuccess": "ホストの削除に成功しました。",
+				"setHost": "ホストを設定しています...",
+				"setHostSuccess": "ホストを成功に設定します。"
+			},
+			"error": {
+				"flushDns": "DNS のフラッシュに失敗しました: %0",
+				"invalidRegion": "サポートされていないリージョン。",
+				"invalidVersion": "サポートされていないバージョン",
+				"mkdir": "ディレクトリの作成中にエラーが発生しました: %0",
+				"patchGame": "ゲームのパッチ適用エラー: %0",
+				"removeHost": "ホストの削除に失敗しました: %0",
+				"setHost": "ホストの設定に失敗しました: %0",
+				"start": "起動中にエラーが発生しました: %0",
+				"unpatchGame": "ゲームの修正プログラム適用解除エラー: %0"
+			},
+			"info": {
+				"autoPatch": "自動パッチ: %0",
+				"build": "ビルド: %0",
+				"dispatchKey": "ディスパッチ キー: %0",
+				"dispatchRegion": "ディスパッチ リージョン: %0",
+				"dispatchSeed": "ディスパッチ シード: %0",
+				"gameVersion": "ゲーム バージョン: %0",
+				"protoVersion": "プロトファイル バージョン: %0",
+				"logLevel": "ログ レベル: %0",
+				"mkdir": "ディレクトリを作成しています: %0",
+				"name": "名前: %0",
+				"restart": "再起動。。。遅延: %0ms",
+				"started": "開始。ヘルプを表示するには、「help」と入力します",
+				"starting": "始動。。。",
+				"stop": "停止中... 遅延: %0ms"
+			}
+		},
+		"ssl": {
+			"info": {
+				"checkCA": "CA ファイルを検証しています...",
+				"checkSRV": "srvファイルを検証しています...",
+				"checkSuccess": "検証の成功。",
+				"create": "%0 を作成しています...",
+				"found": "%0 が見つかりました。",
+				"generate": "%0 を生成しています...",
+				"generateCA": "CA ファイルを生成しています...",
+				"generateSRV": "srvファイルを生成しています...",
+				"mkdir": "SSL ディレクトリを作成しています..."
+			},
+			"warn": {
+				"checkCAFail": "CA ファイルが見つかりません。",
+				"checkSRVFail": "srv ファイルが見つかりません。"
+			}
+		},
+		"tools": {
+			"autoPatch": {
+				"debug": {
+					"reqInfo": "(%0)ホスト: %1 パス: %2",
+					"resolve": "(%0) Resolved: %1",
+					"write": "書き込み先: %0"
+				},
+				"error": {
+					"invalidRegion": "このリージョンでは自動パッチはサポートされていません。",
+					"noProto": "プロトファイルがありません。",
+					"noSeed": "ディスパッチシードがありません。",
+					"queryFail": "クエリに失敗しました: %0",
+					"reqFail": "IP: %0 ホスト: %1 エラー: %2"
+				},
+				"info": {
+					"check": "更新を確認しています...",
+					"success": "更新が完了しました。",
+					"update": "更新。。。"
+				}
+			},
+			"keyGen": {
+				"debug": {
+					"dump": "O: %0 K: %1 DV: %2 KV: %3"
+				},
+				"error": {
+					"dump": "スキップ ダンプ (%0): %1",
+					"unknown": "キー生成エラー: %0"
+				},
+				"info": {
+					"generate": "キーを生成しています...",
+					"notModified": "変更なし。",
+					"save": "変更を保存しています...",
+					"success": "KeyGenの成功。"
+				}
+			},
+			"meta": {
+				"error": {
+					"noPasswordPublicKey": "パスワード公開キーが見つかりません。",
+					"noRSAKeys": "RSA キーが見つかりません。",
+					"noServerPublicKey": "サーバーの公開キーが見つかりません。"
+				},
+				"info": {
+					"replacePasswordPublicKey": "パスワード公開キーを置き換えています...",
+					"replaceServerPublicKey": "サーバーの公開キーを置き換えています..."
+				}
+			},
+			"patcher": {
+				"error": {
+					"noDataDir": "データ ディレクトリが見つかりません。",
+					"patched": "すでにパッチが適用されています。"
+				},
+				"info": {
+					"patchMeta": "メタデータにパッチを適用しています...",
+					"patchUA": "UA にパッチを適用しています...",
+					"unpatchMeta": "メタデータにパッチを適用していません...",
+					"unpatchUA": "UA にパッチを適用しています..."
+				}
+			},
+			"ua": {
+				"error": {
+					"noReturn": "返品指示が見つかりません。",
+					"noServerPublicKey": "サーバーの公開キーが見つかりません。",
+					"unknownInstruction": "不明な命令: %0",
+					"unknownOperand": "不明なオペランド: %0"
+				}
+			}
+		},
+		"update": {
+			"error": {
+				"invalidBuildType": "実行可能ではなく、更新できません。",
+				"invalidContent": "無効なコンテンツ データです。",
+				"invalidJson": "無効な json です。",
+				"invalidSignature": "署名が無効です。",
+				"invalidState": "無効な更新状態: %0",
+				"missingArg": "引数がありません。",
+				"missingURL": "更新URLはありません。",
+				"noData": "データなし。"
+			},
+			"info": {
+				"clean": "クリーンアップ中...",
+				"cleanSuccess": "クリーンアップが完了しました。",
+				"compare": "バージョンを比較しています...",
+				"copy": "exeファイルをコピーしています...",
+				"download": "バージョンの不一致、アップデートのダウンロード...",
+				"exit": "終了。。。",
+				"noDiff": "Same version, stop update.",
+				"restart": "再起動。。。",
+				"stop": "停車。。。",
+				"updateAvailable": "新しいアップデートが利用可能で、「update」と入力してアップデートします。"
+			}
+		},
+		"webServer": {
+			"debug": {
+				"handle": "処理済み: (%0)%1",
+				"noHandler": "未処理: %0"
+			},
+			"error": {
+				"handler": "要求のエラー処理: %0",
+				"noSSL": "SSL 設定を生成できません。中止します。"
+			},
+			"info": {
+				"listen": "ポート %0 でリッスンしています"
+			}
+		},
+		"worker": {
+			"debug": {
+				"initKcpSuccess": "初期化が完了しました: %0",
+				"ready": "用意",
+				"removeConv": "コンバージョンを削除: %0",
+				"setISocketPort": "ISocket ポートの設定: %0 %1",
+				"shutdown": "シャットダウン",
+				"spawn": "ワーカーのスポーン: %0 ISocket ポート: %1",
+				"start": "開始中: %0",
+				"stderr": "標準エラー: %0 %1",
+				"stdout": "標準出力: %0 %1",
+				"stop": "停止中: %0"
+			},
+			"error": {
+				"UDPError": "UDP エラー: %0",
+				"initKcpFail": "初期化 kcp エラー: %0",
+				"invalidId": "不一致 ID: %0",
+				"invalidOpcode": "無効なオペコード: %0",
+				"invalidPort": "無効なポート: %0",
+				"restartFail": "ワーカーを再起動できませんでした: %0",
+				"sendPacketError": "送信パケット エラー: %0"
+			},
+			"info": {
+				"blockAddr": "ブロックされたアドレス: %0",
+				"exit": "ワーカーの終了: %0、コード: %1、シグナル: %2",
+				"listen": "ポート %0 でリッスンしています",
+				"restart": "ワーカーを再起動しています: %0",
+				"started": "ワーカーが開始されました。"
+			},
+			"warn": {
+				"invalidPacket": "無効なパケットを受信しました。xor 復号化に失敗しましたか?"
+			}
+		}
+	}
+}

@@ -1,4 +1,4 @@
-import ConfigBaseBillboard from '.'
+import ConfigBaseBillboard from "."
 
 export default interface ConfigProgressBillboard extends ConfigBaseBillboard {
   CustomKey: string

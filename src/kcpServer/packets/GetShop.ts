@@ -1,7 +1,7 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientStateEnum } from '@/types/enum'
-import { Shop } from '@/types/proto'
-import { RetcodeEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { Shop } from "@/types/proto"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface GetShopReq {
   shopType: number
@@ -14,9 +14,9 @@ export interface GetShopRsp {
 
 class GetShopPacket extends Packet implements PacketInterface {
   constructor() {
-    super('GetShop', {
+    super("GetShop", {
       reqState: ClientStateEnum.POST_LOGIN,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -31,7 +31,7 @@ class GetShopPacket extends Packet implements PacketInterface {
     } else {
       await this.response(context, {
         retcode: RetcodeEnum.RET_SUCC,
-        shop
+        shop,
       })
     }
   }
@@ -42,4 +42,4 @@ class GetShopPacket extends Packet implements PacketInterface {
 }
 
 let packet: GetShopPacket
-export default (() => packet = packet || new GetShopPacket())()
+export default (() => (packet = packet || new GetShopPacket()))()

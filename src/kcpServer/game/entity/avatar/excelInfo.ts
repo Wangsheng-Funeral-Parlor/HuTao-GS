@@ -1,5 +1,6 @@
-import AvatarData from '$/gameData/data/AvatarData'
-import Avatar from '.'
+import Avatar from "."
+
+import AvatarData from "$/gameData/data/AvatarData"
 
 class Hash {
   pre: bigint
@@ -11,7 +12,7 @@ class Hash {
   }
 
   export() {
-    return ((this.pre << 32n) | (this.suffix)).toString()
+    return ((this.pre << 32n) | this.suffix).toString()
   }
 }
 
@@ -48,7 +49,7 @@ export default class ExcelInfo {
       ControllerPathRemoteHashPre,
       ControllerPathRemoteHashSuffix,
       CombatConfigHashPre,
-      CombatConfigHashSuffix
+      CombatConfigHashSuffix,
     } = avatarData
 
     this.prefabPathHash = new Hash(PrefabPathHashPre, PrefabPathHashSuffix)
@@ -63,20 +64,15 @@ export default class ExcelInfo {
   }
 
   export() {
-    const {
-      prefabPathHash,
-      prefabPathRemoteHash,
-      controllerPathHash,
-      controllerPathRemoteHash,
-      combatConfigHash
-    } = this
+    const { prefabPathHash, prefabPathRemoteHash, controllerPathHash, controllerPathRemoteHash, combatConfigHash } =
+      this
 
     return {
       prefabPathHash: prefabPathHash.export(),
       prefabPathRemoteHash: prefabPathRemoteHash.export(),
       controllerPathHash: controllerPathHash.export(),
       controllerPathRemoteHash: controllerPathRemoteHash.export(),
-      combatConfigHash: combatConfigHash.export()
+      combatConfigHash: combatConfigHash.export(),
     }
   }
 }

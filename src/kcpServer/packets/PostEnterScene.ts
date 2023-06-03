@@ -1,7 +1,8 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import GuestPostEnterScene from './GuestPostEnterScene'
-import { ClientStateEnum } from '@/types/enum'
+import GuestPostEnterScene from "./GuestPostEnterScene"
+
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface PostEnterSceneReq {
   enterSceneToken: number
@@ -14,9 +15,9 @@ export interface PostEnterSceneRsp {
 
 class PostEnterScenePacket extends Packet implements PacketInterface {
   constructor() {
-    super('PostEnterScene', {
+    super("PostEnterScene", {
       reqWaitState: ClientStateEnum.ENTER_SCENE | ClientStateEnum.ENTER_SCENE_DONE,
-      reqWaitStateMask: 0xF0FF
+      reqWaitStateMask: 0xf0ff,
     })
   }
 
@@ -31,7 +32,7 @@ class PostEnterScenePacket extends Packet implements PacketInterface {
     }
 
     // Set client state
-    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0F00) | ClientStateEnum.PRE_POST_ENTER_SCENE
+    player.state = ClientStateEnum.ENTER_SCENE | (state & 0x0f00) | ClientStateEnum.PRE_POST_ENTER_SCENE
 
     const hostCtx = currentWorld.host.context
     hostCtx.seqId = seqId
@@ -40,11 +41,11 @@ class PostEnterScenePacket extends Packet implements PacketInterface {
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      enterSceneToken
+      enterSceneToken,
     })
 
     // Set client state
-    player.state = ClientStateEnum.IN_GAME | (state & 0x0F00) | ClientStateEnum.POST_ENTER_SCENE
+    player.state = ClientStateEnum.IN_GAME | (state & 0x0f00) | ClientStateEnum.POST_ENTER_SCENE
   }
 
   async response(context: PacketContext, data: PostEnterSceneRsp): Promise<void> {
@@ -53,4 +54,4 @@ class PostEnterScenePacket extends Packet implements PacketInterface {
 }
 
 let packet: PostEnterScenePacket
-export default (() => packet = packet || new PostEnterScenePacket())()
+export default (() => (packet = packet || new PostEnterScenePacket()))()

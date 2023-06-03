@@ -1,6 +1,6 @@
-import ConfigBaseScenePoint from '.'
+import ConfigBaseScenePoint from "."
 
 export default interface DungeonExit extends ConfigBaseScenePoint {
-  $type: 'DungeonExit'
+  $type: "DungeonExit"
   EntryPointId: number
 }

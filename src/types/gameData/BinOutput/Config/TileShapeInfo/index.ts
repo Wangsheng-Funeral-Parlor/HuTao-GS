@@ -1,6 +1,5 @@
-import SphereTileShapeInfo from './Child/SphereTileShapeInfo'
+import SphereTileShapeInfo from "./Child/SphereTileShapeInfo"
 
-type TileShapeInfo =
-  SphereTileShapeInfo
+type TileShapeInfo = SphereTileShapeInfo
 
 export default TileShapeInfo

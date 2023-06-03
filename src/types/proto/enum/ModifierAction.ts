@@ -1,4 +1,4 @@
 export enum ModifierActionEnum {
   ADDED = 0,
-  REMOVED = 1
+  REMOVED = 1,
 }

@@ -1,5 +1,6 @@
-import { VectorInfo } from '.'
-import { MapMarkFromTypeEnum, MapMarkPointTypeEnum } from './enum'
+import { MapMarkFromTypeEnum, MapMarkPointTypeEnum } from "./enum"
+
+import { VectorInfo } from "."
 
 export interface MapMarkPoint {
   sceneId: number

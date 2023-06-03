@@ -1,7 +1,7 @@
-import ConfigAttackProperty from './ConfigAttackProperty'
-import ConfigBulletWane from './ConfigBulletWane'
-import ConfigCameraShake from './ConfigCameraShake'
-import ConfigHitPattern from './ConfigHitPattern'
+import ConfigAttackProperty from "./ConfigAttackProperty"
+import ConfigBulletWane from "./ConfigBulletWane"
+import ConfigCameraShake from "./ConfigCameraShake"
+import ConfigHitPattern from "./ConfigHitPattern"
 
 export default interface ConfigAttackInfo {
   AttackTag: string

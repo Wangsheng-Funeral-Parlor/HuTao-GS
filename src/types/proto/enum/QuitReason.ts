@@ -8,5 +8,5 @@ export enum QuitReasonEnum {
   BE_BLOCKED = 6,
   KICK_BY_HOST_ENTER_HOME = 7,
   HOST_SCENE_INVALID = 8,
-  KICK_BY_PLAY = 9
+  KICK_BY_PLAY = 9,
 }

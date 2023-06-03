@@ -1,4 +1,4 @@
-import VError from 'verror'
+import VError from "verror"
 
 export default class BufferCursor {
   private _pos: number
@@ -12,7 +12,6 @@ export default class BufferCursor {
     this.buffer = Buffer.isBuffer(buff) ? buff : Buffer.alloc(buff)
     this.length = this.buffer.length
   }
-
 
   private _move(step: number) {
     this._checkWrite(step)
@@ -32,8 +31,19 @@ export default class BufferCursor {
   }
 
   seek(pos: number) {
-    if (pos < 0) throw new VError(new RangeError('Cannot seek before start of buffer'), 'Negative seek values not allowed: %d', pos)
-    if (pos > this.length) throw new VError(new RangeError('Trying to seek beyond buffer'), 'Requested %d position is beyond length %d', pos, this.length)
+    if (pos < 0)
+      throw new VError(
+        new RangeError("Cannot seek before start of buffer"),
+        "Negative seek values not allowed: %d",
+        pos
+      )
+    if (pos > this.length)
+      throw new VError(
+        new RangeError("Trying to seek beyond buffer"),
+        "Requested %d position is beyond length %d",
+        pos,
+        this.length
+      )
 
     this._pos = pos
     return this
@@ -49,12 +59,12 @@ export default class BufferCursor {
     let part: number
 
     if (!method) {
-      method = 'readUInt8'
+      method = "readUInt8"
       part = 1
     }
 
-    if (method.indexOf('16') > 0) part = 2
-    else if (method.indexOf('32') > 0) part = 4
+    if (method.indexOf("16") > 0) part = 2
+    else if (method.indexOf("32") > 0) part = 4
 
     for (let i = 0; i < buffer.length; i += part) {
       arr.push(buffer[method](i))
@@ -89,7 +99,7 @@ export default class BufferCursor {
     }
 
     if (!encoding) {
-      encoding = 'utf8'
+      encoding = "utf8"
     }
 
     const ret = this.buffer.toString(encoding, this._pos, end)
@@ -335,9 +345,9 @@ export class BufferCursorOverflow extends VError {
   size: number
 
   constructor(length, pos, size) {
-    super('BufferCursorOverflow: length %d, position %d, size %d', length, pos, size)
+    super("BufferCursorOverflow: length %d, position %d, size %d", length, pos, size)
 
-    this.kind = 'BufferCursorOverflow'
+    this.kind = "BufferCursorOverflow"
     this.length = length
     this.position = pos
     this.size = size

@@ -1,5 +1,6 @@
-import { DynamicVector } from '$DT/BinOutput/Common/DynamicNumber'
-import ConfigPickupMulti from './ConfigPickupMulti'
+import ConfigPickupMulti from "./ConfigPickupMulti"
+
+import { DynamicVector } from "$DT/BinOutput/Common/DynamicNumber"
 
 export default interface ConfigPickup {
   PickType: string

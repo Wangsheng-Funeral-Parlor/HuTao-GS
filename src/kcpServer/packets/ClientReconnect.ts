@@ -1,5 +1,5 @@
-import Packet, { PacketContext, PacketInterface } from '#/packet'
-import { ClientReconnectReasonEnum } from '@/types/proto/enum'
+import Packet, { PacketContext, PacketInterface } from "#/packet"
+import { ClientReconnectReasonEnum } from "@/types/proto/enum"
 
 export interface ClientReconnectNotify {
   reason: ClientReconnectReasonEnum
@@ -7,10 +7,13 @@ export interface ClientReconnectNotify {
 
 class ClientReconnectPacket extends Packet implements PacketInterface {
   constructor() {
-    super('ClientReconnect')
+    super("ClientReconnect")
   }
 
-  async sendNotify(context: PacketContext, reason: ClientReconnectReasonEnum = ClientReconnectReasonEnum.CLIENT_RECONNNECT_NONE): Promise<void> {
+  async sendNotify(
+    context: PacketContext,
+    reason: ClientReconnectReasonEnum = ClientReconnectReasonEnum.CLIENT_RECONNNECT_NONE
+  ): Promise<void> {
     const notifyData: ClientReconnectNotify = { reason }
 
     await super.sendNotify(context, notifyData)
@@ -18,4 +21,4 @@ class ClientReconnectPacket extends Packet implements PacketInterface {
 }
 
 let packet: ClientReconnectPacket
-export default (() => packet = packet || new ClientReconnectPacket())()
+export default (() => (packet = packet || new ClientReconnectPacket()))()

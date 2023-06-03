@@ -1,12 +1,13 @@
-import { PacketContext } from '#/packet'
-import Embryo from '$/ability/embryo'
-import SkillData from '$/gameData/data/SkillData'
-import { ElemTypeEnum, FightPropEnum } from '@/types/enum'
-import { ChangeEnergyReasonEnum } from '@/types/proto/enum'
-import SkillUserData from '@/types/user/SkillUserData'
-import { getStringHash } from '@/utils/hash'
-import ProudSkill from './proudSkill'
-import SkillDepot from './skillDepot'
+import ProudSkill from "./proudSkill"
+import SkillDepot from "./skillDepot"
+
+import { PacketContext } from "#/packet"
+import Embryo from "$/ability/embryo"
+import SkillData from "$/gameData/data/SkillData"
+import { ElemTypeEnum, FightPropEnum } from "@/types/enum"
+import { ChangeEnergyReasonEnum } from "@/types/proto/enum"
+import SkillUserData from "@/types/user/SkillUserData"
+import { getStringHash } from "@/utils/hash"
 
 export default class Skill {
   depot: SkillDepot
@@ -57,7 +58,7 @@ export default class Skill {
     const { sceneTime, started, cdStartTime, cdDuration } = this
     if (started || sceneTime == null) return false
 
-    return cdStartTime == null || cdDuration == null || (sceneTime - cdStartTime) > cdDuration
+    return cdStartTime == null || cdDuration == null || sceneTime - cdStartTime > cdDuration
   }
 
   async init(userData: SkillUserData) {
@@ -66,11 +67,12 @@ export default class Skill {
 
     this.level = level || 1
 
-    const { AbilityName, ProudSkillGroupId, CdTime, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id) || {}
+    const { AbilityName, ProudSkillGroupId, CdTime, CostStamina, CostElemType, CostElemVal } =
+      (await SkillData.getSkill(id)) || {}
 
     this.cdTime = CdTime || 0
     this.costStamina = CostStamina || 0
-    this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
+    this.costElemType = ElemTypeEnum[(CostElemType || "").toUpperCase()] || 0
     this.costElemVal = CostElemVal || 0
 
     this.abilityName = AbilityName || null
@@ -88,10 +90,11 @@ export default class Skill {
 
     this.level = 1
 
-    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = await SkillData.getSkill(id) || {}
+    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } =
+      (await SkillData.getSkill(id)) || {}
 
     this.costStamina = CostStamina || 0
-    this.costElemType = ElemTypeEnum[(CostElemType || '').toUpperCase()] || 0
+    this.costElemType = ElemTypeEnum[(CostElemType || "").toUpperCase()] || 0
     this.costElemVal = CostElemVal || 0
 
     this.abilityName = AbilityName || null
@@ -103,7 +106,7 @@ export default class Skill {
     await this.proudSkill.initNew()
   }
 
-  async start(context: PacketContext, cdRatio: number = 1, costStaminaRatio: number = 1) {
+  async start(context: PacketContext, cdRatio = 1, costStaminaRatio = 1) {
     const { depot, cdTime, costStamina, abilityName, isEnergySkill, isReady } = this
     const { manager } = depot
     const { avatar } = manager
@@ -137,7 +140,7 @@ export default class Skill {
     return {
       id,
       level,
-      proudSkillData: proudSkill?.exportUserData() || false
+      proudSkillData: proudSkill?.exportUserData() || false,
     }
   }
 }

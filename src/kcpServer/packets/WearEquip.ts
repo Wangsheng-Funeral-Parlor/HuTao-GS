@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface WearEquipReq {
   avatarGuid: string
@@ -15,9 +15,9 @@ export interface WearEquipRsp {
 
 class WearEquipPacket extends Packet implements PacketInterface {
   constructor() {
-    super('WearEquip', {
+    super("WearEquip", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -42,7 +42,7 @@ class WearEquipPacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       avatarGuid,
-      equipGuid
+      equipGuid,
     })
   }
 
@@ -52,4 +52,4 @@ class WearEquipPacket extends Packet implements PacketInterface {
 }
 
 let packet: WearEquipPacket
-export default (() => packet = packet || new WearEquipPacket())()
+export default (() => (packet = packet || new WearEquipPacket()))()

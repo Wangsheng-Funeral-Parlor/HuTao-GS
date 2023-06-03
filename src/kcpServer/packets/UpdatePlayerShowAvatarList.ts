@@ -1,6 +1,6 @@
-import Packet, { PacketInterface, PacketContext } from '#/packet'
-import { RetcodeEnum } from '@/types/proto/enum'
-import { ClientStateEnum } from '@/types/enum'
+import Packet, { PacketInterface, PacketContext } from "#/packet"
+import { ClientStateEnum } from "@/types/enum"
+import { RetcodeEnum } from "@/types/proto/enum"
 
 export interface UpdatePlayerShowAvatarListReq {
   showAvatarIdList: number[]
@@ -15,9 +15,9 @@ export interface UpdatePlayerShowAvatarListRsp {
 
 class UpdatePlayerShowAvatarListPacket extends Packet implements PacketInterface {
   constructor() {
-    super('UpdatePlayerShowAvatarList', {
+    super("UpdatePlayerShowAvatarList", {
       reqState: ClientStateEnum.IN_GAME,
-      reqStatePass: true
+      reqStatePass: true,
     })
   }
 
@@ -29,8 +29,8 @@ class UpdatePlayerShowAvatarListPacket extends Packet implements PacketInterface
 
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
-      showAvatarIdList: profile.showAvatarList.map(avatar => avatar.avatarId),
-      isShowAvatar
+      showAvatarIdList: profile.showAvatarList.map((avatar) => avatar.avatarId),
+      isShowAvatar,
     })
   }
 
@@ -40,4 +40,4 @@ class UpdatePlayerShowAvatarListPacket extends Packet implements PacketInterface
 }
 
 let packet: UpdatePlayerShowAvatarListPacket
-export default (() => packet = packet || new UpdatePlayerShowAvatarListPacket())()
+export default (() => (packet = packet || new UpdatePlayerShowAvatarListPacket()))()
