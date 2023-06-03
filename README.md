@@ -43,7 +43,7 @@ Run ```npm run build```
 
 ## Generate Data ##
 
-* Download [HuTao-GD](https://github.com/NotArandomGUY/HuTao-GD)
+* Download [HuTao-GD](https://github.com/Wangsheng-Funeral-Parlor/HuTao-GD) (Use the dev branch)
 * Run ```npm run build```
 * Put resources in ```./InputData/{version}/```
 ```bash
