@@ -1,4 +1,4 @@
-import UserData from '../user'
+import UserData from "../user"
 
 export interface PlayerInfo {
   uid: number
