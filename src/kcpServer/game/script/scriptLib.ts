@@ -680,7 +680,7 @@ export default class ScriptLib {
   }
 
   public GetGadgetStateByConfigId(context: context, groupId: number, configId: number) {
-    logger.debug("Call  GetGadgetStateByConfigId", groupId, configId)
+    logger.debug("Call GetGadgetStateByConfigId", groupId, configId)
 
     return context.scriptManager.getGroup(groupId)?.gadgetList.find((gadget) => gadget.configId === configId)
       ?.gadgetState
@@ -710,10 +710,12 @@ export default class ScriptLib {
     return 0
   }
 
-  public GetGroupMonsterCount(_context: context, ...arg) {
-    logger.warn("Call unimplemented GetGroupMonsterCount", arg)
+  public GetGroupMonsterCount(context: context) {
+    const { currentGroup } = context
 
-    return 0
+    logger.debug("Call GetGroupMonsterCount")
+
+    return currentGroup.aliveMonsterCount
   }
 
   public GetGroupMonsterCountByGroupId(context: context, groupId: number) {

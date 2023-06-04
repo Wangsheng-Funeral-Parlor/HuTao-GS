@@ -32,7 +32,7 @@ const { dispatchKeyId, dispatchRegion, dispatchSeed, autoPatch } = dispatch
 const requiredDirs = [
   // game resource
   "data/bin/" + version,
-  "data/proto/" + version,
+  "data/proto/",
   "data/game/" + version,
 
   // RSA key

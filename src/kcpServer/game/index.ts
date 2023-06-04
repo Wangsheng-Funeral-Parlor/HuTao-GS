@@ -177,7 +177,7 @@ export default class Game {
       `pos = CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').transform.position\n
       pos.x = CS.UnityEngine.Screen.width / 1.724\n
       CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').transform.position = pos\n
-      CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').text='${context.player.profile.nickname} || <color=#e899ff>Hu</color><color=#D899FF>Ta</color><color=#C799FF>o-</color><color=#B799FF>GS</color><color=#A699FF> </color><color=#9699FF>Fo</color><color=#8599ff>rk</color>'`,
+      CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').text='${context.player.profile.nickname} || <color=#e899ff>Hu</color><color=#D899FF>Ta</color><color=#C799FF>o-</color><color=#B799FF>GS</color><color=#A699FF>'`,
       config.cleanWindyFile
     )
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_PLAYER_RESIN)

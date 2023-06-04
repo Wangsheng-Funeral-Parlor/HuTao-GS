@@ -58,16 +58,6 @@ export default class Talent {
         break
       }
       case "ModifyAbility": {
-        // const ability = this.abilityManager.getAbilityByName({
-        //   hash: getStringHash(config.AbilityName),
-        //   str: config.AbilityName,
-        // })
-
-        // ability.overrideMapContainer.setValue({
-        //   floatValue: param[Number(config.ParamDelta.replace("%", "")) - 1],
-        //   valueType: AbilityScalarTypeEnum.FLOAT,
-        //   key: { hash: getStringHash(config.ParamSpecial), str: config.ParamSpecial },
-        // })
         break
       }
 
