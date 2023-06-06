@@ -57,12 +57,8 @@ export default class Talent {
         abilityList.push(config.AbilityName)
         break
       }
-      case "ModifyAbility": {
-        break
-      }
-
       default:
-        console.log(config.$type)
+        break
     }
   }
 

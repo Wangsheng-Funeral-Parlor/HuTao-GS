@@ -388,8 +388,6 @@ export default class Player extends BaseClass {
     if (this.isInMp() && this.currentWorld) await this.currentWorld.leave(this.context)
     await this.hostWorld.destroy()
 
-    await this.game.save(this.client)
-
     profile.destroy()
     teamManager.destroy()
 

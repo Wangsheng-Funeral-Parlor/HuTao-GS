@@ -16,6 +16,7 @@ import Entity from "$/entity"
 import Gadget from "$/entity/gadget"
 import TrifleItem from "$/entity/gadget/trifleItem"
 import Vehicle from "$/entity/gadget/vehicle"
+import Monster from "$/entity/monster"
 import DungeonData from "$/gameData/data/DungeonData"
 import SceneData from "$/gameData/data/SceneData"
 import CombatManager from "$/manager/combatManager"
@@ -34,7 +35,7 @@ import GlobalState from "@/globalState"
 import Logger from "@/logger"
 import translate from "@/translate"
 import TLogger from "@/translate/tlogger"
-import { ClientStateEnum } from "@/types/enum"
+import { ClientStateEnum, EventTypeEnum } from "@/types/enum"
 import {
   AbilityInvokeEntry,
   CombatInvokeEntry,
@@ -521,13 +522,36 @@ export default class Scene extends BaseClass {
       lastThunder,
       lastLocUpdate,
       lastTimeUpdate,
+      scriptManager,
     } = this
 
     for (const sceneBlock of sceneBlockList) await sceneBlock.emit("Update")
 
-    if (this.activeChallenge != null) {
-      this.activeChallenge.onCheckTimeOut()
+    for (const group of sceneBlockList.flatMap((block) => block.groupList)) {
+      const { monsterList, regionList } = group
+
+      const entityList = [...monsterList, ...playerList]
+
+      for (const entity of entityList) {
+        if (entity instanceof Player) {
+          regionList.forEach((region) => {
+            if (group.contains(region, entity.currentAvatar.motion.pos))
+              scriptManager.emit(
+                EventTypeEnum.EVENT_ENTER_REGION,
+                group.id,
+                region.configId,
+                entity.currentAvatar.entityId
+              )
+          })
+        } else if (entity instanceof Monster) {
+          regionList.forEach((region) => {
+            if (group.contains(region, entity.motion.pos))
+              scriptManager.emit(EventTypeEnum.EVENT_ENTER_REGION, group.id, region.configId, entity.entityId)
+          })
+        }
+      }
     }
+    if (this.activeChallenge != null) this.activeChallenge.onCheckTimeOut()
 
     if (lastThunder == null || Date.now() - lastThunder > 5e3) {
       this.lastThunder = Date.now() - Math.random() * 5e3

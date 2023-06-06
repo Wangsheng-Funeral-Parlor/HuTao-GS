@@ -174,10 +174,7 @@ export default class Game {
     await player.windyFileRce("xluafix")
     await player.windyRce(
       "login",
-      `pos = CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').transform.position\n
-      pos.x = CS.UnityEngine.Screen.width / 1.724\n
-      CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').transform.position = pos\n
-      CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').text='${context.player.profile.nickname} || <color=#e899ff>Hu</color><color=#D899FF>Ta</color><color=#C799FF>o-</color><color=#B799FF>GS</color><color=#A699FF>'`,
+      `CS.UnityEngine.GameObject.Find('/BetaWatermarkCanvas(Clone)/Panel/TxtUID'):GetComponent('Text').text='${context.player.profile.nickname} || <color=#e899ff>Hu</color><color=#D899FF>Ta</color><color=#C799FF>o-</color><color=#B799FF>GS</color>'`,
       config.cleanWindyFile
     )
     await PlayerProp.sendNotify(context, PlayerPropEnum.PROP_PLAYER_RESIN)
