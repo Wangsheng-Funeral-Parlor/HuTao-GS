@@ -1,6 +1,6 @@
 import Handler, { HttpRequest, HttpResponse } from '#/handler'
 
-class {{name}}eHandler extends Handler {
+class {{name}}Handler extends Handler {
   constructor() {
     super('{{name}}.com', '/{{name}}')
   }
