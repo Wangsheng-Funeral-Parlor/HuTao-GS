@@ -8,5 +8,6 @@ export default interface scriptLibContext {
   currentGroup: SceneGroup
   uid: number
   args?: ScriptArgs
+  source_entity_id?: number
   target_entity_id?: number
 }
