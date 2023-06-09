@@ -66,7 +66,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = { param1: configId }
+          const args: ScriptArgs = { param1: configId, uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -83,6 +83,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`AnyMonsterDie Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -103,7 +105,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = { param1: gadgetId }
+          const args: ScriptArgs = { param1: gadgetId, uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -120,6 +122,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`AnyGadgetDie Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -138,7 +142,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = { param1: oldValue, param2: newValue }
+          const args: ScriptArgs = { param1: oldValue, param2: newValue, uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -155,6 +159,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`VariableChange Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -173,7 +179,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = { param1: configId }
+          const args: ScriptArgs = { param1: configId, uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -190,6 +196,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`EnterRegion Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -211,7 +219,7 @@ export default class ScriptTrigger extends BaseClass {
 
           configIdList.forEach((configId) => {
             const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-            const args: ScriptArgs = { param1: configId }
+            const args: ScriptArgs = { param1: configId, uid: 0 }
 
             if (condition) {
               const conditionResult: boolean = condition({ ...context, args }, args)
@@ -227,6 +235,8 @@ export default class ScriptTrigger extends BaseClass {
             }
           })
         })
+    } catch (e) {
+      logger.error(`GadgetCreate Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -245,7 +255,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = { param1: state, param2: configId }
+          const args: ScriptArgs = { param1: state, param2: configId, uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -262,6 +272,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`GadgetStateChange Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -281,7 +293,7 @@ export default class ScriptTrigger extends BaseClass {
             const action: actionFunc = lua.global.get(getFunctionName(Action))
 
             const context: context = { currentGroup: sceneGroup, scriptManager: scriptManager, uid: 0 }
-            const args: ScriptArgs = { param1: ischallenge ? 0 : 1 }
+            const args: ScriptArgs = { param1: ischallenge ? 0 : 1, uid: 0 }
 
             if (condition) {
               const conditionResult: boolean = condition({ ...context, args }, args)
@@ -299,6 +311,8 @@ export default class ScriptTrigger extends BaseClass {
 
         lua.global.resetThread()
       })
+    } catch (e) {
+      logger.error(`DungeonSettle Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -317,7 +331,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = { param1: configId, param2: optionid }
+          const args: ScriptArgs = { param1: configId, param2: optionid, uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -334,6 +348,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`SelectOption Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -355,7 +371,7 @@ export default class ScriptTrigger extends BaseClass {
 
           configIdList.forEach((configId) => {
             const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-            const args: ScriptArgs = { param1: configId }
+            const args: ScriptArgs = { param1: configId, uid: 0 }
 
             if (condition) {
               const conditionResult: boolean = condition({ ...context, args }, args)
@@ -371,6 +387,8 @@ export default class ScriptTrigger extends BaseClass {
             }
           })
         })
+    } catch (e) {
+      logger.error(`AnyMonsterLive Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -396,7 +414,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = null
+          const args: ScriptArgs = { uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -413,6 +431,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`ChallengeSuccess Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -448,6 +468,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`ChallengeFail Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
@@ -486,7 +508,7 @@ export default class ScriptTrigger extends BaseClass {
           const action: actionFunc = lua.global.get(getFunctionName(Action))
 
           const context: context = { currentGroup: currentGroup, scriptManager: scriptManager, uid: 0 }
-          const args: ScriptArgs = null
+          const args: ScriptArgs = { uid: 0 }
 
           if (condition) {
             const conditionResult: boolean = condition({ ...context, args }, args)
@@ -503,6 +525,8 @@ export default class ScriptTrigger extends BaseClass {
 
           return
         })
+    } catch (e) {
+      logger.error(`GroupLoad Error BlockId: ${currentGroup.block.id} GroupId: ${currentGroup.id} Error: ${e}`)
     } finally {
       lua.global.resetThread()
     }
