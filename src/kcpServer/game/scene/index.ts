@@ -127,9 +127,9 @@ export default class Scene extends BaseClass {
     super.initHandlers(this)
   }
 
-  private async loadSceneData() {
+  private loadSceneData() {
     const { id } = this
-    const sceneData = await SceneData.getScene(id)
+    const sceneData = SceneData.getScene(id)
 
     this.type = sceneData.Type || "SCENE_WORLD"
 
@@ -161,14 +161,14 @@ export default class Scene extends BaseClass {
     SceneTime.broadcastNotify(this.broadcastContextList)
   }
 
-  async init(userData: SceneUserData, fullInit: boolean) {
+  init(userData: SceneUserData, fullInit: boolean) {
     const { entityManager, enterSceneToken } = this
     const { hitTreeMap, unlockedPointList, sceneTime } = userData
     const scenePerfMark = `SceneInit-${enterSceneToken}`
 
     Logger.mark(scenePerfMark)
 
-    await this.loadSceneData()
+    this.loadSceneData()
 
     entityManager.init()
 
@@ -187,13 +187,13 @@ export default class Scene extends BaseClass {
     Logger.clearMarks(scenePerfMark)
   }
 
-  async initNew(fullInit: boolean) {
+  initNew(fullInit: boolean) {
     const { entityManager, enterSceneToken } = this
     const scenePerfMark = `SceneInit-${enterSceneToken}`
 
     Logger.mark(scenePerfMark)
 
-    await this.loadSceneData()
+    this.loadSceneData()
 
     entityManager.init()
 
@@ -340,7 +340,7 @@ export default class Scene extends BaseClass {
     for (const entry of invokes) await combatManager.emit("CombatInvoke", context, entry)
   }
 
-  async spawnDropsById(pos: Vector, dropId: number, seqId?: number) {
+  spawnDropsById(pos: Vector, dropId: number, seqId?: number) {
     const { playerList } = this
     for (const player of playerList) player.energyManager.spawnDropsById(pos, dropId, seqId)
   }
@@ -410,7 +410,7 @@ export default class Scene extends BaseClass {
       playerEnterSceneData.prevPos = prevPos
     }
 
-    const dungeonData = await DungeonData.getDungeonByScene(id)
+    const dungeonData = DungeonData.getDungeonByScene(id)
     if (dungeonData) playerEnterSceneData.dungeonId = dungeonData.Id
 
     PlayerEnterScene.sendNotify(context, playerEnterSceneData)

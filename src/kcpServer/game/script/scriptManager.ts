@@ -45,7 +45,7 @@ export default class scriptManager {
     const { entityManager } = scene
     const { id: sceneId } = block.scene
 
-    const groupData = await SceneData.getGroup(sceneId, groupId)
+    const groupData = SceneData.getGroup(sceneId, groupId)
 
     group.monsterList.forEach((monster) => entityManager.remove(monster, undefined, undefined, true))
     group.gadgetList.forEach((gadget) => entityManager.remove(gadget, undefined, undefined, true))
@@ -95,13 +95,13 @@ export default class scriptManager {
     )
   }
 
-  async CreateMonster(groupId: number, configId: number, delayTime = 0) {
+  CreateMonster(groupId: number, configId: number, delayTime = 0) {
     const group = this.getGroup(groupId)
 
     const { block } = group
     const { id: sceneId } = block.scene
 
-    const groupData = await SceneData.getGroup(sceneId, groupId)
+    const groupData = SceneData.getGroup(sceneId, groupId)
 
     setTimeout(() => {
       group.loadMonsters(
@@ -111,17 +111,14 @@ export default class scriptManager {
     }, delayTime)
   }
 
-  async CreateGadget(groupId: number, configId: number) {
+  CreateGadget(groupId: number, configId: number) {
     const group = this.getGroup(groupId)
 
     const { block } = group
     const { id: sceneId } = block.scene
 
-    const groupData = await SceneData.getGroup(sceneId, groupId)
+    const groupData = SceneData.getGroup(sceneId, groupId)
 
-    await group.loadGadgets(
-      Object.values(groupData.Gadgets?.filter((gadget) => gadget.ConfigId == configId) || {}),
-      true
-    )
+    group.loadGadgets(Object.values(groupData.Gadgets?.filter((gadget) => gadget.ConfigId == configId) || {}), true)
   }
 }

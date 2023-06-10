@@ -30,10 +30,9 @@ export default class Weapon extends Equip {
     return weapon
   }
 
-  private async loadWeaponData() {
+  private loadWeaponData() {
     const { itemId, gadgetId, affixList } = this
-    const weaponData =
-      itemId === 0 ? await WeaponData.getWeaponByGadgetId(gadgetId) : await WeaponData.getWeapon(itemId)
+    const weaponData = itemId === 0 ? WeaponData.getWeaponByGadgetId(gadgetId) : WeaponData.getWeapon(itemId)
 
     this.itemId = weaponData?.Id || itemId
     this.gadgetId = weaponData?.GadgetId || gadgetId
@@ -75,7 +74,7 @@ export default class Weapon extends Equip {
 
     await super.init(userData)
 
-    await this.loadWeaponData()
+    this.loadWeaponData()
     for (const affixData of affixDataList) {
       const affix = affixList.find((a) => a.id === affixData.id)
       affix?.init(affixData)
@@ -87,9 +86,9 @@ export default class Weapon extends Equip {
   async initNew(level?: number) {
     const { entity, affixList } = this
 
-    await super.initNew()
+    super.initNew()
 
-    await this.loadWeaponData()
+    this.loadWeaponData()
     for (const affix of affixList) affix.initNew()
 
     await entity.initNew(level)

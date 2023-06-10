@@ -20,13 +20,13 @@ export default class SkillManager {
     this.depotList = []
   }
 
-  private async loadSkillDepotData() {
+  private loadSkillDepotData() {
     const { avatar, depotList } = this
     const { avatarId } = avatar
 
     depotList.splice(0)
 
-    const avatarData = await AvatarData.getAvatar(avatarId)
+    const avatarData = AvatarData.getAvatar(avatarId)
     if (!avatarData) return
 
     const skillIds = [avatarData.SkillDepotId, ...(avatarData.CandSkillDepotIds || [])].filter(
@@ -37,25 +37,25 @@ export default class SkillManager {
   }
 
   async init(userData: SkillManagerUserData) {
-    await this.loadSkillDepotData()
+    this.loadSkillDepotData()
 
     const { candSkillId, depotDataList } = userData || {}
     const { depotList } = this
 
     for (const depot of depotList) {
       const depotData = depotDataList?.find((data) => data?.id === depot.id)
-      if (depotData) await depot.init(depotData)
-      else await depot.initNew()
+      if (depotData) depot.init(depotData)
+      else depot.initNew()
     }
 
     await this.setCandSkillId(parseInt(candSkillId?.toString()) || 0)
   }
 
   async initNew() {
-    await this.loadSkillDepotData()
+    this.loadSkillDepotData()
 
     const { depotList } = this
-    for (const depot of depotList) await depot.initNew()
+    for (const depot of depotList) depot.initNew()
 
     await this.setCandSkillId(0)
   }
@@ -95,7 +95,7 @@ export default class SkillManager {
     this.candSkillId = id
 
     this.currentDepot?.addEmbryos()
-    await talentManager.addFromSkillDepot()
+    talentManager.addFromSkillDepot()
     talentManager.addEmbryos()
 
     // TODO: Trigger quest cond

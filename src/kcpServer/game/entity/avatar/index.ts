@@ -74,13 +74,13 @@ export default class Avatar extends Entity {
     super.initHandlers(this)
   }
 
-  private async loadAvatarData() {
+  private loadAvatarData() {
     const { avatarId, abilityManager } = this
 
-    this.config = await AvatarData.getFightPropConfig(avatarId)
-    this.growCurve = await GrowCurveData.getGrowCurve("Avatar")
+    this.config = AvatarData.getFightPropConfig(avatarId)
+    this.growCurve = GrowCurveData.getGrowCurve("Avatar")
 
-    const avatarData = await AvatarData.getAvatar(avatarId)
+    const avatarData = AvatarData.getAvatar(avatarId)
     if (!avatarData) return
 
     this.name = avatarData.Name || null
@@ -96,7 +96,7 @@ export default class Avatar extends Entity {
       userData
     if (avatarId !== id) return this.initNew(undefined, false)
 
-    await this.loadAvatarData()
+    this.loadAvatarData()
 
     await talentManager.init(talentData)
     await skillManager.init(skillsData)
@@ -126,7 +126,7 @@ export default class Avatar extends Entity {
   async initNew(avatarType: AvatarTypeEnum = AvatarTypeEnum.FORMAL, notify = true): Promise<void> {
     const { player, avatarId, skillManager, fetterList, excelInfo, motion } = this
 
-    await this.loadAvatarData()
+    this.loadAvatarData()
 
     await skillManager.initNew()
     await fetterList.initNew()
@@ -134,7 +134,7 @@ export default class Avatar extends Entity {
 
     motion.standby()
 
-    const weapon = new Weapon((await AvatarData.getAvatar(avatarId))?.InitialWeapon, player)
+    const weapon = new Weapon(AvatarData.getAvatar(avatarId)?.InitialWeapon, player)
     await weapon.initNew()
 
     await player.inventory.add(weapon, notify)

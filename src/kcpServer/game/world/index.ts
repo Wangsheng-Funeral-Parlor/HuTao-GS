@@ -74,7 +74,7 @@ export default class World extends BaseClass {
     return this.host.worldLevel
   }
 
-  async init(userData: WorldUserData) {
+  init(userData: WorldUserData) {
     const { id, sceneDataMap, lastStateData } = userData || {}
 
     this.id = id
@@ -82,17 +82,17 @@ export default class World extends BaseClass {
     this.hostLastState.init(lastStateData)
   }
 
-  async initNew(worldId: number) {
+  initNew(worldId: number) {
     this.id = worldId
 
-    const data = await WorldData.getWorld(worldId)
+    const data = WorldData.getWorld(worldId)
     if (!data) return
 
     const { MainSceneId } = data
 
     this.mainSceneId = MainSceneId
 
-    const mainSceneData = await SceneData.getScene(MainSceneId)
+    const mainSceneData = SceneData.getScene(MainSceneId)
     if (mainSceneData) this.hostLastState.initNew(mainSceneData)
   }
 
@@ -139,15 +139,15 @@ export default class World extends BaseClass {
     }
 
     // check if scene data exists
-    if (!(await SceneData.getScene(sceneId))) return null
+    if (!SceneData.getScene(sceneId)) return null
 
     // create new scene
     scene = new Scene(this, sceneId)
     sceneList.push(scene)
 
     const sceneData = sceneDataMap[sceneId]
-    if (sceneData == null) await scene.initNew(fullInit)
-    else await scene.init(sceneData, fullInit)
+    if (sceneData == null) scene.initNew(fullInit)
+    else scene.init(sceneData, fullInit)
 
     return scene
   }

@@ -61,14 +61,14 @@ export default class Skill {
     return cdStartTime == null || cdDuration == null || sceneTime - cdStartTime > cdDuration
   }
 
-  async init(userData: SkillUserData) {
+  init(userData: SkillUserData) {
     const { id, level, proudSkillData } = userData
     if (this.id !== id) return this.initNew()
 
     this.level = level || 1
 
     const { AbilityName, ProudSkillGroupId, CdTime, CostStamina, CostElemType, CostElemVal } =
-      (await SkillData.getSkill(id)) || {}
+      SkillData.getSkill(id) || {}
 
     this.cdTime = CdTime || 0
     this.costStamina = CostStamina || 0
@@ -81,17 +81,16 @@ export default class Skill {
 
     this.proudSkill = new ProudSkill(this, ProudSkillGroupId)
 
-    if (proudSkillData) await this.proudSkill.init(proudSkillData)
-    else await this.proudSkill.initNew()
+    if (proudSkillData) this.proudSkill.init(proudSkillData)
+    else this.proudSkill.initNew()
   }
 
-  async initNew() {
+  initNew() {
     const { id } = this
 
     this.level = 1
 
-    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } =
-      (await SkillData.getSkill(id)) || {}
+    const { AbilityName, ProudSkillGroupId, CostStamina, CostElemType, CostElemVal } = SkillData.getSkill(id) || {}
 
     this.costStamina = CostStamina || 0
     this.costElemType = ElemTypeEnum[(CostElemType || "").toUpperCase()] || 0
@@ -103,7 +102,7 @@ export default class Skill {
 
     this.proudSkill = new ProudSkill(this, ProudSkillGroupId)
 
-    await this.proudSkill.initNew()
+    this.proudSkill.initNew()
   }
 
   async start(context: PacketContext, cdRatio = 1, costStaminaRatio = 1) {

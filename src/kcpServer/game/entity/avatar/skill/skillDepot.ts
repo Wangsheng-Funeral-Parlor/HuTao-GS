@@ -32,14 +32,14 @@ export default class SkillDepot {
     this.abilityEmbryos = []
   }
 
-  private async loadSkillsData() {
+  private loadSkillsData() {
     const { id, inherentProudSkills, skills, extraAbilities } = this
 
     inherentProudSkills.splice(0)
     skills.splice(0)
     extraAbilities.splice(0)
 
-    const depotData = await SkillData.getSkillDepot(id)
+    const depotData = SkillData.getSkillDepot(id)
     if (!depotData) return
 
     // inherentProudSkills
@@ -47,7 +47,7 @@ export default class SkillDepot {
       const { ProudSkillGroupId, NeedAvatarPromoteLevel } = proudSkillOpen || {}
       if (ProudSkillGroupId == null) continue
 
-      const proudSkillData = await SkillData.getProudSkillByGroup(ProudSkillGroupId)
+      const proudSkillData = SkillData.getProudSkillByGroup(ProudSkillGroupId)
       if (proudSkillData == null) continue
 
       inherentProudSkills.push(new InherentProudSkill(this, proudSkillData.Id, NeedAvatarPromoteLevel))
@@ -66,7 +66,7 @@ export default class SkillDepot {
       ...(depotData.ExtraAbilities || []).filter((ability) => typeof ability === "string" && ability.length > 0)
     )
 
-    const abilityGroupData = await AbilityData.getAbilityGroup(depotData.SkillDepotAbilityGroup)
+    const abilityGroupData = AbilityData.getAbilityGroup(depotData.SkillDepotAbilityGroup)
     if (!abilityGroupData) return
 
     extraAbilities.push(
@@ -101,8 +101,8 @@ export default class SkillDepot {
     }
   }
 
-  async init(userData: SkillDepotUserData) {
-    await this.loadSkillsData()
+  init(userData: SkillDepotUserData) {
+    this.loadSkillsData()
 
     const { skills, energySkill } = this
     const { skillDataList, energySkillData } = userData || {}
@@ -111,23 +111,23 @@ export default class SkillDepot {
       const skillData = skillDataList?.find((data) => data.id === skill.id)
       if (!skillData) continue
 
-      await skill.init(skillData)
+      skill.init(skillData)
     }
 
     if (!energySkill) return
 
-    if (energySkillData) await energySkill.init(energySkillData)
-    else await energySkill.initNew()
+    if (energySkillData) energySkill.init(energySkillData)
+    else energySkill.initNew()
   }
 
-  async initNew() {
-    await this.loadSkillsData()
+  initNew() {
+    this.loadSkillsData()
 
     const { skills, energySkill } = this
 
-    for (const skill of skills) await skill.initNew()
+    for (const skill of skills) skill.initNew()
 
-    await energySkill?.initNew()
+    energySkill?.initNew()
   }
 
   addEmbryos() {

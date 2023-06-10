@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import md5 from "md5"
 
 import priceTier from "../priceTier.json"

@@ -324,10 +324,10 @@ export default class Player extends BaseClass {
     this.emojiCollection = (emojiIdList || []).filter((id) => !isNaN(id))
 
     // Unlock all new flycloaks
-    await this.unlockAllFlycloaks()
+    this.unlockAllFlycloaks()
 
     // Unlock all new costumes
-    await this.unlockAllCostumes()
+    this.unlockAllCostumes()
 
     await hostWorld.init(worldData)
 
@@ -345,13 +345,13 @@ export default class Player extends BaseClass {
     // Set initial level
     await this.setLevel(60)
 
-    inventory.add(await Material.create(this, 201, 1000000, true), false)
-    inventory.add(await Material.create(this, 202, 1000000, true), false)
-    inventory.add(await Material.create(this, 203, 1000000, true), false)
-    inventory.add(await Material.create(this, 221, 1000000, true), false)
-    inventory.add(await Material.create(this, 222, 1000000, true), false)
-    inventory.add(await Material.create(this, 223, 1000000, true), false)
-    inventory.add(await Material.create(this, 224, 1000000, true), false)
+    inventory.add(Material.create(this, 201, 1000000, true), false)
+    inventory.add(Material.create(this, 202, 1000000, true), false)
+    inventory.add(Material.create(this, 203, 1000000, true), false)
+    inventory.add(Material.create(this, 221, 1000000, true), false)
+    inventory.add(Material.create(this, 222, 1000000, true), false)
+    inventory.add(Material.create(this, 223, 1000000, true), false)
+    inventory.add(Material.create(this, 224, 1000000, true), false)
 
     // Unlock all widgets
     await this.unlockAllWidgets()
@@ -371,10 +371,10 @@ export default class Player extends BaseClass {
     await teamManager.initNew()
 
     // Unlock all flycloaks
-    await this.unlockAllFlycloaks()
+    this.unlockAllFlycloaks()
 
     // Unlock all costumes
-    await this.unlockAllCostumes()
+    this.unlockAllCostumes()
 
     // Initialize host world
     await hostWorld.initNew(1)
@@ -396,19 +396,19 @@ export default class Player extends BaseClass {
 
   async unlockAllWidgets() {
     const { inventory } = this
-    const materialDataList = await MaterialData.getMaterialList()
+    const materialDataList = MaterialData.getMaterialList()
     const widgetList = materialDataList.filter((data) => data.MaterialType === "MATERIAL_WIDGET")
 
     for (const materialData of widgetList) {
       const { Id } = materialData
       if (inventory.getItemByItemId(Id) != null) continue
-      await inventory.add(await Material.create(this, Id), false)
+      await inventory.add(Material.create(this, Id), false)
     }
   }
 
   async unlockAllWeapons(inventoryData?: InventoryUserData) {
     const { inventory } = this
-    const weaponList = await WeaponData.getWeaponList()
+    const weaponList = WeaponData.getWeaponList()
 
     for (const weaponData of weaponList) {
       const { Id } = weaponData
@@ -425,7 +425,7 @@ export default class Player extends BaseClass {
 
   async unlockAllAvatars() {
     const { avatarList } = this
-    const newAvatars = (await AvatarData.getAvatarList())
+    const newAvatars = AvatarData.getAvatarList()
       .filter((data) => data.UseType === "AVATAR_FORMAL" && !avatarList.find((a) => a.avatarId === data.Id))
       .map((data) => new Avatar(this, data.Id))
 
@@ -438,11 +438,9 @@ export default class Player extends BaseClass {
     avatarList.push(...newAvatars)
   }
 
-  async unlockAllFlycloaks() {
+  unlockAllFlycloaks() {
     const { flycloakList } = this
-    const newFlycloaks = (await AvatarData.getFlycloakList()).filter(
-      (data) => !flycloakList.find((f) => f.Id === data.Id)
-    )
+    const newFlycloaks = AvatarData.getFlycloakList().filter((data) => !flycloakList.find((f) => f.Id === data.Id))
 
     if (newFlycloaks.length === 0) return
 
@@ -450,9 +448,9 @@ export default class Player extends BaseClass {
     flycloakList.push(...newFlycloaks)
   }
 
-  async unlockAllCostumes() {
+  unlockAllCostumes() {
     const { costumeList } = this
-    const newCostumes = (await AvatarData.getCostumeList()).filter((data) => !costumeList.find((c) => c.Id === data.Id))
+    const newCostumes = AvatarData.getCostumeList().filter((data) => !costumeList.find((c) => c.Id === data.Id))
 
     if (newCostumes.length === 0) return
 

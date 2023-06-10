@@ -29,8 +29,8 @@ class PlayerEnterDungeonPacket extends Packet implements PacketInterface {
     const { currentWorld } = player
     const { pointId, dungeonId } = data
 
-    const dungeonData = await DungeonData.getDungeon(dungeonId)
-    const sceneData = await SceneData.getScene(dungeonData?.SceneId)
+    const dungeonData = DungeonData.getDungeon(dungeonId)
+    const sceneData = SceneData.getScene(dungeonData?.SceneId)
     if (!dungeonData || !sceneData) {
       await this.response(context, { retcode: RetcodeEnum.RET_DUNGEON_ENTER_FAIL })
       return

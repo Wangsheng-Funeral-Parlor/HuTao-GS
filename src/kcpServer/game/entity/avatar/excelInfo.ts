@@ -35,8 +35,8 @@ export default class ExcelInfo {
     this.combatConfigHash = new Hash(0, 0)
   }
 
-  private async loadExcelData() {
-    const avatarData = await AvatarData.getAvatar(this.avatar.avatarId)
+  private loadExcelData() {
+    const avatarData = AvatarData.getAvatar(this.avatar.avatarId)
     if (!avatarData) return
 
     const {
@@ -59,8 +59,8 @@ export default class ExcelInfo {
     this.combatConfigHash = new Hash(CombatConfigHashPre, CombatConfigHashSuffix)
   }
 
-  async init() {
-    await this.loadExcelData()
+  init() {
+    this.loadExcelData()
   }
 
   export() {

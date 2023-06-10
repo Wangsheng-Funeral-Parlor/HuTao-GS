@@ -26,7 +26,7 @@ export default class Equip {
     this.type = type
   }
 
-  async init(userData: EquipUserData) {
+  init(userData: EquipUserData) {
     const { player } = this
     const { guid, itemId, gadgetId, type, isLocked } = userData
 
@@ -37,7 +37,7 @@ export default class Equip {
     this.isLocked = isLocked
   }
 
-  async initNew() {
+  initNew() {
     const { player } = this
 
     this.guid = player.guidManager.getGuid() || 0n

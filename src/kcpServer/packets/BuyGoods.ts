@@ -31,7 +31,7 @@ class BuyGoodsPacket extends Packet implements PacketInterface {
       goods: data.goods,
       shopType: data.shopType,
     }
-    const buyItem = await Material.create(context.player, data.goods.goodsItem.itemId, data.buyCount)
+    const buyItem = Material.create(context.player, data.goods.goodsItem.itemId, data.buyCount)
 
     if (data.goods?.hcoin) {
       await context.player.removePrimogen(data.goods.hcoin * data.buyCount)

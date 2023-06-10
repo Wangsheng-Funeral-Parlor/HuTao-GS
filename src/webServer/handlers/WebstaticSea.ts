@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { join } from "path"
 
 import Handler, { HttpRequest, HttpResponse } from "#/handler"

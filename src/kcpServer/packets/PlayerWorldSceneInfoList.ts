@@ -18,7 +18,7 @@ class PlayerWorldSceneInfoListPacket extends Packet implements PacketInterface {
 
     const { currentWorld } = context.player
 
-    const sceneDataList = await SceneData.getSceneList()
+    const sceneDataList = SceneData.getSceneList()
     const infoList: PlayerWorldSceneInfo[] = []
 
     for (const sceneData of sceneDataList) {

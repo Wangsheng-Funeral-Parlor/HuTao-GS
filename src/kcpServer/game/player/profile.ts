@@ -31,7 +31,7 @@ export default class Profile extends BaseClass {
     super.initHandlers(player)
   }
 
-  async init(userData: ProfileUserData) {
+  init(userData: ProfileUserData) {
     const { avatarList } = this.player
     const {
       nickname,
@@ -58,10 +58,10 @@ export default class Profile extends BaseClass {
     this.isShowAvatar = !!isShowAvatar
 
     // unlock all new namecards
-    await this.unlockAllNamecards()
+    this.unlockAllNamecards()
   }
 
-  async initNew(avatarId: number, nickName: string) {
+  initNew(avatarId: number, nickName: string) {
     this.nickname = nickName
     this.signature = ""
     this.nameCardId = 210001
@@ -75,7 +75,7 @@ export default class Profile extends BaseClass {
     this.isShowAvatar = false
 
     // unlock all namecards
-    await this.unlockAllNamecards()
+    this.unlockAllNamecards()
   }
 
   destroy() {
@@ -93,9 +93,9 @@ export default class Profile extends BaseClass {
     this.unregisterHandlers()
   }
 
-  async unlockAllNamecards() {
+  unlockAllNamecards() {
     const { unlockedNameCardIdList } = this
-    const newNamecards = (await MaterialData.getMaterialList())
+    const newNamecards = MaterialData.getMaterialList()
       .filter((data) => data.MaterialType === "MATERIAL_NAMECARD" && !unlockedNameCardIdList.includes(data.Id))
       .map((data) => data.Id)
 

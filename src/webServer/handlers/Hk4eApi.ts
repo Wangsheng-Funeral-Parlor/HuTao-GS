@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import Handler, { HttpRequest, HttpResponse } from "#/handler"
 import { Announcement, AnnouncementType } from "@/types/announcement"
 import { getTimeSeconds, getTimestamp } from "@/utils/time"

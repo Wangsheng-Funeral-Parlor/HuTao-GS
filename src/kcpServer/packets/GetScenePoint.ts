@@ -40,7 +40,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
 
     const world = belongUid === currentWorld.host.uid ? currentWorld : hostWorld
     const scene = await world.getScene(sceneId, false)
-    const sceneData = await SceneData.getScene(sceneId)
+    const sceneData = SceneData.getScene(sceneId)
 
     if (scene == null || sceneData == null) {
       await this.response(context, { retcode: RetcodeEnum.RET_UNKNOWN_ERROR })
@@ -50,7 +50,7 @@ class GetScenePointPacket extends Packet implements PacketInterface {
     const pointList = []
     const areaList = []
 
-    const scenePointMap = await SceneData.getScenePointMap(sceneId)
+    const scenePointMap = SceneData.getScenePointMap(sceneId)
     for (const pointId in scenePointMap) {
       const { $type, Unlocked } = scenePointMap[pointId]
       if (!unlockType.includes($type) || Unlocked) continue

@@ -232,7 +232,7 @@ export default class Server {
 
     let listening = 0
 
-    async function onListening(): Promise<void> {
+    function onListening(): Promise<void> {
       if (++listening < 3) return
 
       logger.info("message.server.info.started")
@@ -322,7 +322,7 @@ export default class Server {
       }
     }
 
-    writeFile("./handbook.txt", filedata)
+    await writeFile("./handbook.txt", filedata)
   }
   setLogLevel(level: number) {
     logger.setLogLevel(level)

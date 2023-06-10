@@ -121,7 +121,7 @@ export default class Update {
         res.setEncoding("utf8")
         res.on("error", (err) => reject(`Error: ${err.message}`))
         res.on("data", (chunk) => (resData += chunk))
-        res.on("end", async () => {
+        res.on("end", () => {
           try {
             const rsp: UpdateApiResponse = JSON.parse(resData)
             if (rsp == null) throw new TError("message.update.error.invalidJson")

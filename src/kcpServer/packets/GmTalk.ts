@@ -87,7 +87,7 @@ class GmTalkPacket extends Packet implements PacketInterface {
     await entityManager.flushAll()
   }
 
-  private async gmtGod(context: PacketContext, enable: boolean, type?: string) {
+  private gmtGod(context: PacketContext, enable: boolean, type?: string) {
     const { player } = context
     if (type == null) player.godMode = enable
   }
@@ -108,7 +108,7 @@ class GmTalkPacket extends Packet implements PacketInterface {
         await this.gmtKill(context, args[0], args[1] === "ALL")
         break
       case "wudi":
-        await this.gmtGod(context, args.slice(-1)[0] === "ON", args.length > 1 ? args[0] : undefined)
+        this.gmtGod(context, args.slice(-1)[0] === "ON", args.length > 1 ? args[0] : undefined)
         break
       default:
         console.log("GmTalk:", msg)

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import fs from "fs"
 import { join } from "path"
 import { cwd } from "process"

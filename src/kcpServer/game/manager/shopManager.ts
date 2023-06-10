@@ -50,13 +50,13 @@ export default class ShopManager {
     return getTimeSeconds(d)
   }
 
-  async getNextRefresh(shopType: number): Promise<number | null> {
-    const dataList = await ShopData.getShopGoods(shopType)
+  getNextRefresh(shopType: number): number | null {
+    const dataList = ShopData.getShopGoods(shopType)
     return this.calcNextRefresh(dataList.find((data) => data.RefreshType != null))
   }
 
-  async exportGoodsList(shopType: number, _player: Player): Promise<ShopGoods[]> {
-    const dataList = await ShopData.getShopGoods(shopType)
+  exportGoodsList(shopType: number, _player: Player): ShopGoods[] {
+    const dataList = ShopData.getShopGoods(shopType)
     const now = getTimeSeconds()
 
     const goodsList: ShopGoods[] = []
@@ -81,7 +81,7 @@ export default class ShopManager {
             buyLimit: data.BuyLimit,
             beginTime: data.BeginTime,
             endTime: data.EndTime,
-            nextRefreshTime: await this.getNextRefresh(shopType),
+            nextRefreshTime: this.getNextRefresh(shopType),
             minLevel: data.MinPlayerLevel,
             maxLevel: data.MaxPlayerLevel,
             preGoodsIdList: [],
@@ -95,7 +95,7 @@ export default class ShopManager {
     return goodsList
   }
 
-  async exportShop(shopType: number, player: Player): Promise<Shop> {
+  exportShop(shopType: number, player: Player): Shop {
     switch (shopType) {
       case 900:
         return {
@@ -105,16 +105,16 @@ export default class ShopManager {
       case 903:
         return null
       default: {
-        const nextRefresh = await this.getNextRefresh(shopType)
+        const nextRefresh = this.getNextRefresh(shopType)
         return nextRefresh != null
           ? {
               shopType,
-              goodsList: await this.exportGoodsList(shopType, player),
+              goodsList: this.exportGoodsList(shopType, player),
               nextRefreshTime: nextRefresh,
             }
           : {
               shopType,
-              goodsList: await this.exportGoodsList(shopType, player),
+              goodsList: this.exportGoodsList(shopType, player),
             }
       }
     }

@@ -58,10 +58,10 @@ export default class Monster extends Entity {
   private async loadMonsterData() {
     const { player, monsterId } = this
 
-    this.config = await MonsterData.getFightPropConfig(monsterId)
-    this.growCurve = await GrowCurveData.getGrowCurve("Monster")
+    this.config = MonsterData.getFightPropConfig(monsterId)
+    this.growCurve = GrowCurveData.getGrowCurve("Monster")
 
-    const monsterData = await MonsterData.getMonster(monsterId)
+    const monsterData = MonsterData.getMonster(monsterId)
     if (!monsterData) return
 
     this.affixList = monsterData.Affix || []
@@ -76,10 +76,10 @@ export default class Monster extends Entity {
 
     this.monsterType = MonsterTypeEnum[monsterData.Type] || MonsterTypeEnum.MONSTER_NONE
 
-    const describeData = await MonsterData.getDescribe(monsterData.DescribeId)
+    const describeData = MonsterData.getDescribe(monsterData.DescribeId)
     if (describeData) {
       this.titleId = describeData.TitleID || 0
-      this.specialNameId = (await MonsterData.getSpecialName(describeData.SpecialNameLabID))?.Id || 0
+      this.specialNameId = MonsterData.getSpecialName(describeData.SpecialNameLabID)?.Id || 0
     }
 
     this.loadAbilities(monsterData?.Config?.Abilities, true)
@@ -118,7 +118,7 @@ export default class Monster extends Entity {
       const { id, hp } = hpDrop
       if (hpBefore <= hp || hpAfter > hp) continue
 
-      await manager?.scene?.spawnDropsById(motion.pos, id, seqId)
+      manager?.scene?.spawnDropsById(motion.pos, id, seqId)
     }
   }
 
@@ -200,7 +200,7 @@ export default class Monster extends Entity {
     if (manager.scene.EnableScript)
       await this.sceneGroup?.scene.scriptManager.emit(EventTypeEnum.EVENT_ANY_MONSTER_DIE, this.groupId, this.configId)
 
-    await manager?.scene?.spawnDropsById(motion.pos, killDropId, seqId)
+    manager?.scene?.spawnDropsById(motion.pos, killDropId, seqId)
     await super.handleDeath(seqId, batch)
   }
 }

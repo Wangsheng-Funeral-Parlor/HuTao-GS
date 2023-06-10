@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import Handler, { HttpRequest, HttpResponse } from "#/handler"
 
 class ApiAccountHandler extends Handler {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import Weapon from "."
 
 import Entity from "$/entity"
@@ -19,18 +20,18 @@ export default class WeaponEntity extends Entity {
     this.entityType = weapon.monsterEquip ? EntityTypeEnum.MonsterEquip : EntityTypeEnum.Equip
   }
 
-  private async loadWeaponData() {
-    this.config = await WeaponData.getFightPropConfig(this.weapon.itemId)
-    this.growCurve = await GrowCurveData.getGrowCurve("Weapon")
+  private loadWeaponData() {
+    this.config = WeaponData.getFightPropConfig(this.weapon.itemId)
+    this.growCurve = GrowCurveData.getGrowCurve("Weapon")
   }
 
   async init(userData: EntityUserData): Promise<void> {
-    await this.loadWeaponData()
+    this.loadWeaponData()
     super.init(userData)
   }
 
   async initNew(level?: number): Promise<void> {
-    await this.loadWeaponData()
+    this.loadWeaponData()
     super.initNew(level)
   }
 }

@@ -26,7 +26,7 @@ export default class Item {
     this.gadgetId = content?.gadgetId
   }
 
-  private async initEquip(userData: EquipUserData, player: Player) {
+  private initEquip(userData: EquipUserData, player: Player) {
     const { itemId, type } = userData
 
     switch (type) {
@@ -44,7 +44,7 @@ export default class Item {
         this.equip = new Equip(itemId, player, ItemTypeEnum.ITEM_NONE, type)
     }
 
-    await this.equip.init(userData)
+    this.equip.init(userData)
   }
 
   get player(): Player {
@@ -76,7 +76,7 @@ export default class Item {
     return 1
   }
 
-  async init(userData: ItemUserData, player: Player) {
+  init(userData: ItemUserData, player: Player) {
     const { itemId, gadgetId, type, data } = userData
 
     this.itemId = itemId
@@ -85,10 +85,10 @@ export default class Item {
     switch (type) {
       case ItemDataTypeEnum.MATERIAL:
         this.material = new Material(player, itemId)
-        await this.material.init(<MaterialUserData>data)
+        this.material.init(<MaterialUserData>data)
         break
       case ItemDataTypeEnum.EQUIP:
-        await this.initEquip(<EquipUserData>data, player)
+        this.initEquip(<EquipUserData>data, player)
         break
     }
   }

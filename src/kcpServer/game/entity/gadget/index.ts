@@ -43,13 +43,13 @@ export default class Gadget extends Entity {
     super.initHandlers(this)
   }
 
-  private async loadGadgetData() {
+  private loadGadgetData() {
     const { gadgetId } = this
 
-    this.config = await GadgetData.getFightPropConfig(gadgetId)
-    this.growCurve = await GrowCurveData.getGrowCurve("Gadget")
+    this.config = GadgetData.getFightPropConfig(gadgetId)
+    this.growCurve = GrowCurveData.getGrowCurve("Gadget")
 
-    const gadgetData = await GadgetData.getGadget(gadgetId)
+    const gadgetData = GadgetData.getGadget(gadgetId)
     if (!gadgetData) return
 
     this.name = gadgetData.JsonName
@@ -63,12 +63,12 @@ export default class Gadget extends Entity {
   }
 
   async init(userData: EntityUserData): Promise<void> {
-    await this.loadGadgetData()
+    this.loadGadgetData()
     super.init(userData)
   }
 
   async initNew(level?: number): Promise<void> {
-    await this.loadGadgetData()
+    this.loadGadgetData()
     super.initNew(level)
   }
 

@@ -28,7 +28,7 @@ export default class TalentManager {
     return talents.filter((t) => unlockedIdList.includes(t.id))
   }
 
-  async init(userData: TalentUserData) {
+  init(userData: TalentUserData) {
     const { unlockedIdList } = userData || {}
 
     this.unlockedIdList.splice(0)
@@ -38,12 +38,12 @@ export default class TalentManager {
     this.unlockedIdList.push(...unlockedIdList)
   }
 
-  async addFromSkillDepot() {
+  addFromSkillDepot() {
     const { avatar, talents } = this
     const { skillManager } = avatar
     const { currentDepot } = skillManager
 
-    const depotData = await SkillData.getSkillDepot(currentDepot?.id)
+    const depotData = SkillData.getSkillDepot(currentDepot?.id)
     if (!depotData) return
 
     const { Talents } = depotData
@@ -95,7 +95,7 @@ export default class TalentManager {
     return null
   }
 
-  async lockTalent(): Promise<Talent | null> {
+  lockTalent(): Talent | null {
     const { unlockedIdList } = this
 
     let prevTalent: Talent = null

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from "http"
 
 import WebServer from "."

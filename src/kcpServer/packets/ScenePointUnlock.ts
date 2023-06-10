@@ -22,7 +22,7 @@ class ScenePointUnlockPacket extends Packet implements PacketInterface {
 
     const pointList = []
 
-    const scenePointMap = await SceneData.getScenePointMap(sceneId)
+    const scenePointMap = SceneData.getScenePointMap(sceneId)
     for (const pointId in scenePointMap) {
       const { $type, Unlocked } = scenePointMap[pointId]
       if (!unlockType.includes($type) || Unlocked) continue

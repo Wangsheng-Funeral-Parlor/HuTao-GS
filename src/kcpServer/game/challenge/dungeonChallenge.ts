@@ -28,7 +28,7 @@ export default class dungeonChallenge extends Challenge {
     if (this.success) return
   }
 
-  public async settle() {
+  public settle() {
     if (!this.stage) {
       //TODO
 

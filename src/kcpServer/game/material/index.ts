@@ -24,9 +24,9 @@ export default class Material {
     this.itemId = itemId
   }
 
-  private async loadMaterialData() {
+  private loadMaterialData() {
     const { itemId } = this
-    const materialData = await MaterialData.getMaterial(itemId)
+    const materialData = MaterialData.getMaterial(itemId)
 
     this.gadgetId = materialData?.GadgetId || 0
 
@@ -44,14 +44,14 @@ export default class Material {
     this.useOnGain = !!materialData?.UseOnGain
   }
 
-  static async create(player: Player, itemId: number, count = 1, forceAdd = false): Promise<Material> {
+  static create(player: Player, itemId: number, count = 1, forceAdd = false): Material {
     const material = new Material(player, itemId)
-    await material.initNew(count, forceAdd)
+    material.initNew(count, forceAdd)
     return material
   }
 
-  async init(userData: MaterialUserData) {
-    await this.loadMaterialData()
+  init(userData: MaterialUserData) {
+    this.loadMaterialData()
 
     const { player, itemId: id, stackLimit } = this
     const { guid, itemId, count } = userData
@@ -62,8 +62,8 @@ export default class Material {
     this.count = Math.min(stackLimit, count || 1)
   }
 
-  async initNew(count = 1, forceAdd = false) {
-    await this.loadMaterialData()
+  initNew(count = 1, forceAdd = false) {
+    this.loadMaterialData()
 
     const { player, stackLimit } = this
 

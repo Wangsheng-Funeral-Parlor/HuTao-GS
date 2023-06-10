@@ -248,7 +248,7 @@ export default class AbilityManager extends BaseClass {
     const ability = this.getAbilityByName(abilityName)
     if (ability == null) return
 
-    const abilityConfig = await AbilityData.getAbility(await AbilityData.lookupString(abilityName))
+    const abilityConfig = AbilityData.getAbility(AbilityData.lookupString(abilityName))
     if (abilityConfig == null) return
 
     const { OnAbilityStart } = abilityConfig
@@ -314,8 +314,8 @@ export default class AbilityManager extends BaseClass {
     const ability = this.getAbility(instancedAbilityId)
     if (ability == null) return logger.debug("generic.param4", entity.entityId, type, "ability == null", head)
 
-    const abilityName = await AbilityData.lookupString(ability.abilityName)
-    const actionConfig = await AbilityData.getActionByLocalId(abilityName, localId)
+    const abilityName = AbilityData.lookupString(ability.abilityName)
+    const actionConfig = AbilityData.getActionByLocalId(abilityName, localId)
     if (actionConfig == null)
       return logger.debug("generic.param5", entity.entityId, type, "action == null", head, abilityName)
 
