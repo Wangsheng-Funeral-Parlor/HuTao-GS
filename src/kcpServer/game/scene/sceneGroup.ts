@@ -77,37 +77,103 @@ export default class SceneGroup {
     return true
   }
 
-  async loadMonsters(monsters: SceneMonsterScriptConfig[], force = false) {
+  async createMonster(monster: SceneMonsterScriptConfig) {
     const { block, id: groupId, monsterList } = this
     const { id: blockId, scene } = block
     const { world, entityManager } = scene
 
-    if ((await this.reloadList(monsterList)) && !force) return
+    if (!monster) return
+
+    const { MonsterId, ConfigId, PoseId, IsElite, Level, Pos, Rot } = monster
 
     const worldLevelData = WorldData.getWorldLevel(world.level)
     const levelOffset = worldLevelData == null ? 0 : worldLevelData.MonsterLevel - 22
 
+    const entity = new Monster(MonsterId, block.scene.host)
+
+    entity.groupId = groupId
+    entity.configId = ConfigId || 0
+    entity.blockId = blockId
+    entity.poseId = PoseId || 0
+    entity.isElite = !!IsElite
+
+    const { motion, bornPos } = entity
+    const { pos, rot } = motion
+
+    pos.setData(Pos)
+    rot.setData(Rot)
+    bornPos.setData(Pos)
+
+    await entity.initNew(Math.max(1, Math.min(100, Level + levelOffset)))
+
+    monsterList.push(entity)
+    await entityManager.add(entity, undefined, undefined, undefined, true)
+  }
+
+  async createNpc(npc: SceneNpcScriptConfig, suites: SceneSuiteScriptConfig[]) {
+    const { block, id: groupId, npcList } = this
+    const { id: blockId, scene } = block
+    const { entityManager } = scene
+
+    const { NpcId, ConfigId, Pos, Rot } = npc
+    const entity = new Npc(NpcId)
+
+    entity.groupId = groupId
+    entity.configId = ConfigId || 0
+    entity.blockId = blockId
+    entity.suitIdList = suites
+      .map((suite, index) => ({ index, suite }))
+      .filter((e) => e.suite?.Npcs?.includes(ConfigId))
+      .map((e) => e.index + 1)
+
+    const { motion, bornPos } = entity
+    const { pos, rot } = motion
+
+    pos.setData(Pos)
+    rot.setData(Rot)
+    bornPos.setData(Pos)
+
+    await entity.initNew()
+
+    npcList.push(entity)
+    await entityManager.add(entity, undefined, undefined, undefined, true)
+  }
+
+  async createGadget(gadget: SceneGadgetScriptConfig) {
+    const { block, id: groupId, gadgetList } = this
+    const { id: blockId, scene } = block
+    const { entityManager } = scene
+
+    const { GadgetId, ConfigId, Level, Pos, Rot, InteractId, State } = gadget
+    const entity = new Gadget(GadgetId)
+
+    entity.groupId = groupId
+    entity.configId = ConfigId || 0
+    entity.blockId = blockId
+    entity.interactId = InteractId || null
+    entity.gadgetState = State || GadgetStateEnum.Default
+
+    const { motion, bornPos } = entity
+    const { pos, rot } = motion
+
+    pos.setData(Pos)
+    rot.setData(Rot)
+    bornPos.setData(Pos)
+
+    await entity.initNew(Level)
+
+    gadgetList.push(entity)
+    await entityManager.add(entity, undefined, undefined, undefined, true)
+  }
+
+  async loadMonsters(monsters: SceneMonsterScriptConfig[]) {
+    const { block, monsterList } = this
+    const { scene } = block
+
+    if (await this.reloadList(monsterList)) return
+
     for (const monster of monsters) {
-      const { MonsterId, ConfigId, PoseId, IsElite, Level, Pos, Rot } = monster
-      const entity = new Monster(MonsterId, block.scene.host)
-
-      entity.groupId = groupId
-      entity.configId = ConfigId || 0
-      entity.blockId = blockId
-      entity.poseId = PoseId || 0
-      entity.isElite = !!IsElite
-
-      const { motion, bornPos } = entity
-      const { pos, rot } = motion
-
-      pos.setData(Pos)
-      rot.setData(Rot)
-      bornPos.setData(Pos)
-
-      await entity.initNew(Math.max(1, Math.min(100, Level + levelOffset)))
-
-      monsterList.push(entity)
-      await entityManager.add(entity, undefined, undefined, undefined, true)
+      await this.createMonster(monster)
     }
 
     if (scene.EnableScript)
@@ -119,77 +185,34 @@ export default class SceneGroup {
   }
 
   async loadNpcs(npcs: SceneNpcScriptConfig[], suites: SceneSuiteScriptConfig[]) {
-    const { block, id: groupId, npcList } = this
-    const { id: blockId, scene } = block
-    const { entityManager } = scene
+    const { npcList } = this
 
     if (await this.reloadList(npcList)) return
 
     for (const npc of npcs) {
-      const { NpcId, ConfigId, Pos, Rot } = npc
-      const entity = new Npc(NpcId)
-
-      entity.groupId = groupId
-      entity.configId = ConfigId || 0
-      entity.blockId = blockId
-      entity.suitIdList = suites
-        .map((suite, index) => ({ index, suite }))
-        .filter((e) => e.suite?.Npcs?.includes(ConfigId))
-        .map((e) => e.index + 1)
-
-      const { motion, bornPos } = entity
-      const { pos, rot } = motion
-
-      pos.setData(Pos)
-      rot.setData(Rot)
-      bornPos.setData(Pos)
-
-      await entity.initNew()
-
-      npcList.push(entity)
-      await entityManager.add(entity, undefined, undefined, undefined, true)
+      await this.createNpc(npc, suites)
     }
   }
 
-  async loadGadgets(gadgets: SceneGadgetScriptConfig[], force = false) {
-    const { block, id: groupId, gadgetList } = this
-    const { id: blockId, scene } = block
-    const { entityManager } = scene
+  async loadGadgets(gadgets: SceneGadgetScriptConfig[]) {
+    const { block, gadgetList } = this
+    const { scene } = block
 
-    if ((await this.reloadList(gadgetList)) && !force) return
+    if (await this.reloadList(gadgetList)) return
 
     for (const gadget of gadgets) {
-      const { GadgetId, ConfigId, Level, Pos, Rot, InteractId, State } = gadget
-      const entity = new Gadget(GadgetId)
-
-      entity.groupId = groupId
-      entity.configId = ConfigId || 0
-      entity.blockId = blockId
-      entity.interactId = InteractId || null
-      entity.gadgetState = State || GadgetStateEnum.Default
-
-      const { motion, bornPos } = entity
-      const { pos, rot } = motion
-
-      pos.setData(Pos)
-      rot.setData(Rot)
-      bornPos.setData(Pos)
-
-      await entity.initNew(Level)
-
-      gadgetList.push(entity)
-      await entityManager.add(entity, undefined, undefined, undefined, true)
+      this.createGadget(gadget)
     }
 
     if (scene.EnableScript)
-      await this.scene.scriptManager.emit(
+      await scene.scriptManager.emit(
         EventTypeEnum.EVENT_GADGET_CREATE,
         this.id,
         gadgetList.map((gadget) => gadget.configId)
       )
   }
 
-  private async unloadList(entityList: Entity[]) {
+  async unloadList(entityList: Entity[]) {
     const { block, dynamicLoad } = this
     const { scene } = block
     const { entityManager } = scene

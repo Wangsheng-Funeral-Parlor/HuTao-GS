@@ -1,6 +1,6 @@
 import ScriptArgs from "./scriptArgs"
-import scriptManager from "./scriptManager"
 
+import scriptManager from "$/manager/scriptManager"
 import SceneGroup from "$/scene/sceneGroup"
 
 export default interface scriptLibContext {

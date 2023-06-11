@@ -40,19 +40,16 @@ export default class scriptManager {
 
     if (!group) return
 
-    const { block } = group
+    const { block, monsterList, gadgetList, npcList } = group
     const { scene } = block
     const { entityManager } = scene
     const { id: sceneId } = block.scene
 
     const groupData = SceneData.getGroup(sceneId, groupId)
 
-    group.monsterList.forEach((monster) => entityManager.remove(monster, undefined, undefined, true))
-    group.gadgetList.forEach((gadget) => entityManager.remove(gadget, undefined, undefined, true))
-    group.npcList.forEach((npc) => entityManager.remove(npc, undefined, undefined, true))
-    group.monsterList = []
-    group.gadgetList = []
-    group.npcList = []
+    await group.unloadList(monsterList)
+    await group.unloadList(gadgetList)
+    await group.unloadList(npcList)
 
     group.trigger =
       groupData.Triggers.filter((trigger) => groupData.Suites?.[suite - 1]?.Triggers?.includes(trigger.Name)) || []
@@ -84,14 +81,12 @@ export default class scriptManager {
       Object.values(
         groupData.Monsters?.filter((monster) => groupData.Suites?.[suite - 1]?.Monsters?.includes(monster.ConfigId)) ||
           {}
-      ),
-      true
+      )
     )
     await group.loadGadgets(
       Object.values(
         groupData.Gadgets?.filter((gadget) => groupData.Suites?.[suite - 1]?.Gadgets?.includes(gadget.ConfigId)) || {}
-      ),
-      true
+      )
     )
   }
 
@@ -104,10 +99,7 @@ export default class scriptManager {
     const groupData = SceneData.getGroup(sceneId, groupId)
 
     setTimeout(() => {
-      group.loadMonsters(
-        Object.values(groupData.Monsters?.filter((monster) => monster.ConfigId == configId) || {}),
-        true
-      )
+      group.createMonster(groupData.Monsters?.find((monster) => monster.ConfigId == configId))
     }, delayTime)
   }
 
@@ -119,6 +111,6 @@ export default class scriptManager {
 
     const groupData = SceneData.getGroup(sceneId, groupId)
 
-    group.loadGadgets(Object.values(groupData.Gadgets?.filter((gadget) => gadget.ConfigId == configId) || {}), true)
+    group.createGadget(groupData.Gadgets?.find((gadget) => gadget.ConfigId == configId))
   }
 }
