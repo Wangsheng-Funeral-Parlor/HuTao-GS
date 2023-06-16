@@ -44,7 +44,7 @@
     "protobufjs": "^7.2.3",
     "source-map-support": "^0.5.21",
     "verror": "^1.10.1",
-    "wasmoon": "git+https://github.com/kuma-dayo/wasmoon.git",
+    "wasmoon": "https://github.com/kuma-dayo/wasmoon.git",
     "yieldable-json": "^2.0.1"
   },
   "devDependencies": {
