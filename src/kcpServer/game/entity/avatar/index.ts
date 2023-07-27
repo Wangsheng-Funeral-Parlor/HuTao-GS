@@ -22,14 +22,29 @@ import AvatarUserData from "@/types/user/AvatarUserData"
 import { getTimeSeconds } from "@/utils/time"
 
 const AvatarDefaultAbilities = [
-  "Avatar_DefaultAbility_VisionReplaceDieInvincible",
+  "Ability_Avatar_Dive_CrabShield",
   "Avatar_DefaultAbility_AvartarInShaderChange",
+  "Ability_Avatar_Dive_SealEcho",
   "Avatar_SprintBS_Invincible",
+  "Ability_Avatar_Dive_Team",
   "Avatar_Freeze_Duration_Reducer",
+  "Absorb_SealEcho_Bullet_01",
+  "Absorb_SealEcho_Bullet_02",
+  "ActivityAbility_Absorb_Shoot",
+  "Avatar_Attack_ReviveEnergy",
   "Avatar_Attack_ReviveEnergy",
   "Avatar_Component_Initializer",
+  "Avatar_Component_Initializer",
+  "Avatar_DefaultAbility_AvartarInShaderChange",
+  "Avatar_DefaultAbility_VisionReplaceDieInvincible",
   "Avatar_FallAnthem_Achievement_Listener",
+  "Avatar_FallAnthem_Achievement_Listener",
+  "Avatar_Freeze_Duration_Reducer",
+  "Avatar_PlayerBoy_DiveStamina_Reduction",
+  "Avatar_SprintBS_Invincible",
   "GrapplingHookSkill_Ability",
+  "GrapplingHookSkill_Ability",
+  "SceneAbility_DiveVolume",
 ]
 
 export default class Avatar extends Entity {
