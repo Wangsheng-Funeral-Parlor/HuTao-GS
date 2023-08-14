@@ -9,6 +9,7 @@ import ver3_4 from "./ver3_4"
 import ver3_5 from "./ver3_5"
 import ver3_6 from "./ver3_6"
 import ver3_7 from "./ver3_7"
+import ver4_0 from "./ver4_0"
 
 import config, { DEFAULT_CONFIG } from "@/config"
 import { CmdIds } from "@/types/kcp"
@@ -55,6 +56,7 @@ const versionMap: { [version: string]: CmdIds } = {
   "3.5.0": ver3_5,
   "3.6.0": ver3_6,
   "3.7.0": ver3_7,
+  "4.0.0": ver4_0,
 }
 
 export const cmdIds: CmdIds = versionMap[config.game.version] ||
