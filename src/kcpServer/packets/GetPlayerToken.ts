@@ -74,11 +74,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
     const { accountUid, accountToken, accountType, platformType, channelId, keyId, clientSeed, clientRandKey } = data
 
     const { uid, userData } = await game.getPlayerInfo(accountUid)
-    const seed =
-      (BigInt(Math.floor(0x10000 * Math.random())) << 48n) |
-      (BigInt(Math.floor(0x10000 * Math.random())) << 32n) |
-      (BigInt(Math.floor(0x10000 * Math.random())) << 16n) |
-      BigInt(Math.floor(0x10000 * Math.random()))
+    let seed = 0x0n
 
     const rsp: GetPlayerTokenRsp = {
       retcode: RetcodeEnum.RET_SUCC,
@@ -97,16 +93,26 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
 
     if (keyId != null) {
       // >= 2.7.50
-      const { client, server } = await DispatchKey.getKeyPairs(keyId)
+      try {
+        const { client, server } = await DispatchKey.getKeyPairs(keyId)
 
-      const crkEncrypted = Buffer.from(clientSeed || clientRandKey, "base64")
-      const crk = rsaDecrypt(server.private, crkEncrypted)
+        const crkEncrypted = Buffer.from(clientSeed || clientRandKey, "base64")
+        const crk = rsaDecrypt(server.private, crkEncrypted)
 
-      const srk = Buffer.alloc(8)
-      srk.writeBigUInt64BE(seed ^ crk.readBigUInt64BE())
+        seed =
+          (BigInt(Math.floor(0x10000 * Math.random())) << 48n) |
+          (BigInt(Math.floor(0x10000 * Math.random())) << 32n) |
+          (BigInt(Math.floor(0x10000 * Math.random())) << 16n) |
+          BigInt(Math.floor(0x10000 * Math.random()))
 
-      rsp.serverRandKey = rsp.encryptedSeed = rsaEncrypt(client.public, srk).toString("base64")
-      rsp.sign = rsp.seedSignature = rsaSign(server.private, srk).toString("base64")
+        const srk = Buffer.alloc(8)
+        srk.writeBigUInt64BE(seed ^ crk.readBigUInt64BE())
+
+        rsp.serverRandKey = rsp.encryptedSeed = rsaEncrypt(client.public, srk).toString("base64")
+        rsp.sign = rsp.seedSignature = rsaSign(server.private, srk).toString("base64")
+      } catch {
+        rsp.secretKey = 0x0n.toString() //4.0 patch is work
+      }
     } else {
       // < 2.7.50
       rsp.secretKeySeed = seed.toString()
