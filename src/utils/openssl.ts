@@ -179,7 +179,7 @@ export default class OpenSSL {
     const publicPath = join(dir, `${name}Public.pem`)
 
     if (!await fileExists(privatePath)) {
-      if (generateKeySize == null) throw new TError('generic.fileNotFound', `${name}Private.pem`)
+      if (generateKeySize == null) throw new TError('generic.fileNotFound', privatePath)
       await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(generateKeySize, 512))
     }
     if (!await fileExists(publicPath)) await OpenSSL.extractRsaPublicKey(privatePath, publicPath)
@@ -209,7 +209,7 @@ export default class OpenSSL {
 
   static async getPublicKey(dir: string, name: string): Promise<RSAKey> {
     const publicPath = join(dir, `${name}Public.pem`)
-    if (!await fileExists(publicPath)) throw new TError('generic.fileNotFound', `${name}Public.pem`)
+    if (!await fileExists(publicPath)) throw new TError('generic.fileNotFound', publicPath)
 
     const pubSize = await OpenSSL.publicKeySize(publicPath)
     const pubPem = (await readFile(publicPath)).toString()
