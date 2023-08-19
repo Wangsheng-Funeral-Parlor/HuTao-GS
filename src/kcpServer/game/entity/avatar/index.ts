@@ -28,7 +28,15 @@ const AvatarDefaultAbilities = [
   'Avatar_Attack_ReviveEnergy',
   'Avatar_Component_Initializer',
   'Avatar_FallAnthem_Achievement_Listener',
-  'GrapplingHookSkill_Ability'
+  'GrapplingHookSkill_Ability',
+  'Avatar_PlayerBoy_DiveStamina_Reduction',
+  'Ability_Avatar_Dive_Team',
+  'Ability_Avatar_Dive_SealEcho',
+  'Absorb_SealEcho_Bullet_01',
+  'Absorb_SealEcho_Bullet_02',
+  'Ability_Avatar_Dive_CrabShield',
+  'ActivityAbility_Absorb_Shoot',
+  'SceneAbility_DiveVolume'
 ]
 
 export default class Avatar extends Entity {
