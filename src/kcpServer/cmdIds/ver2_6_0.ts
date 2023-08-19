@@ -1,6 +1,6 @@
 import { CmdIds } from '@/types/kcp'
 
-const ver2_6: CmdIds = {
+const ver2_6_0: CmdIds = {
   GmTalkNotify: 3,
   UpdateRedPointNotify: 9,
   GmTalkRsp: 10,
@@ -1509,4 +1509,4 @@ const ver2_6: CmdIds = {
   BuoyantCombatSettleNotify: 9000
 }
 
-export default ver2_6
+export default ver2_6_0

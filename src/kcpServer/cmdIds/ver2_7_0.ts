@@ -1,6 +1,6 @@
 import { CmdIds } from '@/types/kcp'
 
-const ver2_7: CmdIds = {
+const ver2_7_0: CmdIds = {
   ClientBulletCreateNotify: 6,
   KeepAliveNotify: 9,
   ChangeServerGlobalValueNotify: 12,
@@ -1509,4 +1509,4 @@ const ver2_7: CmdIds = {
   StartBuoyantCombatGalleryReq: 9000
 }
 
-export default ver2_7
+export default ver2_7_0

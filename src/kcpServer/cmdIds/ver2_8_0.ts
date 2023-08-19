@@ -1,6 +1,6 @@
 import { CmdIds } from '@/types/kcp'
 
-const ver2_8: CmdIds = {
+const ver2_8_0: CmdIds = {
   ClientBulletCreateNotify: 4,
   UnionCmdNotify: 5,
   PingReq: 7,
@@ -1851,4 +1851,4 @@ const ver2_8: CmdIds = {
   Unk2800_GDDLBKEENNA: 24601
 }
 
-export default ver2_8
+export default ver2_8_0
