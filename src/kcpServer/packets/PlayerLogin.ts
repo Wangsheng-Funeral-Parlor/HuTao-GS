@@ -3,7 +3,7 @@ import config from '@/config'
 import { AdjustTrackingInfo, BlockInfo, FeatureBlockInfo, QueryCurrRegionHttpRsp, ResVersionConfig, ShortAbilityHashPair, TrackingIOInfo } from '@/types/proto'
 import { ENetReasonEnum, RetcodeEnum } from '@/types/proto/enum'
 import { fileExists, readFile } from '@/utils/fileSystem'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 import { join } from 'path'
 import { cwd } from 'process'
 
@@ -105,7 +105,7 @@ class PlayerLoginPacket extends Packet implements PacketInterface {
       const binPath = join(cwd(), `data/bin/${config.version}/QueryCurrRegionHttpRsp.bin`)
       if (!await fileExists(binPath)) return
 
-      curRegionData = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+      curRegionData = await protobufDecode('QueryCurrRegionHttpRsp', await readFile(binPath), true)
     }
 
     const {

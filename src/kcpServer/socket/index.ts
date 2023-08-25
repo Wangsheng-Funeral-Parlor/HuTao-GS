@@ -8,7 +8,7 @@ import Logger from '@/logger'
 import { cRGB } from '@/tty/utils'
 import { PacketHead } from '@/types/kcp'
 import { ENetReasonEnum } from '@/types/proto/enum'
-import { objToProtobuffer } from '@/utils/proto'
+import { protobufEncode } from '@/utils/proto'
 import KcpServer from '../'
 import KcpWorkerInterface from './worker/kcpWorker/kcpWorkerInterface'
 import { ConnectionInfo } from './worker/recvWorker'
@@ -101,13 +101,13 @@ export default class Socket extends BaseClass {
       const worker = this.getWorker<KcpWorkerInterface>(client.workerId)
       if (!worker) throw new Error('worker == null')
 
-      const packetID = <number>getCmdIdByName(packetName)
-      const packetHead = await objToProtobuffer(head, PACKET_HEAD, true)
-      const packetData = await objToProtobuffer(obj, packetID)
+      const cmdId = <number>getCmdIdByName(packetName)
+      const packetHead = await protobufEncode(PACKET_HEAD, head, true)
+      const packetData = await protobufEncode(cmdId, obj)
 
       const log = [
         uidPrefix('SEND', client, 0x7000ff),
-        GlobalState.get('ShowPacketId') ? packetID : '-',
+        GlobalState.get('ShowPacketId') ? cmdId : '-',
         cRGB(0x00e5ff, head?.clientSequenceId?.toString()?.slice(-6)?.padStart(6, '0') || '------'),
         packetName
       ]
@@ -115,7 +115,7 @@ export default class Socket extends BaseClass {
       if (verbosePackets.includes(packetName)) logger.verbose(...log)
       else logger.debug(...log)
 
-      await worker.sendPacket(packetID, packetHead, packetData)
+      await worker.sendPacket(cmdId, packetHead, packetData)
     } catch (err) {
       logger.error('Error sending packet:', err)
     }

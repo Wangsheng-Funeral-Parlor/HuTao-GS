@@ -22,7 +22,7 @@ export enum LogLevel {
 
 const args = parseArgs(process.argv)
 
-let logLevel = args.ll
+let logLevel = <number>args.ll
 if (typeof logLevel !== 'number') logLevel = LogLevel.INFO
 
 let logFileName = null

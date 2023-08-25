@@ -9,7 +9,7 @@ import { waitMs } from '@/utils/asyncWait'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 import { xor } from '@/utils/xor'
 import { join } from 'path'
 import { cwd } from 'process'
@@ -70,7 +70,7 @@ export default class KcpWorker extends Worker {
     if (autoPatch) {
       const binPath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
       if (await fileExists(binPath)) {
-        const curRegionRsp: QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+        const curRegionRsp: QueryCurrRegionHttpRsp = await protobufDecode('QueryCurrRegionHttpRsp', await readFile(binPath), true)
         key = getEc2bKey(Buffer.from(curRegionRsp.clientSecretKey))
       }
     } else {
@@ -176,7 +176,7 @@ export default class KcpWorker extends Worker {
         const packetID: number = packet.readUInt16BE(2)
         const { head, data } = Packet.decode(packet)
 
-        const packetHead = await dataToProtobuffer<PacketHead>(head, PACKET_HEAD, true)
+        const packetHead = await protobufDecode<PacketHead>(PACKET_HEAD, head, true)
         const seqId = packetHead?.clientSequenceId || this.seqId
         this.seqId = seqId
 

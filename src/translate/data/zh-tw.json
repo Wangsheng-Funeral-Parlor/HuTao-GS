@@ -289,7 +289,7 @@
         "noHandler": "沒有數據包的處理程序: %0 %1"
       },
       "warn": {
-        "unknownPacket": "未知數據包: %0"
+        "decodeError": "數據包解碼錯誤: %0"
       },
       "error": {
         "handler": "處理數據包時出錯: %0"

@@ -289,7 +289,7 @@
         "noHandler": "No handler for packet: %0 %1"
       },
       "warn": {
-        "unknownPacket": "Unknown packet: %0"
+        "decodeError": "Packet decode error: %0"
       },
       "error": {
         "handler": "Error handling packet: %0"

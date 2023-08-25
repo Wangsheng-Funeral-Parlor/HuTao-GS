@@ -8,7 +8,7 @@ import { QueryCurrRegionHttpRsp, QueryRegionListHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists, readFile } from '@/utils/fileSystem'
-import { dataToProtobuffer, objToProtobuffer } from '@/utils/proto'
+import { protobufDecode, protobufEncode } from '@/utils/proto'
 import { rsaEncrypt, rsaSign } from '@/utils/rsa'
 import { versionStrToNum } from '@/utils/version'
 import { xor } from '@/utils/xor'
@@ -28,7 +28,7 @@ const {
 } = config
 
 const clientCustomConfig = {
-  sdkenv: dispatchRegion.slice(0, 2) === 'CN' ? '9' : '2',
+  sdkenv: dispatchRegion.startsWith('CN') ? '9' : '2',
   checkdevice: false,
   showexception: false,
   regionConfig: 'pm|fk|add',
@@ -113,7 +113,7 @@ class DispatchHandler extends Handler {
       const binPath = join(cwd(), `data/bin/${version}/QueryRegionListHttpRsp.bin`)
       if (!await fileExists(binPath)) throw new TError('generic.fileNotFound', binPath)
 
-      regionListData = await dataToProtobuffer(await readFile(binPath), 'QueryRegionListHttpRsp', true)
+      regionListData = await protobufDecode('QueryRegionListHttpRsp', await readFile(binPath), true)
     } else {
       const customConfig = Buffer.from(JSON.stringify(clientCustomConfig))
       xor(customConfig, await DispatchKey.getXorKey())
@@ -139,7 +139,7 @@ class DispatchHandler extends Handler {
       region.dispatchUrl = `${clientVersion <= 0x020000 ? 'http' : 'https'}://${host}/query_cur_region`
     }
 
-    return new HttpResponse((await objToProtobuffer(regionListData, 'QueryRegionListHttpRsp', true)).toString('base64'))
+    return new HttpResponse((await protobufEncode('QueryRegionListHttpRsp', regionListData, true)).toString('base64'))
   }
 
   private async getGateAddress(_req: HttpRequest): Promise<HttpResponse> {
@@ -161,7 +161,7 @@ class DispatchHandler extends Handler {
       const binPath = join(cwd(), `data/bin/${version}/QueryCurrRegionHttpRsp.bin`)
       if (!await fileExists(binPath)) throw new TError('generic.fileNotFound', binPath)
 
-      curRegionData = await dataToProtobuffer(await readFile(binPath), 'QueryCurrRegionHttpRsp', true)
+      curRegionData = await protobufDecode('QueryCurrRegionHttpRsp', await readFile(binPath), true)
     } else {
       const customConfig = Buffer.from(JSON.stringify(clientCustomConfig))
       xor(customConfig, await DispatchKey.getXorKey())
@@ -183,16 +183,20 @@ class DispatchHandler extends Handler {
     curRegionData.regionInfo.gateserverPort = Array.isArray(kcpPort) ? kcpPort[Math.floor(Math.random() * kcpPort.length)] : kcpPort
     curRegionData.regionInfo.payCallbackUrl = `https://${hostIp}/recharge`
 
-    return objToProtobuffer(curRegionData, 'QueryCurrRegionHttpRsp', true)
+    return protobufEncode('QueryCurrRegionHttpRsp', curRegionData, true)
   }
 
   private async curRegionRspNFVC(): Promise<string> {
     if (this.nfvcCache) return this.nfvcCache
 
-    this.nfvcCache = (await objToProtobuffer({
-      retcode: RetcodeEnum.RET_SVR_ERROR,
-      msg: 'Not Found version config'
-    }, 'QueryCurrRegionHttpRsp', true)).toString('base64')
+    this.nfvcCache = (await protobufEncode(
+      'QueryCurrRegionHttpRsp',
+      {
+        retcode: RetcodeEnum.RET_SVR_ERROR,
+        msg: 'Not Found version config'
+      },
+      true
+    )).toString('base64')
 
     return this.nfvcCache
   }

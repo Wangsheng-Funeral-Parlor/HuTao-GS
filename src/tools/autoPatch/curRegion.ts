@@ -6,7 +6,7 @@ import { QueryCurrRegionHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import DispatchKey from '@/utils/dispatchKey'
 import { fileExists } from '@/utils/fileSystem'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 import { rsaDecrypt } from '@/utils/rsa'
 import * as dns from 'dns'
 import { existsSync, writeFileSync } from 'fs'
@@ -76,10 +76,13 @@ function query(ip: string, overrideSeed?: string) {
       res.on('end', async () => {
         try {
           const buf = Buffer.from(await decryptResponse(dispatchKeyId, data), 'base64')
-          const curRegionRsp = await dataToProtobuffer<QueryCurrRegionHttpRsp>(buf, 'QueryCurrRegionHttpRsp', true)
+          const curRegionRsp = await protobufDecode<QueryCurrRegionHttpRsp>('QueryCurrRegionHttpRsp', buf, true)
 
           const retcode = curRegionRsp.retcode || 0
-          if (retcode !== RetcodeEnum.RET_SUCC) return reject(translate('message.tools.autoPatch.error.queryFail', RetcodeEnum[retcode]))
+          if (retcode !== RetcodeEnum.RET_SUCC) {
+            reject(translate('message.tools.autoPatch.error.queryFail', RetcodeEnum[retcode]))
+            return
+          }
 
           logger.debug('message.tools.autoPatch.debug.write', binFilePath)
           writeFileSync(binFilePath, buf)

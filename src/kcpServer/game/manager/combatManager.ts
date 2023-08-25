@@ -7,7 +7,7 @@ import TLogger from '@/translate/tlogger'
 import { ClientStateEnum, FightPropEnum } from '@/types/enum'
 import { CombatInvokeEntry, EntityMoveInfo, EvtBeingHitInfo } from '@/types/proto'
 import { ChangeHpReasonEnum, CombatTypeArgumentEnum, MotionStateEnum, ProtEntityTypeEnum } from '@/types/proto/enum'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 
 const fallDamageConfig = {
   fall: {
@@ -103,7 +103,7 @@ export default class CombatManager extends BaseClass {
     await this.emit(
       argType.replace(/(?<=(^|_)[A-Z]).*?(?=($|_))/g, v => v.toLowerCase()).replace(/_/g, ''),
       context,
-      await dataToProtobuffer(buf, proto),
+      await protobufDecode(proto, buf),
       buf
     )
   }

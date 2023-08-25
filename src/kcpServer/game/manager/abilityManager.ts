@@ -17,7 +17,7 @@ import TLogger from '@/translate/tlogger'
 import { AbilityEmbryo, AbilityInvokeEntry, AbilityInvokeEntryHead, AbilityMetaAddAbility, AbilityMetaLoseHp, AbilityMetaModifierChange, AbilityMetaModifierDurabilityChange, AbilityMetaReInitOverrideMap, AbilityMetaSetKilledState, AbilityScalarValueEntry, AbilityString, AbilitySyncStateInfo } from '@/types/proto'
 import { AbilityInvokeArgumentEnum, ModifierActionEnum } from '@/types/proto/enum'
 import { getStringHash } from '@/utils/hash'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 
 const protoLookupTable = {
   ABILITY_NONE: '',
@@ -280,7 +280,7 @@ export default class AbilityManager extends BaseClass {
     return {
       type: argType.replace(/(?<=(^|_)[A-Z]).*?(?=($|_))/g, v => v.toLowerCase()).replace(/_/g, ''),
       head,
-      data: await dataToProtobuffer(buf, proto),
+      data: await protobufDecode(proto, buf),
       buf
     }
   }

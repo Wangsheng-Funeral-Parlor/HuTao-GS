@@ -5,7 +5,7 @@ import TLogger from '@/translate/tlogger'
 import { QueryRegionListHttpRsp } from '@/types/proto'
 import { RetcodeEnum } from '@/types/proto/enum'
 import { fileExists } from '@/utils/fileSystem'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 import * as dns from 'dns'
 import { existsSync, writeFileSync } from 'fs'
 import { get } from 'https'
@@ -49,10 +49,13 @@ function query(ip: string) {
       res.on('end', async () => {
         try {
           const buf = Buffer.from(data, 'base64')
-          const regionListRsp = await dataToProtobuffer<QueryRegionListHttpRsp>(buf, 'QueryRegionListHttpRsp', true)
+          const regionListRsp = await protobufDecode<QueryRegionListHttpRsp>('QueryRegionListHttpRsp', buf, true)
 
           const retcode = regionListRsp.retcode || 0
-          if (retcode !== RetcodeEnum.RET_SUCC) return reject(translate('message.tools.autoPatch.error.queryFail', RetcodeEnum[retcode]))
+          if (retcode !== RetcodeEnum.RET_SUCC) {
+            reject(translate('message.tools.autoPatch.error.queryFail', RetcodeEnum[retcode]))
+            return
+          }
 
           logger.debug('message.tools.autoPatch.debug.write', binFilePath)
           writeFileSync(binFilePath, buf)

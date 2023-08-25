@@ -44,7 +44,7 @@ export const getProtoType = async (proto: string, common: boolean = false): Prom
   return type
 }
 
-export const objToProtobuffer = async (obj: object, cmdId: number | string, common: boolean = false): Promise<Buffer> => {
+export const protobufEncode = async (cmdId: number | string, obj: object, common: boolean = false): Promise<Buffer> => {
   const protoName = getNameByCmdId(cmdId)
   try {
     const type = await getProtoType(protoName.toString(), common)
@@ -61,7 +61,7 @@ export const objToProtobuffer = async (obj: object, cmdId: number | string, comm
   }
 }
 
-export const dataToProtobuffer = async <T extends object>(data: Buffer, cmdId: number | string, common: boolean = false): Promise<T> => {
+export const protobufDecode = async <T extends object>(cmdId: number | string, data: Buffer, common: boolean = false): Promise<T> => {
   const protoName = getNameByCmdId(cmdId)
   try {
     const type = await getProtoType(protoName.toString(), common)
@@ -79,6 +79,6 @@ export const dataToProtobuffer = async <T extends object>(data: Buffer, cmdId: n
 }
 
 export default {
-  objToProtobuffer,
-  dataToProtobuffer
+  protobufEncode,
+  protobufDecode
 }

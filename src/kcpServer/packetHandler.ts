@@ -2,7 +2,7 @@ import ProtoMatch from '#/protomatch'
 import GlobalState from '@/globalState'
 import TLogger from '@/translate/tlogger'
 import { ClientStateEnum } from '@/types/enum'
-import dataUtil from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 import { PacketContext, PacketInterface } from './packet'
 
 const logger = new TLogger('PACKET', 0x8810cd)
@@ -12,42 +12,18 @@ export default class PacketHandler {
 
   private instances: { [name: string]: PacketInterface }
 
-  constructor() {
+  public constructor() {
     this.ptm = new ProtoMatch()
 
     this.instances = {}
   }
 
-  private async getPacket(name: string): Promise<PacketInterface> {
-    const { instances } = this
-
-    if (!instances[name]) {
-      instances[name] = (await import(`./packets/${name}`)).default as PacketInterface
-    }
-
-    return instances[name]
-  }
-
-  private parsePacketName(packetName: string): { name: string, type: string } {
-    const [name, type] = packetName.match(/(^.*)([A-Z].*$)/).slice(1)
-    return { name, type }
-  }
-
-  private unknownPacket(packetData: Buffer, packetID: number): void {
-    const { ptm } = this
-
-    logger.warn('message.packet.warn.unknownPacket', packetID)
-    if (!GlobalState.get('UseProtoMatch')) return
-
-    logger.debug('generic.param4', 'ProtoMatch:', packetID, JSON.stringify(ptm.parseBuffer(packetData), null, 2), JSON.stringify(ptm.findProto(packetData), null, 2))
-  }
-
-  async handle(packetID: number, packetName: string, packetData: Buffer, context: PacketContext, ...any: any[]): Promise<void> {
-    // Unknown packet
-    if (packetID === parseInt(packetName)) return this.unknownPacket(packetData, packetID)
+  public async handle(cmdId: number, cmdName: string, body: Buffer, context: PacketContext, ...any: any[]): Promise<void> {
+    // Dump unknown packet
+    if (cmdId === parseInt(cmdName)) return this.decodeError(cmdId, body)
 
     try {
-      const { name, type } = this.parsePacketName(packetName)
+      const { name, type } = this.parsePacketName(cmdName)
       const packet = await this.getPacket(name)
       const {
         reqState, reqStatePass, reqStateMask,
@@ -67,9 +43,10 @@ export default class PacketHandler {
         ]
       }[type] as [ClientStateEnum, boolean, number, ClientStateEnum, boolean, number]
 
-      const data = await dataUtil.dataToProtobuffer(packetData, packetID)
+      const data = await protobufDecode(cmdId, body)
 
       if (state == null || !packet.checkState(context, state[0], state[1], state[2])) return
+
       await packet.waitState(context, state[3], state[4], state[5])
 
       switch (type) {
@@ -81,8 +58,39 @@ export default class PacketHandler {
           break
       }
     } catch (err) {
-      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('message.packet.debug.noHandler', GlobalState.get('ShowPacketId') ? packetID : '-', packetName)
+      if (err.code === 'MODULE_NOT_FOUND') logger.verbose('message.packet.debug.noHandler', GlobalState.get('ShowPacketId') ? cmdId : '-', cmdName)
       else logger.error('message.packet.error.handler', err)
     }
+  }
+
+  private async getPacket(name: string): Promise<PacketInterface> {
+    const { instances } = this
+
+    if (!instances[name]) {
+      instances[name] = (await import(`./packets/${name}`)).default as PacketInterface
+    }
+
+    return instances[name]
+  }
+
+  private parsePacketName(packetName: string): { name: string, type: string } {
+    const [name, type] = packetName.match(/(^.*)([A-Z].*$)/).slice(1)
+    return { name, type }
+  }
+
+  private decodeError(cmdId: number, body: Buffer): void {
+    const { ptm } = this
+
+    logger.warn('message.packet.warn.decodeError', cmdId)
+
+    if (!GlobalState.get('UseProtoMatch')) return
+
+    let decodedBody = body.length === 0 ? '<empty>' : JSON.stringify(ptm.parseBuffer(body), null, 2)
+    let similarProto = body.length === 0 ? '<empty>' : JSON.stringify(ptm.findProto(body), null, 2)
+
+    if (decodedBody.split('\n').length > 20) decodedBody = JSON.stringify(JSON.parse(decodedBody))
+    if (similarProto.split('\n').length > 20) similarProto = JSON.stringify(JSON.parse(similarProto))
+
+    logger.debug('generic.param4', 'ProtoMatch:', cmdId, decodedBody, similarProto)
   }
 }

@@ -2,7 +2,7 @@ import TError from '@/translate/terror'
 import { QueryCurrRegionHttpRsp } from '@/types/proto'
 import { fileExists, readFile } from '@/utils/fileSystem'
 import { getEc2bKey } from '@/utils/mhyCrypto/ec2b'
-import { dataToProtobuffer } from '@/utils/proto'
+import { protobufDecode } from '@/utils/proto'
 import { join } from 'path'
 import { cwd } from 'process'
 
@@ -11,6 +11,6 @@ export async function dumpEc2bKey(version: string, name: string): Promise<Buffer
 
   if (!await fileExists(binPath)) throw new TError('generic.fileNotFound', binPath)
 
-  const curRegionRsp: QueryCurrRegionHttpRsp = await dataToProtobuffer(await readFile(binPath), name, true)
+  const curRegionRsp: QueryCurrRegionHttpRsp = await protobufDecode(name, await readFile(binPath), true)
   return getEc2bKey(Buffer.from(curRegionRsp.clientSecretKey))
 }
