@@ -40,7 +40,7 @@ export default class TeamManager extends BaseClass {
     const { player, teamList } = this
     const { currentTeam, curAvatarGuid, teamGuidList } = userData
 
-    this.currentTeam = currentTeam
+    this.currentTeam = currentTeam ?? 1
 
     for (let i = 1; i <= 4; i++) {
       const avatarGuidList = teamGuidList?.[i - 1]
