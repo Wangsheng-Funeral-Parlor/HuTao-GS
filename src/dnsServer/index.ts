@@ -10,23 +10,43 @@ import { join } from 'path'
 import { cwd } from 'process'
 import EventEmitter from 'promise-events'
 import NameServer from './nameserver'
-import DnsPacket, { PacketQuestion, PacketResource, ResA, ResCNAME, ResHTTPS } from './packet'
+import DnsPacket, { PacketHeader, PacketQuestion, PacketResource, ResA, ResCNAME, ResHTTPS } from './packet'
 import { NAME_TO_QTYPE, QTYPE_TO_NAME } from './packet/consts'
 import { listAnswer, readStream } from './utils'
 
 const logger = new TLogger('DNSSRV', 0xfc9c14)
 
 class QueryCache {
+  private header: PacketHeader
   private answer: PacketResource[]
+  private authority: PacketResource[]
+  private additional: PacketResource[]
   private expire: number
 
-  public constructor(answer: PacketResource[]) {
+  public constructor(packet: DnsPacket) {
+    const { header, answer, authority, additional } = packet
+
+    this.header = header
     this.answer = answer
+    this.authority = authority
+    this.additional = additional
     this.expire = Date.now() + ((Math.min(...answer.map(ans => ans.ttl)) ?? 15) * 1e3)
+  }
+
+  public getHeader(id: number): PacketHeader {
+    return new PacketHeader({ ...this.header, id })
   }
 
   public getAnswer(): PacketResource[] {
     return this.answer
+  }
+
+  public getAuthority(): PacketResource[] {
+    return this.authority
+  }
+
+  public getAdditional(): PacketResource[] {
+    return this.additional
   }
 
   public isExpired(): boolean {
@@ -216,12 +236,12 @@ export default class DnsServer extends EventEmitter {
         return rsp
       }
 
-      this.writeCache(query)
-      this.releaseLock(query)
-
       query.header.qr = 1
       query.header.rd = 1
       query.header.ra = 1
+
+      this.writeCache(query)
+      this.releaseLock(query)
 
       logger.verbose('generic.param1', `NoRsp: [QRY]:${name} [TYP]:${typeName}`)
 
@@ -311,7 +331,7 @@ export default class DnsServer extends EventEmitter {
 
   private readCache(packet: DnsPacket): boolean {
     const { cacheMap } = this
-    const { question, answer } = packet
+    const { header, question, answer, authority, additional } = packet
 
     for (const q of question) {
       const { name, type } = q
@@ -329,8 +349,13 @@ export default class DnsServer extends EventEmitter {
       }
 
       const cacheAnswer = cache.getAnswer()
+      const cacheAuthority = cache.getAuthority()
+      const cacheAdditional = cache.getAdditional()
 
+      packet.header = cache.getHeader(header.id)
       answer.push(...cacheAnswer.filter(ans => !answer.includes(ans)))
+      authority.push(...cacheAuthority.filter(aut => !authority.includes(aut)))
+      additional.push(...cacheAdditional.filter(add => !additional.includes(add)))
     }
 
     return true
@@ -338,13 +363,13 @@ export default class DnsServer extends EventEmitter {
 
   private writeCache(packet: DnsPacket): void {
     const { cacheMap } = this
-    const { question, answer } = packet
+    const { question } = packet
 
     for (const q of question) {
       const { name, type } = q
 
       // Write answer to cache
-      cacheMap[`${type}:${name}`] = new QueryCache(answer)
+      cacheMap[`${type}:${name}`] = new QueryCache(packet)
     }
   }
 }

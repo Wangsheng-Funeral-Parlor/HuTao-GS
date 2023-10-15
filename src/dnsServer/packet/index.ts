@@ -78,7 +78,7 @@ export class PacketHeader {
   nscount: number
   arcount: number
 
-  constructor(header?: { [k: number]: number }) {
+  constructor(header?: { [k: string]: number }) {
     this.id = 0
     this.qr = 0
     this.opcode = 0
