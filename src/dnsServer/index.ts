@@ -2,6 +2,7 @@ import config from '@/config'
 import Server from '@/server'
 import TLogger from '@/translate/tlogger'
 import { cRGB } from '@/tty/utils'
+import { waitUntil } from '@/utils/asyncWait'
 import { writeFile } from '@/utils/fileSystem'
 import * as dgram from 'dgram'
 import Tcp, { AddressInfo } from 'net'
@@ -9,21 +10,68 @@ import { join } from 'path'
 import { cwd } from 'process'
 import EventEmitter from 'promise-events'
 import NameServer from './nameserver'
-import DnsPacket, { PacketQuestion, ResA, ResCNAME, ResHTTPS } from './packet'
+import DnsPacket, { PacketQuestion, PacketResource, ResA, ResCNAME, ResHTTPS } from './packet'
 import { NAME_TO_QTYPE, QTYPE_TO_NAME } from './packet/consts'
 import { listAnswer, readStream } from './utils'
 
 const logger = new TLogger('DNSSRV', 0xfc9c14)
 
+class QueryCache {
+  private answer: PacketResource[]
+  private expire: number
+
+  public constructor(answer: PacketResource[]) {
+    this.answer = answer
+    this.expire = Date.now() + ((Math.min(...answer.map(ans => ans.ttl)) ?? 15) * 1e3)
+  }
+
+  public getAnswer(): PacketResource[] {
+    return this.answer
+  }
+
+  public isExpired(): boolean {
+    return this.expire <= Date.now()
+  }
+}
+
+class QueryLock {
+  private nextIdx: number
+  private currIdx: number
+
+  public constructor() {
+    this.nextIdx = 0
+    this.currIdx = 0
+  }
+
+  public async acquire(): Promise<void> {
+    const idx = this.nextIdx++
+
+    await waitUntil(() => this.currIdx === idx)
+
+    const { nextIdx, currIdx } = this
+
+    if (currIdx !== 0 && currIdx === nextIdx) {
+      this.nextIdx = 0
+      this.currIdx = 0
+    }
+  }
+
+  public release(): void {
+    this.currIdx++
+  }
+}
+
 export default class DnsServer extends EventEmitter {
-  server: Server
+  public server: Server
 
   private tcp: Tcp.Server
   private udp: dgram.Socket
 
   private nsMap: { [address: string]: NameServer }
+  private cacheMap: { [key: string]: QueryCache }
+  private lockMap: { [key: string]: QueryLock }
 
-  constructor(server: Server) {
+  public constructor(server: Server) {
     super()
 
     this.server = server
@@ -32,6 +80,8 @@ export default class DnsServer extends EventEmitter {
     this.udp = dgram.createSocket('udp4')
 
     this.nsMap = {}
+    this.cacheMap = {}
+    this.lockMap = {}
 
     this.handleTcpConnection = this.handleTcpConnection.bind(this)
     this.handleUdpMessage = this.handleUdpMessage.bind(this)
@@ -43,21 +93,21 @@ export default class DnsServer extends EventEmitter {
     this.udp.on('error', err => logger.error('message.dnsServer.error.UDPError', err))
   }
 
-  start(): void {
+  public start(): void {
     let listening = 0
 
     this.tcp.listen(config.dnsPort, () => {
-      logger.info('message.dnsServer.info.TCPListen', cRGB(0xffffff, this.tcpAddress().port.toString()))
+      logger.info('message.dnsServer.info.TCPListen', cRGB(0xffffff, this.getTcpAddress().port.toString()))
       if (++listening >= 2) this.emit('listening')
     })
 
     this.udp.bind(config.dnsPort, () => {
-      logger.info('message.dnsServer.info.UDPListen', cRGB(0xffffff, this.udpAddress().port.toString()))
+      logger.info('message.dnsServer.info.UDPListen', cRGB(0xffffff, this.getUdpAddress().port.toString()))
       if (++listening >= 2) this.emit('listening')
     })
   }
 
-  stop(): void {
+  public stop(): void {
     const { nsMap, tcp, udp } = this
 
     for (const addr in nsMap) {
@@ -69,44 +119,50 @@ export default class DnsServer extends EventEmitter {
     udp.close()
   }
 
-  tcpAddress(): AddressInfo {
+  public getTcpAddress(): AddressInfo {
     return this.tcp.address() as AddressInfo
   }
 
-  udpAddress(): AddressInfo {
+  public getUdpAddress(): AddressInfo {
     return this.udp.address()
   }
 
-  private async handleTcpConnection(client: Tcp.Socket) {
-    try {
-      const msg = await readStream(client)
-      const rsp = await this.processQuery(msg)
+  private handleTcpConnection(client: Tcp.Socket): void {
+    readStream(client)
+      .then(msg => this.processQuery(msg))
+      .then(rsp => {
+        if (rsp == null) {
+          client.end()
+          return
+        }
 
-      if (rsp == null) {
-        client.end()
-        return
-      }
+        const len = Buffer.alloc(2)
+        len.writeUInt16BE(rsp.length)
 
-      const len = Buffer.alloc(2)
-      len.writeUInt16BE(rsp.length)
-
-      client.end(Buffer.concat([len, rsp]))
-    } catch (err) {
-      logger.error('message.dnsServer.error.TCPError', err)
-    }
+        client.end(Buffer.concat([len, rsp]))
+      }).catch(err => {
+        logger.error('message.dnsServer.error.TCPError', err)
+      })
   }
 
-  private async handleUdpMessage(msg: Buffer, rinfo: dgram.RemoteInfo) {
+  private handleUdpMessage(msg: Buffer, rinfo: dgram.RemoteInfo): void {
     const { udp } = this
     const { address, port } = rinfo
 
-    const rsp = await this.processQuery(msg)
-    if (rsp == null) return
+    this.processQuery(msg).then(rsp => {
+      if (rsp == null) return
 
-    udp.send(rsp, 0, rsp.length, port, address)
+      udp.send(rsp, 0, rsp.length, port, address)
+    })
   }
 
-  async processQuery(msg: Buffer): Promise<Buffer> {
+  private isRedirect(query: string, domain: string): boolean {
+    const index = query.indexOf(domain)
+
+    return index >= 0 && index === (query.length - domain.length) && !query.startsWith('autopatch')
+  }
+
+  private async processQuery(msg: Buffer): Promise<Buffer> {
     const { domains, nameservers } = config
 
     try {
@@ -118,32 +174,56 @@ export default class DnsServer extends EventEmitter {
       const { name, type } = query.question[0]
       const typeName = QTYPE_TO_NAME[type] || type
 
+      await this.acquireLock(query)
+
       logger.verbose('generic.param1', `Qry: ${name} (${typeName})`)
 
-      for (const domain in domains) {
-        const index = name.indexOf(domain)
-        if (index === -1 || index !== (name.length - domain.length) || name.indexOf('autopatch') === 0) continue
-
-        this.createResponse(query, query.question[0], domain)
+      if (this.readCache(query)) {
+        this.releaseLock(query)
 
         const rsp = DnsPacket.write(query, 1024)
+
+        logger.verbose('generic.param1', `CaRsp: [QRY]:${name} [ANS]:${listAnswer(rsp)}`)
+
+        return rsp
+      }
+
+      for (const domain in domains) {
+        if (!this.isRedirect(name, domain)) continue
+
+        this.createRedirectResponse(query, query.question[0], domain)
+
+        this.writeCache(query)
+        this.releaseLock(query)
+
+        const rsp = DnsPacket.write(query, 1024)
+
         logger.verbose('generic.param1', `RdRsp: [DM]:${name} [ANS]:${listAnswer(rsp)}`)
+
         return rsp
       }
 
       for (const ns of nameservers) {
         const rsp = await this.queryNS(ns, query.header.id, false, msg)
+
         if (rsp == null) continue
 
+        this.writeCache(DnsPacket.parse(rsp))
+        this.releaseLock(query)
+
         logger.verbose('generic.param1', `NsRsp: [NS]:${ns} [QRY]:${name} [TYP]:${typeName} [ANS]:${listAnswer(rsp)}`)
+
         return rsp
       }
 
-      logger.verbose('generic.param1', `NoRsp: [QRY]:${name} [TYP]:${typeName}`)
+      this.writeCache(query)
+      this.releaseLock(query)
 
       query.header.qr = 1
       query.header.rd = 1
       query.header.ra = 1
+
+      logger.verbose('generic.param1', `NoRsp: [QRY]:${name} [TYP]:${typeName}`)
 
       return DnsPacket.write(query, 1024)
     } catch (err) {
@@ -156,7 +236,7 @@ export default class DnsServer extends EventEmitter {
     return null
   }
 
-  queryNS(nsAddress: string, id: number, useTcp: boolean, msg: Buffer): Promise<Buffer> {
+  private queryNS(nsAddress: string, id: number, useTcp: boolean, msg: Buffer): Promise<Buffer> {
     const { nsMap } = this
 
     const address = nsAddress.split(':')
@@ -169,7 +249,7 @@ export default class DnsServer extends EventEmitter {
     return ns.query(id, useTcp, msg)
   }
 
-  createResponse(packet: DnsPacket, question: PacketQuestion, domain: string) {
+  private createRedirectResponse(packet: DnsPacket, question: PacketQuestion, domain: string): void {
     const { domains } = config
     const { header, answer } = packet
     const { name, type } = question
@@ -198,6 +278,73 @@ export default class DnsServer extends EventEmitter {
         answer.push(resHTTPS)
         break
       }
+    }
+  }
+
+  private async acquireLock(packet: DnsPacket): Promise<void> {
+    const { lockMap } = this
+    const { question } = packet
+
+    for (const q of question) {
+      const { name, type } = q
+      const key = `${type}:${name}`
+
+      // Create lock instance
+      if (lockMap[key] == null) lockMap[key] = new QueryLock()
+
+      // Acquire lock
+      await lockMap[key].acquire()
+    }
+  }
+
+  private releaseLock(packet: DnsPacket): void {
+    const { lockMap } = this
+    const { question } = packet
+
+    for (const q of question) {
+      const { name, type } = q
+
+      // Release lock
+      lockMap[`${type}:${name}`]?.release()
+    }
+  }
+
+  private readCache(packet: DnsPacket): boolean {
+    const { cacheMap } = this
+    const { question, answer } = packet
+
+    for (const q of question) {
+      const { name, type } = q
+
+      const key = `${type}:${name}`
+      const cache = cacheMap[key]
+
+      // Check if cache miss
+      if (cache == null) return false
+
+      // Check if cache expired
+      if (cache.isExpired()) {
+        cacheMap[key] = null
+        return false
+      }
+
+      const cacheAnswer = cache.getAnswer()
+
+      answer.push(...cacheAnswer.filter(ans => !answer.includes(ans)))
+    }
+
+    return true
+  }
+
+  private writeCache(packet: DnsPacket): void {
+    const { cacheMap } = this
+    const { question, answer } = packet
+
+    for (const q of question) {
+      const { name, type } = q
+
+      // Write answer to cache
+      cacheMap[`${type}:${name}`] = new QueryCache(answer)
     }
   }
 }

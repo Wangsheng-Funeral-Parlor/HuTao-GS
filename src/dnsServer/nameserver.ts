@@ -20,17 +20,17 @@ export interface QueryTask {
 }
 
 export default class NameServer {
-  dnsServer: DnsServer
+  public dnsServer: DnsServer
 
   private udp: dgram.Socket
 
   private queue: QueryTask[]
   private loop: NodeJS.Timer
 
-  ip: string
-  port: number
+  private ip: string
+  private port: number
 
-  constructor(dnsServer: DnsServer, ip: string, port: number = 53) {
+  public constructor(dnsServer: DnsServer, ip: string, port: number = 53) {
     this.dnsServer = dnsServer
 
     this.ip = ip
@@ -48,13 +48,36 @@ export default class NameServer {
     this.udp.on('error', err => logger.error('message.dnsServer.error.socketError', err))
   }
 
-  destroy() {
+  public async query(id: number, useTcp: boolean, msg: Buffer): Promise<Buffer> {
+    const { ip, port } = this
+
+    if (useTcp) {
+      const client = new Tcp.Socket()
+      client.on('error', err => logger.error('message.dnsServer.error.socketError', err))
+
+      client.connect(port, ip)
+
+      const rsp = await readStream(client)
+      const response = DnsPacket.parse(rsp)
+
+      if (response.answer.length === 0) return null
+
+      return rsp
+    } else {
+      return new Promise<Buffer>((resolve, reject) => {
+        this.queue.push({ id, msg, sent: null, resolve, reject })
+        this.update()
+      })
+    }
+  }
+
+  public destroy() {
     const { udp, loop } = this
     clearInterval(loop)
     udp.close()
   }
 
-  update() {
+  private update() {
     const { ip, port, queue, udp } = this
     if (queue.length === 0) return
 
@@ -93,28 +116,5 @@ export default class NameServer {
 
     task.resolve(msg)
     this.update()
-  }
-
-  async query(id: number, useTcp: boolean, msg: Buffer): Promise<Buffer> {
-    const { ip, port } = this
-
-    if (useTcp) {
-      const client = new Tcp.Socket()
-      client.on('error', err => logger.error('message.dnsServer.error.socketError', err))
-
-      client.connect(port, ip)
-
-      const rsp = await readStream(client)
-      const response = DnsPacket.parse(rsp)
-
-      if (response.answer.length === 0) return null
-
-      return rsp
-    } else {
-      return new Promise<Buffer>((resolve, reject) => {
-        this.queue.push({ id, msg, sent: null, resolve, reject })
-        this.update()
-      })
-    }
   }
 }
