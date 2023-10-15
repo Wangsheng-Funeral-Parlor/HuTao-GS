@@ -126,9 +126,10 @@ export default class Weapon extends Equip {
   exportUserData(): WeaponUserData {
     const { entity, affixList } = this
 
-    return Object.assign({
+    return {
       affixDataList: affixList.map(affix => affix.exportUserData()),
-      entityData: entity.exportUserData()
-    }, super.exportUserData())
+      entityData: entity.exportUserData(),
+      ...super.exportUserData()
+    }
   }
 }

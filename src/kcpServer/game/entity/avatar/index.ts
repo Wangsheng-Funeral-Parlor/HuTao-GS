@@ -396,7 +396,7 @@ export default class Avatar extends Entity {
       bornTime
     } = this
 
-    return Object.assign({
+    return {
       guid: guid.toString(),
       id: avatarId,
       type: avatarType,
@@ -406,8 +406,9 @@ export default class Avatar extends Entity {
       equipGuidList: this.exportEquipList().map(equip => equip.guid.toString()),
       flycloak: wearingFlycloakId,
       costume: costumeId,
-      bornTime
-    }, super.exportUserData())
+      bornTime,
+      ...super.exportUserData()
+    }
   }
 
   /**Events**/

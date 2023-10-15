@@ -105,6 +105,6 @@ export default class PlayerProps {
   }
 
   exportUserData(): PropsUserData {
-    return Object.assign({}, this.propMap)
+    return { ...this.propMap }
   }
 }

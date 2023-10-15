@@ -215,11 +215,12 @@ export default class Reliquary extends Equip {
   exportUserData(): ReliquaryUserData {
     const { level, exp, mainPropId, appendPropIdList } = this
 
-    return Object.assign({
+    return {
       level,
       exp,
       mainProp: mainPropId,
-      appendPropList: appendPropIdList
-    }, super.exportUserData())
+      appendPropList: appendPropIdList,
+      ...super.exportUserData()
+    }
   }
 }

@@ -430,6 +430,6 @@ export default class FightProp {
   }
 
   exportUserData(): PropsUserData {
-    return Object.assign({}, this.propMap)
+    return { ...this.propMap }
   }
 }

@@ -46,6 +46,6 @@ export default class OpenState {
   }
 
   exportUserData(): PropsUserData {
-    return Object.assign({}, this.exportOpenStateMap())
+    return { ...this.exportOpenStateMap() }
   }
 }

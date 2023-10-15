@@ -117,7 +117,7 @@ const curConfig = allConfigs[curConfigName]
 if (curConfig == null) logger.error('Config not found:', curConfigName)
 else logger.info('Loaded config:', curConfigName)
 
-const config: Config = Object.assign({}, DEFAULT_CONFIG, curConfig || {})
+const config: Config = { ...DEFAULT_CONFIG, ...(curConfig ?? {}) }
 
 export const NO_CONFIG = curConfig == null
 export const AVAILABLE_CONFIGS = Object.keys(getJson('config.json', {})).filter(k => k !== 'current')

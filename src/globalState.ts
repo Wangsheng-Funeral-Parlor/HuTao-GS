@@ -44,7 +44,7 @@ export default class GlobalState {
   modified: boolean
 
   constructor() {
-    this.state = Object.assign({}, DEFAULT_GSTATE)
+    this.state = { ...DEFAULT_GSTATE }
     this.modified = false
   }
 

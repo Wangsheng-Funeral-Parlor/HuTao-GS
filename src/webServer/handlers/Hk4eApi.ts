@@ -23,9 +23,10 @@ class Hk4eApiHandler extends Handler {
   }
 
   private getCORSHeaders(req: HttpRequest) {
-    return Object.assign({}, CORSHeaders, {
+    return {
+      ...CORSHeaders,
       'Access-Control-Allow-Origin': req.headers.origin || '*'
-    })
+    }
   }
 
   private getAnnListItem(types: AnnouncementType[], announcement: Announcement, id: number) {
