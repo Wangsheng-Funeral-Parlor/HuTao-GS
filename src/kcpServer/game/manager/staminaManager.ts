@@ -2,63 +2,119 @@ import BaseClass from '#/baseClass'
 import VehicleStamina from '#/packets/VehicleStamina'
 import Avatar from '$/entity/avatar'
 import Vehicle from '$/entity/gadget/vehicle'
+import Logger from '@/logger'
 import { PlayerPropEnum } from '@/types/enum'
 import { ChangeHpReasonEnum, MotionStateEnum } from '@/types/proto/enum'
+
+const logger = new Logger('STAMIN', 0xa0a0ff)
 
 const UPDATE_INTERVAL = 200
 const RECOVER_AMOUNT = 500
 
 export default class StaminaManager extends BaseClass {
-  private _curStamina: number
+  private entity: Avatar | Vehicle
 
-  entity: Avatar | Vehicle
+  private startConsumeTime: number | null
+  private startConsumeAquaticTime: number | null
+  private startRecoverTime: number | null
+  private startRecoverAquaticTime: number | null
+  private immediateQueue: number[]
 
-  startConsumeTime: number | null
-  startRecoverTime: number | null
-  immediateQueue: number[]
+  private consumeAmount: number
+  private consumeAquaticAmount: number
+  private curVehicleStamina: number
 
-  consumeAmount: number
+  private timer: NodeJS.Timer
 
-  timer: NodeJS.Timer
-
-  constructor(entity: Avatar | Vehicle) {
+  public constructor(entity: Avatar | Vehicle) {
     super()
-
-    this._curStamina = null
 
     this.entity = entity
 
     this.startConsumeTime = null
+    this.startConsumeAquaticTime = null
     this.startRecoverTime = null
+    this.startRecoverAquaticTime = null
     this.immediateQueue = []
 
     this.consumeAmount = 0
+    this.consumeAquaticAmount = 0
+    this.curVehicleStamina = null
 
     this.timer = null
 
     super.initHandlers(entity)
   }
 
-  private get sceneTime() {
-    return this.entity?.manager?.scene?.sceneTime || null
-  }
-
-  get maxStamina() {
+  public get maxStamina() {
     const { entity } = this
     return entity.player.props.get(PlayerPropEnum.PROP_MAX_STAMINA)
   }
 
-  get curStamina() {
-    const { _curStamina, entity, maxStamina } = this
-    if (entity instanceof Vehicle) return _curStamina == null ? maxStamina : _curStamina
+  public get maxAquaticStamina() {
+    const { entity } = this
+    return entity.player.props.get(PlayerPropEnum.PROP_MAX_AQUATIC_STAMINA)
+  }
+
+  public get curStamina() {
+    const { curVehicleStamina, entity, maxStamina } = this
+    if (entity instanceof Vehicle) return curVehicleStamina ?? maxStamina
     return entity.player.props.get(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA)
   }
 
-  private async tick() {
+  public get curAquaticStamina(): number {
+    const { entity } = this
+    return entity.player.props.get(PlayerPropEnum.PROP_CUR_AQUATIC_STAMINA)
+  }
+
+  public start(): void {
+    if (this.timer) this.stop()
+    this.timer = setInterval(this.tick.bind(this), UPDATE_INTERVAL)
+  }
+
+  public immediate(value: number): void {
+    const { immediateQueue } = this
+    if (value <= 0) return
+
+    immediateQueue.push(-value)
+  }
+
+  public async stop(): Promise<void> {
+    await this.stopConsume()
+    await this.stopRecover()
+
+    const { timer } = this
+    if (timer == null) return
+
+    clearInterval(timer)
+    this.timer = null
+  }
+
+  public async step(): Promise<void> {
+    const { entity } = this
+    const { motion } = entity
+    const { state } = motion
+
+    switch (state) { // NOSONAR
+      case MotionStateEnum.MOTION_CLIMB:
+        await this.setRelativeStamina(-150)
+        break
+    }
+  }
+
+  private get sceneTime() {
+    return this.entity?.manager?.scene?.sceneTime || null
+  }
+
+  private async tick(): Promise<void> {
     const { startRecoverTime, immediateQueue, sceneTime } = this
 
     // Reset recover timer
     if (immediateQueue.length > 0 && startRecoverTime != null) this.startRecoverTime = sceneTime + 1e3
+
+    // Update aquatic stamina
+    const aquaticAmount = this.calcRecoverAquaticAmount() - this.calcConsumeAquaticAmount()
+    if (aquaticAmount !== 0) await this.setRelativeAquaticStamina(aquaticAmount)
 
     // Update stamina
     const amount = (this.calcRecoverAmount() - this.calcConsumeAmount()) +
@@ -89,12 +145,31 @@ export default class StaminaManager extends BaseClass {
     this.consumeAmount = value
   }
 
+  private async startConsumeAquatic(value: number) {
+    await this.stopConsumeAquatic()
+    await this.stopRecoverAquatic()
+
+    const { startConsumeAquaticTime, sceneTime } = this
+    if (startConsumeAquaticTime != null || sceneTime == null) return
+
+    this.startConsumeAquaticTime = sceneTime
+    this.consumeAquaticAmount = value
+  }
+
   private async stopConsume() {
     const { startConsumeTime } = this
     if (startConsumeTime == null) return
 
     await this.tick()
     this.startConsumeTime = null
+  }
+
+  private async stopConsumeAquatic() {
+    const { startConsumeAquaticTime } = this
+    if (startConsumeAquaticTime == null) return
+
+    await this.tick()
+    this.startConsumeAquaticTime = null
   }
 
   private async startRecover(delayed: boolean = false) {
@@ -106,12 +181,29 @@ export default class StaminaManager extends BaseClass {
     this.startRecoverTime = delayed ? sceneTime + 1e3 : sceneTime
   }
 
+  private async startRecoverAquatic(delayed: boolean = false) {
+    await this.stopConsumeAquatic()
+
+    const { startRecoverAquaticTime, sceneTime } = this
+    if (startRecoverAquaticTime != null || sceneTime == null) return
+
+    this.startRecoverAquaticTime = delayed ? sceneTime + 1e3 : sceneTime
+  }
+
   private async stopRecover() {
     const { startRecoverTime } = this
     if (startRecoverTime == null) return
 
     await this.tick()
     this.startRecoverTime = null
+  }
+
+  private async stopRecoverAquatic() {
+    const { startRecoverAquaticTime } = this
+    if (startRecoverAquaticTime == null) return
+
+    await this.tick()
+    this.startRecoverAquaticTime = null
   }
 
   private calcConsumeAmount(): number {
@@ -125,6 +217,17 @@ export default class StaminaManager extends BaseClass {
     return (duration / UPDATE_INTERVAL) * consumeAmount
   }
 
+  private calcConsumeAquaticAmount(): number {
+    const { startConsumeAquaticTime, consumeAquaticAmount, sceneTime } = this
+
+    if (startConsumeAquaticTime == null) return 0
+    const duration = Math.max(0, sceneTime - startConsumeAquaticTime)
+    if (duration <= 0) return 0
+
+    this.startConsumeAquaticTime = sceneTime
+    return (duration / UPDATE_INTERVAL) * consumeAquaticAmount
+  }
+
   private calcRecoverAmount(): number {
     const { startRecoverTime, sceneTime } = this
 
@@ -133,6 +236,17 @@ export default class StaminaManager extends BaseClass {
     if (duration <= 0) return 0
 
     this.startRecoverTime = sceneTime
+    return (duration / UPDATE_INTERVAL) * RECOVER_AMOUNT
+  }
+
+  private calcRecoverAquaticAmount(): number {
+    const { startRecoverAquaticTime, sceneTime } = this
+
+    if (startRecoverAquaticTime == null) return 0
+    const duration = Math.max(0, sceneTime - startRecoverAquaticTime)
+    if (duration <= 0) return 0
+
+    this.startRecoverAquaticTime = sceneTime
     return (duration / UPDATE_INTERVAL) * RECOVER_AMOUNT
   }
 
@@ -148,6 +262,18 @@ export default class StaminaManager extends BaseClass {
     await this.setStamina(curStamina + value)
   }
 
+  private async setRelativeAquaticStamina(value: number) {
+    const { maxAquaticStamina, curAquaticStamina } = this
+
+    if (
+      value === 0 ||
+      (curAquaticStamina <= 0 && value < 0) ||
+      (curAquaticStamina >= maxAquaticStamina && value > 0)
+    ) return
+
+    await this.setAquaticStamina(curAquaticStamina + value)
+  }
+
   private async setStamina(value: number) {
     const { entity, maxStamina, curStamina } = this
     const { manager, player, godMode } = entity
@@ -159,50 +285,31 @@ export default class StaminaManager extends BaseClass {
     if (entity instanceof Avatar) {
       await player.props.set(PlayerPropEnum.PROP_CUR_PERSIST_STAMINA, value, true)
     } else if (entity instanceof Vehicle) {
-      this._curStamina = value
+      this.curVehicleStamina = value
       if (manager) await VehicleStamina.broadcastNotify(manager.scene.broadcastContextList, entity)
     }
   }
 
-  start() {
-    if (this.timer) this.stop()
-    this.timer = setInterval(this.tick.bind(this), UPDATE_INTERVAL)
-  }
+  private async setAquaticStamina(value: number) {
+    const { entity, maxAquaticStamina, curAquaticStamina } = this
+    const { player, godMode } = entity
 
-  immediate(value: number) {
-    const { immediateQueue } = this
-    if (value <= 0) return
+    if (godMode && value < curAquaticStamina) return
 
-    immediateQueue.push(-value)
-  }
+    value = Math.max(0, Math.min(maxAquaticStamina, value))
 
-  async stop() {
-    await this.stopConsume()
-    await this.stopRecover()
-
-    const { timer } = this
-    if (timer == null) return
-
-    clearInterval(timer)
-    this.timer = null
-  }
-
-  async step() {
-    const { entity } = this
-    const { motion } = entity
-    const { state } = motion
-
-    switch (state) { // NOSONAR
-      case MotionStateEnum.MOTION_CLIMB:
-        await this.setRelativeStamina(-150)
-        break
-    }
+    if (entity instanceof Avatar) await player.props.set(PlayerPropEnum.PROP_CUR_AQUATIC_STAMINA, value, true)
   }
 
   /**Events**/
 
   // MotionStateChanged
-  async handleMotionStateChanged(state: MotionStateEnum, oldState: MotionStateEnum) {
+  public async handleMotionStateChanged(state: MotionStateEnum, oldState: MotionStateEnum): Promise<void> {
+    // Log unknown motion state change
+    if (MotionStateEnum[state] == null || MotionStateEnum[oldState] == null) {
+      logger.debug(`Motion state change: ${MotionStateEnum[oldState] ?? oldState}->${MotionStateEnum[state] ?? state}`)
+    }
+
     switch (state) {
       case MotionStateEnum.MOTION_DASH:
       case MotionStateEnum.MOTION_DANGER_DASH:
@@ -246,15 +353,25 @@ export default class StaminaManager extends BaseClass {
         this.startRecover(oldState !== MotionStateEnum.MOTION_NOTIFY)
         break
     }
+
+    switch (state) {
+      case MotionStateEnum.MOTION_AQUATIC_DIVE_DASH:
+      case MotionStateEnum.MOTION_AQUATIC_SWIM_DASH:
+        await this.startConsumeAquatic(204)
+        break
+      default:
+        this.startRecoverAquatic()
+        break
+    }
   }
 
   // OnScene
-  async handleOnScene() {
+  public async handleOnScene(): Promise<void> {
     this.start()
   }
 
   // OffScene
-  async handleOffScene() {
+  public async handleOffScene(): Promise<void> {
     await this.stop()
   }
 }
