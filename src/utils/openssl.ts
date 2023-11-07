@@ -26,13 +26,13 @@ export interface RSAKeyPair {
 export default class OpenSSL {
   private static parseText(txt: string): { [key: string]: string } {
     const lines = txt.split('\n')
-    const output = {}
+    const output: { [key: string]: string } = {}
 
     let lastKey = null
     for (const line of lines) {
       const keyMatch = line.match(/^[a-zA-Z]([a-zA-Z\d\s-])*?:/)
 
-      let key: string = keyMatch?.[0]
+      let key = keyMatch?.[0]
       let val = line.trim()
       if (key == null) {
         if (lastKey == null) continue
@@ -86,17 +86,23 @@ export default class OpenSSL {
     await execCommand(`openssl rsa -in "${inp}" -pubout -out "${out}"`)
   }
 
-  static async privateKeySize(inp: string): Promise<number> {
-    const txt = OpenSSL.parseText(await execCommand(`openssl rsa -in "${inp}" -text -noout`))
-    return parseInt(txt['RSA Private-Key']?.match(/\d*? bit/)?.[0]?.slice(0, -4))
+  static async privateKeySize(inp: string, isFile: boolean): Promise<number> {
+    const txt = OpenSSL.parseText(
+      await execCommand(`openssl rsa ${isFile ? '-in "' + inp + '" ' : ''}-text -noout`, isFile ? undefined : inp)
+    )
+
+    return parseInt((txt['RSA Private-Key'] || txt['Private-Key'])?.match(/\d*? bit/)?.[0]?.slice(0, -4) || '')
   }
 
-  static async publicKeySize(inp: string): Promise<number> {
-    const txt = OpenSSL.parseText(await execCommand(`openssl rsa -pubin -in "${inp}" -text -noout`))
-    return parseInt(txt['RSA Public-Key']?.match(/\d*? bit/)?.[0]?.slice(0, -4))
+  static async publicKeySize(inp: string, isFile: boolean): Promise<number> {
+    const txt = OpenSSL.parseText(
+      await execCommand(`openssl rsa -pubin ${isFile ? '-in "' + inp + '" ' : ''}-text -noout`, isFile ? undefined : inp)
+    )
+
+    return parseInt((txt['RSA Public-Key'] || txt['Public-Key'])?.match(/\d*? bit/)?.[0]?.slice(0, -4) || '')
   }
 
-  static async pemToXmlRsaPrivate(inp: string): Promise<string> {
+  static async pemToXmlRsaPrivate(inp: string, isFile: boolean): Promise<string> {
     const {
       Modulus,
       PublicExponent,
@@ -104,7 +110,9 @@ export default class OpenSSL {
       Exponent1, Exponent2,
       Coefficient,
       PrivateExponent
-    } = OpenSSL.parseText(await execCommand(`openssl rsa -in "${inp}" -text -noout`))
+    } = OpenSSL.parseText(
+      await execCommand(`openssl rsa ${isFile ? '-in "' + inp + '" ' : ''}-text -noout`, isFile ? undefined : inp)
+    )
 
     if (
       Modulus == null ||
@@ -148,11 +156,13 @@ export default class OpenSSL {
     return `<RSAKeyValue><Modulus>${M}</Modulus><Exponent>${E}</Exponent><P>${P}</P><Q>${Q}</Q><DP>${DP}</DP><DQ>${DQ}</DQ><InverseQ>${IQ}</InverseQ><D>${D}</D></RSAKeyValue>`
   }
 
-  static async pemToXmlRsaPublic(inp: string): Promise<string> {
+  static async pemToXmlRsaPublic(inp: string, isFile: boolean): Promise<string> {
     const {
       Modulus,
       Exponent
-    } = OpenSSL.parseText(await execCommand(`openssl rsa -pubin -in "${inp}" -text -noout`))
+    } = OpenSSL.parseText(
+      await execCommand(`openssl rsa -pubin ${isFile ? '-in "' + inp + '" ' : ''}-text -noout`, isFile ? undefined : inp)
+    )
 
     if (
       Modulus == null ||
@@ -174,7 +184,7 @@ export default class OpenSSL {
     return `<RSAKeyValue><Modulus>${M}</Modulus><Exponent>${E}</Exponent></RSAKeyValue>`
   }
 
-  static async getKeyPair(dir: string, name: string, generateKeySize: number = null): Promise<RSAKeyPair> {
+  static async getKeyPair(dir: string, name: string, generateKeySize: number | null = null): Promise<RSAKeyPair> {
     const privatePath = join(dir, `${name}Private.pem`)
     const publicPath = join(dir, `${name}Public.pem`)
 
@@ -182,16 +192,17 @@ export default class OpenSSL {
       if (generateKeySize == null) throw new TError('generic.fileNotFound', privatePath)
       await OpenSSL.generateRsaPrivateKey(privatePath, Math.max(generateKeySize, 512))
     }
+
     if (!await fileExists(publicPath)) await OpenSSL.extractRsaPublicKey(privatePath, publicPath)
 
-    const priSize = await OpenSSL.privateKeySize(privatePath)
-    const pubSize = await OpenSSL.publicKeySize(publicPath)
+    const priSize = await OpenSSL.privateKeySize(privatePath, true)
+    const pubSize = await OpenSSL.publicKeySize(publicPath, true)
 
     const priPem = (await readFile(privatePath)).toString()
     const pubPem = (await readFile(publicPath)).toString()
 
-    const priXml = await OpenSSL.pemToXmlRsaPrivate(privatePath)
-    const pubXml = await OpenSSL.pemToXmlRsaPublic(publicPath)
+    const priXml = await OpenSSL.pemToXmlRsaPrivate(privatePath, true)
+    const pubXml = await OpenSSL.pemToXmlRsaPublic(publicPath, true)
 
     return {
       private: {
@@ -209,11 +220,12 @@ export default class OpenSSL {
 
   static async getPublicKey(dir: string, name: string): Promise<RSAKey> {
     const publicPath = join(dir, `${name}Public.pem`)
+
     if (!await fileExists(publicPath)) throw new TError('generic.fileNotFound', publicPath)
 
-    const pubSize = await OpenSSL.publicKeySize(publicPath)
+    const pubSize = await OpenSSL.publicKeySize(publicPath, true)
     const pubPem = (await readFile(publicPath)).toString()
-    const pubXml = await OpenSSL.pemToXmlRsaPublic(publicPath)
+    const pubXml = await OpenSSL.pemToXmlRsaPublic(publicPath, true)
 
     return {
       size: pubSize,

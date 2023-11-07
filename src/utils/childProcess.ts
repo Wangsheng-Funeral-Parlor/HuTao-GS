@@ -5,10 +5,17 @@ function quoteSpaces(arg: string) {
   return arg.includes(' ') ? `"${arg.replace(/"/, '\\"')}"` : arg
 }
 
-export function execCommand(cmd: string): Promise<string> {
+export function execCommand(cmd: string, stdin?: string, env: NodeJS.ProcessEnv = process.env): Promise<string> {
   return new Promise((resolve, reject) => {
     const cp = exec(cmd, { env, cwd: cwd() })
+
+    if (stdin != null) {
+      cp.stdin?.write(stdin)
+      cp.stdin?.end()
+    }
+
     let buffer = ''
+
     cp.stdout?.setEncoding('utf8')
     cp.stdout?.on('data', data => buffer += data)
     cp.stderr?.setEncoding('utf8')
