@@ -4,6 +4,7 @@ import SceneData from '$/gameData/data/SceneData'
 import { ClientStateEnum } from '@/types/enum'
 
 const unlockType = [
+  'TransPointNormal',
   'SceneTransPoint',
   'DungeonEntry',
   'VirtualTransPoint'
