@@ -48,13 +48,19 @@ export default class Socket extends BaseClass {
 
   private async createKcpWorker(recvWorkerId: number, iPort: number, conv: number, connInfo: ConnectionInfo): Promise<KcpWorkerInterface> {
     const worker = await this.createWorker<KcpWorkerInterface>(KcpWorkerInterface)
+
+    connInfo.byteCheckMode = GlobalState.get('ByteCheckMode')
+
     if (await worker.init(recvWorkerId, iPort, conv, connInfo)) return worker
+
     await this.destroyWorker(worker.id)
+
     return null
   }
 
   async destroyWorker(id: number) {
     const { workerList } = this
+
     const worker = workerList.find(w => w.id === id)
     if (worker == null) return
 

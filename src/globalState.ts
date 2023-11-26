@@ -22,6 +22,7 @@ export interface GlobalStateData {
   UseProtoMatch: boolean
   WorldSpawn: boolean
   GenerateSeed: boolean
+  ByteCheckMode: number
 }
 
 export const DEFAULT_GSTATE: GlobalStateData = {
@@ -34,16 +35,17 @@ export const DEFAULT_GSTATE: GlobalStateData = {
   ShowPacketId: false,
   UseProtoMatch: false,
   WorldSpawn: true,
-  GenerateSeed: true
+  GenerateSeed: true,
+  ByteCheckMode: -1
 }
 
 export default class GlobalState {
-  static instance: GlobalState
+  private static instance: GlobalState
 
-  state: GlobalStateData
-  modified: boolean
+  private state: GlobalStateData
+  private modified: boolean
 
-  constructor() {
+  public constructor() {
     this.state = { ...DEFAULT_GSTATE }
     this.modified = false
   }
@@ -76,20 +78,21 @@ export default class GlobalState {
     }
   }
 
-  static toggle(key: string) {
+  public static toggle(key: keyof GlobalStateData) {
     GlobalState.getInstance().toggle(key)
   }
 
-  toggle(key: string) {
+  public toggle(key: keyof GlobalStateData) {
     const { state } = this
+
     this.set(key, !state[key])
   }
 
-  static set(key: string, val: GStateValue) {
+  public static set(key: keyof GlobalStateData, val: GStateValue) {
     GlobalState.getInstance().set(key, val)
   }
 
-  set(key: string, val: GStateValue) {
+  public set<K extends keyof GlobalStateData>(key: K, val: GStateValue) {
     const { state } = this
 
     if (state[key] == null) return logger.warn('Unknown global state:', key)
@@ -98,26 +101,26 @@ export default class GlobalState {
     if (val == null) return logger.warn('Invalid type, value must be a ', typeof state[key])
 
     if (state[key] !== val) {
-      state[key] = val
+      state[key] = <GlobalStateData[K]>val
       this.modified = true
     }
 
     this.print(key)
   }
 
-  static get(key: string): GStateValue {
+  public static get<K extends keyof GlobalStateData>(key: K): GlobalStateData[K] {
     return GlobalState.getInstance().get(key)
   }
 
-  get(key: string): GStateValue {
+  public get<K extends keyof GlobalStateData>(key: K): GlobalStateData[K] {
     return this.state[key]
   }
 
-  static print(key: string) {
+  public static print(key: keyof GlobalStateData) {
     GlobalState.getInstance().print(key)
   }
 
-  print(key: string) {
+  public print(key: keyof GlobalStateData) {
     const val = this.get(key)
     if (val == null) return
 
@@ -129,20 +132,21 @@ export default class GlobalState {
     logger.info(msg)
   }
 
-  static printAll() {
+  public static printAll() {
     GlobalState.getInstance().printAll()
   }
 
-  printAll() {
+  public printAll() {
     const { state } = this
-    for (const key in state) this.print(key)
+
+    for (const key in state) this.print(<keyof GlobalStateData>key)
   }
 
-  static load() {
+  public static load() {
     GlobalState.getInstance().load()
   }
 
-  load() {
+  public load() {
     const { state } = this
 
     try {
@@ -161,11 +165,11 @@ export default class GlobalState {
     }
   }
 
-  static save() {
+  public static save() {
     GlobalState.getInstance().save()
   }
 
-  save() {
+  public save() {
     try {
       if (!this.modified) {
         logger.info('No changes detected.')

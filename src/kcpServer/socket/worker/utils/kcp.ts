@@ -1,10 +1,12 @@
 import Denque from 'denque'
+import { crc32 } from './crc'
+import { XXH3_64bits } from './xxhash'
 
-type u8 = number
-type u16 = number
-type u32 = number
-type i32 = number
-type usize = number
+type u8 = number // NOSONAR
+type u16 = number // NOSONAR
+type u32 = number // NOSONAR
+type i32 = number // NOSONAR
+type usize = number // NOSONAR
 
 const EMPTY_BUFFER = Buffer.alloc(0)
 
@@ -28,6 +30,7 @@ const KCP_MTU_DEF: usize = 1400
 
 const KCP_INTERVAL: u32 = 100
 const KCP_OVERHEAD: usize = 28
+const KCP_BYTECHECK_OVERHEAD: usize = 32
 
 const KCP_THRESH_INIT: u16 = 2
 const KCP_THRESH_MIN: u16 = 2
@@ -68,10 +71,11 @@ type KcpSegment = {
   rto: u32
   fastAck: u32
   xmit: u32
+  byteCheckCode: u32 | null
   data: Buffer
 }
 
-function createSegment(data: Buffer): KcpSegment {
+function createSegment(data: Buffer, byteCheckMode: number): KcpSegment {
   return {
     conv: 0,
     token: 0,
@@ -85,11 +89,12 @@ function createSegment(data: Buffer): KcpSegment {
     rto: 0,
     fastAck: 0,
     xmit: 0,
+    byteCheckCode: byteCheckMode >= 0 ? 0 : null,
     data,
   }
 }
 
-function encodeSegment(buf: Buffer, seg: KcpSegment) {
+function encodeSegment(buf: Buffer, seg: KcpSegment, corrupt: boolean) {
   const size = segmentSize(seg)
   if (buf.length < size) {
     throw new Error(`buffer too small to encode kcp segment of size ${size}`)
@@ -103,14 +108,31 @@ function encodeSegment(buf: Buffer, seg: KcpSegment) {
   buf.writeUInt32LE(seg.ts, 12)
   buf.writeUInt32LE(seg.sn, 16)
   buf.writeUInt32LE(seg.una, 20)
-  buf.writeUInt32LE(seg.data.length, 24)
-  seg.data.copy(buf, 28)
+
+  const { byteCheckCode, data } = seg
+
+  buf.writeUInt32LE(data.length, 24)
+
+  if (byteCheckCode == null) {
+    // Byte check disabled
+    data.copy(buf, 28)
+    return size
+  }
+
+  // Byte check enabled
+  buf.writeUInt32LE(byteCheckCode, 28)
+  data.copy(buf, 32)
+
+  if (!corrupt) return size
+
+  // Corrupt random data byte
+  if (seg.xmit < 2 && seg.sn > 500) data[Math.floor(Math.random() * data.length)] = 0
 
   return size
 }
 
 function segmentSize(seg: KcpSegment) {
-  return KCP_OVERHEAD + seg.data.length
+  return (seg.byteCheckCode == null ? KCP_OVERHEAD : KCP_BYTECHECK_OVERHEAD) + seg.data.length
 }
 
 /// Input buffer is reused internally by the KCP instance.
@@ -201,9 +223,14 @@ export class Kcp {
   /// Enable stream mode
   private stream: boolean
 
+  /// Byte check mode
+  private byteCheckMode: u32
+  /// Corrupt packet
+  private corrupt: boolean
+
   private outputCallback: OutputCallback
 
-  constructor(conv: u32, token: u32, output: OutputCallback, stream = false) {
+  public constructor(conv: u32, token: u32, output: OutputCallback, stream = false) {
     this.conv = conv >>> 0
     this.token = token >>> 0
     this.sndUna = 0
@@ -223,7 +250,9 @@ export class Kcp {
     this.incr = 0
     this.fastResend = 0
     this.nocwnd = false
-    this.stream = !!stream
+    this.stream = stream
+    this.byteCheckMode = -1
+    this.corrupt = false
     this.sndWnd = KCP_WND_SND
     this.rcvWnd = KCP_WND_RCV
     this.rmtWnd = KCP_WND_RCV
@@ -244,12 +273,12 @@ export class Kcp {
     this.outputCallback = output
   }
 
-  get rtt() {
+  public get rtt() {
     return this.rxsRtt
   }
 
   /// Check buffer size without actually consuming it
-  peekSize() {
+  public peekSize() {
     const segment = this.rcvQueue.peekFront()
     if (!segment) return -1
 
@@ -273,7 +302,7 @@ export class Kcp {
   }
 
   // move available data from rcv_buf -> rcv_queue
-  moveBuf() {
+  public moveBuf() {
     while (!this.rcvBuf.isEmpty()) {
       const nrcvQueue = this.rcvQueue.length
       const seg = this.rcvBuf.peekFront()!
@@ -290,7 +319,7 @@ export class Kcp {
   }
 
   /// Receive data from buffer
-  recv(buf: Buffer, offset = 0) {
+  public recv(buf: Buffer, offset = 0) {
     offset >>>= 0
 
     if (!Buffer.isBuffer(buf) || this.rcvQueue.isEmpty()) {
@@ -323,19 +352,21 @@ export class Kcp {
   }
 
   /// Send bytes into buffer
-  send(buf: Buffer) {
+  public send(buf: Buffer) {
     if (!Buffer.isBuffer(buf)) return -1
+
+    const { stream, sndQueue, mss, byteCheckMode } = this
 
     let sentSize = 0
     //assert(this.mss > 0)
 
     // append to previous segment in streaming mode (if possible)
-    if (this.stream) {
-      const old = this.sndQueue.peekBack()
+    if (stream) {
+      const old = sndQueue.peekBack()
       if (old) {
         const l = old.data.length
-        if (l < this.mss) {
-          const capacity = (this.mss - l) >>> 0
+        if (l < mss) {
+          const capacity = (mss - l) >>> 0
           const extend = Math.min(buf.length, capacity)
 
           const lf = buf.subarray(0, extend)
@@ -351,21 +382,21 @@ export class Kcp {
       }
     }
 
-    const count = buf.length <= this.mss ? 1 : (((buf.length + this.mss - 1) / this.mss) >>> 0)
+    const count = buf.length <= mss ? 1 : (((buf.length + mss - 1) / mss) >>> 0)
 
     if (count >= KCP_WND_RCV) return -2
 
     for (let i = 0; i < count; i++) {
-      const size = Math.min(this.mss, buf.length)
+      const size = Math.min(mss, buf.length)
       const lf = buf.subarray(0, size)
       const rt = buf.subarray(size)
 
-      const newSegment = createSegment(lf)
+      const newSegment = createSegment(lf, byteCheckMode)
       buf = rt
 
       newSegment.frg = this.stream ? 0 : (((count - i - 1) << 24) >>> 24)
 
-      this.sndQueue.push(newSegment)
+      sndQueue.push(newSegment)
       sentSize += size
     }
 
@@ -490,7 +521,32 @@ export class Kcp {
     this.moveBuf()
   }
 
-  inputCmd(cmd: number, buf: Buffer, data: {
+  private byteCheck(buf: Buffer, data: { len: number, byteCheckCode: number | null }) {
+    const { byteCheckMode } = this
+    const { len, byteCheckCode } = data
+
+    if (byteCheckCode == null) return true
+
+    const overhead = this.getHeaderLen()
+
+    let newByteCheckCode = -1
+
+    switch (byteCheckMode) {
+      case 1:
+        newByteCheckCode = crc32(buf.subarray(overhead, overhead + len)) >>> 0
+        break
+      case 2:
+        newByteCheckCode = Number(XXH3_64bits(buf.subarray(overhead, overhead + len)) & 0xFFFFFFFFn)
+        break
+      default:
+        newByteCheckCode = 0
+        break
+    }
+
+    return byteCheckCode === newByteCheckCode
+  }
+
+  public inputCmd(cmd: number, buf: Buffer, data: {
     conv: number
     token: number
     frg: number
@@ -499,7 +555,9 @@ export class Kcp {
     sn: number
     una: number
     len: number
+    byteCheckCode: number | null
   }, flag: boolean, maxAck: number) {
+    const { byteCheckMode } = this
     const { conv, token, frg, wnd, ts, sn, una, len } = data
 
     switch (cmd) {
@@ -521,13 +579,18 @@ export class Kcp {
 
       case KCP_CMD_PUSH: {
         if (sn - (this.rcvNxt + this.rcvWnd) >= 0) break
+        if (!this.byteCheck(buf, data)) {
+          console.log('byte check failed, ignore packet')
+          break
+        }
 
         this.ackPush(sn, ts)
 
         if (sn - this.rcvNxt < 0) break
 
-        const sbuf = buf.subarray(KCP_OVERHEAD, KCP_OVERHEAD + len)
-        const segment = createSegment(sbuf)
+        const overhead = this.getHeaderLen()
+        const sbuf = buf.subarray(overhead, overhead + len)
+        const segment = createSegment(sbuf, byteCheckMode)
 
         segment.conv = conv
         segment.token = token
@@ -556,12 +619,14 @@ export class Kcp {
     return { flag, maxAck }
   }
 
-  readInputBuffer(buf: Buffer) {
+  private readInputBuffer(buf: Buffer) {
+    const overhead = this.getHeaderLen()
+
     let totalRead = 0
     let flag = false
     let maxAck = 0
 
-    while (buf.length >= KCP_OVERHEAD) {
+    while (buf.length >= overhead) {
       const conv = buf.readUInt32LE()
       const token = buf.readUInt32LE(4)
 
@@ -575,7 +640,10 @@ export class Kcp {
       const una = buf.readUInt32LE(20)
       const len = buf.readUInt32LE(24)
 
-      if (buf.length - KCP_OVERHEAD < len) return -2
+      let byteCheckCode: number | null = null
+      if (this.byteCheckMode >= 0) byteCheckCode = buf.readUInt32LE(28)
+
+      if (buf.length - overhead < len) return -2
 
       switch (cmd) {
         case KCP_CMD_PUSH:
@@ -593,24 +661,26 @@ export class Kcp {
       this.parseUna(una)
       this.shrinkBuf()
 
-      const cmdResult = this.inputCmd(cmd, buf, { conv, token, frg, wnd, ts, sn, una, len }, flag, maxAck)
+      const cmdResult = this.inputCmd(cmd, buf, { conv, token, frg, wnd, ts, sn, una, len, byteCheckCode }, flag, maxAck)
       flag = cmdResult.flag
       maxAck = cmdResult.maxAck
 
-      totalRead += KCP_OVERHEAD + len
-      buf = buf.subarray(KCP_OVERHEAD + len)
+      totalRead += overhead + len
+      buf = buf.subarray(overhead + len)
     }
 
     return { totalRead, flag, maxAck }
   }
 
   /// Call this when you received a packet from raw connection
-  input(buf: Buffer) {
-    if (!Buffer.isBuffer(buf) || buf.length < KCP_OVERHEAD) return -1
+  public input(buf: Buffer) {
+    const overhead = this.getHeaderLen()
+
+    if (!Buffer.isBuffer(buf) || buf.length < overhead) return -1
 
     const oldUna = this.sndUna
     const readResult = this.readInputBuffer(buf)
-    if (!isNaN(readResult as number)) return readResult
+    if (!isNaN(readResult as number)) return <number>readResult
 
     const { totalRead, flag, maxAck } = readResult as { totalRead: number, flag: boolean, maxAck: number }
 
@@ -645,11 +715,13 @@ export class Kcp {
     }
   }
 
-  private _flushAck(segment: KcpSegment) {
+  private flushAck(segment: KcpSegment) {
+    const overhead = this.getHeaderLen()
+
     // flush acknowledges
     for (let i = 0; i < this.acklist.length; i++) {
       const [sn, ts] = this.acklist.peekAt(i)!
-      if (this.bufOffset + KCP_OVERHEAD > this.mtu) {
+      if (this.bufOffset + overhead > this.mtu) {
         this.output(this.buf.subarray(0, this.bufOffset))
         this.bufOffset = 0
       }
@@ -657,7 +729,7 @@ export class Kcp {
       segment.sn = sn
       segment.ts = ts
 
-      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment)
+      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment, this.corrupt)
     }
 
     this.acklist.clear()
@@ -690,15 +762,17 @@ export class Kcp {
   }
 
   private _flushProbeCommands(cmd: u8, segment: KcpSegment) {
+    const overhead = this.getHeaderLen()
+
     cmd = (cmd << 24) >>> 24
     segment.cmd = cmd
 
-    if (this.bufOffset + KCP_OVERHEAD > this.mtu) {
+    if (this.bufOffset + overhead > this.mtu) {
       this.output(this.buf.subarray(0, this.bufOffset))
       this.bufOffset = 0
     }
 
-    this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment)
+    this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), segment, this.corrupt)
   }
 
   private flushProbeCommands(segment: KcpSegment) {
@@ -715,53 +789,68 @@ export class Kcp {
     this.probe = 0
   }
 
-  /// Flush pending ACKs
-  flushAck() {
-    if (!this.updated) return
+  private transferSnd(cWnd: number, segment: KcpSegment) {
+    const {
+      conv,
+      token,
+      sndUna,
+      rcvNxt,
+      rxRto,
+      current,
+      sndQueue,
+      sndBuf,
+      byteCheckMode
+    } = this
 
-    const segment = createSegment(EMPTY_BUFFER)
-    segment.conv = this.conv
-    segment.cmd = KCP_CMD_ACK
-    segment.wnd = this.wndUnused()
-    segment.una = this.rcvNxt
-
-    this._flushAck(segment)
-  }
-
-  transferSnd(cWnd: number, segment: KcpSegment) {
     // move data from snd_queue to snd_buf
-    while (this.sndNxt - (this.sndUna + cWnd) < 0) {
-      const newSegment = this.sndQueue.shift()
+    while (this.sndNxt - (sndUna + cWnd) < 0) {
+      const newSegment = sndQueue.shift()
       if (!newSegment) break
 
-      newSegment.conv = this.conv
-      newSegment.token = this.token
+      newSegment.conv = conv
+      newSegment.token = token
       newSegment.cmd = KCP_CMD_PUSH
       newSegment.wnd = segment.wnd
-      newSegment.ts = this.current
+      newSegment.ts = current
       newSegment.sn = this.sndNxt
       this.sndNxt += 1
-      newSegment.una = this.rcvNxt
-      newSegment.resendTs = this.current
-      newSegment.rto = this.rxRto
+      newSegment.una = rcvNxt
+      newSegment.resendTs = current
+      newSegment.rto = rxRto
       newSegment.fastAck = 0
       newSegment.xmit = 0
-      this.sndBuf.push(newSegment)
+
+      switch (byteCheckMode) {
+        case 0:
+          newSegment.byteCheckCode = 0
+          break
+        case 1:
+          newSegment.byteCheckCode = crc32(newSegment.data)
+          break
+        case 2:
+          newSegment.byteCheckCode = Number(XXH3_64bits(newSegment.data) & 0xFFFFFFFFn)
+          break
+        default:
+          newSegment.byteCheckCode = null
+          break
+      }
+
+      sndBuf.push(newSegment)
     }
   }
 
   /// Flush pending data in buffer.
-  flush() {
+  public flush() {
     if (!this.updated) return
 
-    const segment = createSegment(EMPTY_BUFFER)
+    const segment = createSegment(EMPTY_BUFFER, this.byteCheckMode)
     segment.conv = this.conv
     segment.token = this.token
     segment.cmd = KCP_CMD_ACK
     segment.wnd = this.wndUnused()
     segment.una = this.rcvNxt
 
-    this._flushAck(segment)
+    this.flushAck(segment)
     this.probeWndSize()
     this.flushProbeCommands(segment)
 
@@ -774,6 +863,8 @@ export class Kcp {
     // calculate resent
     const resent = (Number(this.fastResend <= 0) * 0xffffffff) | this.fastResend
     const rtoMin = Number(!this.nodelay) * (this.rxRto >>> 3)
+
+    const overhead = this.getHeaderLen()
 
     let lost = false
     let change = 0
@@ -810,14 +901,14 @@ export class Kcp {
       sndSegment.wnd = segment.wnd
       sndSegment.una = this.rcvNxt
 
-      const need = KCP_OVERHEAD + sndSegment.data.length
+      const need = overhead + sndSegment.data.length
 
       if (this.bufOffset + need > this.mtu) {
         this.output(this.buf.subarray(0, this.bufOffset))
         this.bufOffset = 0
       }
 
-      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), sndSegment)
+      this.bufOffset += encodeSegment(this.buf.subarray(this.bufOffset), sndSegment, this.corrupt)
 
       if (sndSegment.xmit >= this.deadLink) this.state = -1
     }
@@ -851,7 +942,7 @@ export class Kcp {
   /// Update state every 10ms ~ 100ms.
   ///
   /// Or you can ask `check` when to call this again.
-  update(current: u32) {
+  public update(current: u32) {
     current >>>= 0
     this.current = current
 
@@ -879,7 +970,7 @@ export class Kcp {
   /// Determine when you should call `update`.
   /// Return when you should invoke `update` in millisec, if there is no `input`/`send` calling.
   /// You can call `update` in that time without calling it repeatly.
-  check(current: u32) {
+  public check(current: u32) {
     current >>>= 0
 
     if (!this.updated) {
@@ -915,21 +1006,23 @@ export class Kcp {
   /// Change MTU size, default is 1400
   ///
   /// MTU = Maximum Transmission Unit
-  setMtu(mtu: usize) {
-    mtu = Math.max(mtu >>> 0, 50, KCP_OVERHEAD)
+  public setMtu(mtu: usize) {
+    const overhead = this.getHeaderLen()
+
+    mtu = Math.max(mtu >>> 0, 50, overhead)
 
     this.mtu = mtu
-    this.mss = (mtu - KCP_OVERHEAD) >>> 0
-    this.buf = Buffer.alloc((mtu + KCP_OVERHEAD) * 3)
+    this.mss = (mtu - overhead) >>> 0
+    this.buf = Buffer.alloc((mtu + overhead) * 3)
   }
 
   /// Get MTU
-  getMtu() {
+  public getMtu() {
     return this.mtu
   }
 
   /// Set check interval
-  setInterval(interval: u32) {
+  public setInterval(interval: u32) {
     this.interval = Math.max(10, Math.min(interval >>> 0, 5000))
   }
 
@@ -940,7 +1033,7 @@ export class Kcp {
   /// `nodelay`: default is disable (false)
   /// `resend`: 0:disable fast resend(default), 1:enable fast resend
   /// `nc`: `false`: normal congestion control(default), `true`: disable congestion control
-  setNodelay(nodelay: boolean, resend: i32, nc: boolean) {
+  public setNodelay(nodelay: boolean, resend: i32, nc: boolean) {
     if (nodelay) {
       this.nodelay = true
       this.rxMinRto = KCP_RTO_NDL
@@ -955,58 +1048,67 @@ export class Kcp {
 
   /// Set `wndsize`
   /// set maximum window size: `sndwnd=32`, `rcvwnd=32` by default
-  setWndSize(sndWnd: u16, rcvWnd: u16) {
+  public setWndSize(sndWnd: u16, rcvWnd: u16) {
     this.sndWnd = (sndWnd << 16) >>> 16
     this.rcvWnd = Math.max((rcvWnd << 16) >>> 16, KCP_WND_RCV)
   }
 
+  /// Set byte check mode
+  public setByteCheck(mode: number, corrupt: boolean) {
+    this.byteCheckMode = Math.max(Math.min(mode, 2), -1)
+    this.corrupt = corrupt
+
+    // Recalculate MTU
+    this.setMtu(this.mtu)
+  }
+
   /// `snd_wnd` Send window
-  getSndWnd() {
+  public getSndWnd() {
     return this.sndWnd
   }
 
   /// `rcv_wnd` Receive window
-  getRcvWnd() {
+  public getRcvWnd() {
     return this.rcvWnd
   }
 
   /// Get `waitsnd`, how many packet is waiting to be sent
-  getWaitSnd() {
+  public getWaitSnd() {
     return this.sndBuf.length + this.sndQueue.length
   }
 
   /// Set `rx_minrto`
-  setRxMinRto(rto: u32) {
+  public setRxMinRto(rto: u32) {
     this.rxMinRto = rto >>> 0
   }
 
   /// Set `fastresend`
-  setFastResend(fr: u32) {
+  public setFastResend(fr: u32) {
     this.fastResend = fr >>> 0
   }
 
   /// KCP header size
-  getHeaderLen() {
-    return KCP_OVERHEAD
+  public getHeaderLen() {
+    return this.byteCheckMode < 0 ? KCP_OVERHEAD : KCP_BYTECHECK_OVERHEAD
   }
 
   /// Enabled stream or not
-  isStream() {
+  public isStream() {
     return this.stream
   }
 
   /// Maximum Segment Size
-  getMss() {
+  public getMss() {
     return this.mss
   }
 
   /// Set maximum resend times
-  setMaxResend(deadLink: u32) {
+  public setMaxResend(deadLink: u32) {
     this.deadLink = deadLink >>> 0
   }
 
   /// Check if KCP connection is dead (resend times excceeded)
-  isDeadLink() {
+  public isDeadLink() {
     return this.state !== 0
   }
 }

@@ -12,6 +12,7 @@ export interface ConnectionInfo {
   port: number
   connected?: boolean
   iPort?: number
+  byteCheckMode?: number
 }
 
 export default class RecvWorker extends Worker {
@@ -24,7 +25,9 @@ export default class RecvWorker extends Worker {
     super()
 
     this.socket = dgram.createSocket('udp4')
-    this.socket.on('message', (msg, rinfo) => this.emit('UDPMessage', msg, rinfo))
+    this.socket.on('message', (msg, rinfo) => {
+      this.emit('UDPMessage', msg, rinfo)
+    })
 
     this.connInfoMap = {}
     this.blockedAddressList = []

@@ -9,7 +9,7 @@ function suggestValue(): (string | number)[] {
   const input = tty.getCurPrompt()?.buffer?.join('') || ''
 
   const key = input.split(' ')[2]
-  if (input.indexOf('gs set') !== 0 || DEFAULT_GSTATE[key] == null) return
+  if (!input.startsWith('gs set') || DEFAULT_GSTATE[key] == null) return
 
   const targetType = typeof DEFAULT_GSTATE[key]
   switch (targetType) {

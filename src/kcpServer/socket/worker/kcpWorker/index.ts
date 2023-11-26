@@ -81,7 +81,9 @@ export default class KcpWorker extends Worker {
   }
 
   private inputKcp(buf: Buffer) {
-    this.kcp.input(buf)
+    const ret = this.kcp.input(buf)
+    if (ret < 0) console.log('kcp input failed with error', ret)
+
     this.updateKcp()
   }
 
@@ -130,12 +132,13 @@ export default class KcpWorker extends Worker {
 
       this.recvWIPort = iPort
 
-      const { token } = info
+      const { token, byteCheckMode } = info
       const kcp = new Kcp(conv, token, this.sendUdpPacket.bind(this))
 
       kcp.setNodelay(true, 8, false)
       kcp.setInterval(0)
       kcp.setMaxResend(1024)
+      kcp.setByteCheck(byteCheckMode ?? -1, false)
 
       this.conv = conv
       this.kcp = kcp
@@ -170,6 +173,7 @@ export default class KcpWorker extends Worker {
 
         if (!Packet.isPacket(packet)) {
           this.log(LogLevel.WARN, 'message.worker.warn.invalidPacket')
+          this.log(LogLevel.DEBUG, 'generic.param1', packet.toString('hex'))
           continue
         }
 
