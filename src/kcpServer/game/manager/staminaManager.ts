@@ -24,7 +24,7 @@ export default class StaminaManager extends BaseClass {
   private consumeAquaticAmount: number
   private curVehicleStamina: number
 
-  private timer: NodeJS.Timer
+  private timer: NodeJS.Timeout
 
   public constructor(entity: Avatar | Vehicle) {
     super()

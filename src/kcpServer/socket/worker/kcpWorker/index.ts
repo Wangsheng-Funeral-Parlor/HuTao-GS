@@ -33,7 +33,7 @@ export default class KcpWorker extends Worker {
   conv: number | null
 
   kcp: Kcp | null
-  timer: NodeJS.Timer | null
+  timer: NodeJS.Timeout | null
   connInfo: ConnectionInfo | null
 
   seqId: number
