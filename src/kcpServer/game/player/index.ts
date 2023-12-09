@@ -348,22 +348,8 @@ export default class Player extends BaseClass {
     await this.setLevel(60)
 
     // Give all items
-    function getStackLimits(materialDataPath: string): { [key: number]: number } {
-      const data = fs.readFileSync(materialDataPath, "utf8")
-      const materials = JSON.parse(data)
-
-      const filteredMaterials = materials.filter((material) => material.ItemType === "ITEM_MATERIAL")
-
-      const stackLimits: { [key: number]: number } = {}
-      filteredMaterials.forEach((material) => {
-        stackLimits[material.Id] = material.StackLimit ?? 9999
-      })
-
-      return stackLimits
-    }
-
     const materialDataPath = `data/game/${config.game.version}/MaterialData.json`
-    const stackLimits = getStackLimits(materialDataPath)
+    const stackLimits = MaterialData.getStackLimit(materialDataPath)
 
     const data = fs.readFileSync(materialDataPath, "utf8")
     const materials = JSON.parse(data)

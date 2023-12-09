@@ -1,3 +1,5 @@
+import fs from "fs"
+
 import Loader from "$/gameData/loader"
 import MaterialDataList, { MaterialData } from "@/types/gameData/MaterialData"
 
@@ -18,6 +20,19 @@ class MaterialDataLoader extends Loader {
 
   getMaterialList(): MaterialData[] {
     return this.data || []
+  }
+
+  getStackLimit(path: string): { [key: number]: number } {
+    const data = fs.readFileSync(path, "utf8")
+    const materials = JSON.parse(data)
+
+    const filteredMaterials = materials.filter((material) => material.ItemType === "ITEM_MATERIAL")
+
+    const stackLimits: { [key: number]: number } = {}
+    filteredMaterials.forEach((material) => {
+      stackLimits[material.Id] = material.StackLimit ?? 9999
+    })
+    return stackLimits
   }
 }
 
