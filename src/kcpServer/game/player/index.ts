@@ -1,4 +1,3 @@
-import fs from "fs"
 import { join } from "path"
 import { cwd } from "process"
 
@@ -36,7 +35,6 @@ import Material from "$/material"
 import Scene from "$/scene"
 import Vector from "$/utils/vector"
 import World from "$/world"
-import config from "@/config"
 import Logger from "@/logger"
 import { ClientStateEnum, FightPropEnum, PlayerPropEnum } from "@/types/enum"
 import { CostumeData, FlycloakData } from "@/types/gameData/AvatarData"
@@ -348,18 +346,15 @@ export default class Player extends BaseClass {
     await this.setLevel(60)
 
     // Give all items
-    const materialDataPath = `data/game/${config.game.version}/MaterialData.json`
-    const stackLimits = MaterialData.getStackLimit(materialDataPath)
+    const stackLimits = MaterialData.getStackLimit()
+    const materialDataList = MaterialData.getMaterialList()
+    const filteredMaterials = materialDataList.filter((data) => data.ItemType === "ITEM_MATERIAL")
 
-    const data = fs.readFileSync(materialDataPath, "utf8")
-    const materials = JSON.parse(data)
-
-    const filteredMaterials = materials.filter((material) => material.ItemType === "ITEM_MATERIAL")
-    const materialIds = filteredMaterials.map((material) => material.Id)
-
-    materialIds.forEach((id) => {
-      inventory.add(Material.create(this, id, stackLimits[id] ?? 9999, true), false)
-    })
+    for (const materialData of filteredMaterials) {
+      const { Id } = materialData
+      if (inventory.getItemByItemId(Id) != null) continue
+      await inventory.add(Material.create(this, Id, stackLimits[Id] ?? 9999, true), false)
+    }
 
     inventory.add(Material.create(this, 201, 1000000, true), false)
     inventory.add(Material.create(this, 202, 1000000, true), false)
