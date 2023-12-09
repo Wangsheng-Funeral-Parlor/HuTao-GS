@@ -1,3 +1,4 @@
+import fs from "fs"
 import { join } from "path"
 import { cwd } from "process"
 
@@ -35,6 +36,7 @@ import Material from "$/material"
 import Scene from "$/scene"
 import Vector from "$/utils/vector"
 import World from "$/world"
+import config from "@/config"
 import Logger from "@/logger"
 import { ClientStateEnum, FightPropEnum, PlayerPropEnum } from "@/types/enum"
 import { CostumeData, FlycloakData } from "@/types/gameData/AvatarData"
@@ -345,13 +347,37 @@ export default class Player extends BaseClass {
     // Set initial level
     await this.setLevel(60)
 
+    // Give all items
+    function getStackLimits(materialDataPath: string): { [key: number]: number } {
+      const data = fs.readFileSync(materialDataPath, "utf8")
+      const materials = JSON.parse(data)
+
+      const filteredMaterials = materials.filter((material) => material.ItemType === "ITEM_MATERIAL")
+
+      const stackLimits: { [key: number]: number } = {}
+      filteredMaterials.forEach((material) => {
+        stackLimits[material.Id] = material.StackLimit ?? 9999
+      })
+
+      return stackLimits
+    }
+
+    const materialDataPath = `data/game/${config.game.version}/MaterialData.json`
+    const stackLimits = getStackLimits(materialDataPath)
+
+    const data = fs.readFileSync(materialDataPath, "utf8")
+    const materials = JSON.parse(data)
+
+    const filteredMaterials = materials.filter((material) => material.ItemType === "ITEM_MATERIAL")
+    const materialIds = filteredMaterials.map((material) => material.Id)
+
+    materialIds.forEach((id) => {
+      inventory.add(Material.create(this, id, stackLimits[id] ?? 9999, true), false)
+    })
+
     inventory.add(Material.create(this, 201, 1000000, true), false)
     inventory.add(Material.create(this, 202, 1000000, true), false)
     inventory.add(Material.create(this, 203, 1000000, true), false)
-    inventory.add(Material.create(this, 221, 1000000, true), false)
-    inventory.add(Material.create(this, 222, 1000000, true), false)
-    inventory.add(Material.create(this, 223, 1000000, true), false)
-    inventory.add(Material.create(this, 224, 1000000, true), false)
 
     // Unlock all widgets
     await this.unlockAllWidgets()
