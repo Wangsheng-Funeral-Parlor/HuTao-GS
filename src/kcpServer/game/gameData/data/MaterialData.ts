@@ -19,6 +19,16 @@ class MaterialDataLoader extends Loader {
   getMaterialList(): MaterialData[] {
     return this.data || []
   }
+  
+  getStackLimit(): { [key: number]: number } {
+    const materials = this.getMaterialList()
+    const filteredMaterials = materials.filter((material) => material.ItemType === "ITEM_MATERIAL")
+    const stackLimits: { [key: number]: number } = {}
+    filteredMaterials.forEach((material) => {
+      stackLimits[material.Id] = material.StackLimit ?? 9999
+    })
+    return stackLimits
+  }
 }
 
 let loader: MaterialDataLoader
