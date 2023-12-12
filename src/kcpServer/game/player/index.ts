@@ -345,13 +345,12 @@ export default class Player extends BaseClass {
     // Set initial level
     await this.setLevel(60)
 
+    // Give all items
+    await this.unlockAllItems()
+    
     inventory.add(Material.create(this, 201, 1000000, true), false)
     inventory.add(Material.create(this, 202, 1000000, true), false)
     inventory.add(Material.create(this, 203, 1000000, true), false)
-    inventory.add(Material.create(this, 221, 1000000, true), false)
-    inventory.add(Material.create(this, 222, 1000000, true), false)
-    inventory.add(Material.create(this, 223, 1000000, true), false)
-    inventory.add(Material.create(this, 224, 1000000, true), false)
 
     // Unlock all widgets
     await this.unlockAllWidgets()
@@ -436,6 +435,18 @@ export default class Player extends BaseClass {
 
     // Add new avatars to avatar list
     avatarList.push(...newAvatars)
+  }
+
+  async unlockAllItems(v?: number, notify = false) {
+    const stackLimits = MaterialData.getStackLimit()
+    const materialDataList = MaterialData.getMaterialList()
+    const filteredMaterials = materialDataList.filter((data) => data.ItemType === "ITEM_MATERIAL")
+
+    for (const materialData of filteredMaterials) {
+      const { Id } = materialData
+      if (this.inventory.getItemByItemId(Id) != null) continue
+      this.inventory.add(Material.create(this, Id, stackLimits[Id] ?? v, true), notify)
+    }
   }
 
   unlockAllFlycloaks() {
