@@ -21,7 +21,7 @@ function execCommand(cmd, slient = false) {
   })
 }
 
-;(async () => {
+; (async () => {
   const mode =
     process.argv
       .find((arg) => arg.indexOf("-mode:") === 0)
@@ -36,6 +36,11 @@ function execCommand(cmd, slient = false) {
   await execCommand("tsc-alias")
 
   if (mode === "dev") return console.log("Build complete.")
+
+  console.log('Building release...')
+  await execCommand('webpack --config webpack.config.js')
+
+  if (mode === 'rel') return console.log('Build complete.')
 
   console.log("Preparing node binary...")
   await require("./prepNodeBin")()
