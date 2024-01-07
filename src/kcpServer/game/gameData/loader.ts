@@ -60,7 +60,10 @@ export default class Loader {
     if (busy) return waitUntil(() => !this.busy)
     this.busy = true
 
-    if (!(await hasJsonAsync(filePath))) logger.warn("message.loader.warn.noData", path)
+    if (!(await hasJsonAsync(filePath))) {
+      this.busy = false
+      return logger.warn("message.loader.warn.noData", path)
+    }
     this.data = await getJsonAsync(filePath, defaultData)
 
     this.busy = false
@@ -69,6 +72,6 @@ export default class Loader {
   async getData() {
     if (this.data == null) await this.load()
 
-    logger.info(this.tlogKey)
+    if (this.data) logger.info(this.tlogKey)
   }
 }

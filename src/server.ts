@@ -297,29 +297,33 @@ export default class Server {
   async generateHandBook() {
     let filedata = `//Game version ${config.game.version}\n\n\n[Avatar]\n`
 
-    const avatarData = AvatarData.data
-    for (const data of avatarData.Avatar) {
-      logger.verbose("generic.param2", data.Id, data.Name)
-      filedata += `ID:${data.Id} Name:${data.Name}\n`
-    }
-
-    filedata += `\n\n[Monster: boss]\n`
-
-    const monsterData = MonsterData.data
-    for (const data of monsterData.Monster) {
-      if (data.Type === "MONSTER_BOSS") {
-        logger.verbose("generic.param3", data.Id, data.Name, data.Type)
-        filedata += `ID:${data.Id} Name:${data.Name} Type:${data.Type}\n`
+    try {
+      const avatarData = AvatarData.data
+      for (const data of avatarData.Avatar) {
+        logger.verbose("generic.param2", data.Id, data.Name)
+        filedata += `ID:${data.Id} Name:${data.Name}\n`
       }
-    }
 
-    filedata += `\n\n[Monster: ordinary]\n`
+      filedata += `\n\n[Monster: boss]\n`
 
-    for (const data of monsterData.Monster) {
-      if (data.Type === "MONSTER_ORDINARY") {
-        logger.verbose("generic.param3", data.Id, data.Name, data.Type)
-        filedata += `ID:${data.Id} Name:${data.Name} Type:${data.Type}\n`
+      const monsterData = MonsterData.data
+      for (const data of monsterData.Monster) {
+        if (data.Type === "MONSTER_BOSS") {
+          logger.verbose("generic.param3", data.Id, data.Name, data.Type)
+          filedata += `ID:${data.Id} Name:${data.Name} Type:${data.Type}\n`
+        }
       }
+
+      filedata += `\n\n[Monster: ordinary]\n`
+
+      for (const data of monsterData.Monster) {
+        if (data.Type === "MONSTER_ORDINARY") {
+          logger.verbose("generic.param3", data.Id, data.Name, data.Type)
+          filedata += `ID:${data.Id} Name:${data.Name} Type:${data.Type}\n`
+        }
+      }
+    } catch (e) {
+      logger.error("generic.param1", "failed to generate handbook due to insufficient resources")
     }
 
     await writeFile("./handbook.txt", filedata)
