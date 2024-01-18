@@ -12,7 +12,7 @@ import { EntityAuthorityInfo, SceneAvatarInfo, SceneEntityInfo, SceneGadgetInfo,
 import { AbilityScalarTypeEnum, ChangeEnergyReasonEnum, ChangeHpReasonEnum, LifeStateEnum, PlayerDieTypeEnum, ProtEntityTypeEnum, VisionTypeEnum } from '@/types/proto/enum'
 import EntityUserData from '@/types/user/EntityUserData'
 import { getStringHash } from '@/utils/hash'
-import EntityProps from './entityProps'
+import EntityProps from './EntityProps.1'
 import FightProp, { FightPropChangeReason } from './fightProps'
 import Motion from './motion'
 

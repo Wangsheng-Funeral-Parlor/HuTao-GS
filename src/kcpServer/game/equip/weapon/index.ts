@@ -81,7 +81,7 @@ export default class Weapon extends Equip {
     await entity.init(entityData)
   }
 
-  async initNew() {
+  async initNew(level?:number) {
     const { entity, affixList } = this
 
     await super.initNew()
@@ -89,7 +89,7 @@ export default class Weapon extends Equip {
     await this.loadWeaponData()
     for (const affix of affixList) affix.initNew()
 
-    await entity.initNew()
+    await entity.initNew(level)
   }
 
   exportAffixMap() {
