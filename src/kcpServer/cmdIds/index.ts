@@ -14,6 +14,8 @@ import ver3_7_0 from './ver3_7_0'
 import ver3_8_50 from './ver3_8_50'
 import ver4_0_0 from './ver4_0_0'
 
+const CCMD_MASK = 0x8000
+
 const versionMap: { [version: string]: CmdIds } = {
   '1.4.50': ver1_4_50,
   '1.6.51': ver1_6_51,
@@ -47,8 +49,16 @@ const versionMap: { [version: string]: CmdIds } = {
   '3.6.0': ver3_6_0,
   '3.7.0': ver3_7_0,
   '3.8.50': ver3_8_50,
-  '4.0.0': ver4_0_0
 }
+
+export const ccmdIds: CmdIds = {
+  GetPlayerTokenReq: CCMD_MASK | 1,
+  GetPlayerTokenRsp: CCMD_MASK | 2
+}
+export const switchedCCmdIds = Object.fromEntries(
+  Object.entries(ccmdIds)
+    .map(e => [e[1], e[0]])
+)
 
 export const cmdIds: CmdIds = versionMap[config.version] || versionMap[DEFAULT_CONFIG.version] || {}
 export const switchedCmdIds = Object.fromEntries(
@@ -58,20 +68,24 @@ export const switchedCmdIds = Object.fromEntries(
 
 export const PACKET_HEAD = 0xFFFF
 
-export const getNameByCmdId = (cmdId: number | string): number | string => {
+export const getNameByCmdId = (cmdId: number | string): string => {
   if (cmdId === PACKET_HEAD) return 'PacketHead'
 
-  const name = switchedCmdIds[cmdId]
-  if (name == null) return cmdId
+  const name = ((typeof cmdId !== 'string' && isCCmd(cmdId)) ? switchedCCmdIds[cmdId] : null) ?? switchedCmdIds[cmdId]
+  if (name == null) return `${cmdId}`
 
   return name
 }
 
-export const getCmdIdByName = (protoName: string | number): number | string => {
+export const getCmdIdByName = (protoName: string | number): number => {
   if (protoName === 'PacketHead') return PACKET_HEAD
 
-  const id = cmdIds[protoName]
-  if (id == null) return protoName
+  const id = (config.useCCmd ? ccmdIds[protoName] : null) ?? cmdIds[protoName]
+  if (id == null) return Number(protoName)
 
   return id
+}
+
+export const isCCmd = (cmdId: number): boolean => {
+  return config.useCCmd && (cmdId & CCMD_MASK) !== 0
 }

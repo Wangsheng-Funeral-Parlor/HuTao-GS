@@ -3,6 +3,7 @@ import GlobalState from '@/globalState'
 import TLogger from '@/translate/tlogger'
 import { ClientStateEnum } from '@/types/enum'
 import { protobufDecode } from '@/utils/proto'
+import { isCCmd } from './cmdIds'
 import { PacketContext, PacketInterface } from './packet'
 
 const logger = new TLogger('PACKET', 0x8810cd)
@@ -43,7 +44,7 @@ export default class PacketHandler {
         ]
       }[type] as [ClientStateEnum, boolean, number, ClientStateEnum, boolean, number]
 
-      const data = await protobufDecode(cmdId, body)
+      const data = await protobufDecode(cmdId, body, isCCmd(cmdId))
 
       if (state == null || !packet.checkState(context, state[0], state[1], state[2])) return
 

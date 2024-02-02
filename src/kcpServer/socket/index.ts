@@ -1,5 +1,5 @@
 import BaseClass from '#/baseClass'
-import { getCmdIdByName, getNameByCmdId, PACKET_HEAD } from '#/cmdIds'
+import { getCmdIdByName, getNameByCmdId, isCCmd, PACKET_HEAD } from '#/cmdIds'
 import { PacketContext, verbosePackets } from '#/packet'
 import uidPrefix from '#/utils/uidPrefix'
 import config from '@/config'
@@ -107,9 +107,9 @@ export default class Socket extends BaseClass {
       const worker = this.getWorker<KcpWorkerInterface>(client.workerId)
       if (!worker) throw new Error('worker == null')
 
-      const cmdId = <number>getCmdIdByName(packetName)
+      const cmdId = getCmdIdByName(packetName)
       const packetHead = await protobufEncode(PACKET_HEAD, head, true)
-      const packetData = await protobufEncode(cmdId, obj)
+      const packetData = await protobufEncode(cmdId, obj, isCCmd(cmdId))
 
       const log = [
         uidPrefix('SEND', client, 0x7000ff),

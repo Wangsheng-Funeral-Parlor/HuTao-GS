@@ -10,6 +10,7 @@ interface Config {
   sslDir: string
   version: string
   packetsToDump: string[]
+  useCCmd: boolean
 
   // auto patcher
   autoGamePatch: boolean
@@ -52,6 +53,7 @@ export const DEFAULT_CONFIG: Config = {
   sslDir: './ssl',
   version: '3.4.0',
   packetsToDump: [],
+  useCCmd: false,
 
   autoGamePatch: false,
   gameDir: null,
@@ -122,5 +124,3 @@ const config: Config = { ...DEFAULT_CONFIG, ...(curConfig ?? {}) }
 export const NO_CONFIG = curConfig == null
 export const AVAILABLE_CONFIGS = Object.keys(getJson('config.json', {})).filter(k => k !== 'current')
 export default config
-
-
