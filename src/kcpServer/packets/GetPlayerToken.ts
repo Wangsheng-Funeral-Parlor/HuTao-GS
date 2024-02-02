@@ -60,6 +60,7 @@ interface GetPlayerTokenRsp {
   regPlatform?: number
   clientIpStr?: string
   // >= 2.7.50
+  keyId?: number
   // custom name
   encryptedSeed?: string
   seedSignature?: string
@@ -120,6 +121,7 @@ class GetPlayerTokenPacket extends Packet implements PacketInterface {
         const srk = Buffer.alloc(8)
         srk.writeBigUInt64BE(seed ^ crk.readBigUInt64BE())
 
+        rsp.keyId = keyId
         rsp.serverRandKey = rsp.encryptedSeed = rsaEncrypt(client.public, srk).toString('base64')
         rsp.sign = rsp.seedSignature = rsaSign(server.private, srk).toString('base64')
       } catch (err) {
