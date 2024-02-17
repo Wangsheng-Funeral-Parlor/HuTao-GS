@@ -17,7 +17,7 @@ import Socket from './socket'
 const logger = new TLogger('KCPSRV', 0xc824ff)
 
 export default class KcpServer extends EventEmitter {
-  private loop: NodeJS.Timer
+  private loop: NodeJS.Timeout
   private frame: number
 
   server: Server

@@ -10,7 +10,7 @@ import Client from './client'
 import { PacketHead } from '@/types/kcp'
 
 export default class DummyClient extends Client {
-  private loop: NodeJS.Timer
+  private loop: NodeJS.Timeout
 
   constructor(server: KcpServer) {
     super(server, 0xFFFFFFFF, null)

@@ -25,7 +25,7 @@ export default class NameServer {
   private udp: dgram.Socket
 
   private queue: QueryTask[]
-  private loop: NodeJS.Timer
+  private loop: NodeJS.Timeout
 
   private ip: string
   private port: number
