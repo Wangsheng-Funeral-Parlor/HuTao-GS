@@ -44,7 +44,7 @@ export default class Update {
     await this.server.runShutdownTasks(true)
 
     logger.info('message.update.info.restart')
-    await detachedSpawn(path, [process.argv[1], ...args])
+    await detachedSpawn(path, ['--security-revert=CVE-2023-46809', process.argv[1], ...args])
 
     logger.info('message.update.info.exit')
     proc.exit()

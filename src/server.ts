@@ -285,7 +285,7 @@ export default class Server {
     await this.runShutdownTasks()
     await waitMs(delay)
 
-    await detachedSpawn(execPath, process.argv.slice(1))
+    await detachedSpawn(execPath, ['--security-revert=CVE-2023-46809', ...process.argv.slice(1)])
     exit()
   }
 
