@@ -23,7 +23,7 @@ class MarkMapPacket extends Packet implements PacketInterface {
     })
   }
 
-  async request(context: PacketContext, data: MarkMapReq): Promise<void> {
+  async request(context, data) {
     const { player } = context
     const { currentWorld, currentScene, lastTpReq } = player
     const { op, mark } = data
@@ -38,28 +38,26 @@ class MarkMapPacket extends Packet implements PacketInterface {
 
     const { sceneId, name, pos } = mark
 
-    if (op === MarkMapOperationEnum.ADD && name.indexOf('tp:') === 0) {
+    if (op === MarkMapOperationEnum.ADD ) {
       const scene = await currentWorld.getScene(sceneId)
       if (!scene || Date.now() - lastTpReq < 5e3) return
 
       player.lastTpReq = Date.now()
 
-      let posY = parseInt(name.split(':')[1])
-      if (isNaN(posY)) posY = 512
-
-      await scene.join(context, new Vector(pos.x, posY, pos.z), new Vector(), currentScene === scene ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
-    }
-
+        let posY = parseInt(name) || 512
+      
+        await scene.join(context, new Vector(pos.x, posY, pos.z), new Vector(), currentScene === scene ? SceneEnterTypeEnum.ENTER_GOTO : SceneEnterTypeEnum.ENTER_JUMP, SceneEnterReasonEnum.TRANS_POINT)
+      }
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       markList: []
     })
   }
 
-  async response(context: PacketContext, data: MarkMapRsp): Promise<void> {
+  async response(context, data) {
     await super.response(context, data)
   }
-}
+ }
 
 let packet: MarkMapPacket
 export default (() => packet = packet || new MarkMapPacket())()
