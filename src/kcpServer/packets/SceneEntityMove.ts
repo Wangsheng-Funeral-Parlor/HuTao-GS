@@ -50,7 +50,6 @@ class SceneEntityMovePacket extends Packet implements PacketInterface {
     await this.response(context, {
       retcode: RetcodeEnum.RET_SUCC,
       entityId,
-      failMotion: motionInfo,
       sceneTime,
       reliableSeq
     })

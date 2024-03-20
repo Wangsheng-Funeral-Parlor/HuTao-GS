@@ -130,6 +130,10 @@ export default class Client extends BaseClass {
 
   // Send packet
   async sendPacket(packetName: string, packetHead: PacketHead, obj: object) {
-    await this.server.socket.sendPacket(this.conv, packetName, packetHead, noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj))
+    try {
+      await this.server.socket.sendPacket(this.conv, packetName, packetHead, noCleanupPackets.includes(packetName) ? obj : protoCleanup(obj))
+    } catch (err) {
+      logger.error('generic.param1', err)
+    }
   }
 }
