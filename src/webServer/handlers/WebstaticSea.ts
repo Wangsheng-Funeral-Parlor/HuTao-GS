@@ -19,7 +19,7 @@ class WebstaticSeaHandler extends Handler {
       join(fsDir, reqPath, 'index.html')
     ]
 
-    const isPkg = __filename.indexOf('index.js') !== -1
+    const isPkg = __filename.indexOf('mainEntry.js') !== -1
 
     if (isPkg) {
       const pkgDir = join(__dirname, '../webstaticSea')

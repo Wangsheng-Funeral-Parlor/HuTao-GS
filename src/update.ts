@@ -44,7 +44,12 @@ export default class Update {
     await this.server.runShutdownTasks(true)
 
     logger.info('message.update.info.restart')
-    await detachedSpawn(path, ['--security-revert=CVE-2023-46809', process.argv[1], ...args])
+    const isPkg = __filename.indexOf('mainEntry.js') !== -1
+    if (isPkg) {
+      await detachedSpawn(path, [process.argv[1], ...args])
+    } else {
+      await detachedSpawn(path, ['--security-revert=CVE-2023-46809', process.argv[1], ...args])
+    }
 
     logger.info('message.update.info.exit')
     proc.exit()
@@ -112,13 +117,13 @@ export default class Update {
           // Consume response data to free up memory
           res.resume()
 
-          return reject(`HTTP ${statusCode}`)
+          return reject(new Error(`HTTP ${statusCode}`))
         }
 
         let resData = ''
 
         res.setEncoding('utf8')
-        res.on('error', err => reject(`Error: ${err.message}`))
+        res.on('error', err => reject(new Error(`Error: ${err.message}`)))
         res.on('data', chunk => resData += chunk)
         res.on('end', async () => {
           try {
@@ -131,10 +136,10 @@ export default class Update {
 
             resolve((<UpdateContent>data).v)
           } catch (err) {
-            reject(err)
+            reject(<Error>err)
           }
         })
-      }).on('error', err => reject(`Error: ${err.message}`))
+      }).on('error', err => reject(new Error(`Error: ${err.message}`)))
     })
   }
 
@@ -146,13 +151,13 @@ export default class Update {
           // Consume response data to free up memory
           res.resume()
 
-          return reject(`HTTP ${statusCode}`)
+          return reject(new Error(`HTTP ${statusCode}`))
         }
 
         let resData = ''
 
         res.setEncoding('utf8')
-        res.on('error', err => reject(`Error: ${err.message}`))
+        res.on('error', err => reject(new Error(`Error: ${err.message}`)))
         res.on('data', chunk => resData += chunk)
         res.on('end', async () => {
           try {
@@ -165,10 +170,10 @@ export default class Update {
 
             resolve(await this.decodeContent(<UpdateContent>data))
           } catch (err) {
-            reject(err)
+            reject(<Error>err)
           }
         })
-      }).on('error', err => reject(`Error: ${err.message}`))
+      }).on('error', err => reject(new Error(`Error: ${err.message}`)))
     })
   }
 
